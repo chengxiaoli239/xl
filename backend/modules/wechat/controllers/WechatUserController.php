@@ -99,7 +99,7 @@ class WechatUserController extends BaseController
         $post = \Yii::$app->request->post();
 
         try {
-            HN0898Service::batchSwitchStatus($post['ids'], $model = '\backend\models\wechat\WechatUser', $post['field'], $post['val'], $this->_user_id);
+            HN0898Service::batchSwitchStatus($post['ids'],'\backend\models\wechat\WechatUser', $post['field'], $post['val'], $this->_user_id);
             WechatUserService::getWechatUsers($this->_user_id, false);
         }catch (\Exception $e){
             return ['status'=>300, 'msg'=>$e->getMessage()];

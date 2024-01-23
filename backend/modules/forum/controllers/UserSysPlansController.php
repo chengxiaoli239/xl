@@ -70,7 +70,7 @@ class UserSysPlansController extends BaseController
 
         $myTzTypes = UserSysPlansService::getMyTzTypes($this->_user_id, $lottery_type);
 
-        $view = $this->_user_id !== 1 ? 'index' : 'index_admin';
+        //$view = $this->_user_id !== 1 ? 'index' : 'index_admin';
         $data = [
             'lottery_types' => $lottery_types,
             'lottery_type' => $lottery_type,
@@ -78,7 +78,7 @@ class UserSysPlansController extends BaseController
             'dataProvider' => $dataProvider,
             'myTzTypes' => $myTzTypes,
         ];
-        return $this->render($view, $data);
+        return $this->render('index', $data);
     }
 
     /**
@@ -455,6 +455,26 @@ class UserSysPlansController extends BaseController
         $rst = HN0898Service::updateSysPlansStatus($id, $status, $this->_user_id);
 
         return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$rst['lottery_type']]);
+    }
+
+    /**
+     * @desc 批量更新状态
+     * @param $id
+     * @param $status
+     * @return array
+     */
+    public function actionBatchSwitchStatus(): array
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+
+        try {
+            HN0898Service::batchSwitchStatus($post['ids'], '\backend\models\UserSysPlans', $post['field'], $post['val'], $this->_user_id);
+        }catch (\Exception $e){
+            return ['status'=>300, 'msg'=>$e->getMessage()];
+        }
+
+        return ['status'=>200, 'msg'=>'操作成功'];
     }
 
     /**

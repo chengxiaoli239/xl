@@ -137,8 +137,8 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
-            $plan = UserSysPlans::findOne(7812);
-            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan, [151]);p(count($codes));
+            $plan = UserSysPlans::findOne(7813);
+            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive(['content'=>'体组六组三 1拖2345、23456 各10元', 'fromUser'=>'wxid_875i1kgd38x122']); p($rst);
         }catch (\Exception $e){

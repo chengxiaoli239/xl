@@ -1,3 +1,11 @@
+<link rel="stylesheet" href="/vendors/layui/2.5.4/css/layui.css?v=2020">
+<link rel="stylesheet" href="/css/layui/global.css?v={{STATIC_VERSION}}">
+<script type="text/javascript" src="/vendors/layui-layer/3.1.1/layer.js"></script>
+<script type="text/javascript" src="/vendors/layui/2.4.5/layui.js"></script>
+<script type="text/javascript" src="/vendors/atrtemplate/4.13.2/template-web.js"></script>
+<script type="text/javascript" src="/statics/js/jquery-2.0.3.js"></script>
+<script type="text/javascript" src="/js/layui/global.js?v={{STATIC_VERSION}}"></script>
+<script type="text/javascript" src="/js/common.js?v={{STATIC_VERSION}}"></script>
 <?php
 
 use yii\helpers\Html;
@@ -32,23 +40,23 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                     </div-->
                     <?php foreach ($myTzTypes as $typeData):?>
                     <div class="btn-group">
-                        <?= Html::a($typeData['type_name'], ['create', 'tz_type'=>$typeData['tz_type'], 'lottery_type'=>$typeData['lottery_type']], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
+                        <?= Html::a($typeData['type_name'], ['create', 'tz_type'=>$typeData['tz_type'], 'lottery_type'=>$typeData['lottery_type']], ['class' => 'btn btn-success btn-sm', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
                     <?endforeach;?>
                 </div>
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
+                <?= Html::button("批量关闭", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchClose']) ?> &nbsp;
+                <?= Html::button("批量开启", ['class' => 'btn btn-success btn-xs', 'id' => 'batchOpen']) ?> &nbsp;
+                <?= Html::button("批量删除", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchDelete']) ?> &nbsp;
+
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     #'filterModel' => $searchModel,
                     'columns' => [
-                        ['class' => 'yii\grid\SerialColumn'],
+                        ['class' => 'yii\grid\CheckboxColumn', 'headerOptions'=>['width'=>'2%']],
 
-                        //'id',
-                        //'uid',
-                        //'account',
-                        //'playway',
                         ['attribute' => 'playway','headerOptions'=>['width'=>'5%'],'label'=>'投注类型',
                             'value' => function($model) {
                                 $playway_Arr = [1=>'二字定', 2=>'三字定', 3=>'四字定', 4=>'一字定', 6=>'X字现'];
@@ -57,7 +65,6 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             }
                         ],
 
-                        //'tz_type',
                         ['attribute' => 'tz_type','label'=>'购买类型', # 'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
                                 if($model->playway == 2 && in_array($model->tz_type, [1,2,3])){
@@ -268,5 +275,50 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
 
             $('#exampleModal_msg').modal('show');
         });
+
+        // Batch update status
+        $('#batchOpen').click(function () {
+            var selectedIds = $('input[name="selection[]"]:checked').map(function () {
+                return this.value;
+            }).get();
+
+            batchUpdate('status', selectedIds, 1);
+        });
+
+        // Batch close status
+        $('#batchClose').click(function () {
+            var selectedIds = $('input[name="selection[]"]:checked').map(function () {
+                return this.value;
+            }).get();
+
+            batchUpdate('status', selectedIds, 0);
+        });
+        // Batch delete status
+        $('#batchDelete').click(function () {
+            var selectedIds = $('input[name="selection[]"]:checked').map(function () {
+                return this.value;
+            }).get();
+
+            batchUpdate('status', selectedIds, -2);
+        });
+        function batchUpdate(field, ids, val) {
+            console.log(field, ids, val)
+            if (ids.length <= 0) {
+                layer.alert('至少选择一项')
+            }
+            // Perform AJAX request to update the selected items
+            $.post('/forum/user-sys-plans/batch-switch-status', { field: field, ids: ids , val: val}, function (response) {
+                if (response.status === 200) {
+                    layer.alert(val===-2?'删除成功':'更新成功', function(index){
+                        layer.close(index); // Close the alert
+                        setTimeout(function(){
+                            location.reload(); // Reload the current page after 2 seconds
+                        }, 1000); // 2000 milliseconds (2 seconds)
+                    });
+                } else {
+                    layer.alert('批量操作失败.');
+                }
+            }, 'json');
+        }
     });
 </script>

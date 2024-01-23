@@ -612,13 +612,16 @@ class HN0898Service extends BaseTZService {
      * @param null $val
      * @return array
      */
-    public static function batchSwitchStatus($ids, $model='UserSysPlans', $field='status', $val=null, $admin_id=0): array
+    public static function batchSwitchStatus($ids, string $model='UserSysPlans', string $field='status', $val=null, $admin_id=0): array
     {
         try {
+            $user_id_field = 'user_id';
+            if(strpos($model, 'UserSysPlans') !== false){
+                $user_id_field = 'uid';
+            }
             $transaction = \Yii::$app->db->beginTransaction();
             $table = $model::tablename();
-            #$rst = $model::updateAll([$field=>(int)$val], ['id'=>$ids, 'user_id'=>$admin_id]); p($rst);
-            $sql = 'UPDATE '.$table.' SET '.$field.'='. $val .' WHERE id IN('.implode(',', $ids).') AND user_id='.$admin_id;
+            $sql = 'UPDATE '.$table.' SET '.$field.'='. $val .' WHERE id IN('.implode(',', $ids).') AND '.$user_id_field.'='.$admin_id;
 
             $result = \Yii::$app->db->createCommand($sql)->execute();
             if(!$result){
@@ -627,9 +630,9 @@ class HN0898Service extends BaseTZService {
 
             TzSystemUsersService::delTzsystemUserData();
             $transaction->commit();
-        }catch (\Exception $exception){
+        }catch (\Exception $e){
             $transaction->rollBack();;
-            return ['status'=>300, 'msg'=>$exception->getMessage()];
+            throw_info($e->getMessage());
         }
 
         return ['status'=>200, 'msg'=>'状态更新成功~', 'data'=>[]];

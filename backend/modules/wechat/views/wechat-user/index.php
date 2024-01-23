@@ -570,7 +570,7 @@ $(function () {
         batchUpdate('status', selectedIds, 1);
     });
 
-    // Batch update status
+    // Batch close status
     $('#batchCloseStatus').click(function () {
         var selectedIds = $('input[name="selection[]"]:checked').map(function () {
             return this.value;
