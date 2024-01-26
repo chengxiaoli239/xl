@@ -117,6 +117,9 @@ class IndexController extends Controller
     private static function _init()
     {
         header("Content-type: text/html; charset=utf-8");
+
+        # 测试
+
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
     }
 
