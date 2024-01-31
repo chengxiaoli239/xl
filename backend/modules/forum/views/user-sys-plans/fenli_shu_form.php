@@ -31,7 +31,7 @@ use yii\widgets\ActiveForm;
             <div class="col-lg-2 col-xs-6">
                 <!--分离数-->
                 <?php foreach ($model->fenli_shu_code as $index => $code): ?>
-                    <?= $form->field($model, "fenli_shu_code[]")->textInput(['maxlength' => true])->label("分离数") ?>
+                    <?= $form->field($model, "fenli_shu_code[$index]")->textInput(['maxlength' => true])->label("分离数") ?>
                 <?php endforeach; ?>
             </div>
         </li>
