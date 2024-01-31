@@ -13,7 +13,7 @@ use yii\widgets\ActiveForm;
         <li>
             <div class="col-lg-8 col-xs-12">
                 <?= $form->field($model, 'fenli_shu_sel')->checkboxList(
-                    FenLiShu::TYPE_FLS_OPTIONS,
+                    FenLiShu::getTypeOptions($model->playway),
                     [
                         'item' => function ($index, $label, $name, $checked, $value) {
                             $options = [

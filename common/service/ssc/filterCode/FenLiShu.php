@@ -28,4 +28,33 @@ class FenLiShu extends \common\service\BaseService
         self::TYPE_XBXD => 'XBXD',
         self::TYPE_XXCD => 'XXCD',
     ];
+
+    /**
+     * 获取分离数
+     * @param $playway
+     * @return array
+     */
+    public static function getTypeOptions($playway=1): array
+    {
+        $options = self::TYPE_FLS_OPTIONS;
+        if($playway==1){
+            $options = [
+                self::TYPE_AXXD => 'AXXD',
+                self::TYPE_XBCX => 'XBCX',
+                self::TYPE_ABXX => 'ABXX',
+                self::TYPE_AXCX => 'AXCX',
+                self::TYPE_XBXD => 'XBXD',
+                self::TYPE_XXCD => 'XXCD',
+            ];
+        }elseif ($playway==2){
+            $options = [
+                self::TYPE_ABCX => 'ABCX',
+                self::TYPE_ABXD => 'ABXD',
+                self::TYPE_AXCD => 'AXCD',
+                self::TYPE_XBCD => 'XBCD',
+            ];
+        }
+
+        return $options;
+    }
 }
