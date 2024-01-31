@@ -249,7 +249,7 @@ class UserSysPlansService extends BaseService {
         if(isset($UserSysPlans['type_ds_details']) && $UserSysPlans['type_ds_details']){
             $tmpFilter['type_ds_details'] = $UserSysPlans['type_ds_details'];
         }
-        unset($post['UserSysPlans']['type_4ds']);
+        unset($post['UserSysPlans']['type_ds_details']);
 
         # 16、遗漏投
         if(isset($UserSysPlans['bet_while_miss']) && $UserSysPlans['bet_while_miss']){
@@ -429,6 +429,18 @@ class UserSysPlansService extends BaseService {
         unset($post['UserSysPlans']['arise_in_sel']);
         unset($post['UserSysPlans']['arise_in']);
 
+        # 分离数
+        if(!empty($UserSysPlans['fenli_shu_sel'][0]) && !empty($UserSysPlans['fenli_shu_code'][0])){
+            $flsDatas = $UserSysPlans['fenli_shu_sel'];
+            $fenli_shu = [];
+            foreach ($flsDatas as $k=>$flsSel){
+                if(empty($UserSysPlans['fenli_shu_code'][$k])) continue;
+                $fenli_shu[] = ['type'=>(int)$flsSel, 'code'=>$UserSysPlans['fenli_shu_code'][$k]];
+            }
+            $tmpFilter['fenli_shu'] = $fenli_shu;
+        }
+        unset($post['UserSysPlans']['fenli_shu_sel']);
+        unset($post['UserSysPlans']['fenli_shu_code']);
 
         ################### 公共参数 - 结束 #########################
 
@@ -890,7 +902,8 @@ class UserSysPlansService extends BaseService {
      * @param $tz_type
      * @return array
      */
-    public static function getSysPlansTypeDatas($playway = 3, $tz_type='', $uid=''){
+    public static function getSysPlansTypeDatas($playway = 3, $tz_type='', $uid=''): array
+    {
         $data = [];
         $data['sel_pos'] = [1=>'',2=>'',3=>'',4=>''];
         $data['hefen_pos'] = [1=>'',2=>'',3=>'',4=>''];

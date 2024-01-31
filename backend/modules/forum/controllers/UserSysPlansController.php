@@ -13,6 +13,7 @@ use backend\service\TzService;
 use backend\service\UserService;
 use backend\service\UserSysPlansService;
 use common\service\CommonService;
+use common\service\ssc\filterCode\FenLiShu;
 use common\tools\Tool_Common;
 use Yii;
 use backend\models\UserSysPlans;
@@ -140,6 +141,9 @@ class UserSysPlansController extends BaseController
 
         # 5、动态过滤
         $model->is_filter_dynamic = 0;
+        # 分离数
+        $model->fenli_shu_code = ['']; #
+        $model->fenli_shu_sel = FenLiShu::TYPE_FLS_OPTIONS; #
         ############################ 排除参数结束 #############################
 
         $model->nums = UserSysPlansService::getDefaultTzNums($tz_type);
@@ -305,11 +309,25 @@ class UserSysPlansController extends BaseController
                 $model->import_codes_txts = $codes;
             }
             foreach ($hz_Arr_Data as $key=>$val){
-                if(in_array($key, ['hefen_pos1', 'hefen_pos2', 'hefen_pos3', 'hefen_pos4', 'no_fix_henfen_pos', 'fixed_sel_pos', 'arise_in_sel', 'odd_pos', 'even_pos', 'big_pos', 'small_pos'])){
-                    $model->$key = explode(',', $val);
-                }else{
-                    $model->$key = $val;
-                    //if(in_array($key, ['hz', 'p1', 'p2', 'p3', 'p4', 'p5', 'bet_while_miss', 'status_val', 'type_4ds', 'code1', 'code2', 'arise', 'type_4d', 'type_4s', 'hefen', 'no_fix_hefen', 'arise_in', 'xhenfen','singles_key', 'ps_1', 'ps_2'])){
+                switch (true){
+                    case in_array($key, ['hefen_pos1', 'hefen_pos2', 'hefen_pos3', 'hefen_pos4', 'no_fix_henfen_pos', 'fixed_sel_pos', 'arise_in_sel', 'odd_pos', 'even_pos', 'big_pos', 'small_pos']):
+                        $model->$key = explode(',', $val);
+                        break;
+                    case $key == 'fenli_shu': # 分离数
+                        $flsSel = [];
+                        $flsCode = [];
+                        foreach ($hz_Arr_Data['fenli_shu'] as $fls){
+                            $flsSel[] = $fls['type'];
+                            $flsCode[] = $fls['code'];
+                        }
+                        $model->fenli_shu_sel = $flsSel;
+                        $model->fenli_shu_code = $flsCode;
+                        break;
+                    default:
+                        $model->$key = $val;
+                        //if(in_array($key, ['hz', 'p1', 'p2', 'p3', 'p4', 'p5', 'bet_while_miss', 'status_val', 'type_4ds', 'code1', 'code2', 'arise', 'type_4d', 'type_4s', 'hefen', 'no_fix_hefen', 'arise_in', 'xhenfen','singles_key', 'ps_1', 'ps_2'])){
+                        break;
+
                 }
             }
         }

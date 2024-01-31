@@ -6,6 +6,7 @@ use backend\models\StaticProfits;
 use backend\models\SystemConfig;
 use backend\models\UserSysPlans;
 use common\kj\ssc\Lucky5;
+use common\service\ssc\filterCode\FenLiShu;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -534,7 +535,8 @@ class NumService extends BaseService {
      * @param int $code_type 1一定2二定3三定4四定5五位二定
      * @return array
      */
-    public static function getCodesArise(array $codesArr = [], int $type = 1, int $code_type = 4){
+    public static function getCodesArise(array $codesArr = [], int $type = 1, int $code_type = 4): array
+    {
 
         $codes4Arr = [];
         # 去除双重数字
@@ -585,7 +587,7 @@ class NumService extends BaseService {
 
     /**
      * @desc 2个号码返回组号码组合 - 全倒
-     * @param $codes 格式：11或者12
+     * @param $codes - 格式：11或者12
      * @param $type 0除1取
      * @param $code_type 2二字定3三定4四定5五位二定
      * @return array ['1,2,3,4', '1,1,2,3', '1,1,1,2']
@@ -1054,15 +1056,15 @@ class NumService extends BaseService {
             //$query->andWhere($andWhere);
         }
         # tz_type:28 和值-取
-        if(isset($codes_hz['get_hzs']) && !empty($codes_hz['get_hzs'])){
+        if(!empty($codes_hz['get_hzs'])){
             $where = array_merge($where, [ ['IN', 'codes_hz', $codes_hz['get_hzs']] ]);
         }
         # tz_type:28 和值-除
-        if(isset($codes_hz['remove_hzs']) && !empty($codes_hz['remove_hzs'])){
+        if(!empty($codes_hz['remove_hzs'])){
             $where = array_merge($where, [ ['NOT IN', 'codes_hz', $codes_hz['remove_hzs']] ]);
         }
 
-        if(in_array($code_type, [2, 3]) && isset($codes_hz['fixed_sel_pos']) && !empty($codes_hz['fixed_sel_pos'])){
+        if(in_array($code_type, [2, 3]) && !empty($codes_hz['fixed_sel_pos'])){
             $fixed_sel_poses = explode(',', $codes_hz['fixed_sel_pos']);
             foreach($fixed_sel_poses as $f_pos){
                 $where[] = ['=', 'code_'.$f_pos, 'X'];
@@ -1079,10 +1081,11 @@ class NumService extends BaseService {
         $where = NumService::getPosEvenWhere($codes_hz, $where);  # 筛选位置：双
         $where = NumService::getPosBigWhere($codes_hz, $where);  # 筛选位置：大
         $where = NumService::getPosSmallWhere($codes_hz, $where);  # 筛选位置：小
+        $where = NumService::getFenLiShuWhere($codes_hz, $where, $code_type);  # 分离数
 
         ####################################  走移 start  ##################################
         # 123千走456各1元 - 未完成待续
-        if(isset($codes_hz['zou_yi']) && !empty($codes_hz['zou_yi'])){
+        if(!empty($codes_hz['zou_yi'])){
             $poses = ['1', '2', '3', '4'];
             $fix_poses = [];
             $no_fix_poses = [];
@@ -1219,7 +1222,7 @@ class NumService extends BaseService {
         }
 
         # 合分 - 四定，例如：合分：147，转化成和值：1、11、21、31、4、14、14、34、7、17、27
-        if($code_type == 4 && isset($codes_hz['xhefen']) && !empty($codes_hz['xhefen'])){
+        if($code_type == 4 && !empty($codes_hz['xhefen'])){
             $lenHefen = strlen($codes_hz['xhefen']);
             $codes_hefen = [];
             for ($i=0; $i<$lenHefen; $i++){
@@ -1336,7 +1339,7 @@ class NumService extends BaseService {
         }
 
         # 同时选择取、除四单四双
-        if(isset($codes_hz['type_4ds']) OR isset($codes_hz['type_4ds'])){
+        if(isset($codes_hz['type_4ds'])){
             if(is_array($codes_hz['type_4ds']) AND !empty($codes_hz['type_4ds'])){
                 $where = array_merge($where, [['IN', 'type_4ds', $codes_hz['type_4ds']]]);
             }
@@ -1414,10 +1417,11 @@ class NumService extends BaseService {
             }
         }
         ########################### 任意位置包含、排除 start ###################################
+        //p(['codes_hz'=>$codes_hz]);
 
         ###################################################### filters过滤参数开始05.24 ######################################################
         # 1、排除前x期 05.24
-        if(in_array($code_type, [2,3,4]) && isset($codes_hz['filters']) && isset($codes_hz['filters']['is_filter']) && $codes_hz['filters']['is_filter']==1){
+        if(isset($codes_hz['filters']['is_filter']) && in_array($code_type, [2, 3, 4]) && $codes_hz['filters']['is_filter'] == 1){
             $filters = $codes_hz['filters'];
             if(!empty($codes)){
                 $filter_poses = NumService::getFilterPosByCode($codes[0]); # 根据导入的号码判断要过滤的位置
@@ -1426,11 +1430,11 @@ class NumService extends BaseService {
                         $query->andWhere(['<>', 'code_'.$pos, 'X']);
                     }
                 }
-                if($lottery_type && isset($filters['filter_xQ_before']) && !empty($filters['filter_xQ_before'])){
+                if($lottery_type && !empty($filters['filter_xQ_before'])){
                     $qihao = HN0898Service::getCurrentQihao($lottery_type);
                     $index_id = SscKjData::find()->where(['AND', ['=', 'qihao', $qihao], ['=','lottery_type', $lottery_type]])->asArray()->one()['index_id'];
                     $filter_index_ids = [];
-                    if(isset($filters['filter_xQ_before']) && !empty($filters['filter_xQ_before'])){ # 1,2;4~6 前x期
+                    if(!empty($filters['filter_xQ_before'])){ # 1,2;4~6 前x期
                         $tmp_filter_index_Arrs = explode(';', $filters['filter_xQ_before']);
                         foreach ($tmp_filter_index_Arrs as $tmp_filter_index_Arr){
                             if(strpos($tmp_filter_index_Arr, ',') !== false){ # 1,2
@@ -1489,7 +1493,7 @@ class NumService extends BaseService {
         }
 
         # 2、排除前x天同期 05.25
-        if(in_array($code_type, [2,3,4]) && isset($codes_hz['filter_dates']) && isset($codes_hz['filter_dates']['is_filter_date']) && $codes_hz['filter_dates']['is_filter_date']==1){
+        if(isset($codes_hz['filter_dates']['is_filter_date']) && in_array($code_type, [2, 3, 4]) && $codes_hz['filter_dates']['is_filter_date'] == 1){
             $filter_dates = $codes_hz['filter_dates'];
             if(!empty($codes)){
                 $filter_poses = NumService::getFilterPosByCode($codes[0]); # 根据导入的号码判断要过滤的位置
@@ -1498,7 +1502,7 @@ class NumService extends BaseService {
                         $query->andWhere(['<>', 'code_'.$pos, 'X']);
                     }
                 }
-                if($lottery_type && isset($filter_dates['filter_xD_before']) && !empty($filter_dates['filter_xD_before'])){
+                if($lottery_type && !empty($filter_dates['filter_xD_before'])){
                     $qihao = HN0898Service::getQihao($lottery_type);
                     $sub_qihao = substr($qihao, -3, 3); # 短期号
                     //p([$qihao, $sub_qihao]);
@@ -1506,7 +1510,7 @@ class NumService extends BaseService {
                     //$index_date = SscKjData::find()->where(['AND', ['=', 'qihao', $qihao], ['=','lottery_type', $lottery_type]])->asArray()->one()['date'];
                     $index_date = date('Y-m-d');
                     $filter_index_dates = [];
-                    if(isset($filter_dates['filter_xD_before']) && !empty($filter_dates['filter_xD_before'])){ # 1,2;4~6 # 前x天同期
+                    if(!empty($filter_dates['filter_xD_before'])){ # 1,2;4~6 # 前x天同期
                         $tmp_filter_index_Arrs = explode(';', $filter_dates['filter_xD_before']);
                         foreach ($tmp_filter_index_Arrs as $tmp_filter_index_Arr){
                             //p($tmp_filter_index_Arr);
@@ -1563,7 +1567,7 @@ class NumService extends BaseService {
         }
 
         # 3、排除期期号定位 05.25
-        if(in_array($code_type, [2,3,4]) && isset($codes_hz['filter_qihaos']) && isset($codes_hz['filter_qihaos']['is_filter_qihao']) && $codes_hz['filter_qihaos']['is_filter_qihao']==1){
+        if(isset($codes_hz['filter_qihaos']['is_filter_qihao']) && in_array($code_type, [2, 3, 4]) && $codes_hz['filter_qihaos']['is_filter_qihao'] == 1){
             $filter_qihaos = $codes_hz['filter_qihaos'];
             $is_filter_qihao = $filter_qihaos['is_filter_qihao'];
             if(!empty($codes)){
@@ -1616,7 +1620,7 @@ class NumService extends BaseService {
         # tz_type:28 上奖取
         if(isset($codes_hz['get_arises'])){
             $codes_hz['arise'] = explode(',', $codes_hz['get_arises']);
-            $codesArr_arise = self::getCodesArise([$codes_hz['arise'], $type = 1]);
+            $codesArr_arise = self::getCodesArise([$codes_hz['arise']], $type = 1);
             $codesArr = array_intersect($codesArr, $codesArr_arise);
         }
 
@@ -2040,6 +2044,103 @@ class NumService extends BaseService {
         return $where;
     }
 
+    /**
+     * 分离数
+     * @param array $codes_hz
+     * @param array $where
+     * @param int $code_type
+     * @return array
+     */
+    private static function getFenLiShuWhere(array $codes_hz=[], array &$where=[], int $code_type=4): array
+    {
+        #p($codes_hz, 0);
+        if(empty($codes_hz['fenli_shu'])){
+            return $where;
+        }
+        foreach ($codes_hz['fenli_shu'] as $fls){
+            $type = $fls['type']; // todo FenLiShu::TYPE_FLS_OPTIONS;
+            $code = $fls['code']; # 号码：比如：23456
+            $len = strlen($code);
+            if($len<2){
+                return $where;
+            }
+            switch ($type){
+                case FenLiShu::TYPE_ABCD:
+                    $codesArr = NumService::getCodesArise([$code], $type=1, $code_type);
+                    $where[] = ['NOT IN', 'code', $codesArr];
+                    break;
+                case FenLiShu::TYPE_ABCX:
+                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, $len);//p(['codesArr'=>$codesArr]);
+                    if($len==2){
+                        $where[] = ['NOT IN', 'CONCAT(code_1,code_2)', $codesArr];
+                        $where[] = ['NOT IN', 'CONCAT(code_1,code_3)', $codesArr];
+                        $where[] = ['NOT IN', 'CONCAT(code_2,code_3)', $codesArr];
+                    }else{
+                        $where[] = ['NOT IN', 'CONCAT(code_1,code_2,code_3)', $codesArr];
+                    }
+                    break;
+                case FenLiShu::TYPE_ABXD:
+                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, $len);//p(['codesArr'=>$codesArr]);
+                    if($len==2){
+                        $where[] = ['NOT IN', 'CONCAT(code_1,code_2)', $codesArr];
+                        $where[] = ['NOT IN', 'CONCAT(code_1,code_4)', $codesArr];
+                        $where[] = ['NOT IN', 'CONCAT(code_2,code_4)', $codesArr];
+                    }else {
+                        $where[] = ['NOT IN', 'CONCAT(code_1,code_2,code_4)', $codesArr];
+                    }
+                    break;
+                case FenLiShu::TYPE_AXCD:
+                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, $len);//p(['codesArr'=>$codesArr]);
+                    if($len==2){
+                        $where[] = ['NOT IN', 'CONCAT(code_1,code_3)', $codesArr];
+                        $where[] = ['NOT IN', 'CONCAT(code_1,code_4)', $codesArr];
+                        $where[] = ['NOT IN', 'CONCAT(code_3,code_4)', $codesArr];
+                    }else {
+                        $where[] = ['NOT IN', 'CONCAT(code_1,code_3,code_4)', $codesArr];
+                    }
+                    break;
+                case FenLiShu::TYPE_XBCD:
+                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, $len);//p(['codesArr'=>$codesArr]);
+                    if($len==2){
+                        $where[] = ['NOT IN', 'CONCAT(code_2,code_3)', $codesArr];
+                        $where[] = ['NOT IN', 'CONCAT(code_2,code_4)', $codesArr];
+                        $where[] = ['NOT IN', 'CONCAT(code_3,code_4)', $codesArr];
+                    }else {
+                        $where[] = ['NOT IN', 'CONCAT(code_2,code_3,code_4)', $codesArr];
+                    }
+                    break;
+                case FenLiShu::TYPE_AXXD:
+                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, 2);//p(['codesArr'=>$codesArr]);
+                    $where[] = ['NOT IN', 'CONCAT(code_1,code_4)', $codesArr];
+                    break;
+                case FenLiShu::TYPE_XBCX:
+                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, 2);//p(['codesArr'=>$codesArr]);
+                    $where[] = ['NOT IN', 'CONCAT(code_2,code_3)', $codesArr];
+                    break;
+                case FenLiShu::TYPE_ABXX:
+                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, 2);//p(['codesArr'=>$codesArr]);
+                    $where[] = ['NOT IN', 'CONCAT(code_1,code_2)', $codesArr];
+                    break;
+                case FenLiShu::TYPE_AXCX:
+                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, 2);//p(['codesArr'=>$codesArr]);
+                    $where[] = ['NOT IN', 'CONCAT(code_1,code_3)', $codesArr];
+                    break;
+                case FenLiShu::TYPE_XBXD:
+                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, 2);//p(['codesArr'=>$codesArr]);
+                    $where[] = ['NOT IN', 'CONCAT(code_2,code_4)', $codesArr];
+                    break;
+                case FenLiShu::TYPE_XXCD:
+                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, 2);//p(['codesArr'=>$codesArr]);
+                    $where[] = ['NOT IN', 'CONCAT(code_3,code_4)', $codesArr];
+                    break;
+                default:
+                    break;
+            }
+        }
+        //p([$codes_hz['fenli_shu'], $where]);
+
+        return $where;
+    }
 
     /**
      * @desc 获取过滤位置 by code 目前注意针对导入之后再过滤的情况
@@ -2405,7 +2506,7 @@ class NumService extends BaseService {
             if(isset($hz_Arr['get_types'])) $filter6['get_types'] = $hz_Arr['get_types'];// else $filter0['arise'] = 0;
         }
         # 14.1、单双类型取
-        if(isset($hz_Arr['type_4ds']) && !empty($hz_Arr['type_4ds'])){
+        if(!empty($hz_Arr['type_4ds'])){
             if(isset($hz_Arr['type_4ds'])) $filter6['type_4ds'] = $hz_Arr['type_4ds'];
         }
 
@@ -2560,7 +2661,13 @@ class NumService extends BaseService {
             $desc .= $hz_Arr['small_sel']==NumService::POS_ODD_OBTAIN ? ' 取小:' : '除小:';
             $desc .= $hz_Arr['small_pos'].'位';
         }
-
+        # 分离数
+        if(!empty($hz_Arr['fenli_shu'])){
+            $desc .= ' 分离:';
+            foreach ($hz_Arr['fenli_shu'] as $fls){
+                $desc .= FenLiShu::TYPE_FLS_OPTIONS[$fls['type']].'_'.$fls['code'].';';
+            }
+        }
 
         # 不定位合分:两数、三数
         if(isset($hz_Arr['no_fix_hefen_pos']) && isset($hz_Arr['no_fix_hefen'])){ # no_fix_hefen_pos=1:两数、no_fix_hefen_pos=2:三数

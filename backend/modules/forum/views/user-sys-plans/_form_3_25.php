@@ -137,6 +137,9 @@ use yii\widgets\ActiveForm;
                 <!--大小、单双模板引入-->
                 <?php include(dirname(__FILE__).'/dx_ds.php');?>
 
+                <!--分离数数表单引入-->
+                <?php include(dirname(__FILE__).'/fenli_shu_form.php'); ?>
+
                 <!-- 任意位置(不定位)-99-->
                 <?php include(dirname(__FILE__).'/filters/ever_positions.php'); # 任意位置(不定位)-99 ?>
 

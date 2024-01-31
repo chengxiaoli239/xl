@@ -205,6 +205,12 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $has_bet_nums;
     ####################### 中则投、中则倍投、中则波推倍投 #####################
 
+    ####################### 分离数开始 #####################
+    public $fenli_shu_sel;
+    public $fenli_shu_code;
+    ####################### 分离数结束 #####################
+
+
     /**
      * @inheritdoc
      */
