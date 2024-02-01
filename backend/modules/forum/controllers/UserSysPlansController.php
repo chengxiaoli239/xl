@@ -142,7 +142,7 @@ class UserSysPlansController extends BaseController
         # 5、动态过滤
         $model->is_filter_dynamic = 0;
         # 分离数
-        $model->fenli_shu_code = ['']; #
+        $model->fenli_shu_code = [0=>'']; #
         $model->fenli_shu_sel = FenLiShu::getTypeOptions((int)$playway);
         ############################ 排除参数结束 #############################
 

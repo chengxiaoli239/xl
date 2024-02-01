@@ -5,6 +5,7 @@ use backend\models\searchs\wechat\Bets;
 use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
+use backend\service\BetService;
 use backend\service\NumService;
 use backend\service\statics\statics_3d\Statics3dUserDataService;
 use backend\service\StaticService;
@@ -36,6 +37,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $plan = UserSysPlans::findOne(7902);
+            $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             $data = QxcTcw::getOfficialCode($type='json', $is_auto=1, $lottery_type=27);p($data);
 
             $data = QxcTcw::getNineNineLottery($type='json', $is_auto=2, $lottery_type=27);
