@@ -2070,17 +2070,23 @@ class NumService extends BaseService {
                     $where[] = ['NOT IN', 'code', $codesArr];
                     break;
                 case FenLiShu::TYPE_ABCX:
-                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, $len);//p(['codesArr'=>$codesArr]);
-                    if($len==2){
-                        $where[] = ['NOT IN', 'CONCAT(code_1,code_2)', $codesArr];
-                        $where[] = ['NOT IN', 'CONCAT(code_1,code_3)', $codesArr];
-                        $where[] = ['NOT IN', 'CONCAT(code_2,code_3)', $codesArr];
+                    if(false && $code_type==3){
+                        $codesArr = NumService::getCodesArise([$code]);
+                        p($codesArr);
                     }else{
-                        $where[] = ['NOT IN', 'CONCAT(code_1,code_2,code_3)', $codesArr];
+                        $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, $len<=2?2:3);//p(['codesArr'=>$codesArr]);
+                        if($len==2){
+                            $where[] = ['NOT IN', 'CONCAT(code_1,code_2)', $codesArr];
+                            $where[] = ['NOT IN', 'CONCAT(code_1,code_3)', $codesArr];
+                            $where[] = ['NOT IN', 'CONCAT(code_2,code_3)', $codesArr];
+                        }else{
+                            $where[] = ['NOT IN', 'CONCAT(code_1,code_2,code_3)', $codesArr];
+                        }
                     }
+                    //p([$code, $len, 'codeArr'=>$codesArr]);
                     break;
                 case FenLiShu::TYPE_ABXD:
-                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, $len);//p(['codesArr'=>$codesArr]);
+                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, $len<=2?2:3);//p(['codesArr'=>$codesArr]);
                     if($len==2){
                         $where[] = ['NOT IN', 'CONCAT(code_1,code_2)', $codesArr];
                         $where[] = ['NOT IN', 'CONCAT(code_1,code_4)', $codesArr];
@@ -2090,7 +2096,7 @@ class NumService extends BaseService {
                     }
                     break;
                 case FenLiShu::TYPE_AXCD:
-                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, $len);//p(['codesArr'=>$codesArr]);
+                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, $len<=2?2:3);//p(['codesArr'=>$codesArr]);
                     if($len==2){
                         $where[] = ['NOT IN', 'CONCAT(code_1,code_3)', $codesArr];
                         $where[] = ['NOT IN', 'CONCAT(code_1,code_4)', $codesArr];
@@ -2100,7 +2106,7 @@ class NumService extends BaseService {
                     }
                     break;
                 case FenLiShu::TYPE_XBCD:
-                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, $len);//p(['codesArr'=>$codesArr]);
+                    $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, $len<=2?2:3);//p(['codesArr'=>$codesArr]);
                     if($len==2){
                         $where[] = ['NOT IN', 'CONCAT(code_2,code_3)', $codesArr];
                         $where[] = ['NOT IN', 'CONCAT(code_2,code_4)', $codesArr];
@@ -2137,7 +2143,7 @@ class NumService extends BaseService {
                     break;
             }
         }
-        //p([$codes_hz['fenli_shu'], $where]);
+        //p([$codes_hz['fenli_shu'], $where, $codesArr]);
 
         return $where;
     }

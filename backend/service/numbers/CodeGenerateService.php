@@ -13,15 +13,16 @@ class CodeGenerateService extends BaseService {
      */
     public static function getCode(string $codeStr='', int $returnNums=2): array
     {
+        //p([$codeStr, $returnNums]);
         $returnCode = [];
         $len = strlen($codeStr);
-        switch ($returnNums){
-            case 1:
+        switch (true){
+            case $returnNums == 1:
                 for ($i=0; $i<$len; $i++){
                     $returnCode[] = $codeStr[$i];
                 }
                 break;
-            case 2:
+            case $returnNums == 2:
                 for ($i=0; $i<$len; $i++){
                     for ($j=0; $j<$len; $j++){
                         if($j<=$i) continue;
@@ -30,7 +31,7 @@ class CodeGenerateService extends BaseService {
                     }
                 }
                 break;
-            case 3:
+            case $returnNums == 3:
                 for ($i=0; $i<$len; $i++){
                     for ($j=0; $j<$len; $j++){
                         if($j<=$i) continue;
