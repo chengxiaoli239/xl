@@ -2057,6 +2057,7 @@ class NumService extends BaseService {
         if(empty($codes_hz['fenli_shu'])){
             return $where;
         }
+        //p($codes_hz['fenli_shu']);
         foreach ($codes_hz['fenli_shu'] as $fls){
             $type = $fls['type']; // todo FenLiShu::TYPE_FLS_OPTIONS;
             $code = $fls['code']; # 号码：比如：23456
@@ -2072,7 +2073,7 @@ class NumService extends BaseService {
                 case FenLiShu::TYPE_ABCX:
                     if(false && $code_type==3){
                         $codesArr = NumService::getCodesArise([$code]);
-                        p($codesArr);
+                        //p($codesArr);
                     }else{
                         $codesArr = \backend\service\numbers\CodeGenerateService::getCode($code, $len<=2?2:3);//p(['codesArr'=>$codesArr]);
                         if($len==2){

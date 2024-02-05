@@ -93,7 +93,7 @@ use yii\widgets\ActiveForm;
                 <?php include(dirname(__FILE__).'/dx_ds.php');?>
 
                 <!--分离数数表单引入-->
-                <?php include(dirname(__FILE__).'/fenli_shu_form.php'); ?>
+                <?php //include(dirname(__FILE__).'/fenli_shu_form.php'); ?>
 
                 <div class="row">
                     <div class="col-lg-6 col-xs-12">

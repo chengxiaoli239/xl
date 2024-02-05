@@ -49,7 +49,7 @@ class UserSysPlansService extends BaseService {
             $playway = BetService::getPlaywayByTzType($tz_type);
             $post['UserSysPlans']['playway'] = $playway;
         }
-        #p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id]);
+        //p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id]);
 
         $post['UserSysPlans']['singles'] = preg_replace( '#\s+#', '', trim($post['UserSysPlans']['singles']));
         $post['UserSysPlans']['start_qihao'] = str_replace(' ', '', $post['UserSysPlans']['start_qihao']);
@@ -430,13 +430,20 @@ class UserSysPlansService extends BaseService {
         unset($post['UserSysPlans']['arise_in']);
 
         # 分离数
-        if(!empty($UserSysPlans['fenli_shu_sel'][0]) && !empty($UserSysPlans['fenli_shu_code'][0])){
+        if(!empty($UserSysPlans['fenli_shu_code'])){
+            foreach ($UserSysPlans['fenli_shu_code'] as $index=>$flCode){
+                $type = $UserSysPlans['fenli_shu_sel_'.$index][0]??'';
+                if($type==='') continue;
+                $fenli_shu[] = ['type'=>(int)$type, 'code'=>$flCode];
+            }
+            /*
             $flsDatas = $UserSysPlans['fenli_shu_sel'];
             $fenli_shu = [];
             foreach ($flsDatas as $k=>$flsSel){
                 if(empty($UserSysPlans['fenli_shu_code'][$k])) continue;
                 $fenli_shu[] = ['type'=>(int)$flsSel, 'code'=>$UserSysPlans['fenli_shu_code'][$k]];
             }
+            */
             $tmpFilter['fenli_shu'] = $fenli_shu;
         }
         unset($post['UserSysPlans']['fenli_shu_sel']);

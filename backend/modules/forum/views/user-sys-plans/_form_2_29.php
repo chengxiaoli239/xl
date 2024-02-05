@@ -124,7 +124,7 @@ use yii\widgets\ActiveForm;
                 <?php include(dirname(__FILE__).'/dx_ds.php');?>
 
                 <!--分离数数表单引入-->
-                <?php include(dirname(__FILE__).'/fenli_shu_form.php'); ?>
+                <?php //include(dirname(__FILE__).'/fenli_shu_form.php'); ?>
 
                 <!--动态过滤号码-->
                 <?php include(dirname(__FILE__).'/filter_dynamic.php'); # 动态过滤号码 ?>

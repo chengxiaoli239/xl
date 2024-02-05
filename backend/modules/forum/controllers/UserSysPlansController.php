@@ -314,14 +314,15 @@ class UserSysPlansController extends BaseController
                         $model->$key = explode(',', $val);
                         break;
                     case $key == 'fenli_shu': # 分离数
-                        $flsSel = [];
-                        $flsCode = [];
-                        foreach ($hz_Arr_Data['fenli_shu'] as $fls){
-                            $flsSel[] = $fls['type'];
-                            $flsCode[] = $fls['code'];
+                        $flsCodes = [];
+                        $flsSels = [];
+                        foreach ($hz_Arr_Data['fenli_shu'] as $index=>$fls){
+                            $flsCodes[] = $fls['code'];
+                            $flsSels[] = $fls['type'];
+                            $model->{"fenli_shu_sel_".$index} = $fls['type'];
                         }
-                        $model->fenli_shu_sel = $flsSel;
-                        $model->fenli_shu_code = $flsCode;
+                        $model->fenli_shu_sel = $flsCodes;
+                        $model->fenli_shu_code = $flsCodes;
                         break;
                     default:
                         $model->$key = $val;

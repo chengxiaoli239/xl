@@ -40,6 +40,7 @@ use yii\widgets\ActiveForm;
             </div>
             -->
 
+            <!--
             <div class="row">
                 <div class="col-lg-6 col-xs-6">
                     <?= $form->field($model, 'sys_password')->textInput(['maxlength' => true]) ?>
@@ -48,6 +49,7 @@ use yii\widgets\ActiveForm;
                     <?= $form->field($model, 'sys_repassword')->textInput(['maxlength' => true]) ?>
                 </div>
             </div>
+            -->
 
             <div class="row">
                 <div class="col-lg-12">
