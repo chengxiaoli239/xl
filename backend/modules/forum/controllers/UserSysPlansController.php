@@ -143,7 +143,7 @@ class UserSysPlansController extends BaseController
         $model->is_filter_dynamic = 0;
         # 分离数
         $model->fenli_shu_code = [0=>'']; #
-        $model->fenli_shu_sel = FenLiShu::getTypeOptions((int)$playway);
+        $model->fenli_shu_sel = [current(FenLiShu::getTypeOptions((int)$playway))];
         ############################ 排除参数结束 #############################
 
         $model->nums = UserSysPlansService::getDefaultTzNums($tz_type);
