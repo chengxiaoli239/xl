@@ -882,7 +882,7 @@ class NumCodeService extends BaseService {
             $query->andWhere(['NOT IN', 'code', $filterCodes2]);
         }
 
-        #$sql = $query->createCommand()->getRawSql(); p($sql);
+        //$sql = $query->createCommand()->getRawSql(); p($sql);
         $NumTypes = $query->asArray()->all();
         #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
@@ -2017,6 +2017,8 @@ class NumCodeService extends BaseService {
      */
     public static function getBeforeKjCodesDynamic120(object $plan, int $filter_type=0): array
     {
+        $lottery_type = $plan->lottery_type;
+        list($current_kj_qihao, $next_qihao) = QihaoService::getKjQiHao($lottery_type);
         $hzArr = Json::decode($plan->hz_Arr);
         # 随机内容添加："log_sel":1,"log_1":"05","fixed_pos_hefen_sel":2,"hefen_pos1":"1,2,3","hefen1":"012356789"
         //p($hzArr, 0);
@@ -2041,6 +2043,7 @@ class NumCodeService extends BaseService {
                 'hefen1' => str_replace(rand(0, 9), '', '0123456789'),
             ]);
         }
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '随机对数或合分', ['plan_id'=>$plan->id, 'qihao'=>$current_kj_qihao, 'hzArr'=>$hzArr, 'filter_type'=>$filter_type]);
         # {"ps_sel":2,"ps_2":"34689","ps_3":"01257","log_sel":1,"log_1":"05","fixed_pos_hefen_sel":2,"hefen_pos1":"1,2,3","hefen1":"012356789","arise_in_sel":2,"arise_in":"02356","filters":{"playway":"3","start_qihao":"20231226281","lottery_type":"8"}}
         $codes = NumService::getCodesKuaiXuan($hzArr);
 

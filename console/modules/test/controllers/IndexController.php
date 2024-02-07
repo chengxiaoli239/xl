@@ -37,8 +37,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $data = \common\service\ssc\QihaoService::getKjQiHao(8);p($data);
-            $plan = UserSysPlans::findOne(7860);
+            //$data = \common\service\ssc\QihaoService::getKjQiHao(8);p($data);
+            $plan = UserSysPlans::findOne(7995);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             $data = QxcTcw::getOfficialCode($type='json', $is_auto=1, $lottery_type=27);p($data);
 
