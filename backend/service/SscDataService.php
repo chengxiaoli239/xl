@@ -51,7 +51,7 @@ class SscDataService extends BaseService {
     public static $zzt_plan_types = [6, 8]; # 中则投计划类型
     public static $zzt_else_fanmai_types = [7]; # 中则投否则反卖
 
-    public static $dealDataStatusFields = [
+    public static array $dealDataStatusFields = [
         'status' => '全局状态',
         'static4dPerDateProfits_status' => 'A每天四定利润统计',
         'updateDs_status' => 'B单双处理状态',
@@ -62,7 +62,7 @@ class SscDataService extends BaseService {
     ];
 
     const DEAL_DATA_STATUS_PENDDING = 0; # 待处理
-    const DEAL_DATA_STATUS_SUCCESS = 2; # 无需处理
+    const DEAL_DATA_STATUS_SUCCESS = 2; # 处理成功
     const DEAL_DATA_STATUS_FAIL = 3; # 处理失败
     const DEAL_DATA_STATUS_NOT_NEED_DEAL = 4; # 无需处理
 
@@ -482,7 +482,7 @@ class SscDataService extends BaseService {
      * @description 返回历史和值遗漏
      * @param $num
      * @param $position
-     * @param $recently 多少期内，默认为200
+     * @param $recently - 多少期内，默认为200
      * @return array
      */
     public static function getDwHistoryMiss($num, $position, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 200){
@@ -536,7 +536,7 @@ class SscDataService extends BaseService {
 
     /**
      * @desc 二定、三定、四定单双遗漏统计
-     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+     * @param $lottery_type - 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * 12XX 21XX X12X X21X XX12 XX21 1XX2 2XX1 1111 2222
      */
     public static function updateDsYL($lottery_type = DEFAULT_LOTTERY_TYPE){
@@ -545,6 +545,9 @@ class SscDataService extends BaseService {
         $start_time = microtime(true);
         try {
             $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, '', $field='updateDsYL_status');
+            if($DataDealStatus->$field == SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL){
+                throw_info('未开启统计：'.self::$dealDataStatusFields[$field], 40001);
+            }
             $SDNumsArr = StaticService::$typeArr;
             unset($SDNumsArr[0],$SDNumsArr[1],$SDNumsArr[8],$SDNumsArr[9],$SDNumsArr[10],$SDNumsArr[11]);
             # 大数组：包括二定、三定、四定
@@ -628,7 +631,7 @@ class SscDataService extends BaseService {
             }
             $dealStatus = 2;
         }catch (\Exception $e){
-            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
+            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false OR $e->getCode()>40000) ? 2 : 3;
             Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常1', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 
@@ -1139,6 +1142,9 @@ class SscDataService extends BaseService {
         $start_time = microtime(true);
         try {
             $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, '', $field='update3NumYL_status');
+            if($DataDealStatus->$field == SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL){
+                throw_info('未开启统计：'.self::$dealDataStatusFields[$field], 40001);
+            }
 
             $zhis = $threeNums;
             // 和值为8、9在200期里边遗漏期数
@@ -1172,7 +1178,7 @@ class SscDataService extends BaseService {
             }
             $dealStatus = 2;
         }catch (\Exception $e){
-            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
+            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false OR $e->getCode()>40000) ? 2 : 3;
             Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常2', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 
@@ -1187,8 +1193,8 @@ class SscDataService extends BaseService {
      * @description 返回历史单双遗漏
      * @param $num
      * @param $position
-     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
-     * @param $recently 多少期内，默认为
+     * @param $lottery_type - 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+     * @param $recently - 多少期内，默认为
      * @return array
      */
     public static function getDsHistoryMiss($num, $position, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 472){
@@ -1256,8 +1262,8 @@ class SscDataService extends BaseService {
     /**
      * @description 返回号码单双类型遗漏
      * @param $num
-     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
-     * @param $recently 多少期内，默认为
+     * @param $lottery_type - 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+     * @param $recently - 多少期内，默认为
      * @return array
      */
     public static function getCodeTypeHistoryMiss($vals, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 472){
@@ -1734,7 +1740,10 @@ class SscDataService extends BaseService {
         $start_time = microtime(true);
         try {
 
-            $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, $qihao, $statusField='updateDs_status');
+            $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, $qihao, $field='updateDs_status');
+            if($DataDealStatus->$field == SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL){
+                throw_info('未开启统计：'.self::$dealDataStatusFields[$field], 40001);
+            }
 
             $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
             $data = explode(',',$SscKjData['code_str']);
@@ -1806,12 +1815,12 @@ class SscDataService extends BaseService {
             }
             $dealStatus = 2;
         }catch (\Exception $e){
-            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
+            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false OR $e->getCode()>40000) ? 2 : 3;
             Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常3', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 
         $end_time = microtime(true);
-        SscDataService::dealDataRecord($DataDealStatus, $statusField, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s', 'deal_time'=>date('Y-m-d H:i:s')]);
+        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s', 'deal_time'=>date('Y-m-d H:i:s')]);
         return $rst;
     }
 
@@ -1836,7 +1845,7 @@ class SscDataService extends BaseService {
             }
             throw new \Exception('无任务记录'.$lottery_type.'_'.$qihao.'_num:'.$num);
         }
-        if(!empty($DataDealStatus) && $DataDealStatus->$field == 1){
+        if($DataDealStatus->$field == 1){
             throw new \Exception('已经处理过数据'.self::$dealDataStatusFields[$field]);
         }
 
@@ -1860,10 +1869,10 @@ class SscDataService extends BaseService {
                 throw new \Exception('已经处理过数据');
             }
             if($DataDealStatus->lottery_type == 8 && substr($DataDealStatus->next_qihao, -3, 3) == '109'){
-                $status = 2;
+                $status = SscDataService::DEAL_DATA_STATUS_SUCCESS;
             }
             $DataDealStatus->$field = $status;
-            $all_status = 2;
+            $all_status = SscDataService::DEAL_DATA_STATUS_SUCCESS;
             $all_keys = array_keys(SscDataService::$dealDataStatusFields);
             foreach ($all_keys as $key){
                 if($key == 'status') continue;
@@ -2555,6 +2564,9 @@ class SscDataService extends BaseService {
         $start_time = microtime(true);
         try {
             $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, '', $field='updateSdHzYL_status');
+            if($DataDealStatus->$field == SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL){
+                throw_info('未开启统计：'.self::$dealDataStatusFields[$field], 40001);
+            }
             # 大数组：包括二定、三定、四定
             $updateDsDatas = SscSdHzVal::find()->asArray()->All();
             //$rst[$interval] = SscDataService::dsYLStatic($interval);
@@ -2604,7 +2616,7 @@ class SscDataService extends BaseService {
             }
             $dealStatus = 2;
         }catch (\Exception $e){
-            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
+            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false OR $e->getCode()>40000) ? 2 : 3;
             Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常4', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 
@@ -2954,6 +2966,9 @@ class SscDataService extends BaseService {
         try {
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划1', ['lottery_type'=>$lottery_type]);
             $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, '', $field='opProfitsPlans_status');
+            if($DataDealStatus->$field == SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL){
+                throw_info('未开启统计：'.self::$dealDataStatusFields[$field], 40001);
+            }
             # 止盈止损、翻倍止盈止损 计划
             $where = [
                 'OR',
@@ -3229,7 +3244,7 @@ class SscDataService extends BaseService {
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划', ['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
             $dealStatus = 2;
         }catch (\Exception $e){
-            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
+            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false OR $e->getCode()>40000) ? 2 : 3;
             Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常5', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage().'-File-'.$e->getFile().'--line-'.$e->getLine()]);
         }
 
@@ -4610,7 +4625,7 @@ class SscDataService extends BaseService {
 
             $logArr['plan_'.implode('_', $plan_types)][$UserSysPlan->id]['rst'] = $rst;
         }catch (\Exception $exception){
-            Tool_Common::log('/statics/'.__FUNCTION__.'_err', 'ERR', '单计划-中则投-错误2', ['plan_id'=>$plan_id, 'err_msg'=>$exception->getMessage()]);
+            Tool_Common::log('/statics/'.__FUNCTION__.'_err', 'ERR', '单计划-中则投-错误2', ['plan_id'=>$UserSysPlan->id, 'err_msg'=>$exception->getMessage()]);
             $update_flag = false;
         }
 
@@ -5267,7 +5282,7 @@ class SscDataService extends BaseService {
                 'qihao' => $qihao, # 期号
                 'lottery_type' => $lottery_type,
                 # A每天四定利润统计状态
-                'static4dPerDateProfits_status' => $LotteryDataDealStatus->static4dPerDateProfits_status==0 ? 4 : SscDataService::DEAL_DATA_STATUS_PENDDING,
+                'static4dPerDateProfits_status' => $LotteryDataDealStatus->static4dPerDateProfits_status==0 ? SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL : SscDataService::DEAL_DATA_STATUS_PENDDING,
                 # B单双处理状态
                 'updateDs_status' => $LotteryDataDealStatus->updateDs_status==0 ? SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL : SscDataService::DEAL_DATA_STATUS_PENDDING,
                 # C单双遗漏处理状态

@@ -36,13 +36,6 @@ class OpKjService extends BaseService {
             $tmpData = ['code'=>$code, 'data'=>$data, 'msg'=>$msg];
             $rst['data'][] = $tmpData;
             Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据入列00', ['lottery_type'=>$lottery_type, 'tmpData'=>$tmpData]);
-            //if($code==0){
-            //    foreach ($data['idData'] as $d){
-            //        $params = ['user_id'=>$d['user_id'], 'type'=>WechatUserService::TYPE_ORDER_BET, 'queue_delay_time'=>30, 'msg'=>'开奖后报表计算', 'wechat_user_id'=>$d['wechat_user_id']];
-            //        push_queue_fast(UserDayStaticsJobs::class, $params); # 处理数据入列
-            //        Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据-3d', $params);
-            //    }
-            //}
             $rst = ['code'=>$code, 'data'=>$data, 'msg'=>$msg];
         }else{
             $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type, 'is_batch_simulate'=>0])->orderBy('id DESC')->limit(100)->all();

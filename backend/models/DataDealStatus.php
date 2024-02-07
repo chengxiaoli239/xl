@@ -50,6 +50,7 @@ class DataDealStatus extends \common\models\base\BaseModel
             [['update_time'], 'safe'],
             [['qihao', 'next_qihao'], 'string', 'max' => 24],
             [['status_desc', 'static4dPerDateProfits_status_desc', 'updateDs_status_desc', 'updateDsYL_status_desc', 'update3NumYL_status_desc', 'updateSdHzYL_status_desc', 'opProfitsPlans_status_desc'], 'string', 'max' => 240],
+            [['lottery_type', 'qihao'], 'unique', 'targetAttribute' => ['lottery_type', 'qihao']],
         ];
     }
 
@@ -62,7 +63,7 @@ class DataDealStatus extends \common\models\base\BaseModel
             'id' => Yii::t('app', 'ID'),
             'lottery_type' => Yii::t('app', '彩票类型'),
             'qihao' => Yii::t('app', '期号'),
-            'next_qihao' => Yii::t('app', '下期期号'),
+            'next_qihao' => Yii::t('app', '下一期期号'),
             'status' => Yii::t('app', '状态:0待处理1已处理'),
             'status_desc' => Yii::t('app', '状态结果描述'),
             'static4dPerDateProfits_status' => Yii::t('app', 'A每天四定利润统计:0待处理1已处理'),

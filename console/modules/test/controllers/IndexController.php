@@ -37,6 +37,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%lottery_data_deal_status}}'); p($r);
             //$data = \common\service\ssc\QihaoService::getKjQiHao(8);p($data);
             $plan = UserSysPlans::findOne(7995);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));

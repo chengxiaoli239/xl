@@ -40,8 +40,6 @@ return [
 
     # 不统计的彩种
     'NOT_STATIC_LOTTERYS' => [8, 9, 10, 11, 12, 13 ], # 台湾宾果，冰岛90s,3m,5m,10m
-    # 统计数据彩种
-    'STATIC_DATA_LOTTERYS' => [1,6,17], # 统计数据
 
     'GET_BASE_DATA_CACHE_TIME' => 30 * 60,
 

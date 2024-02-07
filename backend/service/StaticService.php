@@ -1204,6 +1204,9 @@ class StaticService extends BaseService {
         try {
             Tool_Common::log('/datas/'.__FUNCTION__, "INFO", '四定利润统计状态', ['lottery_type'=>$lottery_type, 'fun'=>__FUNCTION__]);
             $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, '', $field='static4dPerDateProfits_status');
+            if($DataDealStatus->$field == SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL){
+                throw_info('未开启统计：'.SscDataService::$dealDataStatusFields[$field], 40001);
+            }
 
             $allStaticProfits = self::allDateStaticProfits($lottery_type, $s_date);
             $tmpProfits = [];
@@ -1248,7 +1251,7 @@ class StaticService extends BaseService {
             }
             $dealStatus = 2;
         }catch (\Exception $e){
-            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : 3;
+            $dealStatus = (strpos($e->getMessage(), '已经处理') !== false OR $e->getCode()>40000) ? 2 : 3;
             Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常6', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 

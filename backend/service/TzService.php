@@ -141,17 +141,13 @@ class TzService extends BaseService {
             # 2、单双
             $rstLog['updateDs'] = SscDataService::updateDsData($lottery_type); // 每期开奖单双数据
             $time3 = microtime(true);
-            if(in_array($lottery_type, \Yii::$app->params['STATIC_DATA_LOTTERYS'])){ # 重庆、新疆才统计单双遗漏, 冰岛90、3m5m10m不统计
-                $rstLog['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏 耗时4s -- 耗时长，需剥离优化 2022.04.09
-            }
+            $rstLog['updateDsYL'] = SscDataService::updateDsYL($lottery_type); // 单双遗漏 耗时4s -- 耗时长，需剥离优化 2022.04.09
             $time4 = microtime(true);
 
             # 3、三字现
             //$rst['update3NumData'] = SscDataService::update3NumData($lottery_type); // 每期开奖遗漏 已写开奖表 三字现遗漏表暂时不写了
             $time5 = microtime(true);
-            if(in_array($lottery_type, \Yii::$app->params['STATIC_DATA_LOTTERYS'])) { # 重庆、新疆才统计单双遗漏, 冰岛90、3m5m10m不统计
-                $rstLog['update3NumYL'] = SscDataService::update3NumYL($lottery_type); # 耗时 6-7s - 30s -- 耗时长，需剥离优化 2022.04.09
-            }
+            $rstLog['update3NumYL'] = SscDataService::update3NumYL($lottery_type); # 耗时 6-7s - 30s -- 耗时长，需剥离优化 2022.04.09
             $time6 = microtime(true);
 
             # 4、四定和值遗漏
