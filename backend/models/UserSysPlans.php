@@ -218,6 +218,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $fenli_shu_sel_8;
     public $fenli_shu_sel_9;
     public $fenli_shu_sel_10;
+    public $fenli_shu_sel_11;
     public $fenli_shu_code;
     ####################### 分离数结束 #####################
 
