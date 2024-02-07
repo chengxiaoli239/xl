@@ -12,4 +12,13 @@ trait LotteryCacheKeyTrait
     {
         return 'lottery:type:grabDataStatus_x0' . $grabDataStatus;
     }
+
+    /**
+     * @param int $lottery_type
+     * @return string
+     */
+    public static function lotteryQiHaoInfo(int $lottery_type=DEFAULT_LOTTERY_TYPE): string
+    {
+        return 'lottery:qiHaoInfo:current_'.$lottery_type;
+    }
 }

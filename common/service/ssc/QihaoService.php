@@ -6,6 +6,9 @@ namespace common\service\ssc;
  * Date: 2018/05/06
  * Time: 09:40
  */
+
+use backend\models\DataDealStatus;
+use common\service\cache\CacheKeyService;
 use common\service\CommonService;
 
 
@@ -33,4 +36,23 @@ class QihaoService extends CommonService
         return $qihaos;
     }
 
+    /**
+     * @param int $lottery_type
+     * @return array|mixed
+     */
+    public static function getKjQiHao(int $lottery_type=DEFAULT_LOTTERY_TYPE)
+    {
+        $mkey = CacheKeyService::lotteryQiHaoInfo($lottery_type);
+        $data = commonRedis()->get($mkey);
+        if(empty($data)){
+            $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
+            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $currentKjQihao = $DataDealStatus['qihao'];
+            $nextQihao = $DataDealStatus['next_qihao'];
+            $data = [$currentKjQihao, $nextQihao];
+            commonRedis()->setex($mkey, 30, $data);
+        }
+
+        return $data;
+    }
 }

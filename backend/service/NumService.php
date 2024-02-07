@@ -2868,7 +2868,7 @@ class NumService extends BaseService {
                     $codes = NumCodeService::getBeforeKjCodesDynamic7($plan);
                     break;
                 case 8: # 头尾相加不等于期号最后两位相加(四定)
-                    $codes = NumCodeService::getBeforeKjCodesDynamic8($plan, $lottery_type);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic8($plan);
                     break;
                 case 9: # 随机9000组(四定)
                     $codes = NumCodeService::getBeforeKjCodesDynamic9($playway);
@@ -2935,22 +2935,22 @@ class NumService extends BaseService {
                     $codes = NumCodeService::getBeforeKjCodesDynamic28($plan, $positions=[1,2,3,4], 3000);
                     break;
                 case 29: # 排除前一期号码剩余号码至少上1个码
-                    $codes = NumCodeService::getBeforeKjCodesDynamic29($plan, $lottery_type, $cNum=1);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic29($plan, $cNum=1);
                     break;
                 case 30: # 排除前一期号码剩余号码至少上2个码
-                    $codes = NumCodeService::getBeforeKjCodesDynamic29($plan, $lottery_type, $cNum=2);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic29($plan, $cNum=2);
                     break;
                 case 31: # 剔除前100期123位一致的直码
-                    $codes = NumCodeService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[1,2,3], $num=self::BEFORE_3X_QS);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic31($plan, $positions=[1,2,3], $num=self::BEFORE_3X_QS);
                     break;
                 case 32: # 剔除前100期124位一致的直码
-                    $codes = NumCodeService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[1,2,4], $num=self::BEFORE_3X_QS);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic31($plan, $positions=[1,2,4], $num=self::BEFORE_3X_QS);
                     break;
                 case 33: # 剔除前100期134位一致的直码
-                    $codes = NumCodeService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[1,3,4], $num=self::BEFORE_3X_QS);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic31($plan, $positions=[1,3,4], $num=self::BEFORE_3X_QS);
                     break;
                 case 34: # 剔除前100期234位一致的直码
-                    $codes = NumCodeService::getBeforeKjCodesDynamic31($plan, $lottery_type, $positions=[2,3,4], $num=self::BEFORE_3X_QS);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic31($plan, $positions=[2,3,4], $num=self::BEFORE_3X_QS);
                     break;
                 case 35: # 过滤期号一致历史号码全倒(四定)
                     $codes = NumCodeService::getBeforeKjCodesDynamic35($plan, $lottery_type);
@@ -2968,7 +2968,7 @@ class NumService extends BaseService {
                     $codes = NumCodeService::getBeforeKjCodesDynamic28($plan, $positions=[2,3,4,5]);
                     break;
                 case 40: # 过滤1234大小类型一致近1500组直码(四定)
-                    $codes = NumCodeService::getBeforeKjCodesDynamic36($plan, $lottery_type, $positions=[1,2,3,4]);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic36($plan, $positions=[1,2,3,4]);
                     break;
                 case 41: # 过滤1234前期大小或单双类型分别都不一致号码(四定)
                     $codes = NumCodeService::getBeforeKjCodesDynamic41($plan, $filter_type=1);
@@ -3031,19 +3031,19 @@ class NumService extends BaseService {
                     $codes = NumCodeService::getBeforeKjCodesDynamic60($plan, $positions=[1,2,3,4], $lottery_type);
                     break;
                 case 61: # 杀上期千位码
-                    $codes = NumCodeService::getBeforeKjCodesDynamic61($plan, $positions=[1], $lottery_type);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic61($plan, $positions=[1]);
                     break;
                 case 62: # 杀上期百位码
-                    $codes = NumCodeService::getBeforeKjCodesDynamic61($plan, $positions=[2], $lottery_type);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic61($plan, $positions=[2]);
                     break;
                 case 63: # 杀上期十位码
-                    $codes = NumCodeService::getBeforeKjCodesDynamic61($plan, $positions=[3], $lottery_type);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic61($plan, $positions=[3]);
                     break;
                 case 64: # 杀上期个位码
-                    $codes = NumCodeService::getBeforeKjCodesDynamic61($plan, $positions=[4], $lottery_type);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic61($plan, $positions=[4]);
                     break;
                 case 65: # 杀期号尾数位码
-                    $codes = NumCodeService::getBeforeKjCodesDynamic61($plan, $positions=['q'], $lottery_type);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic61($plan, $positions=['q']);
                     break;
                 case 66: # 取千位最近x个码
                     $codes = NumCodeService::getBeforeKjCodesDynamic62($plan, $positions=[1], $cNum=9);
@@ -3058,7 +3058,7 @@ class NumService extends BaseService {
                     $codes = NumCodeService::getBeforeKjCodesDynamic62($plan, $positions=[4], $cNum=9);
                     break;
                 case 70: # 取个位最近x个码
-                    $codes = NumCodeService::getBeforeKjCodesDynamic63($plan, $positions=[1,2,3,4], $lottery_type);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic63($plan, $positions=[1,2,3,4]);
                     break;
                 case 71: # 过滤同单双类型+双重
                     $codes = NumCodeService::getBeforeKjCodesDynamic64($plan, $type_field='type_ds', $positions=[1,2,3,4], $filterNums=500); #
