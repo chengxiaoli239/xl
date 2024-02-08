@@ -547,7 +547,7 @@ class IndexController extends Controller
 
         d(strpos('120341234888', '1234'));
         p(base64_decode("letWC2p_t2X835-hS-3637vZD9Wx49oD15hti5J93RY="));
-        $rst = StaticService::staticOnePlanProifts($plan_id=5885);
+        $rst = StaticService::staticOnePlanProfits($plan_id=5885);
         p($rst);
         $UserSysPlans = UserSysPlans::findOne($plan_id='5834');
         $current_qihao = NumService::getPlanBetCurrentQihao($UserSysPlans, $lottery_type = 17);
