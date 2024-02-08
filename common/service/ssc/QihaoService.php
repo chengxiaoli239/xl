@@ -8,8 +8,10 @@ namespace common\service\ssc;
  */
 
 use backend\models\DataDealStatus;
+use backend\models\SscKjDataDs;
 use common\service\cache\CacheKeyService;
 use common\service\CommonService;
+use common\tools\KjDataGet;
 
 
 class QihaoService extends CommonService
@@ -54,5 +56,18 @@ class QihaoService extends CommonService
         }
 
         return $data;
+    }
+
+    /**
+     * @param int $lottery_type
+     * @return bool|int|string
+     */
+    public static function getNextStaticDsQiHao(int $lottery_type = DEFAULT_LOTTERY_TYPE){
+        $last_qihao = SscKjDataDs::find()->select(['qihao as last_qihao'])->where(['lottery_type'=>$lottery_type])
+            ->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one()['last_qihao'];
+
+        $next_qihao = KjDataGet::getNextQihaoByQihao($last_qihao, $lottery_type);
+
+        return $next_qihao;
     }
 }

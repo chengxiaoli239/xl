@@ -45,7 +45,10 @@ use backend\service\BingDao\BingDaoService;
 use backend\service\qilin\QiLinBaseService;
 use backend\service\SevenService;
 use backend\service\sports\TennisSportsService;
-use backend\service\statics\statics_3d\Statics3dUserDataService;
+use backend\service\statics\plan\OperatePlanService;
+use backend\service\statics\statics_base\BaseDataService;
+use backend\service\statics\statics_base\DealDataService;
+use backend\service\statics\statics_qx\StaticsQxMissService;
 use backend\service\StaticService;
 use backend\service\UserService;
 use backend\service\wanbo\tennis\TennisService;
@@ -647,15 +650,15 @@ class IndexController extends Controller
         $codes_hz_data = json_decode($codes_hz);
         $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, json_encode($codes_hz_data), $plan->id);p($codes);
 
-        p(array_keys(SscDataService::$dealDataStatusFields));
-        $r = SscDataService::insertLotteryDealDataStatus($lottery_type=17);p($r);
+        p(array_keys(DealDataService::$dealDataStatusFields));
+        $r = DealDataService::insertLotteryDealDataStatus($lottery_type=17);p($r);
         $r = SscDataService::insertDealDataTask($lottery_type=23);p($r);
         p(urldecode('%E6%97%85%E6%8A%95%E9%BB%91%E8%99%8E'));
         p(base64_decode('MjEyNV9pbTFidGdhb3pfNHB0dHhhaDF5Z181,MTczNV9pbTEwdzI4MjIyMDIyMDMxMTgzMTk2,'));
         $rst = FootBallService::getSorceFromUnibet(); p($rst);# 群发微信消息
 
         $data = NaSiDaKe::getLotteryNo($type='json', $is_auto=2, $lottery_type=25);p($data);
-        $rst = SscDataService::opProfitsPlans12_13($lottery_type = 8);
+        $rst = OperatePlanService::opProfitsPlans12_13($lottery_type = 8);
         p($rst);# A出x次B出y次投B 计划处理
         $r = BaseService::login($id = 10);
         p($r);
@@ -764,7 +767,7 @@ class IndexController extends Controller
         p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 17);
         p($rst);// 更新单双遗漏
-        $rst = SscDataService::insertDsTypeDatas($lottery_type = 17);
+        $rst = BaseDataService::insertDsTypeDatas($lottery_type = 17);
         p($rst);
         $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);
         p($data);
@@ -1015,7 +1018,7 @@ class IndexController extends Controller
         p($rst);// 单双遗漏
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 8);
         p($rst);// 单双遗漏
-        $miss = SscDataService::getDsHistoryMiss($num, '1,2,3,4', $lottery_type = 5, 5000);
+        $miss = StaticsQxMissService::getDsHistoryMiss($num, '1,2,3,4', $lottery_type = 5, 5000);
         p($miss); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $UserSysPlans = UserSysPlans::findOne($plan_id = 6);
         $flag = BetService::getIsBetTrue($UserSysPlans);
@@ -1097,7 +1100,7 @@ class IndexController extends Controller
         p($rst);
         $rst = ChatCommonBetService::betByDesc($token = 'e221d63e7d00', $desc = '千123456789百123456789十123456789个123456789各0.1');
         p($rst);
-        $rst = SscDataService::insertCodeType();
+        $rst = BaseDataService::insertCodeType();
         p($rst);
         $rst = JuHuaBaseService::getBetCodes(['2123', '3457', '7892', '3029', '3X09', '3424'], $single = 0.1, $playway = 3);
         p($rst); # 同步余额
@@ -1117,14 +1120,14 @@ class IndexController extends Controller
 
         $time = BetService::getBetCacheTime($lottery_type = 5, $qihao = '200319036');
         p($time);# 投注之后缓存时间
-        $rst = SscDataService::getPlanNextSingle(52, 0, $next_single_key, $lottery_type = 5);
+        $rst = OperatePlanService::getPlanNextSingle(52, 0, $next_single_key, $lottery_type = 5);
         p($rst);
         $qs = SscDataService::getLossQs(52);
         p($qs);
         $rst = BetService::isLogin($uid = 20, $tz_system_id = 9);
         d($rst);
 
-        $rst = SscDataService::insertCodeType2();
+        $rst = BaseDataService::insertCodeType2();
         p($rst);
 
 
@@ -1134,7 +1137,7 @@ class IndexController extends Controller
         p(['即将开奖期号' => $qihao, 'lottery_type' => $lottery_type]);
         $rst = OpKjService::opKjData4('3,X,2,9@X,2,4,9@3,9,X,9@3,9,7,X', '3,9,7,9,5');
         p($rst);
-        $rst = SscDataService::insertCodeType5();
+        $rst = BaseDataService::insertCodeType5();
         p($rst);
         $str = '0,9,1,0';
         $rst = CommonService::isCodeType22b($str);
@@ -1145,7 +1148,7 @@ class IndexController extends Controller
         $miss = SscDataService::getSdHzYlHistoryMiss([1], $lottery_type = 5, 900000);
         p($miss);
 
-        $rst = SscDataService::insertCodeType3();
+        $rst = BaseDataService::insertCodeType3();
         p($rst);
         $rst = CommonService::isCodeType2b('9,1,1,X');
         p($rst);
@@ -1181,7 +1184,7 @@ class IndexController extends Controller
         p(3 % 5);
         $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5);
         p($rst); # 70s
-        $rst = SscDataService::insertCode($type = 5);
+        $rst = BaseDataService::insertCode($type = 5);
         p($rst); # 插入三字现、四字现
         $rst = StaticService::staticHzPerDateProfits('2019-10-31', $lottery_type = 5);
         p($rst);
@@ -1320,7 +1323,7 @@ class IndexController extends Controller
         $arr = ['海南省内包邮'];
         //$str = 'a:1:{i:0;s:18:"海南省内包邮"}';
         p(serialize($arr));
-        $rst = SscDataService::insertStaticVal();
+        $rst = BaseDataService::insertStaticVal();
         p($rst);
         $rst = HuiYuanService5::login(3, 6);
         p($rst);
@@ -1476,7 +1479,7 @@ class IndexController extends Controller
         $rst = UserCustomPlansService::insertSDPlans();
         p($rst);
         //$rst = StaticService::allMonthStaticProfits();p($rst); # 利润统计
-        $rst = SscDataService::insert4dDsZHData();
+        $rst = BaseDataService::insert4dDsZHData();
         p($rst);
         $m = \Yii::$app->cache;
         $qihao = HN0898Service::getQihao();

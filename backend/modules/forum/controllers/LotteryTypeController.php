@@ -4,6 +4,7 @@ namespace backend\modules\forum\controllers;
 
 use backend\service\HN0898Service;
 use backend\service\SscDataService;
+use backend\service\statics\statics_base\DealDataService;
 use backend\service\StaticService;
 use backend\service\SystemService;
 use Yii;
@@ -115,7 +116,7 @@ class LotteryTypeController extends BaseController
         $post = Yii::$app->request->post();
         if ($model->load($post) && $model->save()) {
             $lottery_type = $post['LotteryType']['lottery_type'];
-            SscDataService::insertLotteryDealDataStatus($lottery_type);
+            DealDataService::insertLotteryDealDataStatus($lottery_type);
             return $this->redirect(['index']);
         }
 
@@ -170,7 +171,7 @@ class LotteryTypeController extends BaseController
         $post = Yii::$app->request->post();
         if ($model->load($post) && $model->save()) {
             $lottery_type = $post['LotteryType']['lottery_type'];
-            SscDataService::insertLotteryDealDataStatus($lottery_type);
+            DealDataService::insertLotteryDealDataStatus($lottery_type);
             return $this->redirect(['index']);
         }
 

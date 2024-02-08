@@ -39,6 +39,7 @@ use backend\models\ThreeNum;
 use backend\models\TzSystemsAuth;
 use backend\models\TzTypes;
 use backend\models\UserSysPlans;
+use backend\service\statics\statics_base\DealDataService;
 use backend\tools\Util;
 use common\service\CommonService;
 use common\service\lottery\LotteryTypeService;
@@ -1203,9 +1204,9 @@ class StaticService extends BaseService {
         $start_time = microtime(true);
         try {
             Tool_Common::log('/datas/'.__FUNCTION__, "INFO", '四定利润统计状态', ['lottery_type'=>$lottery_type, 'fun'=>__FUNCTION__]);
-            $DataDealStatus = SscDataService::judgeDealTaskStatus($lottery_type, '', $field='static4dPerDateProfits_status');
+            $DataDealStatus = DealDataService::judgeDealTaskStatus($lottery_type, '', $field='static4dPerDateProfits_status');
             if($DataDealStatus->$field == SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL){
-                throw_info('未开启统计：'.SscDataService::$dealDataStatusFields[$field], 40001);
+                throw_info('未开启统计：'.DealDataService::$dealDataStatusFields[$field], 40001);
             }
 
             $allStaticProfits = self::allDateStaticProfits($lottery_type, $s_date);
@@ -1256,7 +1257,7 @@ class StaticService extends BaseService {
         }
 
         $end_time = microtime(true);
-        SscDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s', 'deal_time'=>date('Y-m-d H:i:s')]);
+        DealDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s', 'deal_time'=>date('Y-m-d H:i:s')]);
 
         return ['status'=>200, 'data'=>$setData, 'rst'=>$rst];
     }

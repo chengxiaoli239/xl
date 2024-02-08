@@ -11,23 +11,19 @@ namespace backend\service;
 use backend\models\BettingRecords;
 use backend\models\DataTime;
 use backend\models\KjConfig;
-use backend\models\Num4Type;
 use backend\models\SscDsYl;
 use backend\models\SscKjData;
 use backend\models\SysPlansCodes;
-use backend\models\SystemConfig;
-use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
-use backend\models\User;
 use backend\models\UserCustomPlans;
 use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
 use backend\service\clients\TzSystemUsersService;
 use backend\service\NineNine\NineNineBaseService;
+use backend\service\statics\statics_base\BaseDataService;
 use backend\tools\Tools;
 use common\kj\qxc\QxcTcw;
 use common\models\AdminModel;
-use common\service\CaptchaCodeService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use yii;
@@ -1841,7 +1837,7 @@ class HN0898Service extends BaseTZService {
     public static function initDsDatas($lottery_type = DEFAULT_LOTTERY_TYPE){
         //$rst = ['status'=>200, 'msg'=>'操作成功lottery_type['.$lottery_type.']'];
 
-        $rst = SscDataService::insertDsTypeDatas($lottery_type);
+        $rst = BaseDataService::insertDsTypeDatas($lottery_type);
 
         return $rst;
     }

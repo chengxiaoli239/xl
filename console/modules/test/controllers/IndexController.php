@@ -7,6 +7,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\service\BetService;
 use backend\service\NumService;
+use backend\service\SscDataService;
 use backend\service\statics\statics_3d\Statics3dUserDataService;
 use backend\service\StaticService;
 use common\kj\qxc\QxcTcw;
@@ -37,6 +38,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $r = SscDataService::openOnePlanBetStatus($plan_id=120, $next_qihao='2024038');
+            $rst = SscDataService::isCanBet($plan_id, $next_qihao); p($rst);
             $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%lottery_data_deal_status}}'); p($r);
             //$data = \common\service\ssc\QihaoService::getKjQiHao(8);p($data);
             $plan = UserSysPlans::findOne(7995);
