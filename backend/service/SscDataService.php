@@ -131,15 +131,15 @@ class SscDataService extends BaseService {
      * @param $lottery_type integer 彩种类型：1:1.5分 2:3分 3:5分 4:10分 5重庆 6新疆 7北京快乐8
      * @return bool
      */
-    public static function updateDsData(int $lottery_type = DEFAULT_LOTTERY_TYPE): bool
+    public static function updateDsData(int $lottery_type = DEFAULT_LOTTERY_TYPE)
     {
         $mkey = 'DS_COUNT_NUMS_'.$lottery_type.'_05';
         $m = \Yii::$app->cache;
 
+        $flag = true;
         $next_qihao = QihaoService::getNextStaticDsQiHao($lottery_type);
         $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
 
-        //p([$lottery_type, $next_qihao, $last_qihao]);
         if($next_qihao<=$last_qihao){
             $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
             if(!$new_qihao){ # 防止官网某一期不开的情况, 自动获取开奖表下一期的开奖号码
@@ -151,7 +151,7 @@ class SscDataService extends BaseService {
         }
         //p([$qihao, $new_qihao, $next_qihao, $last_qihao, $lottery_type]);
 
-        return $flag;
+        return (boolean)$flag;
     }
 
     /**
@@ -1431,12 +1431,14 @@ class SscDataService extends BaseService {
             }
             $dealStatus = 2;
         }catch (\Exception $e){
+            $rst = 1;
             $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : ($e->getCode()>40000? 4: 3);
             Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常3', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 
         $end_time = microtime(true);
         DealDataService::dealDataRecord($DataDealStatus, $field, $dealStatus, $dealDesc = ['time_consume'=>($end_time-$start_time).'s', 'deal_time'=>date('Y-m-d H:i:s')]);
+
         return $rst;
     }
 

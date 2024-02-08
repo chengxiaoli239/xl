@@ -38,6 +38,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $rst['updateDs'] = SscDataService::updateDsData($lottery_type = 8); p($rst);// 每期开奖遗漏 -- 新开
             $r = SscDataService::openOnePlanBetStatus($plan_id=120, $next_qihao='2024038');
             $rst = SscDataService::isCanBet($plan_id, $next_qihao); p($rst);
             $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%lottery_data_deal_status}}'); p($r);
