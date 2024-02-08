@@ -110,14 +110,14 @@ class TzService extends BaseService {
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array|bool
      */
-    public static function operateSystemBetPlans($lottery_type = DEFAULT_LOTTERY_TYPE, $is_test = 0){
+    public static function operateSystemBetPlans(int $lottery_type = DEFAULT_LOTTERY_TYPE, $qihao='', $is_test = 0){
         self::_init();
         $rst = ['status'=>200, 'msg'=>'操作成功!'];
 
         $rstLog = [];
         try {
             //$qihao = KjDataGet::getEndQihao($lottery_type);
-            $qihao = HN0898Service::getCurrentQihao($lottery_type);
+            $qihao = $qihao?:HN0898Service::getCurrentQihao($lottery_type);
             $statusRst = self::beforeRunSysPlans($qihao, $lottery_type);
             if($statusRst['status'] != 200){
                 //return $statusRst;
