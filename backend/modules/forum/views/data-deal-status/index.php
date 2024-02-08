@@ -118,6 +118,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $txt = "<font color='#cd5c5c'>未开启统计</font>";
                                     return Html::a($txt, 'javascript:;', ['title' => '处理开关未开启']);
                                 }
+                                return $field.'_'.$model->$field;
                             }
                         ],
                         //'updateDs_status_desc',
