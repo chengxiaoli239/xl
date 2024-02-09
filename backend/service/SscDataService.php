@@ -48,6 +48,7 @@ use backend\models\SscDwHzYl;
 use  yii;
 use yii\db\Expression;
 use yii\helpers\BaseStringHelper;
+use yii\helpers\Json;
 
 class SscDataService extends BaseService {
     public static $fb_plan_types = [2, 3, 4, 5, 9, 10, 16]; # 翻倍计划类型
@@ -1423,6 +1424,8 @@ class SscDataService extends BaseService {
             if($rst){
                 $val = SystemConfig::findOne(['key'=>'ssc_kj_time_period'])->value; # 开奖时间间隔:20分钟
                 $m->set($mkey, 1,$val*60);
+            }else{
+                throw_info(Json::encode($SscKjDataDs->getErrors(), 320));
             }
             //p([$rst, $tmpData,$SscKjDataDs->attributes,$SscKjDataDs->getErrors()]);
             if(!$rst){
