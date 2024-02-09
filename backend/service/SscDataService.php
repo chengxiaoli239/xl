@@ -270,10 +270,15 @@ class SscDataService extends BaseService {
 
     /**
      * @description 最后顺序id
-     * @param int $interval
+     * @param int $lottery_type
+     * @return int
      */
-    public static function getKjDataLastIndexId($lottery_type = DEFAULT_LOTTERY_TYPE){
-        $last_id = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['max(index_id) as index_id'])->asArray()->one()['index_id'];
+    public static function getKjDataLastIndexId($lottery_type = DEFAULT_LOTTERY_TYPE): int
+    {
+        $lastQuery = SscKjData::find()->select(['id', 'index_id'])->where(['lottery_type'=>$lottery_type]);
+        //$sql = $lastQuery->createCommand()->getRawSql();p($sql);
+        $last = $lastQuery->orderBy(['id'=>SORT_DESC])->asArray()->one();
+        $last_id = (int)$last['index_id'];
 
         return $last_id;
     }
@@ -1222,15 +1227,16 @@ class SscDataService extends BaseService {
 
     /**
      * @description 返回历史四定和值遗漏
-     * @param $num
-     * @param $position
-     * @param $recently 多少期内，默认为 4天
+     * @param $zuHes
+     * @param int $lottery_type
+     * @param int $recently 多少期内，默认为 4天
      * @return array
      */
     public static function getSdHzYlHistoryMiss($zuHes, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 250){
         $last_times = 0;
-        $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['last_id'=>'index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
-        $min_id = $last['last_id'] - $recently - 1;
+        $lastIndexId = SscDataService::getKjDataLastIndexId($lottery_type);
+        $min_id = $lastIndexId - $recently - 1;
+        //p([$min_id, $last]);
 
         $where = ['AND', ['IN', 'codes_4nums_hz', $zuHes], ['>=', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
         $SscKjData = SscKjData::find()->select(['id','index_id','qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
@@ -1349,7 +1355,7 @@ class SscDataService extends BaseService {
 
     /**
      * @desc 每期开奖单双记录-已完成
-     * @param $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
+     * @param $lottery_type - 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @param string $qihao
      */
     public static function insertSscKjDataDs($qihao = '', $lottery_type = DEFAULT_LOTTERY_TYPE){
@@ -1425,18 +1431,14 @@ class SscDataService extends BaseService {
                 $val = SystemConfig::findOne(['key'=>'ssc_kj_time_period'])->value; # 开奖时间间隔:20分钟
                 $m->set($mkey, 1,$val*60);
             }else{
+                //p([$rst, $tmpData,$SscKjDataDs->attributes,$SscKjDataDs->getErrors()]);
                 throw_info(Json::encode($SscKjDataDs->getErrors(), 320));
-            }
-            //p([$rst, $tmpData,$SscKjDataDs->attributes,$SscKjDataDs->getErrors()]);
-            if(!$rst){
-                $logArr = ['attributes'=>$SscKjDataDs->attributes, 'msg'=>$SscKjDataDs->getErrors()];
-                Tool_Common::log('insertSscKjDataDsError','INFO','每期开奖单双记录-插入失败', $logArr);
             }
             $dealStatus = 2;
         }catch (\Exception $e){
             $rst = 1;
             $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : ($e->getCode()>40000? 4: 3);
-            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常3', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '数据处理异常3', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 
         $end_time = microtime(true);
@@ -1725,7 +1727,7 @@ class SscDataService extends BaseService {
             # 大数组：包括二定、三定、四定
             $updateDsDatas = SscSdHzVal::find()->asArray()->All();
             //$rst[$interval] = SscDataService::dsYLStatic($interval);
-            //if($type==2)p($updateDsDatas);
+            //p($updateDsDatas);
             foreach ($updateDsDatas as $Data){
                 //if($Data['id'] != 61) continue;
                 $zuHes = explode(',', $Data['val']);
@@ -2390,7 +2392,7 @@ class SscDataService extends BaseService {
                     $logArr['plan_8'][$UserSysPlan->id]['rst'] = $rst;
                 }
             }
-            Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划7', $logArr);
+            Tool_Common::log('/plan/opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划7', $logArr);
 
             OperatePlanService::opProfitsPlans12_13($lottery_type); # A出x次B出y次投B、A出x次B出y次投B_2 计划处理
 
@@ -2400,7 +2402,7 @@ class SscDataService extends BaseService {
             $dealStatus = 2;
         }catch (\Exception $e){
             $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : ($e->getCode()>40000? 4: 3);
-            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常5', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage().'-File-'.$e->getFile().'--line-'.$e->getLine()]);
+            Tool_Common::log('/plan/'.__FUNCTION__, 'ERR', '数据处理异常5', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage().'-File-'.$e->getFile().'--line-'.$e->getLine()]);
         }
 
         $end_time = microtime(true);

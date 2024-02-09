@@ -371,12 +371,9 @@ class KjDataGet
         if(!$kjDatas) return false;
         $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
         if(!empty($SscKjData)){
-            if(!in_array($lottery_type, [1, 17])){
-                return ['status'=>301, 'msg'=>'开奖号码存在'];
-            }
-        }else{
-            $SscKjData = new SscKjData();
+            return ['status'=>301, 'msg'=>'开奖号码存在'];
         }
+        $SscKjData = new SscKjData();
         $lastIndexId = SscDataService::getKjDataLastIndexId($lottery_type);
         $index_id = $lastIndexId + 1;
 

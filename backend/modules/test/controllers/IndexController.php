@@ -564,8 +564,6 @@ class IndexController extends Controller
         p($rst);
         $lottery_type = 8;
         $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);
-        $r = push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name]);
-        d($r);
 
         $data = [
             'url' => 'http://example.com/image.jpg',
@@ -1071,8 +1069,6 @@ class IndexController extends Controller
         p($rst);
         $snInfo = LuckyBaseService::getSn($user_id = 17, $tz_system_id = 9);
         p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
-        $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5, $type = 2);
-        p($rst);// 更新和值遗漏
         $mcLock = new McLockService();
         $flag = $mcLock->Lock('dw');
         d($flag);
@@ -1270,8 +1266,6 @@ class IndexController extends Controller
 
         $rst[] = StaticService::static4dPerDateProfits($lottery_type = 6);
         p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
-        $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 5);
-        p($rst);// 更新和值遗漏
         $snid = NineNineBaseService::getSnidBySn('JXSSC1909201535157573FFE1', $lottery_type = 6);
         p($snid);// 获取方案内容
         $rst = HN0898Service::getRemoteHzRecords(3, 2);
