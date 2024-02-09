@@ -1750,7 +1750,6 @@ class SscDataService extends BaseService {
 
                 $SscSdHzYl->updated_at = time();
                 $miss = SscDataService::getSdHzYlHistoryMiss($zuHes, $lottery_type, $Data['static_nums']);
-                p($miss);
                 //if($zuHes == [5,6,7,8,9,10]) p([$zuHes,$miss, $Data['static_nums']]);
                 $SscSdHzYl->static_nums = $Data['static_nums'];
                 $SscSdHzYl->status = $Data['status'];

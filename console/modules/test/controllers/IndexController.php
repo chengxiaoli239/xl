@@ -38,7 +38,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 1); p($rst);// 更新和值遗漏
+            //$rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 1); p($rst);// 更新和值遗漏
             //$r = push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>1, 'lottery_name'=>'七星彩', 'business_id'=>'2024016', 'ignore'=>1]);
             $r = push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>17, 'lottery_name'=>'排列五', 'business_id'=>'2024038', 'ignore'=>1]);
             p($r);
