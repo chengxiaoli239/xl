@@ -1270,7 +1270,7 @@ class SscDataService extends BaseService {
             $max_range = $SscKjData[1]['qihao'] ."-". $SscKjData[0]['qihao'];
         }
         $last_time_miss_range = $SscKjData[1]['qihao'] ."-". $SscKjData[0]['qihao'];
-        $current_times = $last['last_id'] - $SscKjData[0]->index_id;
+        $current_times = $lastIndexId - $SscKjData[0]->index_id;
         //p([$last['last_id'] , $SscKjData[0]]);
 
         $rstData = [
@@ -1750,6 +1750,7 @@ class SscDataService extends BaseService {
 
                 $SscSdHzYl->updated_at = time();
                 $miss = SscDataService::getSdHzYlHistoryMiss($zuHes, $lottery_type, $Data['static_nums']);
+                //p($miss);
                 //if($zuHes == [5,6,7,8,9,10]) p([$zuHes,$miss, $Data['static_nums']]);
                 $SscSdHzYl->static_nums = $Data['static_nums'];
                 $SscSdHzYl->status = $Data['status'];
