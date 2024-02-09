@@ -108,9 +108,9 @@ class TzService extends BaseService {
     /**
      * @desc 处理系统投注计划
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
-     * @return array|bool
+     * @return array
      */
-    public static function operateSystemBetPlans(int $lottery_type = DEFAULT_LOTTERY_TYPE, $qihao='', $is_test = 0){
+    public static function operateSystemBetPlans(int $lottery_type = DEFAULT_LOTTERY_TYPE, $qihao='', $ignore = 0){
         self::_init();
         $rst = ['status'=>200, 'msg'=>'操作成功!'];
 
@@ -122,7 +122,7 @@ class TzService extends BaseService {
             if($statusRst['status'] != 200){
                 //return $statusRst;
             }
-            if(!$is_test && !$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opSystemBetPlans')){
+            if(!$ignore && !$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opSystemBetPlans')){
                 throw new \Exception('不可操作统计数据，还没到开奖时间');
             }
             $rst['qihao'] = $qihao;
