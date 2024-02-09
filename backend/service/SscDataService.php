@@ -1235,8 +1235,8 @@ class SscDataService extends BaseService {
     public static function getSdHzYlHistoryMiss($zuHes, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 250){
         $last_times = 0;
         $lastIndexId = SscDataService::getKjDataLastIndexId($lottery_type);
-        $min_id = $lastIndexId - $recently - 1;
-        //p([$min_id, $last]);
+        $min_id = max($lastIndexId - $recently - 1, 0);
+        //p([$lastIndexId, $recently, $min_id]);
 
         $where = ['AND', ['IN', 'codes_4nums_hz', $zuHes], ['>=', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
         $SscKjData = SscKjData::find()->select(['id','index_id','qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
@@ -1750,6 +1750,7 @@ class SscDataService extends BaseService {
 
                 $SscSdHzYl->updated_at = time();
                 $miss = SscDataService::getSdHzYlHistoryMiss($zuHes, $lottery_type, $Data['static_nums']);
+                p($miss);
                 //if($zuHes == [5,6,7,8,9,10]) p([$zuHes,$miss, $Data['static_nums']]);
                 $SscSdHzYl->static_nums = $Data['static_nums'];
                 $SscSdHzYl->status = $Data['status'];
