@@ -134,24 +134,10 @@ class SscDataService extends BaseService {
      */
     public static function updateDsData(int $lottery_type = DEFAULT_LOTTERY_TYPE)
     {
-        $mkey = 'DS_COUNT_NUMS_'.$lottery_type.'_05';
-        $m = \Yii::$app->cache;
-
-        $flag = true;
-        $next_qihao = QihaoService::getNextStaticDsQiHao($lottery_type);
         list($lastQihao, $lastIndexId, $lastId, $nextQihao) = SscDataService::getKjDataLastIndexId($lottery_type);
 
-        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新单双状态', ['lottery_type'=>$lottery_type, 'next_qihao'=>$next_qihao, 'lastQihao'=>$lastQihao, 'nextQihao'=>$nextQihao]);
-        if($next_qihao<=$lastQihao){
-            $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
-            if(!$new_qihao){ # 防止官网某一期不开的情况, 自动获取开奖表下一期的开奖号码
-                $new_qihao = SscKjData::find()->where(['AND', ['>', 'qihao',$next_qihao], ['=', 'lottery_type', $lottery_type]])->orderBy('id ASC')->limit(1)->one()->qihao;
-            }
-            //p([$qihao, $new_qihao, $next_qihao, $last_qihao, $lottery_type]);
-            $flag = SscDataService::insertSscKjDataDs($new_qihao, $lottery_type);
-            $m->set($mkey, $new_qihao, 24*60*60);
-        }
-        //p([$qihao, $new_qihao, $next_qihao, $last_qihao, $lottery_type]);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新单双状态', ['lottery_type'=>$lottery_type, 'lastQihao'=>$lastQihao, 'nextQihao'=>$nextQihao]);
+        $flag = SscDataService::insertSscKjDataDs($lastQihao, $lottery_type);
 
         return (boolean)$flag;
     }
@@ -1392,11 +1378,12 @@ class SscDataService extends BaseService {
             $opData['updated_time'] = date('Y-m-d H:i:s');
             //p(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
             $SscKjDataDs = SscKjDataDs::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
-            if(!$SscKjDataDs){
-                $SscKjDataDs = new SscKjDataDs();
-                $opData['created_at'] = time();
-                $opData['index_id'] = $SscKjData->index_id;
+            if($SscKjDataDs){
+                return false;
             }
+            $SscKjDataDs = new SscKjDataDs();
+            $opData['created_at'] = time();
+            $opData['index_id'] = $SscKjData->index_id;
 
             # 1、一定
             foreach ($tmpData as $key=>$tmp){
