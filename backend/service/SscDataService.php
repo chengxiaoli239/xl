@@ -139,9 +139,11 @@ class SscDataService extends BaseService {
 
         $flag = true;
         $next_qihao = QihaoService::getNextStaticDsQiHao($lottery_type);
-        $last_qihao = SscDataService::getKjDataLastQihao($lottery_type);
+        $lastQihao = SscDataService::getKjDataLastQihao($lottery_type);
+        //list($lastQihao, $lastIndexId, $lastId) = SscDataService::getKjDataLastIndexId($lottery_type);
 
-        if($next_qihao<=$last_qihao){
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新单双状态', ['lottery_type'=>$lottery_type, 'next_qihao'=>$next_qihao, 'last_qihao'=>$lastQihao]);
+        if($next_qihao<=$lastQihao){
             $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
             if(!$new_qihao){ # 防止官网某一期不开的情况, 自动获取开奖表下一期的开奖号码
                 $new_qihao = SscKjData::find()->where(['AND', ['>', 'qihao',$next_qihao], ['=', 'lottery_type', $lottery_type]])->orderBy('id ASC')->limit(1)->one()->qihao;
@@ -271,16 +273,18 @@ class SscDataService extends BaseService {
     /**
      * @description 最后顺序id
      * @param int $lottery_type
-     * @return int
+     * @return array
      */
-    public static function getKjDataLastIndexId($lottery_type = DEFAULT_LOTTERY_TYPE): int
+    public static function getKjDataLastIndexId($lottery_type = DEFAULT_LOTTERY_TYPE): array
     {
-        $lastQuery = SscKjData::find()->select(['id', 'index_id'])->where(['lottery_type'=>$lottery_type]);
+        $lastQuery = SscKjData::find()->select(['qihao', 'index_id', 'id'])->where(['lottery_type'=>$lottery_type]);
         //$sql = $lastQuery->createCommand()->getRawSql();p($sql);
         $last = $lastQuery->orderBy(['id'=>SORT_DESC])->asArray()->one();
-        $last_id = (int)$last['index_id'];
+        $lastQihao = (string)$last['qihao'];
+        $lastIndexId = (int)$last['index_id'];
+        $lastId = (int)$last['id'];
 
-        return $last_id;
+        return [$lastQihao, $lastIndexId, $lastId];
     }
 
     /**
@@ -1234,7 +1238,7 @@ class SscDataService extends BaseService {
      */
     public static function getSdHzYlHistoryMiss($zuHes, $lottery_type = DEFAULT_LOTTERY_TYPE, $recently = 250){
         $last_times = 0;
-        $lastIndexId = SscDataService::getKjDataLastIndexId($lottery_type);
+        list($lastQihao, $lastIndexId, $lastId) = SscDataService::getKjDataLastIndexId($lottery_type);
         $min_id = max($lastIndexId - $recently - 1, 0);
         //p([$lastIndexId, $recently, $min_id]);
 

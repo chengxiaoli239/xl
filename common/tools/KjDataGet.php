@@ -374,7 +374,7 @@ class KjDataGet
             return ['status'=>301, 'msg'=>'开奖号码存在'];
         }
         $SscKjData = new SscKjData();
-        $lastIndexId = SscDataService::getKjDataLastIndexId($lottery_type);
+        list($lastQihao, $lastIndexId, $lastId) = SscDataService::getKjDataLastIndexId($lottery_type);
         $index_id = $lastIndexId + 1;
 
         $kjDatasArr = explode(',',$kjData);

@@ -716,7 +716,7 @@ class NumCodeService extends BaseService {
         $lottery_type = $plan->lottery_type;
 
         list($current_kj_qihao, $next_qihao) = QihaoService::getKjQiHao($lottery_type);
-        $lastIndexId = SscDataService::getKjDataLastIndexId($lottery_type);
+        list($lastQihao, $lastIndexId, $lastId) = SscDataService::getKjDataLastIndexId($lottery_type);
         $startIndexId = $lastIndexId - $num;
 
         $positions_str = 'code'.implode(',",",code', $positions);
