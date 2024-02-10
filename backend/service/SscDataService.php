@@ -1387,28 +1387,28 @@ class SscDataService extends BaseService {
 
             # 1、一定
             foreach ($tmpData as $key=>$tmp){
-                $field = 'code_'.$key;
-                $opData[$field] = $tmpData[$key];
+                $sField = 'code_'.$key;
+                $opData[$sField] = $tmp;
             }
 
             # 2、二定
             $zuHes = [ [1,2], [1,3], [1,4], [2,3], [2,4], [3,4] ];
             foreach ($zuHes as $key=>$zuHe){
-                $field = 'code_'.$zuHe[0].'_'.$zuHe[1];
-                $opData[$field] = $tmpData[$zuHe[0]].$tmpData[$zuHe[1]];
+                $sField = 'code_'.$zuHe[0].'_'.$zuHe[1];
+                $opData[$sField] = $tmpData[$zuHe[0]].$tmpData[$zuHe[1]];
             }
 
             # 3、三定
             $zuHes = [ [1,2,3], [1,2,4], [1,3,4], [2,3,4] ];
             foreach ($zuHes as $key=>$zuHe){
-                $field = 'code_'.$zuHe[0].'_'.$zuHe[1].'_'.$zuHe[2];
-                $opData[$field] = $tmpData[$zuHe[0]].$tmpData[$zuHe[1]].$tmpData[$zuHe[2]];
+                $sField = 'code_'.$zuHe[0].'_'.$zuHe[1].'_'.$zuHe[2];
+                $opData[$sField] = $tmpData[$zuHe[0]].$tmpData[$zuHe[1]].$tmpData[$zuHe[2]];
             }
 
             # 4、四定
             $zuHe = [ 1,2,3,4 ];
-            $field = 'code_'.$zuHe[0].'_'.$zuHe[1].'_'.$zuHe[2].'_'.$zuHe[3];
-            $opData[$field] = $tmpData[$zuHe[0]].$tmpData[$zuHe[1]].$tmpData[$zuHe[2]].$tmpData[$zuHe[3]];
+            $sField = 'code_'.$zuHe[0].'_'.$zuHe[1].'_'.$zuHe[2].'_'.$zuHe[3];
+            $opData[$sField] = $tmpData[$zuHe[0]].$tmpData[$zuHe[1]].$tmpData[$zuHe[2]].$tmpData[$zuHe[3]];
 
             $opData['qihao'] = (string)$qihao;
             $opData['code_str'] = $SscKjData['code_str'];
