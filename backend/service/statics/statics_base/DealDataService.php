@@ -84,7 +84,10 @@ class DealDataService extends BaseService
             $DataDealStatus->{$field.'_desc'} = json_encode($dealDesc, 320);
             $DataDealStatus->save();
         }catch (\Exception $e){
-            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '处理数据任务状态', ['lottery_type'=>$DataDealStatus->lottery_type, 'next_qihao'=>$DataDealStatus->next_qihao, 'qihao'=>$DataDealStatus->qihao, 'field'=>$field, 'status'=>$status, 'dealDesc'=>$dealDesc, 'err_msg'=>$e->getMessage(), 'line'=>$e->getLine(), 'file'=>$e->getFile()]);
+            try {
+
+                Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '处理数据任务状态', ['lottery_type'=>$DataDealStatus->lottery_type, 'next_qihao'=>$DataDealStatus->next_qihao, 'qihao'=>$DataDealStatus->qihao, 'field'=>$field, 'status'=>$status, 'dealDesc'=>$dealDesc, 'err_msg'=>$e->getMessage(), 'line'=>$e->getLine(), 'file'=>$e->getFile()]);
+            }catch (\Exception $e){}
             return false;
         }
 
