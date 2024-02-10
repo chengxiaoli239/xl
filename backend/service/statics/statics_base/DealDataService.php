@@ -32,6 +32,7 @@ class DealDataService extends BaseService
         if(empty($qihao)){
             $qihao = HN0898Service::getCurrentQihao($lottery_type);
         }
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '逐期统计', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
         $DataDealStatus = DataDealStatus::findOne(['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
         $key = 'judgeDealTaskStatus_'.$lottery_type.'_'.$qihao;
         if(empty($DataDealStatus)){
