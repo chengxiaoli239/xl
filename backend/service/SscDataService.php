@@ -284,7 +284,7 @@ class SscDataService extends BaseService {
         $lastId = (int)$last['id'];
         $nextQihao = KjDataGet::getNextQihaoByQihao($lastQihao, $lottery_type);
 
-        return [$lastQihao, $lastIndexId, $lastId, $lastQihao];
+        return [$lastQihao, $lastIndexId, $lastId, $nextQihao];
     }
 
     /**
