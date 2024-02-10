@@ -96,7 +96,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         //'static4dPerDateProfits_status_desc',
                         //'updateDs_status',
-                        ['attribute'=>'static4dPerDateProfits_status','label'=>'B单双处理状态',//'headerOptions'=>['width'=>'5%'],
+                        ['attribute'=>'updateDs_status','label'=>'B单双处理状态',//'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value'=>function($model){
                                 $field = 'updateDs_status';
@@ -201,7 +201,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         //'updateSdHzYL_status_desc',
                         //'opProfitsPlans_status',
-                        ['attribute'=>'static4dPerDateProfits_status','label'=>'F投注计划处理状态',//'headerOptions'=>['width'=>'5%'],
+                        ['attribute'=>'opProfitsPlans_status','label'=>'F投注计划处理状态',//'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value'=>function($model){
                                 $field = 'opProfitsPlans_status';
