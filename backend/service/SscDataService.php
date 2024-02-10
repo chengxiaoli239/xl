@@ -139,11 +139,9 @@ class SscDataService extends BaseService {
 
         $flag = true;
         $next_qihao = QihaoService::getNextStaticDsQiHao($lottery_type);
-        $lastQihao = SscDataService::getKjDataLastQihao($lottery_type);
-        //$next_qihao = KjDataGet::getNextQihaoByQihao($lastQihao, $lottery_type);
-        list($lastQihaoA, $lastIndexId, $lastId) = SscDataService::getKjDataLastIndexId($lottery_type);
+        list($lastQihao, $lastIndexId, $lastId, $nextQihao) = SscDataService::getKjDataLastIndexId($lottery_type);
 
-        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新单双状态', ['lottery_type'=>$lottery_type, 'next_qihao'=>$next_qihao, 'last_qihao'=>$lastQihao, 'lastQihaoA'=>$lastQihaoA]);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新单双状态', ['lottery_type'=>$lottery_type, 'next_qihao'=>$next_qihao, 'lastQihao'=>$lastQihao, 'nextQihao'=>$nextQihao]);
         if($next_qihao<=$lastQihao){
             $new_qihao = SscKjData::find()->where(['qihao'=>$next_qihao, 'lottery_type'=>$lottery_type])->one()->qihao;
             if(!$new_qihao){ # 防止官网某一期不开的情况, 自动获取开奖表下一期的开奖号码
@@ -284,8 +282,9 @@ class SscDataService extends BaseService {
         $lastQihao = (string)$last['qihao'];
         $lastIndexId = (int)$last['index_id'];
         $lastId = (int)$last['id'];
+        $nextQihao = KjDataGet::getNextQihaoByQihao($lastQihao, $lottery_type);
 
-        return [$lastQihao, $lastIndexId, $lastId];
+        return [$lastQihao, $lastIndexId, $lastId, $lastQihao];
     }
 
     /**
