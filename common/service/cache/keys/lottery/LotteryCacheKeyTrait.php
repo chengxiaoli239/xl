@@ -28,7 +28,7 @@ trait LotteryCacheKeyTrait
      */
     public static function userLotteryTypes(int $user_id=0): string
     {
-        return 'lottery:userLotteryTypes:type_'.$user_id;
+        return 'lottery:userLotteryTypes:user_id_'.$user_id;
     }
 
 }

@@ -21,6 +21,6 @@ trait LotteryStaticsCacheKeyTrait
 
     public static function preInsertPlanTaskKey($planId, $activeQiHao=''): string
     {
-        return 'lottery:pre_insert_plan_task:val_'.$planId.'_'.$activeQiHao;
+        return 'lottery:pre_insert_task:plan_id_'.$planId.'_activeQiHao_'.$activeQiHao;
     }
 }
