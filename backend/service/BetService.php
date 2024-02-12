@@ -25,6 +25,7 @@ use backend\service\NineNine\NineNineBaseService;
 use backend\service\NineNine\NineNineNewService;
 use backend\service\NineNine\NineNineService6;
 use common\kj\cqssc\CqsscKcw;
+use common\service\cache\CacheKeyService;
 use common\service\jobs\kj_data\UserBetJob;
 use common\service\proxy\ProxyBaseService;
 use common\tools\RedisLock;
@@ -431,7 +432,7 @@ abstract class BetService extends BaseBetService {
                     $BetService = self::getBetObj($uid, $tz_system_id, $lottery_type);
                     if(false && $balance<$bet_money){
                         BetService::closeTask($task_id, $qihao, $activeQihao, $account, $msg='余额不足，不可重推'); # 关闭计划
-                    }elseif($is_local_bet == 0 && $qihao == $activeQihao){ # 云服务
+                    }elseif($is_local_bet == 0 && $qihao == $activeQihao){ # 0:云服务
                         #$betKey = BetService::buildLotteryBetKey($activeQihao, $plan_id, $bet_sort_key, $task_id);
                         #if($lock = $m->get($betKey)){
                         #    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-3', ['task_id'=>$task_id,'betKey'=>$betKey]);
@@ -470,15 +471,13 @@ abstract class BetService extends BaseBetService {
                         }
 
                         Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注成功-end', $logArr);
-                    }elseif(!empty($activeQihao) && $qihao<$activeQihao){
+                    }elseif(!empty($activeQihao) && $qihao<$activeQihao){ # 过期为下
                         BetService::closeTask($task_id, $qihao, $activeQihao, $account, $msg='未开盘或者已关盘[' . date('Y-m-d H:i:s') . ']'); # 关闭计划
                         $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = ['status' => 300, 'qihao'=>$qihao, 'activeQihao'=>$activeQihao, 'msg' => $msg];
                         Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-5', ['uid'=>$uid,'account'=>$account,'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
                     }
 
                     $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetInfo'] = $betErrorPlansTask;
-                    $rnt = rand(1, 3);
-                    sleep($rnt);
                 }catch (\Exception $exception){
                     Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '下注错误', ['task_id'=>$task_id]);
                     $rst[$lottery_type][$task_id]['repeatBetRst'] = ['task_id'=>$task_id, 'err_msg'=>$exception->getMessage()];
@@ -2029,7 +2028,7 @@ abstract class BetService extends BaseBetService {
 
         foreach ($lottery_types as $lottery_type){
             $HI = date('H:i');
-            if($lottery_type == 8 && '04:00'<$HI && $HI<'09:00'){
+            if($lottery_type == 8 && '03:59'<$HI && $HI<'09:00'){
                 //return ['status'=>300, 'msg'=>'幸运五非开盘时间'];
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '批量插入任务100', ['lottery_type'=>$lottery_type, 'err_msg'=>'幸运五非开盘时间']);
                 continue;
@@ -2059,17 +2058,15 @@ abstract class BetService extends BaseBetService {
                         $qihao = $next_qihao;
                     }
                     $is_equal = ($qihao==$next_qihao) ? 1 : 0;
-                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'qihao'=>$qihao, 'is_equal'=>$is_equal, 'lottery_type'=>$lottery_type]);
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'is_equal'=>$is_equal, 'lottery_type'=>$lottery_type]);
                     //if($uid != 17) continue; # 测试
 
-                    $insert_mkey = 'insertPlanTask_key_'.$lottery_type.'_'.$qihao.'_'.$plan->id;
-                    if($m->get($insert_mkey)){
-                        throw new Exception('已记录yx表'.$lottery_type.'_'.$qihao.'_'.$plan->id);
+                    $insert_mkey = CacheKeyService::insertPlanTaskKey($lottery_type, $qihao, $plan->id);
+                    if(commonRedis()->get($insert_mkey)){
+                        throw new Exception('已记录yx表'.$insert_mkey);
                     }
                     $Task = BetErrorPlansTask::findOne(['plan_id'=>$plan->id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
                     if($Task){
-                        $logArr = ['status'=>200, 'msg'=>'已记录推送表'.$lottery_type.'_'.$qihao];
-                        Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '写入计划任务表', $logArr);
                         throw new Exception('已记录推送表'.$lottery_type.'_'.$qihao);
                     }
 
@@ -2082,8 +2079,7 @@ abstract class BetService extends BaseBetService {
                         if('09:00'<=$dateHI && $dateHI<='09:05' && $lottery_type==DEFAULT_LOTTERY_TYPE){
                             #return ['status'=>200, 'data'=>['next_qihao'=>date('Ymd').'109']];
                         }else{
-                            Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao_not_active']);
-                            throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
+                            throw new Exception('计划未处理完成_next_qihao_not_active_'.$lottery_type.'_'.$qihao);
                         }
                     }
 
@@ -2096,7 +2092,7 @@ abstract class BetService extends BaseBetService {
                     if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
                         $testInsertRst = self::_logRecordsByPlandId($plan->id, $qihao, $codes, $plan->lottery_type, $is_test, $sn, $snid, $plan->hz_Arr, $r=3); # 直接记录表
                         if($testInsertRst['status'] == 200){
-                            $m->set($insert_mkey, 1, 60);
+                            commonRedis()->setex($insert_mkey, 60, 1);
                         }
                     }else{
                         $task_qihao = $qihao;
@@ -2121,17 +2117,14 @@ abstract class BetService extends BaseBetService {
 
                         $status = UserService::accountIsExpire($plan->uid, $tz_system_id); # 账号是否过期
                         if(!$status && $plan->account != 'gaozi2018'){
-                            Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示-2', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
                             throw new \yii\base\Exception('账号过期提示-2');
                         }
 
-                        $preInsertLockKey = 'preInsertLockKey_'.$plan->id.'_'.$activeQihao;
-
-                        if($lock = $m->get($preInsertLockKey)){
+                        $preInsertLockKey = CacheKeyService::preInsertPlanTaskKey($plan->id, $activeQihao);
+                        if(commonRedis()->get($preInsertLockKey)){
                             throw new \yii\base\Exception('已经被锁:'.$preInsertLockKey);
                         }
-                        $time = BetService::getBetCacheTime($lottery_type, $activeQihao); # 投注之后缓存时间
-                        $m->set($preInsertLockKey, 1, $time);
+                        commonRedis()->setex($preInsertLockKey, BetService::getBetCacheTime($lottery_type, $activeQihao), 1);# 投注之后缓存时间
 
                         $insertRst = $BetService->postBatchBet($activeQihao, $plan->id, $codes);
                         $rst['data'][$plan->id] = $insertRst;
@@ -2141,7 +2134,7 @@ abstract class BetService extends BaseBetService {
                     }
                     $rst['data'] = ['activeQihao'=>$activeQihao, 'plan_id'=>$plan->id, 'msg'=>'正常', 'qihao'=>$qihao];
                 }catch (\Exception $e){
-                    Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '插入计划-异常', ['uid'=>$uid, 'plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage(), 'errcode'=>$e->getCode(), 'file'=>$e->getFile(), 'line'=>$e->getLine()]);
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '插入计划-异常', ['uid'=>$uid, 'plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage(), 'errCode'=>$e->getCode(), 'file'=>$e->getFile(), 'line'=>$e->getLine()]);
                     $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>$e->getMessage()];
                 }
             }

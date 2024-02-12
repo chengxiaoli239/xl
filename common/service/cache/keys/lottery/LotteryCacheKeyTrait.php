@@ -21,4 +21,14 @@ trait LotteryCacheKeyTrait
     {
         return 'lottery:qiHaoInfo:current_'.$lottery_type;
     }
+
+    /**
+     * @param int $user_id
+     * @return string
+     */
+    public static function userLotteryTypes(int $user_id=0): string
+    {
+        return 'lottery:userLotteryTypes:type_'.$user_id;
+    }
+
 }

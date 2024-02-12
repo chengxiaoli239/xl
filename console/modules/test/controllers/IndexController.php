@@ -11,6 +11,7 @@ use backend\service\SscDataService;
 use backend\service\statics\statics_3d\Statics3dUserDataService;
 use backend\service\StaticService;
 use common\kj\qxc\QxcTcw;
+use common\service\cache\CacheKeyService;
 use common\service\helpers\ThirdD;
 use common\service\thirdD\match\MatchCodeService;
 use common\service\thirdD\MethodMatchService;
@@ -38,6 +39,11 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $lottery_types = \backend\service\UserSysPlansService::getMyLotteryTypes($user_id=40);//p($lottery_types);
+
+            $mkey = CacheKeyService::userLotteryTypes($user_id=40);
+            $lottery_types1 = commonRedis()->get($mkey);
+            p([$lottery_types, $lottery_types1]);
             list($lastQihao, $lastIndexId, $lastId, $nextQihao) = SscDataService::getKjDataLastIndexId($lottery_type=8);
             p([$lastQihao, $lastIndexId, $lastId, $nextQihao]);
             //$rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 17); p($rst);// 更新和值遗漏

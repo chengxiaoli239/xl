@@ -16,7 +16,6 @@ use backend\models\SystemConfig;
 use backend\models\TzSystemsAuth;
 use backend\models\UserCustomPlans;
 use common\service\jobs\kj_data\AfterRunSysPlansJob;
-use common\service\jobs\kj_data\UserBetJob;
 use common\service\jobs\kj_data\UserBetTaskRecordJob;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;

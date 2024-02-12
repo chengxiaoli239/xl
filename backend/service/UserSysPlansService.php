@@ -23,6 +23,7 @@ use backend\models\UserCustomPlans;
 use backend\models\UserSysPlans;
 use common\models\AdminModel;
 use common\models\base\BaseModel;
+use common\service\cache\CacheKeyService;
 use common\service\CommonService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -989,9 +990,10 @@ class UserSysPlansService extends BaseService {
      */
     public static function getMyLotteryTypes($uid=0){
 
-        $m = \Yii::$app->cache;
-        $mkey = 'getMyLotteryTypes_data_'.$uid;
-        //if($typeDatas = $m->get($mkey)) return $typeDatas;
+        $mkey = CacheKeyService::userLotteryTypes($uid);
+        if($typeDatas = commonRedis()->get($mkey)){
+            return $typeDatas;
+        }
         if($uid>1){
             $where = ['uid'=>$uid];
         }else{
@@ -1015,7 +1017,7 @@ class UserSysPlansService extends BaseService {
             $typeDatas[$key]['name'] = $tmpDatas[$lottery_type];
         }
 
-        $m->set($mkey, $typeDatas, \Yii::$app->params['BASE_DATA_CACHE_TIME']);
+        commonRedis()->setex($mkey, \Yii::$app->params['BASE_DATA_CACHE_TIME'], $typeDatas);
 
         return $typeDatas;
     }
