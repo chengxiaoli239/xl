@@ -25,6 +25,7 @@ use common\models\AdminModel;
 use common\models\base\BaseModel;
 use common\service\cache\CacheKeyService;
 use common\service\CommonService;
+use common\service\ssc\QihaoService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
@@ -1467,7 +1468,8 @@ class UserSysPlansService extends BaseService {
         $tz_type = $data['UserSysPlans']['tz_type'];
         $is_test = $data['UserSysPlans']['is_test']; # 是否模拟
         //p([$uid, $tz_system_id, $lottery_type]);
-        $activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
+        //$activeQihao = BetService::getActiveQihao($uid, $tz_system_id, $lottery_type);
+        list($currentKjQiHao, $activeQiHao) = QihaoService::getKjQiHao($lottery_type);
         //p([$tz_type, $activeQihao]);
         $model = new UserSysPlans();
         UserSysPlansService::preOpData($data, $user_id=1);
@@ -1481,7 +1483,7 @@ class UserSysPlansService extends BaseService {
         # 5、投注请求
         $BetService = BetService::getBetObj($uid, $tz_system_id, $lottery_type);
         # 下注操作
-        $tmpRst = $BetService->betByCodes($activeQihao, $codes, $uid, $single, $playway, $lottery_type);
+        $tmpRst = $BetService->betByCodes($activeQiHao, $codes, $uid, $single, $playway, $lottery_type);
         $rstData = $tmpRst['rstData'];
         $xCsrf = $tmpRst['xCsrf'];
         $m = \Yii::$app->cache;
@@ -1511,7 +1513,7 @@ class UserSysPlansService extends BaseService {
                 'account' => $account,
                 'post_desc' => $post_desc,
                 'codes' => implode('@', $codes),  // 投注号码
-                'qihao' => $activeQihao,  // 投注期号
+                'qihao' => $activeQiHao,  // 投注期号
                 'plan_id' => '',  // 计划id
                 'tz_system_id' => $TzSystemsUsers->tz_system_id,  // 投注系统tz_systems .id
                 'sn'=>trim($sn, ','),
@@ -1522,12 +1524,12 @@ class UserSysPlansService extends BaseService {
                 'betting_money'=> $totalmoney,  // 投注金额
             ];
             $insertRst = BetService::_logRecords($insertData);
-            Tool_Common::log('/quick_bet/'.__FUNCTION__, 'INFO', '新过滤快打', ['account'=>$account, 'qihao'=>$activeQihao, 'playway'=>$playway, 'counts'=>count($codes), 'insertRst'=>$insertRst]);
+            Tool_Common::log('/quick_bet/'.__FUNCTION__, 'INFO', '新过滤快打', ['account'=>$account, 'qihao'=>$activeQiHao, 'playway'=>$playway, 'counts'=>count($codes), 'insertRst'=>$insertRst]);
 
         }
         $rst['data']['push_rst'] = $rstData;
 
-        $rst['data']['push_data']['qihao'] = $activeQihao;
+        $rst['data']['push_data']['qihao'] = $activeQiHao;
         $rst['data']['push_data']['nums'] = count($codes);
         $rst['data']['push_data']['money'] = round($totalmoney,2);
         $rst['data']['push_data']['code_desc'] = $post_desc;

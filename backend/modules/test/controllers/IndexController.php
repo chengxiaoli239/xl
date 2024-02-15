@@ -697,8 +697,6 @@ class IndexController extends Controller
         p($rst);
         $rst = BaseService::login($id = 10);
         p($rst);
-        $activeQihao = BetService::getActiveQihao($uid = 10, $tz_system_id = 9, $lottery_type = 8);
-        p($activeQihao, 0);
         p($rst);
         $rst = BaoTaService::syncBaoTaCrontabs($id = 1);
         p($rst);
@@ -883,8 +881,6 @@ class IndexController extends Controller
         p($data);
         $data = JiaNaDa::getLottery($type = 'json', $is_auto = 2);
         p($data);
-        $activeQihao = BetService::getActiveQihao($uid = 24, $tz_system_id = 9, $lottery_type = 8);
-        p($activeQihao);
         $rst = BingDaoService::login($uid = 12, $tz_system_id = 13);
         p($rst);
         //PoxyIPService::delProxyUidsKey();

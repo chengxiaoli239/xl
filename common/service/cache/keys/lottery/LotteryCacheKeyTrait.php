@@ -31,4 +31,8 @@ trait LotteryCacheKeyTrait
         return 'lottery:userLotteryTypes:user_id_'.$user_id;
     }
 
+    public static function lotteryBetPlanIdKey($account='', $activeQiHao='', $planId=0): string
+    {
+        return 'lottery:userBetPlan:account_'.$account.'_'.$activeQiHao.'_'.$planId;
+    }
 }
