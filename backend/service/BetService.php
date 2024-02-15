@@ -28,6 +28,7 @@ use common\kj\cqssc\CqsscKcw;
 use common\service\cache\CacheKeyService;
 use common\service\jobs\kj_data\UserBetJob;
 use common\service\proxy\ProxyBaseService;
+use common\service\ssc\QihaoService;
 use common\tools\RedisLock;
 use Yii;
 use backend\models\BettingRecords;
@@ -2057,17 +2058,18 @@ abstract class BetService extends BaseBetService {
                         TzSystemUsersService::getActiveQihao($lottery_type, $next_qihao); # 下期期号
                         $qihao = $next_qihao;
                     }
+                    list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
                     $is_equal = ($qihao==$next_qihao) ? 1 : 0;
-                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'is_equal'=>$is_equal, 'lottery_type'=>$lottery_type]);
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'is_equal'=>$is_equal, 'lottery_type'=>$lottery_type, 'currentQiHao'=>$currentQiHao, 'nextQiHao'=>$nextQiHao]);
                     //if($uid != 17) continue; # 测试
 
                     $insert_mkey = CacheKeyService::insertPlanTaskKey($lottery_type, $qihao, $plan->id);
                     if(commonRedis()->get($insert_mkey)){
-                        throw new Exception('已记录yx表'.$insert_mkey);
+                        throw_info('已记录yx表'.$insert_mkey, 40001);
                     }
                     $Task = BetErrorPlansTask::findOne(['plan_id'=>$plan->id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
                     if($Task){
-                        throw new Exception('已记录推送表'.$lottery_type.'_'.$qihao);
+                        throw_info('已记录推送表'.$lottery_type.'_'.$qihao, 40002);
                     }
 
                     //$next_qihao_is_active = TzService::beforeBet($lottery_type, $c_active_qihao);
@@ -2134,7 +2136,10 @@ abstract class BetService extends BaseBetService {
                     }
                     $rst['data'] = ['activeQihao'=>$activeQihao, 'plan_id'=>$plan->id, 'msg'=>'正常', 'qihao'=>$qihao];
                 }catch (\Exception $e){
-                    Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '插入计划-异常', ['uid'=>$uid, 'plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage(), 'errCode'=>$e->getCode(), 'file'=>$e->getFile(), 'line'=>$e->getLine()]);
+                    if($e->getCode()<40000){
+                        $logArr = ['uid'=>$uid, 'plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage(), 'errCode'=>$e->getCode(), 'file'=>$e->getFile(), 'line'=>$e->getLine()];
+                        Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '插入计划-异常', $logArr);
+                    }
                     $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>$e->getMessage()];
                 }
             }
