@@ -1996,9 +1996,8 @@ abstract class BetService extends BaseBetService {
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>'没有开启的计划']);
                 continue;
             }
+
             list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lottery_type); # 期号数据
-
-
             $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qiHao, 'opProfitsPlans_status');
             if(empty($DataDealStatus) OR $DataDealStatus != 2){
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>$qiHao.'计划未处理完成']);
@@ -2030,7 +2029,7 @@ abstract class BetService extends BaseBetService {
                     if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
                         $testInsertRst = self::_logRecordsByPlandId($plan->id, $qiHao, $codes, $plan->lottery_type, $is_test, $sn, $snid, $plan->hz_Arr, $r=3); # 直接记录表
                         if($testInsertRst['status'] == 200){
-                            commonRedis()->setex($insert_mkey, 60, 1);
+                            commonRedis()->setex($insert_mkey, 300, 1);
                         }
                     }else{
                         $activeQiHao = $qiHao;
@@ -2060,6 +2059,7 @@ abstract class BetService extends BaseBetService {
                         $logArr = ['uid'=>$uid, 'account'=>$plan->account, 'plan_id'=>$plan->id, 'activeQiHao'=>$activeQiHao, 'insertRst'=>$insertRst];
                         $user_ids[$uid] = ['user_id'=>$uid];
                         Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入计划-任务-2', $logArr);
+                        commonRedis()->setex($insert_mkey, 120, 1);
                     }
                     $rst['data'] = ['activeQiHao'=>$qiHao, 'plan_id'=>$plan->id, 'msg'=>'正常'];
                 }catch (\Exception $e){
