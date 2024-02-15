@@ -2011,7 +2011,7 @@ abstract class BetService extends BaseBetService {
                     if(commonRedis()->get($insert_mkey)){
                         throw_info('已记录yx表'.$insert_mkey, 40001);
                     }
-                    $Task = BetErrorPlansTask::findOne(['plan_id'=>$plan->id, 'qiHao'=>$qiHao, 'lottery_type'=>$lottery_type]);
+                    $Task = BetErrorPlansTask::findOne(['plan_id'=>$plan->id, 'qihao'=>$qiHao, 'lottery_type'=>$lottery_type]);
                     if($Task){
                         throw_info('已记录推送表'.$lottery_type.'_'.$qiHao, 40002);
                     }
