@@ -2016,14 +2016,8 @@ abstract class BetService extends BaseBetService {
                     }
 
                     $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qiHao, 'opProfitsPlans_status');
-                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '下注期号判断02', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id, 'DataDealStatus'=>$DataDealStatus, 'task_qihao'=>$qiHao]);
                     if(empty($DataDealStatus) OR $DataDealStatus != 2){
-                        $dateHI = date('H:i');
-                        if('09:00'<=$dateHI && $dateHI<='09:05' && $lottery_type==DEFAULT_LOTTERY_TYPE){
-                            #return ['status'=>200, 'data'=>['next_qihao'=>date('Ymd').'109']];
-                        }else{
-                            throw new Exception('计划未处理完成_next_qihao_not_active_'.$lottery_type.'_'.$qiHao);
-                        }
+                        throw new Exception('计划未处理完成_'.$lottery_type.'_'.$qiHao);
                     }
 
                     # 4、投注号码 codes
@@ -2040,7 +2034,7 @@ abstract class BetService extends BaseBetService {
                     }else{
                         $activeQiHao = $qiHao;
                         $logArr = ['plan_id'=>$plan->id, 'is_auto_bet'=>$TzSystemsUsers->is_auto_bet, 'lottery_type'=>$lottery_type, 'uid'=>$uid];
-                        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入计划任务-1', $logArr);
+                        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入真实计划任务-1', $logArr);
 
                         list($code, $current_profits) = UserService::updateUserProfits($TzSystemsUsers);
                         if($code>0 OR !$TzSystemsUsers->is_auto_bet){
