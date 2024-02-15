@@ -1996,7 +1996,14 @@ abstract class BetService extends BaseBetService {
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>'没有开启的计划']);
                 continue;
             }
-            $m = \Yii::$app->cache;
+            list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lottery_type); # 期号数据
+
+
+            $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qiHao, 'opProfitsPlans_status');
+            if(empty($DataDealStatus) OR $DataDealStatus != 2){
+                Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>$qiHao.'计划未处理完成']);
+                continue;
+            }
             $user_ids = [];
             foreach ($plans as $plan){
                 try {
@@ -2004,7 +2011,6 @@ abstract class BetService extends BaseBetService {
                     $lottery_type = $plan->lottery_type;
                     $uid = $plan->uid;
                     $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
-                    list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lottery_type); # 期号数据
                     Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'currentKjQiHao'=>$currentKjQiHao, 'qiHao'=>$qiHao]);
 
                     $insert_mkey = CacheKeyService::insertPlanTaskKey($lottery_type, $qiHao, $plan->id);
@@ -2013,11 +2019,6 @@ abstract class BetService extends BaseBetService {
                     }
                     if(BetErrorPlansTask::findOne(['plan_id'=>$plan->id, 'qihao'=>$qiHao, 'lottery_type'=>$lottery_type])){
                         throw_info('已记录推送表'.$lottery_type.'_'.$qiHao, 40002);
-                    }
-
-                    $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qiHao, 'opProfitsPlans_status');
-                    if(empty($DataDealStatus) OR $DataDealStatus != 2){
-                        throw new Exception('计划未处理完成_'.$lottery_type.'_'.$qiHao);
                     }
 
                     # 4、投注号码 codes
