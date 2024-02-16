@@ -344,10 +344,11 @@ class OperatePlanService extends BaseService
             $lottery_type = $UserSysPlans->lottery_type;
             $RedisLock = new RedisLock();
             $Rkey = __FUNCTION__.'_redis_op_plan_8_'.$lottery_type.'_'.$UserSysPlans->id;
-            \Yii::$app->redis->expire($Rkey, 120);
             if(!$RedisLock->lock($Rkey, 30)){
                 throw_info('并发处理失败');
             }
+            \Yii::$app->redis->expire($Rkey, 120);
+
             //$current_miss = ($codes_hz['is_init'] == 1) ? 0 : $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
             $flag = SscDataService::isZjBefore($UserSysPlans->id, $recordDatas);
             $codes_hz = json_decode($UserSysPlans->hz_Arr, true);

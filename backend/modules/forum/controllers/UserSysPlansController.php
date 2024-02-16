@@ -316,7 +316,7 @@ class UserSysPlansController extends BaseController
                     case $key == 'fenli_shu': # 分离数
                         $flsCodes = [];
                         $flsSels = [];
-                        foreach ($hz_Arr_Data['fenli_shu'] as $index=>$fls){
+                        foreach ($hz_Arr_Data['fenli_shu']?:[] as $index=>$fls){
                             $flsCodes[] = $fls['code'];
                             $flsSels[] = $fls['type'];
                             $model->{"fenli_shu_sel_".$index} = $fls['type'];

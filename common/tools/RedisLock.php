@@ -5,7 +5,6 @@ use Yii;
 /**
  *  Redis锁操作类
  *  Date:   2016-06-30
- *  Author: fdipzone
  *  Ver:    1.0
  *
  *  Func:
@@ -15,12 +14,10 @@ use Yii;
  */
 class RedisLock { // class start
 
-    private $_config;
     public $_redis;
 
     /**
      * 初始化
-     * @param Array $config redis连接设定
      */
     public function __construct(){
         $this->_redis = \Yii::$app->redis;
@@ -28,11 +25,12 @@ class RedisLock { // class start
 
     /**
      * 获取锁
-     * @param  String  $key    锁标识
+     * @param String $key    锁标识
      * @param  Int     $expire 锁过期时间
      * @return Boolean
      */
-    public function lock($key, $expire=5){
+    public function lock(string $key, $expire=5): bool
+    {
         $is_lock = $this->_redis->setnx($key, time()+$expire);
 
         // 不能获取锁
@@ -47,7 +45,7 @@ class RedisLock { // class start
             }
         }
 
-        return $is_lock? true : false;
+        return (bool)$is_lock;
     }
 
     /**
@@ -60,15 +58,11 @@ class RedisLock { // class start
     }
 
     public function sadd($key, $val){
-        $is_lock = $this->_redis->sadd($key, $val);
-
-        return $is_lock;
+        return $this->_redis->sadd($key, $val);
     }
 
     public function srem($key, $val){
-        $is_lock = $this->_redis->srem($key, $val);
-
-        return $is_lock;
+        return $this->_redis->srem($key, $val);
     }
 
 } // class end
