@@ -160,7 +160,7 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
-            $plan = UserSysPlans::findOne(8079);
+            $plan = UserSysPlans::findOne(8081);
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive(['content'=>'体组六组三 1拖2345、23456 各10元', 'fromUser'=>'wxid_875i1kgd38x122']); p($rst);

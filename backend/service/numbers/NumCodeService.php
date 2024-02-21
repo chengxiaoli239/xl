@@ -2112,10 +2112,10 @@ class NumCodeService extends BaseService {
         $sql = $historyKjDataQuery->createCommand()->getRawSql();//p($sql);
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤上期每两个号码及对数', ['positions'=>$positions, 'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'sql'=>$sql]);
         $historyKjData = $historyKjDataQuery->asArray()->one();
-        $p1 = implode('', NumService::getCodeLine1($historyKjData['code1']));
-        $p2 = implode('', NumService::getCodeLine1($historyKjData['code2']));
-        $p3 = implode('', NumService::getCodeLine1($historyKjData['code3']));
-        $p4 = implode('', NumService::getCodeLine1($historyKjData['code4']));
+        $p1 = ($historyKjData['code1']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code1']));
+        $p2 = ($historyKjData['code2']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code2']));
+        $p3 = ($historyKjData['code3']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code3']));
+        $p4 = ($historyKjData['code4']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code4']));
         //p([$line1Codes, $line2Codes , $line3Codes , $line4Codes , $p1, $p2, $p3, $p4]);
 
         $hzArr = array_merge((array)$hzArr, [
@@ -2126,8 +2126,8 @@ class NumCodeService extends BaseService {
             'fixed_sel_pos' => implode(',', $positions),
         ]);
 
-        $codes = NumService::getCodesKuaiXuan($hzArr);
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤位置+其它位置合分是该位置的', ['positions'=>$positions,  'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'historyKjData'=>$historyKjData, 'sql'=>$sql]);
+        $codes = NumService::getCodesKuaiXuan($hzArr, (int)($playway+1));
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤位置+其它位置合分是该位置的', ['positions'=>$positions,  'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'historyKjData'=>$historyKjData, 'sql'=>$sql, 'hzArr'=>$hzArr]);
 
         return $codes;
     }
