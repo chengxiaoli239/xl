@@ -446,7 +446,9 @@ class UserSysPlansService extends BaseService {
                 $fenli_shu[] = ['type'=>(int)$flsSel, 'code'=>$UserSysPlans['fenli_shu_code'][$k]];
             }
             */
-            $tmpFilter['fenli_shu'] = $fenli_shu;
+            if(!empty($fenli_shu)){
+                $tmpFilter['fenli_shu'] = $fenli_shu;
+            }
         }
         unset($post['UserSysPlans']['fenli_shu_sel']);
         unset($post['UserSysPlans']['fenli_shu_code']);

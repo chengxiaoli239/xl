@@ -258,6 +258,10 @@ class NumService extends BaseService {
         149=>'随机对数1对(四定)', # 0的2跨是2、1的2跨就只是3、8的2跨是6、9的2跨是7
         150=>'随机前三合分9个(四定)', # 0的2跨是2、1的2跨就只是3、8的2跨是6、9的2跨是7
         151=>'配数单双互排除及该位置号码(四定)',
+        152=>'0123路配数-除-千位X',
+        153=>'0123路配数-除-百位X',
+        154=>'0123路配数-除-十位X',
+        155=>'0123路配数-除-个位X',
     ];
 
     /**
@@ -3290,6 +3294,18 @@ class NumService extends BaseService {
                     break;
                 case 151: # 配数单双互排除及该位置号码(四定)
                     $codes = NumCodeService::getBeforeKjCodesDynamic121($plan, $positions=[1,2,3,4]);
+                    break;
+                case 152: # 123路配数-除-千位X
+                    $codes = NumCodeService::getBeforeKjCodesDynamic122($plan, $positions=[1]);
+                    break;
+                case 153: # 123路配数-除-百位X
+                    $codes = NumCodeService::getBeforeKjCodesDynamic122($plan, $positions=[2]);
+                    break;
+                case 154: # 123路配数-除-十位X
+                    $codes = NumCodeService::getBeforeKjCodesDynamic122($plan, $positions=[3]);
+                    break;
+                case 155: # 123路配数-除-个位X
+                    $codes = NumCodeService::getBeforeKjCodesDynamic122($plan, $positions=[4]);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
