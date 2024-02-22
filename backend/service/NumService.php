@@ -1847,10 +1847,10 @@ class NumService extends BaseService {
         }
         switch($code_type){
             case 4:
-                $codes_hz['ps_1'] = $codes_hz['ps_1'] ? : '0123456789';
-                $codes_hz['ps_2'] = $codes_hz['ps_2'] ? : '0123456789';
-                $codes_hz['ps_3'] = $codes_hz['ps_3'] ? : '0123456789';
-                $codes_hz['ps_4'] = $codes_hz['ps_4'] ? : '0123456789';
+                $codes_hz['ps_1'] = ($codes_hz['ps_1'] OR $codes_hz['ps_1'] !=='' ) ? $codes_hz['ps_1'] : '0123456789';
+                $codes_hz['ps_2'] = ($codes_hz['ps_2'] OR $codes_hz['ps_2'] !=='' ) ? $codes_hz['ps_2'] : '0123456789';
+                $codes_hz['ps_3'] = ($codes_hz['ps_3'] OR $codes_hz['ps_3'] !=='' ) ? $codes_hz['ps_3'] : '0123456789';
+                $codes_hz['ps_4'] = ($codes_hz['ps_4'] OR $codes_hz['ps_4'] !=='' ) ? $codes_hz['ps_4'] : '0123456789';
                 /*
                 $codes_hz['ps_1'] = NumService::getNumsArr($codes_hz['ps_1'] ? : '0123456789');
                 $codes_hz['ps_2'] = NumService::getNumsArr($codes_hz['ps_2'] ? : '0123456789');

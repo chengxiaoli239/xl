@@ -58,7 +58,6 @@ class IndexController extends Controller
             $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%lottery_data_deal_status}}'); p($r);
             //$data = \common\service\ssc\QihaoService::getKjQiHao(8);p($data);
             $plan = UserSysPlans::findOne(7995);
-            $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             $data = QxcTcw::getOfficialCode($type='json', $is_auto=1, $lottery_type=27);p($data);
 
             $data = QxcTcw::getNineNineLottery($type='json', $is_auto=2, $lottery_type=27);
@@ -160,7 +159,8 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
-            $plan = UserSysPlans::findOne(8081);
+            $plan = UserSysPlans::findOne(8084);
+            $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive(['content'=>'体组六组三 1拖2345、23456 各10元', 'fromUser'=>'wxid_875i1kgd38x122']); p($rst);
