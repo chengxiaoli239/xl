@@ -2001,11 +2001,11 @@ class NumCodeService extends BaseService
         if($playway == 3){
             # 四定
             for ($i=1; $i<=4; $i++){
-                $hzArr['ps_'.$i] = array_shift($myArray);
+                $hzArr['ps_'.$i] = array_shift($psData);
             }
         }else{
             for ($i=1; $i<=(4-count($positions)); $i++){
-                $hzArr['ps_'.$i] = array_shift($myArray);
+                $hzArr['ps_'.$i] = array_shift($psData);
             }
         }
         //p($hzArr);
