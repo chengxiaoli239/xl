@@ -169,12 +169,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         ['attribute' => 'playway_name','label'=>'方式',#'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
                                 $str = $model->playway_name;
-                                if($model->playway == 2 && $model->tz_type > 0){
-                                    $buy_type_Arr = [0=>'反买', 1=>'正买'];
-                                    $str .= '['.$buy_type_Arr[$model->buy_type].']';
-                                }
                                 if($model->tz_type > 0){
-                                    //$str .= '['.\backend\service\StaticService::$kArr[$model->tz_type].']';
                                     $str .= '['.\backend\service\BetService::getTypeNameByTzType($model->tz_type).']';
                                 }
                                 return $str;
