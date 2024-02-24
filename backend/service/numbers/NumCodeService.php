@@ -1986,14 +1986,28 @@ class NumCodeService extends BaseService
         $p3 = ($historyKjData['code3']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code3']));
         $p4 = ($historyKjData['code4']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code4']));
         //p([$p1, $p2, $p3, $p4]);
+        $psData = [1=>$p1, 2=>$p2, 3=>$p3, 4=>$p4];
+        foreach ($positions as $position){
+            unset($psData[$position]);
+        }
 
         $hzArr = array_merge((array)$hzArr, [
             'ps_sel' => NumService::PEI_SHU_EXCLUDE,
-            'ps_1' => $p1,
-            'ps_2' => $p2,
-            'ps_3' => $p3,
+            #'ps_1' => $p1,
+            #'ps_2' => $p2,
+            #'ps_3' => $p3,
             'fixed_sel_pos' => implode(',', $positions),
         ]);
+        if($playway == 3){
+            # 四定
+            for ($i=1; $i<=4; $i++){
+                $hzArr['ps_'.$i] = array_shift($myArray);
+            }
+        }else{
+            for ($i=1; $i<=(4-count($positions)); $i++){
+                $hzArr['ps_'.$i] = array_shift($myArray);
+            }
+        }
         //p($hzArr);
 
         $codes = NumService::getCodesKuaiXuan($hzArr, (int)($playway+1));
