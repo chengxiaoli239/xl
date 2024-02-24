@@ -8,6 +8,7 @@ use backend\service\BetService;
 use backend\service\HN0898Service;
 use backend\service\numbers\CodeTypeService;
 use common\tools\Tool_Common;
+use yii\db\Exception;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
@@ -39,10 +40,9 @@ class AgentClientsService extends ClientsBaseService{
      * @param string $access_token
      * @param string $from_type
      * @param string $from
-     * @param int $buy_type
      * @param int $lottery_type
      * @return array
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     public static function syncMemberBetLogs($member_bet_logs=[], $access_token='', $from_type='kuaixuan', $from='api', $lottery_type=DEFAULT_LOTTERY_TYPE){
         try {

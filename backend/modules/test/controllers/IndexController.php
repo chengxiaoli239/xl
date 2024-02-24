@@ -424,8 +424,6 @@ class IndexController extends Controller
         p($lottery_types);
         $str = 'fTtrNuJ2---sSYXaQFRUjChzqbBn7Od4SRDBvZp7hL4';
         p(base64_decode($str));
-        $logData_str = '{"log_member_quick_select_id":"215386","member_id":"114","account":"aa123123A","nickname":"","fix_num":"40","bet_count":"24","bet_money":"48","operation_content":"[四定位]，全转数：[2378]","operation_datetime":"09-17 11:36:42","time_value":"2023/9/17 11:36:42","operation_ip":"112.67.*.*","ip_value":"112.67.80.156","operation_ip_extension":"112.67.80.156","is_package":"0","log_type":"102"}';
-        $logData = Json::decode($logData_str, true);
         p(['logData'=>$logData], 0);
         list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token='00e9146df95b0dfb1b9557790acbbfc8');
         p($logData);
@@ -447,8 +445,6 @@ class IndexController extends Controller
             'from_type' => 'kuaixuan',
             'from' => 'api',
         ];
-        $rst = AgentClientsService::syncMemberBetLogs($post['member_bet_logs'], $post['access_token'], $post['from_type'], $post['from'], $post['lottery_type']);
-        p($rst);
         $access_token = '00e9146df95b0dfb1b9557790acbbfc8';
         $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
         AgentClientsService::checkProfits($TzSystemsUsers);
