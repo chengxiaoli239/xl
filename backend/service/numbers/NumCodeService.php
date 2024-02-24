@@ -1979,7 +1979,7 @@ class NumCodeService extends BaseService
 
         $hzArr = Json::decode($plan->hz_Arr, true);
         list($current_kj_qihao, $next_qihao) = QihaoService::getKjQiHao($lottery_type);
-        $historyKjData = NumCodeService::getKjData($lottery_type, $current_kj_qihao);
+        $historyKjData = NumCodeService::getKjData($current_kj_qihao, $lottery_type);
 
         $p1 = ($historyKjData['code1']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code1']));
         $p2 = ($historyKjData['code2']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code2']));
