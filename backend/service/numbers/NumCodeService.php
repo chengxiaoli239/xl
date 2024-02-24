@@ -40,7 +40,9 @@ class NumCodeService extends BaseService
             $sql = $historyKjDataQuery->createCommand()->getRawSql();//p($sql);
             $kjData = $historyKjDataQuery->asArray()->one();
             Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据', ['lottery_type'=>$lottery_type, 'qiHao'=>$qiHao, 'kjData'=>$kjData]);
-            commonRedis()->setex($mkey, 300, $kjData);
+            if(!empty($kjData['qihao'])){
+                commonRedis()->setex($mkey, 300, $kjData);
+            }
         }
 
         return $kjData;
@@ -1485,7 +1487,7 @@ class NumCodeService extends BaseService
         $lottery_type = $plan->lottery_type;
 
         list($current_kj_qihao, $next_qihao) = QihaoService::getKjQiHao($lottery_type);
-        $filterQihao = ($date_num>0)?$current_kj_qihao:date('Ymd', strtotime('-'.$date_num.' day')). substr($next_qihao, -3);
+        $filterQihao = ($date_num>0)?date('Ymd', strtotime('-'.$date_num.' day')). substr($next_qihao, -3):$current_kj_qihao;
         $historyKjData = NumCodeService::getKjData($filterQihao, $lottery_type);
 
         if(empty($historyKjData)){
@@ -1809,7 +1811,7 @@ class NumCodeService extends BaseService
         $lottery_type = $plan->lottery_type;
 
         list($current_kj_qihao, $next_qihao) = QihaoService::getKjQiHao($lottery_type);
-        $filterQihao = ($date_num>0)?$current_kj_qihao:date('Ymd', strtotime('-'.$date_num.' day')). substr($next_qihao, -3);
+        $filterQihao = ($date_num>0)?date('Ymd', strtotime('-'.$date_num.' day')). substr($next_qihao, -3):$current_kj_qihao;
         $historyKjData = NumCodeService::getKjData($filterQihao, $lottery_type);
         //p(['historyKjData'=>$historyKjData]);
 

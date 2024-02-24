@@ -160,7 +160,7 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
-            $historyKjData = NumCodeService::getKjData($qihao='20240224002', $lottery_type=8);p($historyKjData);
+            $historyKjData = NumCodeService::getKjData($qihao='20240224120', $lottery_type=8);p($historyKjData);
             $plan = UserSysPlans::findOne(8084);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
