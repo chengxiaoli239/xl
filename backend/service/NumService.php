@@ -262,11 +262,17 @@ class NumService extends BaseService {
         153=>'0123路配数-除-百位X',
         154=>'0123路配数-除-十位X',
         155=>'0123路配数-除-个位X',
+        #156=>'两数合分-除-上期千百位置',
+        #157=>'两数合分-除-上期千十位置',
+        #158=>'两数合分-除-上期千个位置',
+        #159=>'两数合分-除-上期百十位置',
+        #160=>'两数合分-除-上期百个位置',
+        #161=>'两数合分-除-上期十个位置',
     ];
 
     /**
      * @desc 获取系统模拟投注四定和值
-     * @param $counts 获取几组和值
+     * @param $counts - 获取几组和值
      * @param string $qihao
      * @param int $type  1倒序剔除2随机剔除
      * @return array
@@ -2302,7 +2308,7 @@ class NumService extends BaseService {
         }
 
         $allHfWhere = ['AND'];
-        foreach ($codes_hz['hfDatas'] as $hfData){
+        foreach ($codes_hz['hfData'] as $hfData){
             $allHfSubWhere = ['OR'];
             $positions_str = '(`code_'.implode('` + `code_', $hfData['pos']).'`)';
             foreach ($hfData['hefens'] as $hefen){
@@ -2367,25 +2373,26 @@ class NumService extends BaseService {
      * @param array $codes_hz
      * @param int $code_type
      */
-    private static function getHefenInitData($codes_hz=[], $code_type=4){
-        $hfDatas = [];
+    private static function getHefenInitData(array $codes_hz=[], $code_type=4): array
+    {
+        $hfData = [];
         if(!empty($codes_hz['hefen_pos1']) && isset($codes_hz['hefen1'])){
-            $hfDatas[] = ['pos'=>explode(',', $codes_hz['hefen_pos1']), 'hefens'=>NumService::getHefens($codes_hz['hefen1'])];
+            $hfData[] = ['pos'=>explode(',', $codes_hz['hefen_pos1']), 'hefens'=>NumService::getHefens($codes_hz['hefen1'])];
             unset($codes_hz['hefen_pos1'], $codes_hz['hefen1']);
         }
         if(!empty($codes_hz['hefen_pos2']) && isset($codes_hz['hefen2'])){
-            $hfDatas[] = ['pos'=>explode(',', $codes_hz['hefen_pos2']), 'hefens'=>NumService::getHefens($codes_hz['hefen2'])];
+            $hfData[] = ['pos'=>explode(',', $codes_hz['hefen_pos2']), 'hefens'=>NumService::getHefens($codes_hz['hefen2'])];
             unset($codes_hz['hefen_pos2'], $codes_hz['hefen2']);
         }
         if(!empty($codes_hz['hefen_pos3']) && isset($codes_hz['hefen3'])){
-            $hfDatas[] = ['pos'=>explode(',', $codes_hz['hefen_pos3']), 'hefens'=>NumService::getHefens($codes_hz['hefen3'])];
+            $hfData[] = ['pos'=>explode(',', $codes_hz['hefen_pos3']), 'hefens'=>NumService::getHefens($codes_hz['hefen3'])];
             unset($codes_hz['hefen_pos3'], $codes_hz['hefen3']);
         }
         if(!empty($codes_hz['hefen_pos4']) && isset($codes_hz['hefen4'])){
-            $hfDatas[] = ['pos'=>explode(',', $codes_hz['hefen_pos4']), 'hefens'=>NumService::getHefens($codes_hz['hefen4'])];
+            $hfData[] = ['pos'=>explode(',', $codes_hz['hefen_pos4']), 'hefens'=>NumService::getHefens($codes_hz['hefen4'])];
             unset($codes_hz['hefen_pos4'], $codes_hz['hefen4']);
         }
-        $codes_hz['hfDatas'] = $hfDatas;
+        $codes_hz['hfData'] = $hfData;
 
         return $codes_hz;
     }
@@ -2878,7 +2885,6 @@ class NumService extends BaseService {
                     $codes = NumCodeService::getBeforeKjCodesDynamic9($playway);
                     break;
                 case 10: # 过滤最近2880组(四定)，不够往前搜集 前四，与12 后4类似
-                    #$codes = NumCodeService::getBeforeKjCodesDynamic10($plan, $lottery_type);
                     $codes = NumCodeService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,3,4], $num=2880);
                     break;
                 case 11: # 过滤前200期开过2次以上号码的全转(四定)
@@ -2909,7 +2915,6 @@ class NumService extends BaseService {
                     $codes = NumCodeService::getBeforeKjCodesDynamic19($plan, $lottery_type);
                     break;
                 case 20: # 过滤最近3200组(四定)，不够往后搜集 前四，与12 后4类似
-                    #$codes = NumCodeService::getBeforeKjCodesDynamic10($plan, $lottery_type, $num=2000);
                     $codes = NumCodeService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,3,4], $num=3200);
                     break;
                 case 21: # 过滤后4最近3200组(四定)，不够往后搜集
@@ -2932,7 +2937,6 @@ class NumService extends BaseService {
                     $codes = NumCodeService::getBeforeKjCodesDynamic26($plan, $lottery_type);
                     break;
                 case 27: # 过滤前4最近1152组(四定)，不够往后搜集
-                    #$codes = NumCodeService::getBeforeKjCodesDynamic10($plan, $lottery_type, $num=1152);
                     $codes = NumCodeService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,3,4], $num=1152);
                     break;
                 case 28: # 过滤期号尾号一致历史直码(四定) - 1234
@@ -3306,6 +3310,9 @@ class NumService extends BaseService {
                     break;
                 case 155: # 123路配数-除-个位X
                     $codes = NumCodeService::getBeforeKjCodesDynamic122($plan, $positions=[4]);
+                    break;
+                case 156: # 两数合分-除-上期千百位置
+                    $codes = NumCodeService::getBeforeKjCodesDynamic123($plan, $positions=[1,2]);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);

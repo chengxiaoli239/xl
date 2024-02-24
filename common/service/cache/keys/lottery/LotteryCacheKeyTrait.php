@@ -23,6 +23,16 @@ trait LotteryCacheKeyTrait
     }
 
     /**
+     * @param int $lottery_type
+     * @param string $qiHao
+     * @return string
+     */
+    public static function lotteryKjInfo(int $lottery_type=DEFAULT_LOTTERY_TYPE, string $qiHao=''): string
+    {
+        return 'lottery:kjInfo:info_'.$lottery_type.'_'.$qiHao;
+    }
+
+    /**
      * @param int $user_id
      * @return string
      */

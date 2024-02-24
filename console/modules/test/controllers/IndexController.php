@@ -6,6 +6,7 @@ use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\service\BetService;
+use backend\service\numbers\NumCodeService;
 use backend\service\NumService;
 use backend\service\SscDataService;
 use backend\service\statics\statics_3d\Statics3dUserDataService;
@@ -159,6 +160,7 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
+            $historyKjData = NumCodeService::getKjData($qihao='20240224002', $lottery_type=8);p($historyKjData);
             $plan = UserSysPlans::findOne(8084);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
