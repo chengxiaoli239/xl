@@ -1736,7 +1736,7 @@ class NumService extends BaseService {
         $allPsWhere = ['AND'];
         foreach ($fixed_sel_pos as $fixed_pos){
             if($code_type ==4){
-                $allPsWhere[] = ['IN', 'code_'.$fixed_pos, (in_array($code_type, [2, 3]) ? 'X' :NumService::getNumsArr($ps_datas[$fixed_pos]))];
+                $allPsWhere[] = ['IN', 'code_'.$fixed_pos, NumService::getNumsArr($ps_datas[$fixed_pos])];
                 unset($ps_datas[$fixed_pos]);
             }else{
                 $where[] = ['=', 'code_'.$fixed_pos, 'X'];
