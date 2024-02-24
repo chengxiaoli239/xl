@@ -2308,7 +2308,7 @@ class NumService extends BaseService {
         }
 
         $allHfWhere = ['AND'];
-        foreach ($codes_hz['hfData'] as $hfData){
+        foreach ($codes_hz['hfDatas'] as $hfData){
             $allHfSubWhere = ['OR'];
             $positions_str = '(`code_'.implode('` + `code_', $hfData['pos']).'`)';
             foreach ($hfData['hefens'] as $hefen){
@@ -2392,7 +2392,7 @@ class NumService extends BaseService {
             $hfData[] = ['pos'=>explode(',', $codes_hz['hefen_pos4']), 'hefens'=>NumService::getHefens($codes_hz['hefen4'])];
             unset($codes_hz['hefen_pos4'], $codes_hz['hefen4']);
         }
-        $codes_hz['hfData'] = $hfData;
+        $codes_hz['hfDatas'] = $hfData;
 
         return $codes_hz;
     }
