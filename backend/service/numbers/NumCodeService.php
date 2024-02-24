@@ -1997,7 +1997,7 @@ class NumCodeService extends BaseService
         //p($hzArr);
 
         $codes = NumService::getCodesKuaiXuan($hzArr, (int)($playway+1));
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤位置+其它位置合分是该位置的', ['positions'=>$positions,  'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'historyKjData'=>$historyKjData, 'hzArr'=>$hzArr]);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤位置+其它位置合分是该位置的', ['positions'=>$positions,  'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'historyKjData'=>$historyKjData, 'hzArr'=>$hzArr, 'counts'=>count($codes)]);
 
         return $codes;
     }
