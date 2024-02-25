@@ -1586,7 +1586,7 @@ abstract class BetService extends BaseBetService {
      * @desc 是否登录，判断标准，能正常获取用户信息、余额
      * @param int $uid
      * @param $tz_system_id
-     * @return HuiYuanService5|KuaiLe8Service|LuckyBaseService|NineNineService6|SevenService|XlService
+     * @return bool
      */
     public static function isLogin($uid, $tz_system_id, $r=''){
         $m = \Yii::$app->cache;
@@ -1803,12 +1803,11 @@ abstract class BetService extends BaseBetService {
      */
     public static function getTypeNameByTzType($tz_type){
 
-        $m = \Yii::$app->cache;
-        $mkey = 'TZ_TYPE_NAME_'.$tz_type;
-        if(!$typeName = $m->get($mkey)){
+        $mkey = CacheKeyService::lotteryTzType($tz_type);
+        if(!$typeName = commonRedis()->get($mkey)){
             $typeName = TzTypes::findOne(['type'=>$tz_type])->type_name;
 
-            $m->set($mkey, $typeName, 60*60);
+            commonRedis()->setex($mkey,60*60, $typeName);
         }
 
         return $typeName;
@@ -2093,21 +2092,22 @@ abstract class BetService extends BaseBetService {
 
     /**
      * @param $lottery_type
-     * @param string $next_qihao
+     * @param string $qihao
+     * @param string $status_key
      * @return array|DataDealStatus|null
      */
     public static function getDataDealStatus($lottery_type, $qihao='', $status_key='opProfitsPlans_status'){
 
         $m = \Yii::$app->cache;
-        $mkey = 'getDataDealStatus_'.$lottery_type.'_'.$qihao;
+        $mkey = CacheKeyService::lotteryDealStatus($lottery_type, $qihao, $status_key);
         $status = $m->get($mkey);
-        if(empty($DataDealStatus)){
+        if(empty($status)){
             $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type, 'next_qihao'=>$qihao])->one();
-            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '数据处理状态', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus->attributes]);
+            Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '数据处理状态', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus->attributes]);
             $status = 0;
             if(!empty($DataDealStatus)){
                 $status = $DataDealStatus->$status_key;
-                $m->set($mkey, $status, 5);
+                commonRedis()->setex($mkey, 5, $status);
             }
         }
 

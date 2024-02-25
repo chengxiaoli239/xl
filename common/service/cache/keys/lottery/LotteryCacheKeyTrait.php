@@ -45,4 +45,22 @@ trait LotteryCacheKeyTrait
     {
         return 'lottery:userBetPlan:account_'.$account.'_'.$activeQiHao.'_'.$planId;
     }
+
+    /**
+     * @param $tz_type
+     * @return string
+     */
+    public static function lotteryTzType($tz_type): string
+    {
+        return 'lottery:tz_type:type_name_'.$tz_type;
+    }
+    /**
+     * @param int $lottery_type
+     * @param string $qiHao
+     * @return string
+     */
+    public static function lotteryDealStatus(int $lottery_type=DEFAULT_LOTTERY_TYPE, string $qiHao='', $status_key=''): string
+    {
+        return 'lottery:getDataDealStatus_:info_'.$lottery_type.'_'.$qiHao.'_'.$status_key;
+    }
 }

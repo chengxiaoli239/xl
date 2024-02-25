@@ -161,6 +161,7 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
+            $r = \backend\service\BetService::getTypeNameByTzType($tz_type=25);p($r);
             $plan = UserSysPlans::findOne(8121);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             $historyKjData = NumCodeService::getKjData($qihao='20240224120', $lottery_type=8);p($historyKjData);
