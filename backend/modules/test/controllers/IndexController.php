@@ -133,6 +133,10 @@ class IndexController extends Controller
         p($cookie);
     }
 
+    /**
+     * /test/index/api-log
+     * @return array
+     */
     public function actionApiLog(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
