@@ -13,6 +13,7 @@ use backend\service\SscDataService;
 use backend\service\statics\statics_3d\Statics3dUserDataService;
 use backend\service\StaticService;
 use common\kj\qxc\QxcTcw;
+use common\kj\ssc\Aozhou;
 use common\service\cache\CacheKeyService;
 use common\service\helpers\ThirdD;
 use common\service\thirdD\match\MatchCodeService;
@@ -161,6 +162,8 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
+
+            $data = Aozhou::getLucky5($type='json', $is_auto=2);p($data);
             $r = \backend\service\BetService::getTypeNameByTzType($tz_type=25);p($r);
             $plan = UserSysPlans::findOne(8121);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));

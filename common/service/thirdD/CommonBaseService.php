@@ -14,8 +14,10 @@ class CommonBaseService extends BaseService
     const CODE_FOR_IGNORE_U = 77777; # 聊天忽略
 
     # lottery_type:26 福彩3d、27 排列三
+    const LOTTERY_TYPE_LUCKY5 = 8;
     const LOTTERY_TYPE_FUCAI = 26;
     const LOTTERY_TYPE_PL3 = 27;
+    const LOTTERY_TYPE_AOZHOU5 = 28;
     const THIRDD_LOTTERY_TYPES = [
         self::LOTTERY_TYPE_FUCAI,
         self::LOTTERY_TYPE_PL3,
@@ -23,6 +25,13 @@ class CommonBaseService extends BaseService
     const THIRDD_LOTTERY_OPTIONS = [
         self::LOTTERY_TYPE_FUCAI => '福',
         self::LOTTERY_TYPE_PL3 => '排',
+    ];
+
+    const LOTTERY_TYPE_OPTIONS = [
+        self::LOTTERY_TYPE_LUCKY5 => '幸运五',
+        self::LOTTERY_TYPE_FUCAI => '福',
+        self::LOTTERY_TYPE_PL3 => '排',
+        self::LOTTERY_TYPE_AOZHOU5 => '澳洲幸运五',
     ];
 
     # 共用的状态值

@@ -39,11 +39,10 @@ class TelegramController extends Controller
     public function actionCallback(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
-        $get = \Yii::$app->request->get();
 
-        Tool_Common::log('/telegram/'.__FUNCTION__,'INFO', '聊天信息', ['post'=>$post, 'get'=>$get]);
+        Tool_Common::log('/telegram/'.__FUNCTION__,'INFO', '聊天信息', ['post'=>$post]);
 
-        return ['get'=>$get, 'post'=>$post];
+        return ['post'=>$post];
     }
 
 }

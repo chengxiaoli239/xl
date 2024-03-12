@@ -126,7 +126,7 @@ class BaseKj extends BaseService {
         $opencode = $kjData['opencode']; # 开奖号码
         $opentime = $kjData['opentime']; # 开奖时间
         $expect = $kjData['expect']; # 期号
-        //p([DEFAULT_LOTTERY_TYPE,$expect, $kjData]);
+        //p([$lottery_type, $expect, $kjData]);
         self::setKjDataCache($lottery_type, $expect, $kjData);
 
         if ($returnType == 'xml') {

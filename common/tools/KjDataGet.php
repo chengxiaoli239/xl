@@ -27,6 +27,7 @@ use common\service\jobs\kj_data\StaticHzProfitsJob;
 use common\service\jobs\kj_data\StaticPeiShuTrueFalseJob;
 use common\service\jobs\kj_data\StaticSdProfitsJob;
 use common\service\jobs\kj_data\UpdateCodeTypeYlJob;
+use common\service\lottery\aozhou5\AoZhou5Service;
 use common\service\ssc\QihaoService;
 use backend\service\CurlService;
 use backend\service\HN0898Service;
@@ -326,11 +327,17 @@ class KjDataGet
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖后处理', ['code'=>$code, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
 
         $rst = ['status'=>200, 'msg'=>'处理成功'];
-        if($code==0){
-            if(in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)){
+        if($code!=0) {
+            return $rst;
+        }
+        switch (true){
+            case in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES):
                 OperateLotteryService::operate($lottery_type);  # 3D 处理3D下注记录
-            }else{
-
+                break;
+            case $lottery_type == CommonBaseService::LOTTERY_TYPE_AOZHOU5:
+                AoZhou5Service::afterKj($lottery_type);
+                break;
+            default:
                 $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
                 # 队列处理
                 #$rst['TzService'] = TzService::opSystemBetPlans($lottery_type); # 处理系统投注计划，更新统计数据、
@@ -344,9 +351,9 @@ class KjDataGet
                 push_queue(StaticPeiShuTrueFalseJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>20]);
                 push_queue(StaticSdProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>25]);
                 push_queue(UpdateCodeTypeYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>30]);
-            }
-            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '统计数据入列', ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'msg'=>'数据入列成功']);
+                break;
         }
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '统计数据入列', ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'msg'=>'数据入列成功']);
         //StaticService::opStaticProfits(); # 投注利润统计
         //SscDataService::updateDsData(); // 更新单双
         //StaticService::static4dMonthsProfits(); # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr

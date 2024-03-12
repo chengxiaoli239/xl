@@ -80,7 +80,7 @@ class Lucky5 extends BaseKj {
                     Tool_Common::log('luck5', 'INFO', '号码网盘抓取-幸运网1', ['domain'=>$domain, 'kjData'=>$kjData]);
                 }catch (\Exception $e){
                     $m->srem($exsit_key, $TzSystemsUsers->id);
-                    Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '网盘开奖数据获取异常', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
+                    Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '网盘开奖数据获取异常', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
                 }
             }
         }
@@ -121,7 +121,7 @@ class Lucky5 extends BaseKj {
                 throw_info('非开奖抓取时间节点:'.date('Y-m-d H:i:s'));
             }
             $kjData = self::getCurrentKjData(self::$lottery_type, $current_qihao);
-            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-实讯网01', ['lottery_type'=>self::$lottery_type, 'current_qihao'=>$current_qihao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
+            Tool_Common::log('/kj_dats/'.__FUNCTION__, 'INFO', '号码抓取-实讯网01', ['lottery_type'=>self::$lottery_type, 'current_qihao'=>$current_qihao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
             if($is_auto==2 OR empty($kjData)) {
                 $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun-one');
 
@@ -229,7 +229,7 @@ class Lucky5 extends BaseKj {
         $s2 = microtime(true);
         $logArr = $rst;
         $logArr['consume_time'] = ($s2-$s1).'s';
-        Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-时讯网', $logArr);
+        Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '号码抓取-时讯网', $logArr);
 
         return $rst;
     }

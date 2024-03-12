@@ -30,7 +30,7 @@ class Thirdd extends BaseKj {
                 self::lockGrab($lottery_type, $seconds);
             }
 
-            if(true OR !$kjData = Thirdd::getCurrentKjData($lottery_type, $current_qihao) OR $is_auto==2) {
+            if(!$kjData = Thirdd::getCurrentKjData($lottery_type, $current_qihao) OR $is_auto==2) {
                 try {
                     $domain = BaseKj::getApiHostByRoute('/kj/thirdd/fu-cai');
                     // 设置请求头
@@ -88,16 +88,16 @@ class Thirdd extends BaseKj {
                     }
 
                     $kjData = ['expect'=>$qihao, 'opencode'=>$opencode, 'opentime'=>substr($kjData['date'], 0, 10).' 21:30:00'];
-                    Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>self::$lottery_type, 'domain'=>$domain, 'kjData'=>$kjData]);
+                    Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>self::$lottery_type, 'domain'=>$domain, 'kjData'=>$kjData]);
                 }catch (\Exception $e){
-                    Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
+                    Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
                 }
             }else{
-                Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '3d数据抓取-缓存', ['lottery_type'=>self::$lottery_type, 'cq'=>$current_qihao, 'kjData'=>$kjData]);
+                Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '3d数据抓取-缓存', ['lottery_type'=>self::$lottery_type, 'cq'=>$current_qihao, 'kjData'=>$kjData]);
             }
         }catch (\Exception $e){
             $kjData = Thirdd::getCurrentKjData($lottery_type);
-            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '3d数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$current_qihao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '3d数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$current_qihao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
         }
         return self::extracted($kjData, $lottery_type, $returnType, $is_auto);
     }
