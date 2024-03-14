@@ -18,6 +18,7 @@ class BaseController extends Controller
     public $_get;
     public $_account;
     public $_user_id;
+    public $service;
 
     /**
      * 参数存放

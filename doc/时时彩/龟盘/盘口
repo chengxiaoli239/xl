@@ -3,3 +3,8 @@
     https://ac1868.com/
     安全码：hq168
     账号密码：Jj1188, aa112233
+
+# 别人给机器人发消息，收到的回调示例：
+[聊天信息] == post:{"update_id":840228257,"message":{"message_id":48,"from":{"id":7114082398,"is_bot":false,"first_name":"金钱龟","username":"oloo1688","language_code":"zh-hans"},"chat":{"id":7114082398,"first_name":"金钱龟","username":"oloo1688","type":"private"},"date":1710343813,"text":"24/50"}}
+[聊天信息] == post:{"update_id":840228258,"message":{"message_id":49,"from":{"id":7114082398,"is_bot":false,"first_name":"金钱龟","username":"oloo1688","language_code":"zh-hans"},"chat":{"id":7114082398,"first_name":"金钱龟","username":"oloo1688","type":"private"},"date":1710343818,"text":"23/50"}}
+
