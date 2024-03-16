@@ -3,7 +3,9 @@
 namespace common\service\lottery\aozhou5;
 
 use backend\models\BettingRecords;
+use common\helpers\LotteryType;
 use common\service\lottery\CommonLotteryService;
+use common\tools\Tool_Common;
 
 class AoZhou5Service extends CommonLotteryService
 {
@@ -32,6 +34,7 @@ class AoZhou5Service extends CommonLotteryService
     {
         $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type])
             ->orderBy('id DESC')->limit(100)->all();
+        Tool_Common::log('/kj_aozhou/'.__FUNCTION__, 'INFO', LotteryType::getName($lottery_type).'开奖之后业务处理', ['lottery_type'=>$lottery_type, 'count'=>count($bettingRecords)]);
 
     }
 
