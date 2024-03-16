@@ -5,6 +5,7 @@ use backend\models\SystemConfig;
 use backend\models\TzSystemsUsers;
 use backend\service\CurlService;
 use backend\service\Lucky5\LuckyBaseService;
+use common\helpers\LotteryType;
 use common\kj\BaseKj;
 use common\service\CommonService;
 use common\service\proxy\ProxyBaseService;
@@ -30,7 +31,7 @@ class Aozhou extends BaseKj {
             $dateHI = date('H:i');
             $seconds = ('00:00'<$dateHI && $dateHI<'21:00') ? 1800 : 120;
             if($is_auto==1){
-                //self::lockGrab($lottery_type, $seconds);
+                self::lockGrab($lottery_type, $seconds);
             }
 
             if($is_auto==2 OR !$kjData = self::getCurrentKjData($lottery_type, $current_qihao)) {
@@ -111,16 +112,16 @@ class Aozhou extends BaseKj {
                     }
 
                     $kjData = ['expect'=>$qihao, 'opencode'=>$opencode, 'opentime'=>$kjData['preDrawTime']];
-                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>self::$lottery_type, 'domain'=>$domain, 'kjData'=>$kjData]);
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'domain'=>$domain, 'kjData'=>$kjData]);
                 }catch (\Exception $e){
-                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type,LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);
                 }
             }else{
-                Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '澳洲幸运五数据抓取-缓存', ['lottery_type'=>self::$lottery_type, 'cq'=>$current_qihao, 'kjData'=>$kjData]);
+                Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-缓存', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'cq'=>$current_qihao, 'kjData'=>$kjData]);
             }
         }catch (\Exception $e){
             $kjData = self::getCurrentKjData($lottery_type);
-            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '澳洲幸运五数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$current_qihao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$current_qihao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
         }
         return self::extracted($kjData, $lottery_type, $returnType, $is_auto);
     }
