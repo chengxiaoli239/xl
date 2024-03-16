@@ -17,7 +17,7 @@ use yii\filters\VerbFilter;
  */
 class QueueLogController extends BaseController
 {
-    protected $service;
+    public $service;
 
     public function __construct($id, Module $module, QueueService $queueService, array $config = [])
     {
