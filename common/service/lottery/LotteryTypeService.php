@@ -11,12 +11,12 @@ use yii\helpers\Json;
 
 class LotteryTypeService extends BaseService
 {
-    public static function getLotteryTypeData($grabStatus=''): array
+    public static function getLotteryTypeData($grabStatus='', $useCache=1): array
     {
         $mkey = CacheKeyService::lotteryData($grabStatus);
 
         $lotteryTypeData = commonRedis()->get($mkey);
-        if(empty($lotteryTypeData)){
+        if(!$useCache OR empty($lotteryTypeData)){
             $lotteryTypeDataQuery = LotteryType::find();
             if($grabStatus !== ''){
                 $lotteryTypeDataQuery->where(['grabDataStatus'=>(int)$grabStatus]);

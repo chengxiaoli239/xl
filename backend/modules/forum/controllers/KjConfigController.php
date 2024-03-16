@@ -6,6 +6,7 @@ use backend\service\HN0898Service;
 use backend\service\UserSysPlansService;
 use common\kj\cqssc\CqsscKcw;
 use common\service\CommonService;
+use common\service\lottery\LotteryTypeService;
 use Yii;
 use backend\models\KjConfig;
 use backend\models\searchs\KjConfig as KjConfigSearch;
@@ -137,6 +138,7 @@ class KjConfigController extends BaseController
     public function actionSwitchStatus($id,$status){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         HN0898Service::updateKjConfigStatus($id, $status, $this->_user_id);
+        LotteryTypeService::getLotteryTypeData($grabDataStatus=1, $useCache=0);
 
         return $this->redirect(['index']);
     }
