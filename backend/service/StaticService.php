@@ -1203,7 +1203,7 @@ class StaticService extends BaseService {
 
         $start_time = microtime(true);
         try {
-            Tool_Common::log('/datas/'.__FUNCTION__, "INFO", '四定利润统计状态', ['lottery_type'=>$lottery_type, 'fun'=>__FUNCTION__]);
+            Tool_Common::log('/data/'.__FUNCTION__, "INFO", '四定利润统计状态', ['lottery_type'=>$lottery_type, 'fun'=>__FUNCTION__]);
             $DataDealStatus = DealDataService::judgeDealTaskStatus($lottery_type, '', $field='static4dPerDateProfits_status');
             if($DataDealStatus->$field == SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL){
                 throw_info('未开启统计：'.DealDataService::$dealDataStatusFields[$field], 40001);
@@ -1253,7 +1253,7 @@ class StaticService extends BaseService {
             $dealStatus = 2;
         }catch (\Exception $e){
             $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : ($e->getCode()>40000? 4: 3);
-            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常6', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '数据处理异常6', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 
         $end_time = microtime(true);

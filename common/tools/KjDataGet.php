@@ -335,7 +335,8 @@ class KjDataGet
                 OperateLotteryService::operate($lottery_type);  # 3D 处理3D下注记录
                 break;
             case $lottery_type == CommonBaseService::LOTTERY_TYPE_AOZHOU5:
-                AoZhou5Service::afterKj($lottery_type);
+                //AoZhou5Service::afterKj($lottery_type);
+                push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>LotteryType::getName($lottery_type), 'business_id'=>$qihao]);
                 break;
             default:
                 $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据

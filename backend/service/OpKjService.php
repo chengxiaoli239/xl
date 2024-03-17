@@ -14,6 +14,7 @@ use backend\models\User;
 use backend\models\UserFollowData;
 use common\service\CommonService;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
+use common\service\lottery\aozhou5\AoZhou5Service;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\OperateLotteryService;
 use common\service\wechat\WechatUserService;
@@ -28,23 +29,29 @@ class OpKjService extends BaseService {
      * @param integer $lottery_type - 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return array
      */
-    public static function opSscKjData($lottery_type = DEFAULT_LOTTERY_TYPE): array
+    public static function opSscKjData(int $lottery_type = DEFAULT_LOTTERY_TYPE): array
     {
         $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
-        if(in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)){
-            list($code, $data, $msg) = OperateLotteryService::operate($lottery_type);  # 3D 处理3D下注记录
-            $tmpData = ['code'=>$code, 'data'=>$data, 'msg'=>$msg];
-            $rst['data'][] = $tmpData;
-            Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据入列00', ['lottery_type'=>$lottery_type, 'tmpData'=>$tmpData]);
-            $rst = ['code'=>$code, 'data'=>$data, 'msg'=>$msg];
-        }else{
-            $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type, 'is_batch_simulate'=>0])->orderBy('id DESC')->limit(100)->all();
-            if(!$bettingRecords) return $rst;
-            foreach ($bettingRecords as $BettingRecord){
-                $rst['data'][$BettingRecord->id] = OpKjService::opOneBettingRecord($BettingRecord->id, $BettingRecord);
-            }
-            Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据-5x', ['rst'=>$rst]);
+        switch (true){
+            case in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES):
+                list($code, $data, $msg) = OperateLotteryService::operate($lottery_type);  # 3D 处理3D下注记录
+                $tmpData = ['code'=>$code, 'data'=>$data, 'msg'=>$msg];
+                $rst['data'][] = $tmpData;
+                Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据入列00', ['lottery_type'=>$lottery_type, 'tmpData'=>$tmpData]);
+                $rst = ['code'=>$code, 'data'=>$data, 'msg'=>$msg];
+                break;
+            case $lottery_type == CommonBaseService::LOTTERY_TYPE_AOZHOU5:
+                AoZhou5Service::afterKj($lottery_type);
+                break;
+            default:
+                $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type, 'is_batch_simulate'=>0])->orderBy('id DESC')->limit(100)->all();
+                if(!$bettingRecords) return $rst;
+                foreach ($bettingRecords as $BettingRecord){
+                    $rst['data'][$BettingRecord->id] = OpKjService::opOneBettingRecord($BettingRecord->id, $BettingRecord);
+                }
+                break;
         }
+        Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据-5x', ['rst'=>$rst]);
 
         return $rst;
     }
