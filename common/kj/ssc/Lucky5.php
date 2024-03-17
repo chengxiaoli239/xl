@@ -150,11 +150,11 @@ class Lucky5 extends BaseKj {
             if(empty($kjData['opencode'])){
                 throw_info('开奖号码不能为空');
             }
-            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '号码抓取-实讯网02', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'is_remote'=>$is_remote]);
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '号码抓取-实讯网02', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'is_remote'=>$is_remote]);
         }catch (\Exception $e){
             $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
 
-            Tool_Common::log('/kj_datas/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网03', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst, 'err_msg'=>$e->getMessage(), 'is_remote'=>$is_remote, 'current_proxy_addr'=>$current_proxy_addr]);
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网03', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst, 'err_msg'=>$e->getMessage(), 'is_remote'=>$is_remote, 'current_proxy_addr'=>$current_proxy_addr]);
             if($e->getCode() != self::SUCCESS_CODE){
                 return false;
             }
