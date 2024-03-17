@@ -1498,6 +1498,11 @@ class HN0898Service extends BaseTZService {
                 $localQihao = SscKjData::find()->select(['qihao'=>'MAX(qihao)'])->where(['lottery_type'=>$lottery_type])->scalar();
                 $qihao = max($qihao, $localQihao); # 取最大
                 break;
+            case 28:
+                $dateTime = date('Y-m-d H:i:s');
+                $diffDate = '2024-03-17 22:18:40';
+                $qihao = 51088277 + floor((strtotime($dateTime) - strtotime($diffDate))/300);
+                break;
             default:
                 $qihao = SscKjData::find()->select(['qihao'=>'MAX(qihao)'])->where(['lottery_type'=>$lottery_type])->scalar();
                 break;
@@ -1511,6 +1516,12 @@ class HN0898Service extends BaseTZService {
         }
 
         return $qihao;
+    }
+
+    public static function getAzLucky5Different()
+    {
+        $diff = '51088275';
+
     }
 
     /**

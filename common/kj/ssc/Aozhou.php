@@ -9,6 +9,7 @@ use common\helpers\LotteryType;
 use common\kj\BaseKj;
 use common\service\CommonService;
 use common\service\proxy\ProxyBaseService;
+use common\service\ssc\QihaoService;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use GuzzleHttp\Client;
@@ -28,34 +29,14 @@ class Aozhou extends BaseKj {
     public static function getLucky5(string $returnType = 'json', $is_auto = 1){
         try {
             $lottery_type = self::$lottery_type;
-            $dateHI = date('H:i');
-            $seconds = ('00:00'<$dateHI && $dateHI<'21:00') ? 1800 : 120;
             if($is_auto==1){
-                self::lockGrab($lottery_type, $seconds);
+                self::lockGrab($lottery_type, $seconds=120);
             }
 
+            list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
             if($is_auto==2 OR !$kjData = self::getCurrentKjData($lottery_type, $current_qihao)) {
                 try {
                     $domain = BaseKj::getApiHostByRoute('/kj/aozhou/lucky5');
-                    // 设置请求头
-                    // 构造请求头
-                    $headers = [
-                        'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-                        'Accept-Encoding: gzip, deflate, br, zstd',
-                        'Accept-Language: zh-CN,zh;q=0.9',
-                        'Cache-Control: max-age=0',
-                        'If-Modified-Since: Fri, 23 Feb 2024 13:19:14 GMT',
-                        'If-None-Match: W/"3b78-18dd61eb850"',
-                        'Sec-Ch-Ua: "Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-                        'Sec-Ch-Ua-Mobile: ?0',
-                        'Sec-Ch-Ua-Platform: "Windows"',
-                        'Sec-Fetch-Dest: document',
-                        'Sec-Fetch-Mode: navigate',
-                        'Sec-Fetch-Site: none',
-                        'Sec-Fetch-User: ?1',
-                        'Upgrade-Insecure-Requests: 1',
-                        'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-                    ];
 
                     // 创建 CookieJar 来存储 cookie
                     $cookieJar = new CookieJar();
@@ -65,21 +46,6 @@ class Aozhou extends BaseKj {
                     $firstUrl = $domain.'/view/aozxy5/ssc_index.html';
 
                     $now_time = time();
-                    // 发起第一个 GET 请求
-                    //$response = $client->request('GET', $firstUrl, $headers);
-                    #$response = $client->request('GET', $firstUrl, [
-                    #    'headers' => [
-                    #        'Accept-Encoding' => 'gzip, deflate, br',
-                    #        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 #Safari/537.36',
-                    #    ],
-                    #]);
-
-                    // 获取响应头中的 Set-Cookie
-                    #$setCookie = $response->getHeader('Set-Cookie');
-
-                    // 提取需要的 Cookie
-                    #$cookie = reset($setCookie); // 获取第一个 Set-Cookie
-                    //p(['cookie'=>$cookie]);
 
                     // 第二个请求的 URL
                     $secondUrl = $domain.'/api/CQShiCai/getBaseCQShiCaiList.do?lotCode=10010';
@@ -117,7 +83,7 @@ class Aozhou extends BaseKj {
                     Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type,LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);
                 }
             }else{
-                Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-缓存', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'cq'=>$current_qihao, 'kjData'=>$kjData]);
+                Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-缓存', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'cq'=>$current_qihao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
             }
         }catch (\Exception $e){
             $kjData = self::getCurrentKjData($lottery_type);

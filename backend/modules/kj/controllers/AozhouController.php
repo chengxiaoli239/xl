@@ -36,7 +36,7 @@ class AozhouController extends Controller
     public function actionLucky5($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
-        $data = Aozhou::getLucky5($type, $post['is_auto']);
+        $data = Aozhou::getLucky5($type, $post['is_auto']??1);
         return $data;
     }
 

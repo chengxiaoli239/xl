@@ -7,6 +7,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\service\BetService;
 use backend\service\clients\AgentClientsService;
+use backend\service\HN0898Service;
 use backend\service\numbers\NumCodeService;
 use backend\service\NumService;
 use backend\service\SscDataService;
@@ -43,6 +44,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $current_qihao = HN0898Service::getCurrentQihao($lottery_type = 28); # 针对哪一期过滤，默认为：当前期号
+            p($current_qihao);
             $rst = KjDataGet::grabOneLotteryKjData($lottery_type=28);p($rst); # 开奖
             LotteryTypeService::getLotteryTypeData($grabDataStatus=1, $useCache=0);
             $lottery_types = StaticService::getGrabDataLotteryTypes($useCache=0);
