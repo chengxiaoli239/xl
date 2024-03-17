@@ -1518,12 +1518,6 @@ class HN0898Service extends BaseTZService {
         return $qihao;
     }
 
-    public static function getAzLucky5Different()
-    {
-        $diff = '51088275';
-
-    }
-
     /**
      * @desc 获取台湾欢乐生肖天数差
      * @param string $end_date
