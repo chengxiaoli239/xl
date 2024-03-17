@@ -18,6 +18,7 @@ use backend\service\NumService;
 use backend\service\SscDataService;
 use backend\service\SystemService;
 use backend\service\TzService;
+use common\helpers\LotteryType;
 use common\kj\cqssc\CqsscKcw;
 use common\service\CommonService;
 use common\service\jobs\kj_data\GrabKjDatasJob;
@@ -158,30 +159,29 @@ class KjDataGet
      */
     public static function grabOneLotteryKjData(int $lottery_type=DEFAULT_LOTTERY_TYPE): ?array
     {
-        $m = \Yii::$app->cache;
         $RedisLock = new RedisLock();
         $KjConfigs = KjConfig::findAll(['enable'=>1, 'lottery_type'=>$lottery_type]);
         foreach ($KjConfigs as $kjConfig){
             try {
-                $grabOneMkey = 'grabOneLotteryKjData_x0_'.$lottery_type;
+                $grabOneKey = 'grabOneLotteryKjData_x0_'.$lottery_type;
                 $status = KjDataGet::isCanGrab($kjConfig->lottery_type);
                 if(!$status && !$kjConfig->is_batch){
                     throw_info('该时间段不可抓取');
                 }
-                if(!$RedisLock->lock($grabOneMkey, 15)){
+                if(!$RedisLock->lock($grabOneKey, 15)){
                     throw_info('短时间内操作-暂不处理');
                 }
 
                 $url = $kjConfig->host.$kjConfig->path;
                 $data = CurlService::httpGet($url);
-                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖任务获取', ['lottery_type'=>$lottery_type, 'url'=>$url, 'data'=>$data]);
+                Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖任务获取', ['lottery_type'=>$lottery_type, 'url'=>$url, 'data'=>$data]);
                 if(isset($data['status']) && $data['status'] != 200){
                     throw_info($data['msg']??'开奖数据抓取异常');
                 }
 
                 if($kjConfig->is_batch == 1){ # 批量
                     $kjDatas = $data;
-                    Tool_Common::log('/kj_datas/'.__FUNCTION__, 'INFO', '批量抓取开奖号码', ['data'=>$data]);
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '批量抓取开奖号码', ['data'=>$data]);
                     if($kjDatas){
                         # xjssc  1七星彩17排列五
                         $kjDatas = array_reverse($kjDatas); # 翻转
@@ -198,13 +198,13 @@ class KjDataGet
                     }
                     $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, 'lottery'=>CqsscKcw::getLotteryNameArr()[$kjConfig->lottery_type]];
                 }
-                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖记录', $logArr);
+                Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖记录', $logArr);
                 /* 处理系统投注计划 add 2019-01-21 */
                 KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
-                $RedisLock->unlock($grabOneMkey);
+                $RedisLock->unlock($grabOneKey);
             }catch (\Exception $e){
-                $RedisLock->unlock($grabOneMkey);
-                Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '短时间内操作', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+                $RedisLock->unlock($grabOneKey);
+                Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '短时间内操作', ['lottery_type'=>$lottery_type, 'lottery_name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage().'_'.$e->getFile().'_'.$e->getLine()]);
                 return ['code'=>$e->getCode(), 'msg'=>$e->getMessage()];
             }
         }
@@ -465,7 +465,7 @@ class KjDataGet
             $msg = current($SscKjData->getErrors());
             $lotteryNameArr = CqsscKcw::getLotteryNameArr();
             $logArr = ['msg'=>$msg, 'qihao'=>$qihao, 'kjData'=>$kjData, 'lottery'=>$lotteryNameArr[$lottery_type]];
-            Tool_Common::log('insertSscKjData_err', 'INFO', '开奖记录-错误', $logArr);
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖记录-错误', $logArr);
             return ['status' => 300, 'msg' => $msg];
         }
 

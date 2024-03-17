@@ -26,10 +26,10 @@ class RedisLock { // class start
     /**
      * 获取锁
      * @param String $key    锁标识
-     * @param  Int     $expire 锁过期时间
+     * @param Int $expire 锁过期时间
      * @return Boolean
      */
-    public function lock(string $key, $expire=5): bool
+    public function lock(string $key, int $expire=5): bool
     {
         $is_lock = $this->_redis->setnx($key, time()+$expire);
 

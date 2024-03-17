@@ -265,10 +265,14 @@ class SscDataService extends BaseService {
         $lastQuery = SscKjData::find()->select(['qihao', 'index_id', 'id'])->where(['lottery_type'=>$lottery_type]);
         //$sql = $lastQuery->createCommand()->getRawSql();p($sql);
         $last = $lastQuery->orderBy(['id'=>SORT_DESC])->asArray()->one();
-        $lastQihao = (string)$last['qihao'];
-        $lastIndexId = (int)$last['index_id'];
-        $lastId = (int)$last['id'];
-        $nextQihao = KjDataGet::getNextQihaoByQihao($lastQihao, $lottery_type);
+        if(empty($last)){
+            $lastIndexId = 0;
+        }else{
+            $lastQihao = (string)$last['qihao'];
+            $lastIndexId = (int)$last['index_id'];
+            $lastId = (int)$last['id'];
+            $nextQihao = KjDataGet::getNextQihaoByQihao($lastQihao, $lottery_type);
+        }
 
         return [$lastQihao, $lastIndexId, $lastId, $nextQihao];
     }

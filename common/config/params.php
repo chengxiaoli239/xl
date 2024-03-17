@@ -101,4 +101,9 @@ return [
 
     # 解析接口
     'EXPLAIN_CODE_API' => 'http://af1.ssxx9999.com',
+
+    'TELEGRAM' => [
+        'API' => 'https://api.telegram.org',
+        'TOKEN' => '6902259997:AAEsg51soXNS1MYPdmHNnpj0YWBo6J3aeyo',
+    ],
 ];

@@ -16,6 +16,7 @@ use common\kj\qxc\QxcTcw;
 use common\kj\ssc\Aozhou;
 use common\service\cache\CacheKeyService;
 use common\service\helpers\ThirdD;
+use common\service\lottery\LotteryTypeService;
 use common\service\thirdD\match\MatchCodeService;
 use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\OperateLotteryService;
@@ -42,6 +43,10 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $rst = KjDataGet::grabOneLotteryKjData($lottery_type=28);p($rst); # 开奖
+            LotteryTypeService::getLotteryTypeData($grabDataStatus=1, $useCache=0);
+            $lottery_types = StaticService::getGrabDataLotteryTypes($useCache=0);
+            p($lottery_types);
             $lottery_types = \backend\service\UserSysPlansService::getMyLotteryTypes($user_id=40);//p($lottery_types);
 
             $mkey = CacheKeyService::userLotteryTypes($user_id=40);
@@ -66,15 +71,12 @@ class IndexController extends Controller
             $data = QxcTcw::getNineNineLottery($type='json', $is_auto=2, $lottery_type=27);
             $Thirdd = new \common\kj\ssc\Thirdd();
             $data = $Thirdd->getFuCai3d($type='json', 2);p($data);
-            $rst = KjDataGet::grabOneLotteryKjData($lottery_type=26);p($rst); # 开奖
             $kjData = \common\kj\ssc\Thirdd::getCurrentKjData($lottery_type=26, $current_qihao);
             p([$kjData, $current_qihao]);
             $kdCodes = \backend\service\NumService::getKuduCodes([2,5,8,7], $kd=3);p($kdCodes);
             $qihao = substr(QxcTcw::getNineNineQihao($lottery_type=26, 2), 2);p($qihao);# 期号
             $MessageService = new EYunMessageOperateService($user_id=22);
             $rst = $MessageService->searchUser(''); p($rst);
-            $lottery_types = StaticService::getGrabDataLotteryTypes($useCache=0);
-            p($lottery_types);
             $betRow = Bets::findOne(26244	);
             list($code, $data, $msg) = OperateLotteryService::operateOne($betRow);
             p([$code, $data, $msg]);
