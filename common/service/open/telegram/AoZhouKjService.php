@@ -30,6 +30,7 @@ class AoZhouKjService  extends TelegramBaseService
                 $text .= "\n\n";
             }
         }
+        $text = "\n\n============================";
         Tool_Common::log('/kj_aozhou/'.__FUNCTION__, 'INFO', '开奖后群消息', ['lottery_type'=>$this->lottery_type, 'qihao'=>$qiHao, 'text'=>$text]);
 
         $config = \Yii::$app->params['TELEGRAM'];
