@@ -28,7 +28,7 @@ use common\service\jobs\kj_data\StaticHzProfitsJob;
 use common\service\jobs\kj_data\StaticPeiShuTrueFalseJob;
 use common\service\jobs\kj_data\StaticSdProfitsJob;
 use common\service\jobs\kj_data\UpdateCodeTypeYlJob;
-use common\service\lottery\aozhou5\AoZhou5Service;
+use common\service\open\telegram\AoZhouKjService;
 use common\service\ssc\QihaoService;
 use backend\service\CurlService;
 use backend\service\HN0898Service;
@@ -335,8 +335,14 @@ class KjDataGet
             case in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES):
                 OperateLotteryService::operate($lottery_type);  # 3D 处理3D下注记录
                 break;
-            case $lottery_type == CommonBaseService::LOTTERY_TYPE_LUCKY5:
             case $lottery_type == CommonBaseService::LOTTERY_TYPE_AOZHOU5:
+                $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
+                # 1、队列处理下注数据
+                push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name, 'business_id'=>$qihao]);
+                # 2、群里发开奖信息
+                (new AoZhouKjService())->operateSendKjData($qihao);
+                break;
+            case $lottery_type == CommonBaseService::LOTTERY_TYPE_LUCKY5:
                 $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
                 # 1、队列处理下注数据
                 push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name, 'business_id'=>$qihao]);
