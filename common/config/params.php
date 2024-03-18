@@ -105,5 +105,6 @@ return [
     'TELEGRAM' => [
         'API' => 'https://api.telegram.org',
         'TOKEN' => '6902259997:AAEsg51soXNS1MYPdmHNnpj0YWBo6J3aeyo',
+        'GROUP_ID' => -4183690108,
     ],
 ];
