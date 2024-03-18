@@ -30,7 +30,7 @@ class AoZhouKjService  extends TelegramBaseService
             'chat_id' => $config['GROUP_ID'],
             'token' => $config['TOKEN'],
         ];
-        push_queue(SendMessageJobs::class, $params); # TG消息发送
+        #push_queue(SendMessageJobs::class, $params); # TG消息发送
 
     }
 }
