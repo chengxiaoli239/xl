@@ -45,9 +45,17 @@ class TelegramController extends BaseController
     public function actionCallback(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        //p([$this->_post, $this->_get]);
-        $this->service->callbackMessage($this->_post, $this->_get);
-        Tool_Common::log('/telegram/'.__FUNCTION__,'INFO', '聊天信息', ['get'=>$this->_get, 'post'=>$this->_post]);
+        try {
+            $token = $this->_get['token'];
+            if(empty($token)){
+
+            }
+            //p([$this->_post, $this->_get]);
+            $this->service->callbackMessage($this->_post, $token);
+        }catch (\Exception $e){
+
+        }
+        Tool_Common::log('/telegram/'.__FUNCTION__,'INFO', '聊天信息', ['token'=>$token, 'post'=>$this->_post]);
 
         return ['post'=>$this->_post];
     }

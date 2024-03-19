@@ -12,14 +12,15 @@ class TelegramMessageService  extends TelegramBaseService
 
     /**
      * @param $post
-     * 1、私聊：{"update_id":840228241,"message":{"message_id":27,"from":{"id":6830978835,"is_bot":false,"first_name":"破局","last_name":"Mr","language_code":"zh-hans"},"chat":{"id":6830978835,"first_name":"破局","last_name":"Mr","type":"private"},"date":1709564365,"text":"可不可以不想你"}}
-     *
-     * 2、群聊：{"update_id":840228248,"message":{"message_id":38,"from":{"id":6830978835,"is_bot":false,"first_name":"破局","last_name":"Mr","language_code":"zh-hans"},"chat":{"id":6830978835,"first_name":"破局","last_name":"Mr","type":"private"},"date":1709826476,"text":"/start","entities":[{"offset":0,"length":6,"type":"bot_command"}]}}
-     *
-     * 3、进群（获取群号）：{"update_id":840228252,"message":{"message_id":43,"from":{"id":7114082398,"is_bot":false,"first_name":"金钱龟","username":"oloo1688"},"chat":{"id":-4183690108,"title":"破局机器人讨论组","type":"group","all_members_are_administrators":true},"date":1710341284,"new_chat_participant":{"id":7114082398,"is_bot":false,"first_name":"金钱龟","username":"oloo1688"},"new_chat_member":{"id":7114082398,"is_bot":false,"first_name":"金钱龟","username":"oloo1688"},"new_chat_members":[{"id":7114082398,"is_bot":false,"first_name":"金钱龟","username":"oloo1688"}]}}
+     1、私聊：{"update_id":840228241,"message":{"message_id":27,"from":{"id":6830978835,"is_bot":false,"first_name":"破局","last_name":"Mr","language_code":"zh-hans"},"chat":{"id":6830978835,"first_name":"破局","last_name":"Mr","type":"private"},"date":1709564365,"text":"可不可以不想你"}}
+
+     2、群聊：{"update_id":840228248,"message":{"message_id":38,"from":{"id":6830978835,"is_bot":false,"first_name":"破局","last_name":"Mr","language_code":"zh-hans"},"chat":{"id":6830978835,"first_name":"破局","last_name":"Mr","type":"private"},"date":1709826476,"text":"/start","entities":[{"offset":0,"length":6,"type":"bot_command"}]}}
+
+     3、进群（获取群号）：{"update_id":840228252,"message":{"message_id":43,"from":{"id":7114082398,"is_bot":false,"first_name":"金钱龟","username":"oloo1688"},"chat":{"id":-4183690108,"title":"破局机器人讨论组","type":"group","all_members_are_administrators":true},"date":1710341284,"new_chat_participant":{"id":7114082398,"is_bot":false,"first_name":"金钱龟","username":"oloo1688"},"new_chat_member":{"id":7114082398,"is_bot":false,"first_name":"金钱龟","username":"oloo1688"},"new_chat_members":[{"id":7114082398,"is_bot":false,"first_name":"金钱龟","username":"oloo1688"}]}}
+     * @token $token 机器人的token
      * @return array
      */
-    public function callbackMessage($params): array
+    public function callbackMessage($params, $token): array
     {
         $message = $params['message'];
         $chat = $message['chat'];
