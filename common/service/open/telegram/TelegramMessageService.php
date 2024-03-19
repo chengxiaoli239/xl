@@ -25,7 +25,7 @@ class TelegramMessageService  extends TelegramBaseService
         $chat = $message['chat'];
         $from = $message['from'];
         $userId = 0; # 有待确定如何取值
-        Tool_Common::log('/telegram'.__FUNCTION__, 'ERR', '消息处理异常', ['type'=>$chat['type']]);
+        Tool_Common::log('/telegram/'.__FUNCTION__, 'ERR', '消息处理异常', ['type'=>$chat['type']]);
         try {
             switch ($chat['type']){
                 case self::CHAT_TYPE_GROUP:
@@ -40,7 +40,7 @@ class TelegramMessageService  extends TelegramBaseService
                     break;
             }
         }catch (\Exception $e){
-            Tool_Common::log('/telegram'.__FUNCTION__, 'ERR', '消息处理异常', ['params'=>$params, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/telegram/'.__FUNCTION__, 'ERR', '消息处理异常', ['params'=>$params, 'err_msg'=>$e->getMessage()]);
         }
         //p(['post'=>$post, 'get'=>$get, 'cdddd']);
 
