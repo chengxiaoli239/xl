@@ -8,3 +8,7 @@
 [聊天信息] == post:{"update_id":840228257,"message":{"message_id":48,"from":{"id":7114082398,"is_bot":false,"first_name":"金钱龟","username":"oloo1688","language_code":"zh-hans"},"chat":{"id":7114082398,"first_name":"金钱龟","username":"oloo1688","type":"private"},"date":1710343813,"text":"24/50"}}
 [聊天信息] == post:{"update_id":840228258,"message":{"message_id":49,"from":{"id":7114082398,"is_bot":false,"first_name":"金钱龟","username":"oloo1688","language_code":"zh-hans"},"chat":{"id":7114082398,"first_name":"金钱龟","username":"oloo1688","type":"private"},"date":1710343818,"text":"23/50"}}
 
+# 创建机器人已经接收消息流程：
+1、在telegram创建机器人之后获取的token，在系统中添加
+2、系统中添加的token，系统自动设置机器人对应的回调地址且带上token，用于回调消息内容中的token和用户系统中添加的做关联
+3、好友入群回调信息带的token和群id，群id可用于机器人往群里发消息
