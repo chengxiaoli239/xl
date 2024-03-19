@@ -47,7 +47,9 @@ class BaseController extends Controller
             }
         }
         Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '用户登陆access_token信息', ['uid'=>$this->_user_id, 'session_id'=>$session_id, 'userLoginAccessTokenDatas'=>$userLoginAccessTokenDatas]);
-        $this->_account = $User->username;
+        if(!empty($User)){
+            $this->_account = $User->username;
+        }
     }
 
     /**

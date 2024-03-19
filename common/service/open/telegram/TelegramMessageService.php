@@ -30,11 +30,11 @@ class TelegramMessageService  extends TelegramBaseService
             switch ($chat['type']){
                 case self::CHAT_TYPE_GROUP:
                     # 群消息
-                    $this->saveGroupInfo($from, $chat, $userId);
+                    list($platformUserId, $name, $info) = $this->saveGroupInfo($from, $chat, $userId);
                     break;
                 case self::CHAT_TYPE_PRIVATE:
                     # 私聊
-                    $this->saveFriendInfo($from, $chat, $userId);
+                    list($platformUserId, $name, $info) = $this->saveFriendInfo($from, $chat, $userId);
                     $text = $message['text'];
 
                     break;
@@ -42,6 +42,7 @@ class TelegramMessageService  extends TelegramBaseService
         }catch (\Exception $e){
             Tool_Common::log('/telegram/'.__FUNCTION__, 'ERR', '消息处理异常', ['params'=>$params, 'err_msg'=>$e->getMessage()]);
         }
+        Tool_Common::log('/telegram/'.__FUNCTION__, 'ERR', '消息处理异常', ['params'=>$params, 'platformUserId'=>$platformUserId, 'name'=>$name, 'info'=>$info->attributes]);
         //p(['post'=>$post, 'get'=>$get, 'cdddd']);
 
         return [];
@@ -69,7 +70,7 @@ class TelegramMessageService  extends TelegramBaseService
             ];
         }
         $setData['updated_at'] = $now_time;
-        $wechatUser->setAttributes($setData);
+        $wechatUser->setAttributes($setData, false);
         if(!$wechatUser->save()){
             throw_info(Json::encode($wechatUser->getErrors()));
         }
@@ -94,13 +95,13 @@ class TelegramMessageService  extends TelegramBaseService
             $group = new PlatformGroup();
             $setData = [
                 'user_id' => $userId, # 本系统用户id
-                'group_id' => $groupId,
+                'group_id' => (string)$groupId,
                 'name' => $chat['title'],
                 'created_at' => $now_time,
             ];
         }
         $setData['updated_at'] = $now_time;
-        $group->setAttributes($setData);
+        $group->setAttributes($setData, false);
         if(!$group->save()){
             throw_info(Json::encode($group->getErrors()));
         }
@@ -111,16 +112,18 @@ class TelegramMessageService  extends TelegramBaseService
             $groupUser = new PlatformGroupUser();
             $setData = [
                 'user_id' => $userId,
-                'group_id' => $groupId,
-                'platform_user_id' => $platformUserId,
+                'group_id' => (string)$groupId,
+                'platform_user_id' => (string)$platformUserId,
+                'created_at' => $now_time,
             ];
         }
         $setData['username'] = $from['first_name'];
-        $groupUser->setAttributes($setData);
+        $setData['updated_at'] = $now_time;
+        $groupUser->setAttributes($setData, false);
         if(!$groupUser->save()){
             throw_info(Json::encode($groupUser->getErrors()));
         }
 
-        return [$platformUserId, $group->nickName, $group];
+        return [$platformUserId, $group->name, $group];
     }
 }
