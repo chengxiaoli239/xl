@@ -25,6 +25,7 @@ class TelegramMessageService  extends TelegramBaseService
         $chat = $message['chat'];
         $from = $message['from'];
         $userId = 0; # 有待确定如何取值
+        Tool_Common::log('/telegram'.__FUNCTION__, 'ERR', '消息处理异常', ['type'=>$chat['type']]);
         try {
             switch ($chat['type']){
                 case self::CHAT_TYPE_GROUP:
