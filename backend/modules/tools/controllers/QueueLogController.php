@@ -18,7 +18,7 @@ use yii\filters\VerbFilter;
 
 class QueueController extends BaseController
 {
-    protected $service;
+    public $service;
 
     public function __construct($id, Module $module, QueueService $queueService, array $config = [])
     {
@@ -82,7 +82,7 @@ class QueueController extends BaseController
         try {
             $params = \Yii::$app->request->post();
             $this->service->rePush($params);
-            return Common::jsonSuccess(['ÖØĞÂÈëÁĞ³É¹¦']);
+            return Common::jsonSuccess(['ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ³É¹ï¿½']);
         } catch (\Exception $e) {
             return Common::jsonError([], $e->getMessage());
         }
@@ -93,7 +93,7 @@ class QueueController extends BaseController
         try {
             $params = \Yii::$app->request->post();
             $this->service->markComplete($params);
-            return Common::jsonSuccess(['±ê¼Ç³É¹¦']);
+            return Common::jsonSuccess(['ï¿½ï¿½Ç³É¹ï¿½']);
         } catch (\Exception $e) {
             return Common::jsonError([], $e->getMessage());
         }
