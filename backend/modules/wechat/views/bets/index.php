@@ -9,7 +9,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\searchs\wechat\Bets */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = '3D记录';
+$this->title = '记录';
 $this->params['breadcrumbs'][] = $this->title;
 $columns = array_merge(
 [

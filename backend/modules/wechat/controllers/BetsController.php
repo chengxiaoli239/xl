@@ -3,6 +3,7 @@
 namespace backend\modules\wechat\controllers;
 
 use backend\models\thirdD\BetsBackend;
+use backend\models\TzSystemsAuth;
 use backend\service\UserService;
 use Yii;
 use backend\models\wechat\Bets;

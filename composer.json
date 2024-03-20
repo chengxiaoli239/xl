@@ -17,13 +17,15 @@
         "izyue/yii2-admin": "*",
         "yiidoc/yii2-redactor": "*",
         "yiisoft/yii2-imagine": "*",
-        "bubifengyun/yii2-echarts": "*",
+        "bubifengyun/yii2-echarts": "^0.0.7",
         "daixianceng/yii2-echarts": "*",
         "ext-json": "*",
         "yiisoft/yii2-queue": "^2.3",
         "ext-curl": "*",
         "yiisoft/yii2-redis": "^2.0",
-        "guzzlehttp/guzzle": "^7.8"
+        "guzzlehttp/guzzle": "^7.8",
+        "fakerphp/faker": "^1.23",
+        "bower-asset/jquery": "^3.2.1"
     },
     "github-oauth":{
         "github.com": "722087c57e7cbca71d81c8c1f74116ccce8218cf"

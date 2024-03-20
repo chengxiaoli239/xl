@@ -19,7 +19,9 @@ $username = AdminModel::findOne($uid)->username;
             <div class="panel-body">
                 <?php $form = ActiveForm::begin(); ?>
 
-                    <?= $form->field($model, 'tz_systems_ids')->checkboxList($allSystems, ['itemOptions'=>['labelOptions'=>['class'=>'tz_system_id']]])->label('投注网点') ?>
+                    <?= $form->field($model, 'tz_systems_ids')
+                        ->checkboxList($allSystems, ['itemOptions'=>['labelOptions'=>['class'=>'tz_system_id']]])
+                        ->label('投注网点') ?>
 
                     <?= $form->field($model, 'tz_types')->checkboxList($allTzTypes)->label('投注方式tz_types') ?>
 

@@ -401,7 +401,9 @@ $this->registerJs($js);
 
 <script>
     $(function () {
-        historyLists = <?php echo \yii\helpers\Json::encode($historyRecords)?>;
+        historyLists = <?php if (isset($historyRecords)) {
+            echo \yii\helpers\Json::encode($historyRecords);
+        }?>;
         function switchWechat(wechatId, switchStatus, nickName='') {
             var data = {wechatId:wechatId, switchStatus:switchStatus, 'nickName':nickName};
             if(switchStatus===0 && wechatId !== ''){

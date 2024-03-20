@@ -1,5 +1,6 @@
 <?php
 
+use backend\models\TzSystemsAuth;
 use backend\service\UserService;
 use common\service\thirdD\CommonBaseService;
 use yii\helpers\Html;
@@ -9,10 +10,18 @@ use yii\widgets\ActiveForm;
 /* @var $model backend\models\searchs\wechat\Bets */
 /* @var $form yii\widgets\ActiveForm */
 
-$PlayMethods = \common\models\thirdD\PlayMethod::find()->where(['status'=>1])->asArray()->all();
-$datas = array_column($PlayMethods, 'name', 'id');
-$playMethodOptions = $datas;
 $is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
+$TzSystems = TzSystemsAuth::findOne(['uid'=>\Yii::$app->user->identity->id]);
+$lotterys = \backend\models\LotteryType::find()->select(['lottery_type','title'])->where(['lottery_type'=>explode(',', $TzSystems->lottery_types)])->indexBy('lottery_type')->asArray()->all();
+$lotteryNames = array_column($lotterys, 'title', 'lottery_type');
+$playMethodsQuery = \common\models\thirdD\PlayMethod::find()->where(['status'=>1]);
+if(isset($lotteryNames[\common\helpers\LotteryType::AZ_LUCKY_5])){
+    $playMethodsQuery->andWhere(['type'=>\common\models\thirdD\PlayMethod::TYPE_GP]);
+}else{
+    $playMethodsQuery->andWhere(['type'=>\common\models\thirdD\PlayMethod::TYPE_3D]);
+}
+$PlayMethods = $playMethodsQuery->asArray()->all();
+$playMethodOptions = array_column($PlayMethods, 'name', 'id');
 ?>
 <style>
 .form-control{
@@ -42,7 +51,7 @@ $is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
         <?}?>
         <div class="col-lg-2 col-xs-4">
             <?= $form->field($model, 'wechatUserName')
-                ->label('微信ID', ['class' => 'control-label hidden-xs'])->textInput(['placeholder' => '微信ID'])
+                ->label('用户ID', ['class' => 'control-label hidden-xs'])->textInput(['placeholder' => '平台用户ID'])
             ?>
         </div>
         <div class="col-lg-2 col-xs-4">
@@ -73,7 +82,7 @@ $is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
         </div>
         <div class="col-lg-2 col-xs-4">
             <?php echo $form->field($model, 'lottery_type')->dropDownList(
-        CommonBaseService::THIRDD_LOTTERY_OPTIONS, ['prompt'=>'-选择彩种-']
+        $lotteryNames, ['prompt'=>'-选择彩种-']
             )->label('类', ['class' => 'control-label hidden-xs']); ?>
         </div>
         <div class="col-lg-2 col-xs-3">
