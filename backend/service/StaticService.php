@@ -694,7 +694,7 @@ class StaticService extends BaseService {
             ];
         }
         if($month != date('Y-m')){
-            $m->set($mkey, $allStatic, 6*30*24*60*60);
+            $m->set($mkey, $allStatic, 7*24*3600);
         }
 
         //echo $date.'月份：';
