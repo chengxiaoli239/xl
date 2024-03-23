@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property int $user_id user.id,本系统用户id
  * @property string $from_id 消息平台用户id
+ * @property string $chat_id 消息来源id
  * @property int $is_bot 是否机器人0、1
  * @property string $name 用户或群名称
  * @property string $type 消息类型:private、group
@@ -38,13 +39,12 @@ class TelegramMessage extends \common\models\base\BaseModel
     {
         return [
             [['user_id', 'is_bot', 'created_at', 'updated_at'], 'integer'],
-            [['text', 'created_at', 'updated_at'], 'required'],
-            [['text'], 'string'],
+            [['chat_id', 'text', 'created_at', 'updated_at'], 'required'],
+            [['text', 'content'], 'string'],
             [['update_at'], 'safe'],
-            [['from_id', 'name'], 'string', 'max' => 32],
+            [['from_id', 'chat_id', 'name'], 'string', 'max' => 32],
             [['type'], 'string', 'max' => 24],
             [['message_id', 'update_id'], 'string', 'max' => 64],
-            [['content'], 'string', 'max' => 255],
             [['user_id', 'message_id'], 'unique', 'targetAttribute' => ['user_id', 'message_id']],
         ];
     }
@@ -58,6 +58,7 @@ class TelegramMessage extends \common\models\base\BaseModel
             'id' => 'ID',
             'user_id' => 'user.id,本系统用户id',
             'from_id' => '消息平台用户id',
+            'chat_id' => '消息来源id',
             'is_bot' => '是否机器人0、1',
             'name' => '用户或群名称',
             'type' => '消息类型:private、group',

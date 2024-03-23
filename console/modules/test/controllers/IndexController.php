@@ -44,6 +44,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%telegram_message}}'); p($r);
             $current_qihao = HN0898Service::getCurrentQihao($lottery_type = 28); # 针对哪一期过滤，默认为：当前期号
             p($current_qihao);
             $rst = KjDataGet::grabOneLotteryKjData($lottery_type=28);p($rst); # 开奖
@@ -66,7 +67,6 @@ class IndexController extends Controller
             $rst['updateDs'] = SscDataService::updateDsData($lottery_type = 17);p($rst); // 每期开奖遗漏 -- 新开
             $r = SscDataService::openOnePlanBetStatus($plan_id=120, $next_qihao='2024038');
             $rst = SscDataService::isCanBet($plan_id, $next_qihao); p($rst);
-            $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%lottery_data_deal_status}}'); p($r);
             //$data = \common\service\ssc\QihaoService::getKjQiHao(8);p($data);
             $plan = UserSysPlans::findOne(7995);
             $data = QxcTcw::getOfficialCode($type='json', $is_auto=1, $lottery_type=27);p($data);
