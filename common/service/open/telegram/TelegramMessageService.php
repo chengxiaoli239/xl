@@ -1,7 +1,9 @@
 <?php
 namespace common\service\open\telegram;
 
+use backend\models\open\PlatformRobot;
 use common\models\open\PlatformGroupUser;
+use common\models\open\telegram\TelegramMessage;
 use common\models\wechat\WechatUser;
 use common\models\open\PlatformGroup;
 use common\tools\Tool_Common;
@@ -25,9 +27,10 @@ class TelegramMessageService  extends TelegramBaseService
         $message = $params['message'];
         $chat = $message['chat'];
         $from = $message['from'];
-        $userId = 0; # 有待确定如何取值
-        Tool_Common::log('/telegram/'.__FUNCTION__, 'ERR', '消息处理异常', ['type'=>$chat['type']]);
+        $userId = self::getUserIdByToken($token); # 有待确定如何取值
+        Tool_Common::log('/telegram/'.__FUNCTION__, 'ERR', '消息接收', ['type'=>$chat['type'], 'user_id'=>$userId, 'token'=>$token]);
         try {
+            $this->saveMessage($params, $userId); # 消息存表
             switch ($chat['type']){
                 case self::CHAT_TYPE_GROUP:
                     # 群消息
@@ -42,11 +45,40 @@ class TelegramMessageService  extends TelegramBaseService
             }
         }catch (\Exception $e){
             Tool_Common::log('/telegram/'.__FUNCTION__, 'ERR', '消息处理异常', ['params'=>$params, 'err_msg'=>$e->getMessage()]);
+            return ['code'=>300, 'message'=>$e->getMessage()];
         }
-        Tool_Common::log('/telegram/'.__FUNCTION__, 'ERR', '消息处理异常', ['params'=>$params, 'platformUserId'=>$platformUserId, 'name'=>$name, 'info'=>$info->attributes]);
-        //p(['post'=>$post, 'get'=>$get, 'cdddd']);
+        Tool_Common::log('/telegram/'.__FUNCTION__, 'ERR', '消息处理', ['params'=>$params, 'platformUserId'=>$platformUserId, 'name'=>$name, 'info'=>$info->attributes]);
 
         return [];
+    }
+
+    /**
+     * 消息保存
+     * @param array $params
+     * @param int $userId
+     * @return void
+     */
+    public function saveMessage(array $params=[], int $userId=0)
+    {
+        $message = $params['message'];
+        $chat = $message['chat'];
+        $from = $message['from'];
+        $setData = [
+            'user_id' => $userId,
+            'from_id' => $from['id'],
+            'chat_id' => $chat['id'],
+            'name' => ($chat['type']==self::CHAT_TYPE_GROUP)?$chat['title']:($chat['first_name'].$chat['last_name']),
+            'type' => $chat['type'],
+            'message_id' => $message['message_id'],
+            'update_id' => $params['update_id'],
+            'text' => $message['text'],
+            'content' => Json::encode($params),
+        ];
+        $telegramMessage = new TelegramMessage();
+        $telegramMessage->setAttributes($setData, false);
+        if(!$telegramMessage->save()){
+            Tool_Common::log('/telegram/'.__FUNCTION__, 'ERR', '消息保存异常', ['params'=>$params, 'err_msg'=>Json::encode($telegramMessage->getErrors())]);
+        }
     }
 
     /**
@@ -56,21 +88,24 @@ class TelegramMessageService  extends TelegramBaseService
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public function saveFriendInfo(array $from=[], array $chat=[]): array
+    public function saveFriendInfo(array $from=[], array $chat=[], $userId=0): array
     {
         $platformUserId = $from['id'];
         $wechatUser = WechatUser::findOne(['userName'=>$platformUserId]);
-        $now_time = time();
+        $nowTime = time();
+        $setData = [];
         if(empty($wechatUser)){
             $wechatUser = new WechatUser();
             $setData = [
-                'user_id' => 0, # 本系统用户id
                 'userName' => $platformUserId,
-                'nickName' => $chat['first_name'].$chat['last_name'],
-                'created_at' => $now_time,
+                'created_at' => $nowTime,
             ];
         }
-        $setData['updated_at'] = $now_time;
+        $setData = array_merge($setData, [
+            'user_id' => $userId, # 本系统用户id
+            'nickName' => $chat['first_name'].$chat['last_name'],
+            'updated_at' => $nowTime,
+        ]);
         $wechatUser->setAttributes($setData, false);
         if(!$wechatUser->save()){
             throw_info(Json::encode($wechatUser->getErrors()));
@@ -126,5 +161,10 @@ class TelegramMessageService  extends TelegramBaseService
         }
 
         return [$platformUserId, $group->name, $group];
+    }
+
+    public static function getUserIdByToken($token='')
+    {
+        return PlatformRobot::find()->select(['user_id'])->where(['token'=>$token])->scalar();
     }
 }

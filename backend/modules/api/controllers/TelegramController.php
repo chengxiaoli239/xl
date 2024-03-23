@@ -32,10 +32,10 @@ class TelegramController extends BaseController
         ];
     }
 
-    public function __construct($id, $module, TelegramMessageService $TelegramMessageService, $config = [])
+    public function __construct($id, $module, TelegramMessageService $telegramMessageService, $config = [])
     {
         parent::__construct($id, $module, $config);
-        $this->service = $TelegramMessageService;
+        $this->service = $telegramMessageService;
     }
 
     /**
@@ -48,16 +48,17 @@ class TelegramController extends BaseController
         try {
             $token = $this->_get['token'];
             if(empty($token)){
-
+                throw_info('token is null');
             }
             //p([$this->_post, $this->_get]);
             $this->service->callbackMessage($this->_post, $token);
         }catch (\Exception $e){
-
+            Tool_Common::log('/telegram/'.__FUNCTION__,'ERR', '聊天信息接收-异常', ['token'=>$token, 'post'=>$this->_post]);
+            return ['code'=>300, 'data'=>[], 'message'=>'fail'];
         }
         Tool_Common::log('/telegram/'.__FUNCTION__,'INFO', '聊天信息', ['token'=>$token, 'post'=>$this->_post]);
 
-        return ['post'=>$this->_post];
+        return ['code'=>200, 'data'=>['post'=>$this->_post], 'message'=>'success'];
     }
 
 }
