@@ -71,6 +71,8 @@ class TelegramMessageService  extends TelegramBaseService
             'type' => $chat['type'],
             'message_id' => $message['message_id'],
             'update_id' => $params['update_id'],
+            'updated_at' => strtotime($message['date']),
+            'created_at' => strtotime($message['date']),
             'text' => $message['text'],
             'content' => Json::encode($params),
         ];
