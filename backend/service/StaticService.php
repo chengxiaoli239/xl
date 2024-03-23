@@ -379,7 +379,7 @@ class StaticService extends BaseService {
             ];
         }
         if($month != date('Y-m')){
-            $m->set($mkey, $allStatic, 6*30*24*60*60);
+            $m->set($mkey, $allStatic, 7*24*3600);
         }
 
         //echo $date.'月份：';
@@ -859,7 +859,7 @@ class StaticService extends BaseService {
             ];
         }
         if($date != date('Y-m-d')){
-            $m->set($mkey, $allStatic, 6*30*24*60*60);
+            $m->set($mkey, $allStatic, 7*24*3600);
         }
         //p($allStatic);
 
@@ -906,7 +906,7 @@ class StaticService extends BaseService {
         //p($allStatic);
         $now_time = date('H:i');
         if($date != date('Y-m-d') && $now_time>'03:30'){
-            $m->set($mkey, $allStatic, 6*30*24*60*60);
+            $m->set($mkey, $allStatic, 7*24*3600);
         }
 
         return $allStatic;
@@ -959,7 +959,7 @@ class StaticService extends BaseService {
         }
         //p($allStatic);
         if($date != date('Y-m-d')){
-            $m->set($mkey, $allStatic, 6*30*24*60*60);
+            $m->set($mkey, $allStatic, 7*24*3600);
         }
 
         return $allStatic;
@@ -1006,7 +1006,7 @@ class StaticService extends BaseService {
             ];
         }
         if($month != date('Y-m')){
-            $m->set($mkey, $allStatic, 6*30*24*60*60);
+            $m->set($mkey, $allStatic, 7*24*3600);
         }
 
         //echo $date.'月份：';
