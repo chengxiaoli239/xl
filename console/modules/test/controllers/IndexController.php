@@ -5,6 +5,7 @@ use backend\models\searchs\wechat\Bets;
 use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
+use backend\models\VBets;
 use backend\service\BetService;
 use backend\service\clients\AgentClientsService;
 use backend\service\HN0898Service;
@@ -44,6 +45,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $params = Json::decode('{"user_id":21,"business_id":6830978835,"token":"6902259997:AAEsg51soXNS1MYPdmHNnpj0YWBo6J3aeyo","update_id":840228241,"message":{"message_id":27,"from":{"id":6830978835,"is_bot":false,"first_name":"破局","last_name":"Mr","language_code":"zh-hans"},"chat":{"id":6830978835,"first_name":"破局","last_name":"Mr","type":"private"},"date":1709564365,"text":"1正3/10"}}');
+            $d = \common\service\jobs\telegram\MessageReceiveJobs::handle($params);
             $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%telegram_message}}'); p($r);
             $current_qihao = HN0898Service::getCurrentQihao($lottery_type = 28); # 针对哪一期过滤，默认为：当前期号
             p($current_qihao);

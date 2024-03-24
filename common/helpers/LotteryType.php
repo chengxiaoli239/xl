@@ -1,13 +1,7 @@
 <?php
 namespace common\helpers;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ServerException;
-use GuzzleHttp\RequestOptions;
-use Yii;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
+use common\models\thirdD\BetOrderId;
 
 class LotteryType
 {
@@ -32,6 +26,21 @@ class LotteryType
     public static function getName($lottery_type=DEFAULT_LOTTERY_TYPE): string
     {
         return self::TYPE_OPTIONS[$lottery_type]??'未知彩种';
+    }
 
+    /**
+     * 下注单号
+     * @return bool|mixed|null
+     */
+    public static function getOrderId(){
+        $BetOrderId = new BetOrderId();
+        $BetOrderId->created_at = time();
+        $BetOrderId->updated_at = time();
+        $r = $BetOrderId->save();
+        if(empty($r)){
+            return false;
+        }
+
+        return $BetOrderId->bet_order_id;
     }
 }

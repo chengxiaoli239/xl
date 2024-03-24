@@ -1,0 +1,68 @@
+官网地址：https://1680632.com/view/aozxy5/ssc_index.html
+下注示例 POST
+1、正打法：1正/1 2正/2 3正/3 4正4
+    A、请求1：
+        地址：https://url3.ac3868.com/api/
+        __: isAutoOdds
+        gameId: 601
+        rebate: A
+        data: [[134,"1.95","1"],[135,"1.95","2"],[136,"1.95","3"],[137,"1.95","4"]]
+        cbk: 0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6
+        返回：{}
+    B、请求2（可能不需要）：
+        地址：https://url3.ac3868.com/api/
+        __: memberThreadmd
+        newsId: 100000137
+        cbk: 0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6
+        返回：{}
+    C、请求3：
+        地址：https://url3.ac3868.com/api/
+        __: bettingSingle
+        data: {"gameId":601,"pusId":9,"openingNum":51090290,"rebate":"A","data":[[134,"1.95","1"],[135,"1.95","2"],[136,"1.95","3"],[137,"1.95","4"]]}
+        cbk: 0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6
+        返回：{"error":"账户可用馀额不足，请减少部分注额后重新下注!"}
+2、角打法：12角/1 23角/2 3角/3 14角/4
+    A、请求1：
+        地址：https://url3.ac3868.com/api/
+        __: isAutoOdds
+        gameId: 601
+        rebate: A
+        data: [[142,"1.95","1"],[144,"1.95","2"],[145,"1.95","3"],[143,"1.95","4"]]
+        cbk: 0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6
+        返回：{}
+    B、请求2：
+        地址：https://url3.ac3868.com/api/
+        __: bettingSingle
+        data: {"gameId":601,"pusId":9,"openingNum":51090292,"rebate":"A","data":[[143,"1.95","4"],[142,"1.95","1"],[144,"1.95","2"],[145,"1.95","3"]]}
+        cbk: 0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6
+        返回：{"error":"账户可用馀额不足，请减少部分注额后重新下注!"}
+    C、请求3：
+        地址：https://url3.ac3868.com/api/
+3、1念打法：1念4/3 1念3/2 1念2/1
+    A、请求1：
+        地址：https://url3.ac3868.com/api/
+        __: isAutoOdds
+        gameId: 601
+        rebate: A
+        data: [[148,"2.9","1"],[147,"2.9","2"],[146,"2.9","3"]]
+        cbk: 0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6
+    B、请求2：
+        地址：https://url3.ac3868.com/api/
+        __: bettingSingle
+        data: {"gameId":601,"pusId":9,"openingNum":51090293,"rebate":"A","data":[[148,"2.9","1"],[147,"2.9","2"],[146,"2.9","3"]]}
+        cbk: 0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6
+4、2念打法：2念1/1 2念3/2 2念4/3
+    A、请求1：
+        地址：https://url3.ac3868.com/api/
+        __: isAutoOdds
+        gameId: 601
+        rebate: A
+        data: [[149,"2.9","1"],[150,"2.9","2"],[151,"2.9","3"]]
+        cbk: 0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6
+    B、请求2：
+        地址：https://url3.ac3868.com/api/
+        __: bettingSingle
+        data: {"gameId":601,"pusId":9,"openingNum":51090296,"rebate":"A","data":[[149,"2.9","1"],[150,"2.9","2"],[151,"2.9","3"]]}
+        cbk: 0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6
+
+

@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "{{%platform_robot}}".
  *
  * @property int $id
+ * @property int $platform_robot_id
  * @property int $platform_id 平台ID
  * @property int $user_id user.id,系统用户id
  * @property string $name 机器人名称
@@ -34,13 +35,13 @@ class PlatformRobot extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['platform_id', 'user_id', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['platform_robot_id', 'platform_id', 'user_id', 'status', 'created_at', 'updated_at'], 'integer'],
             [['created_at', 'updated_at'], 'required'],
             [['update_at'], 'safe'],
             [['name'], 'string', 'max' => 32],
             [['token'], 'string', 'max' => 64],
             [['remark'], 'string', 'max' => 255],
-            [['user_id'], 'unique'],
+            [['platform_id', 'user_id', 'token'], 'unique', 'targetAttribute' => ['platform_id', 'user_id', 'token']],
         ];
     }
 
@@ -51,6 +52,7 @@ class PlatformRobot extends \common\models\base\BaseModel
     {
         return [
             'id' => 'ID',
+            'platform_robot_id' => 'Platform Robot ID',
             'platform_id' => '平台ID',
             'user_id' => 'user.id,系统用户id',
             'name' => '机器人名称',

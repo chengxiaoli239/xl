@@ -2,7 +2,6 @@
 namespace common\open\thirdD\api;
 
 use Yii;
-use common\open\thirdD\SxThirdDBase;
 
 class SiteUserApi extends SxThirdDBase
 {

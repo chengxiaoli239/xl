@@ -6,7 +6,7 @@ use common\helpers\LotteryType;
 use common\service\jobs\telegram\SendMessageJobs;
 use common\tools\Tool_Common;
 
-class AoZhouKjService  extends TelegramBaseService
+class AoZhouKjService  extends BaseService
 {
     public int $lottery_type = LotteryType::AZ_LUCKY_5;
 

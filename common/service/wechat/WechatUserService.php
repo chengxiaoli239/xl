@@ -10,6 +10,7 @@ use common\service\cache\CacheKeyService;
 use common\service\thirdD\ThirdDTypeService;
 use common\service\wechat\eyun\EYunBaseService;
 use common\tools\Tool_Common;
+use yii\db\ActiveRecord;
 
 class WechatUserService extends BaseService
 {
@@ -60,17 +61,17 @@ class WechatUserService extends BaseService
 
     /**
      * 获取代理微信好友
-     * @param string $user_id 代理id
+     * @param integer $userId 代理id
      * @param bool $useCache
-     * @return array|mixed|\yii\db\ActiveRecord[]
+     * @return array|mixed|ActiveRecord[]
      */
-    public static function getWechatUsers($user_id='', $useCache=true){
+    public static function getWechatUsers(int $userId=0, bool $useCache=true){
         $m = \Yii::$app->cache;
-        $mkey = self::getWechatUsersKey($user_id);
-        if(!$useCache OR !$data = $m->get($mkey)){
+        $mkey = self::getWechatUsersKey($userId);
+        if(true OR !$useCache OR !$data = $m->get($mkey)){
             $dataQuery = WechatUser::find()
-                ->select(['id', 'user_id', 'userName', 'agent_id'=>'user_id', 'member_id'=>'id', 'nickName', 'status', 'smallHead'])
-                ->where(['user_id'=>$user_id]);
+                ->select(['id', 'user_id', 'userName', 'agent_id'=>'user_id', 'member_id'=>'id', 'reply_type', 'is_need_confirm', 'nickName', 'status', 'smallHead'])
+                ->where(['user_id'=>$userId]);
             #$sql = $dataQuery->createCommand()->getRawSql();p($sql);
             $data = $dataQuery->indexBy(['userName'])->asArray()->all();
             $m->set($mkey, $data, 600);
@@ -134,17 +135,18 @@ class WechatUserService extends BaseService
 
     /**
      * 获取最后微信id
-     * @param int $user_id
+     * @param int $userId
+     * @param string $robot_wechat
      * @return string
      */
-    public static function getCurrentRobotWechat(int $user_id=0, $robot_wechat=''): string
+    public static function getCurrentRobotWechat(int $userId=0, string $robot_wechat=''): string
     {
-        $mkey = CacheKeyService::userCurrentWechat($user_id);
-        if($robot_wechat){
+        $mkey = CacheKeyService::userCurrentWechat($userId);
+        if($robot_wechat && false){
             $wcId = $robot_wechat;
         }else{
             $wcId = commonRedis()->get($mkey);
-            if(empty($wcId) && $RobotUser = RobotUser::find()->where(['user_id'=>$user_id])->orderBy(['wechat_status'=>SORT_DESC])->one()){
+            if(empty($wcId) && $RobotUser = RobotUser::find()->where(['user_id'=>$userId])->orderBy(['wechat_status'=>SORT_DESC])->one()){
                 $wcId = $RobotUser->wcId;
             }
         }

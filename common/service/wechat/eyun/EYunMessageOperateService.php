@@ -9,6 +9,7 @@ use backend\service\agent\AgentUsersService;
 use backend\service\BetService;
 use backend\service\HN0898Service;
 use backend\service\SscDataService;
+use common\helpers\LotteryType;
 use common\models\eyun\RobotUser;
 use common\models\wechat\WechatUser;
 use common\service\BaseService;
@@ -568,7 +569,7 @@ class EYunMessageOperateService  extends EYunBaseService
                 throw_info($msg);
             }
 
-            $betOrderId = ThirdDTypeService::getOrderId();
+            $betOrderId = LotteryType::getOrderId();
             if(empty($betOrderId)){
                 throw_info('单号生成失败');
             }

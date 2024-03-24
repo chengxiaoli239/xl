@@ -1,7 +1,7 @@
 <?php
 namespace common\service\open\telegram;
 
-class TelegramBaseService  extends \common\service\BaseService
+class BaseService  extends \common\service\BaseService
 {
 
     const CHAT_TYPE_PRIVATE = 'private';

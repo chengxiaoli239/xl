@@ -9,7 +9,7 @@ namespace backend\modules\api\controllers;
 
 use backend\controllers\BaseController;
 use common\tools\Tool_Common;
-use common\service\open\telegram\TelegramMessageService;
+use common\service\open\telegram\MessageService;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -32,7 +32,7 @@ class TelegramController extends BaseController
         ];
     }
 
-    public function __construct($id, $module, TelegramMessageService $telegramMessageService, $config = [])
+    public function __construct($id, $module, MessageService $telegramMessageService, $config = [])
     {
         parent::__construct($id, $module, $config);
         $this->service = $telegramMessageService;

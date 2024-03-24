@@ -1,7 +1,6 @@
 <?php
 namespace common\open\thirdD\api;
 
-use common\open\thirdD\SxThirdDBase;
 use common\tools\Util;
 use GuzzleHttp\RequestOptions;
 

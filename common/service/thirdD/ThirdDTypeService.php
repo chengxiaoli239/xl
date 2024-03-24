@@ -782,6 +782,8 @@ class ThirdDTypeService extends CommonBaseService
     /**
      * 判断金额：各x元、共x元
      * @param string $text
+     * @param string $matchName
+     * @param array $playMethod
      * @return array
      */
     public static function getMoneys(string $text='', $matchName='', $playMethod=[]): array
@@ -925,22 +927,6 @@ class ThirdDTypeService extends CommonBaseService
         $cnTextSingle = str_replace(['组三', '组六'], '', $text);
 
         return $cnTextSingle;
-    }
-
-    /**
-     * 下注单号
-     * @return bool|mixed|null
-     */
-    public static function getOrderId(){
-        $BetOrderId = new BetOrderId();
-        $BetOrderId->created_at = time();
-        $BetOrderId->updated_at = time();
-        $r = $BetOrderId->save();
-        if(empty($r)){
-            return false;
-        }
-
-        return $BetOrderId->bet_order_id;
     }
 
     /**

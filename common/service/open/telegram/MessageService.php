@@ -6,10 +6,11 @@ use common\models\open\PlatformGroupUser;
 use common\models\open\telegram\TelegramMessage;
 use common\models\wechat\WechatUser;
 use common\models\open\PlatformGroup;
+use common\service\jobs\telegram\MessageReceiveJobs;
 use common\tools\Tool_Common;
 use yii\helpers\Json;
 
-class TelegramMessageService  extends TelegramBaseService
+class MessageService  extends BaseService
 {
 
     /**
@@ -34,13 +35,18 @@ class TelegramMessageService  extends TelegramBaseService
             switch ($chat['type']){
                 case self::CHAT_TYPE_GROUP:
                     # 群消息
-                    list($platformUserId, $name, $info) = $this->saveGroupInfo($from, $chat, $userId);
+                    list($platformUserId, $name, $info) = $this->saveGroupInfo($from, $chat, $userId, $token);
                     break;
                 case self::CHAT_TYPE_PRIVATE:
                     # 私聊
-                    list($platformUserId, $name, $info) = $this->saveFriendInfo($from, $chat, $userId);
-                    $text = $message['text'];
-
+                    list($platformUserId, $name, $info) = $this->saveFriendInfo($from, $chat, $userId, $token);
+                    $params = array_merge($params, [
+                        'business_id' => $platformUserId,
+                        'user_id' => $userId,
+                        'token' => $token,
+                    ]);
+                    # 回复用户
+                    push_queue_open(MessageReceiveJobs::class, $params);
                     break;
             }
         }catch (\Exception $e){
@@ -90,16 +96,19 @@ class TelegramMessageService  extends TelegramBaseService
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public function saveFriendInfo(array $from=[], array $chat=[], $userId=0): array
+    public function saveFriendInfo(array $from=[], array $chat=[], $userId=0, $token=''): array
     {
+        $robotPlatformUserId = explode(':', $token)[0];
         $platformUserId = $from['id'];
-        $wechatUser = WechatUser::findOne(['userName'=>$platformUserId]);
+        $wechatUser = WechatUser::findOne(['userName'=>$platformUserId, 'robot_wechat'=>$robotPlatformUserId]);
         $nowTime = time();
         $setData = [];
         if(empty($wechatUser)){
             $wechatUser = new WechatUser();
             $setData = [
+                'user_id' => $userId,
                 'userName' => $platformUserId,
+                'robot_wechat' => $robotPlatformUserId,
                 'created_at' => $nowTime,
             ];
         }
@@ -169,4 +178,5 @@ class TelegramMessageService  extends TelegramBaseService
     {
         return PlatformRobot::find()->select(['user_id'])->where(['token'=>$token])->scalar();
     }
+
 }

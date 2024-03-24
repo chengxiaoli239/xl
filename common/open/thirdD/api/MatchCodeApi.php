@@ -3,7 +3,6 @@ namespace common\open\thirdD\api;
 
 use common\tools\Common;
 use GuzzleHttp\RequestOptions;
-use common\open\thirdD\SxThirdDBase;
 use yii\helpers\Json;
 
 class MatchCodeApi extends SxThirdDBase

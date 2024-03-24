@@ -5,7 +5,6 @@ use common\service\wechat\eyun\api\EventServiceTrait;
 use common\tools\Common;
 use GuzzleHttp\RequestOptions;
 use Yii;
-use common\open\thirdD\SxThirdDBase;
 
 class SiteOrderApi extends SxThirdDBase
 {
