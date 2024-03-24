@@ -90,6 +90,9 @@ class Aozhou extends BaseKj {
             $kjData = self::getCurrentKjData($lottery_type);
             Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$current_qihao, 'currentQiHao'=>$currentQiHao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
         }
+        if(empty($kjData)){
+            return false;
+        }
         return self::extracted($kjData, $lottery_type, $returnType, $is_auto);
     }
 }
