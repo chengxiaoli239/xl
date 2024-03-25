@@ -17,7 +17,7 @@ class Odds3dService extends CommonBaseService
      */
     public static function addUserOdds($user_id, $systemTypeId=15): array
     {
-        $Odds = PlayMethod::find()->where(['=', 'system_type_id'=>$systemTypeId])->asArray()->all();
+        $Odds = PlayMethod::find()->where(['system_type_id'=>$systemTypeId])->asArray()->all();
         foreach ($Odds as $odd){
             $where = ['user_id'=>$user_id, 'play_method_id'=>$odd['id']];
             $Odds = Odds::findOne($where);
