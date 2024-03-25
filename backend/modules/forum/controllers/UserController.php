@@ -93,8 +93,8 @@ class UserController extends BaseController
             $oneTzSystemId = explode(',', $this->_post['TzSystemsAuth']['tz_systems_ids'])[0];
             if(!empty($oneTzSystemId)){
                 $TzSystems = TzSystems::findOne($oneTzSystemId);
-                if(in_array($TzSystems->system_type_id, [15])){ # 3d类型站点
-                    \common\service\thirdD\Odds3dService::addUserOdds($uid); # 3d 用户添加赔率
+                if($TzSystems->system_type_id>=15){
+                    \common\service\thirdD\Odds3dService::addUserOdds($uid, $TzSystems->system_type_id); # 3d 用户添加赔率
                 }
             }
             return $this->redirect(['index']);

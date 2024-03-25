@@ -11,12 +11,13 @@ class PlayMethod extends BaseModel
         self::TYPE_3D => '3D',
         self::TYPE_GP => '龟盘',
     ];
+
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return '{{%thirdd_playmethod}}';
+        return '{{%playmethod}}';
     }
 
 }

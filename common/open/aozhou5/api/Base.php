@@ -1,5 +1,5 @@
 <?php
-namespace common\open\thirdD\api;
+namespace common\open\aozhou5\api;
 
 use common\models\open\SsxxRequestLog;
 use common\open\thirdD\api\SiteOauthApi;
@@ -14,7 +14,7 @@ use yii\helpers\ArrayHelper;
 use common\helpers\RequestHelper;
 use yii\helpers\Json;
 
-class SxThirdDBase extends OpenBase
+class Base extends OpenBase
 {
     /**
      * @var string api请求地址
@@ -37,7 +37,7 @@ class SxThirdDBase extends OpenBase
     /**
      * 创建接口实例
      * @param  string $name api名称
-     * @return SxThirdDBase
+     * @return Base
      */
     public static function createObject(string $name = ''): object
     {

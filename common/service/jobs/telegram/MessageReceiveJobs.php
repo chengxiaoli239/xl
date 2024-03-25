@@ -96,18 +96,18 @@ class MessageReceiveJobs extends CommonJob
         }catch (\Exception $e){
             $err_msg =  ($e->getCode() == CommonBaseService::CODE_FOR_USER) ? $e->getMessage() : '处理异常，请正确输入';
             if($e->getCode()>50000){ # 大于50000
-                Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'ERR', self::$name.'11', ['user_id'=>$userId, 'wcId'=>$wcId, 'data'=>$data, 'err_msg'=>$e->getMessage(), 'code'=>$e->getCode()]);
+                Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'ERR', self::$name.'11', ['user_id'=>$userId, 'data'=>$data, 'err_msg'=>$e->getMessage(), 'code'=>$e->getCode()]);
                 return '忽略回复：'.$e->getMessage();
             }
             p(['dkdkkkkk', $code, $e->getMessage()]);
             $r = self::reply($userId, [$err_msg], $data); # 回复消息
-            Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$userId, 'wcId'=>$wcId, 'data'=>$data, 'r'=>$r, 'err_msg'=>$e->getMessage(), 'file'=>$e->getFile().'_'.$e->getLine()]);
+            Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$userId, 'data'=>$data, 'r'=>$r, 'err_msg'=>$e->getMessage(), 'file'=>$e->getFile().'_'.$e->getLine()]);
 
             $message = $err_msg;
         }
         //push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$userId, 'type'=>$vdata['type'], 'msg'=>'', 'wechat_user_id'=>$wechatUser['id']]);
 
-        Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'INFO', self::$name.'13', ['wcId'=>$wcId, 'text'=>$data['text'], 'replyTxts'=>$replyTxts]);
+        Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'INFO', self::$name.'13', ['text'=>$data['text'], 'replyTxts'=>$replyTxts]);
 
         return $message;
     }

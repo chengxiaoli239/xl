@@ -124,7 +124,7 @@ class MessageOperateService  extends BaseService
         list($message_id , $from, $chat, $date, $text) = [$message['message_id'], $message['from'], $message['chat'], $message['date'], $message['text']];
         //p([$message_id , $from, $chat, $date, $text]);
 
-        $text = "1正3/20 2念1/20";
+        $text = "1正/20 2念1/20";
         list($code, $vData, $msg) = self::matchOtherOperate($text);
         if($code == CommonBaseService::CODE_FOR_USER){
             return [$code, $vData, $msg];

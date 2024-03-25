@@ -6,6 +6,7 @@ use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
 use common\models\thirdD\LocalToSiteMethod;
 use common\service\BaseService;
+use common\service\lottery\aozhou5\MethodMapService;
 
 class CommonBaseService extends BaseService
 {
@@ -56,10 +57,10 @@ class CommonBaseService extends BaseService
     /**
      * 网盘相关信息
      * @param int $user_id
-     * @param $lottery_type
-     * @return array|TzSystemsUsers|null
+     * @param int $lottery_type
+     * @return
      */
-    public static function getSystemBaseInfo(int $user_id, $lottery_type=26){
+    public static function getSystemBaseInfo(int $user_id, int $lottery_type=26){
         $system = TzSystemsUsers::find()->alias('tsu')
             ->select(['user_id'=>'tsu.uid', 'tz.system_type_id', 'tsu.ssc_domain', 'cookie'=>'tsu.cookie'])
             ->leftJoin(TzSystems::tableName().' tz', 'tsu.tz_system_id=tz.id')
@@ -84,19 +85,30 @@ class CommonBaseService extends BaseService
      * @param int $method_id
      * @param int $system_type_id     * @return array
      */
-    public static function getLocalToSiteMethods(int $method_id=0, int $system_type_id=15): array
+    public static function getLocalToSiteMethods(int $method_id=0, int $system_type_id=15, $betCodes=''): array
     {
-        $m = \Yii::$app->cache;
-        $mkey = CommonBaseService::getLocalToSiteMethodsMkey($system_type_id);
-        if(!$data = $m->get($mkey)){
-            $data = LocalToSiteMethod::find()
-                ->select(['id', 'system_type_id', 'method_id', 'site_method_id', 'name'])
-                ->indexBy('method_id')
-                ->where(['=', 'system_type_id', $system_type_id])->asArray()->all() ;
-            $m->set($mkey, $data, 600);
-        }
-        if(isset($data[$method_id])){
-            return $data[$method_id];
+        //p([$method_id, $system_type_id, $betCodes]);
+        if($system_type_id == 16){
+            $flippedArray = array_flip(MethodMapService::METHOD_TYPE_OPTIONS);
+            # 龟盘
+            $data = [
+                'method_id' => $method_id,
+                'site_method_id' => $flippedArray[$betCodes]??0,
+                'name' => $betCodes,
+            ];
+        }else{
+            $m = \Yii::$app->cache;
+            $mkey = CommonBaseService::getLocalToSiteMethodsMkey($system_type_id);
+            if(!$data = $m->get($mkey)){
+                $data = LocalToSiteMethod::find()
+                    ->select(['id', 'system_type_id', 'method_id', 'site_method_id', 'name'])
+                    ->indexBy('method_id')
+                    ->where(['=', 'system_type_id', $system_type_id])->asArray()->all() ;
+                $m->set($mkey, $data, 600);
+            }
+            if(isset($data[$method_id])){
+                return $data[$method_id];
+            }
         }
 
         return $data;
