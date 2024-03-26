@@ -90,6 +90,9 @@ class CommonBaseService extends BaseService
         //p([$method_id, $system_type_id, $betCodes]);
         if($system_type_id == 16){
             $flippedArray = array_flip(MethodMapService::METHOD_TYPE_OPTIONS);
+            if(!isset($flippedArray[$betCodes])){
+                throw_info('不存在的玩法:'.$betCodes);
+            }
             # 龟盘
             $data = [
                 'method_id' => $method_id,

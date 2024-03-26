@@ -73,24 +73,16 @@ class AoZhou5BetService extends CommonBaseService
             Tool_Common::log('/betSite/'.__FUNCTION__, 'INFO', '盘口信息', $logArr);
             $betCodes = $betRow->codes;
             //p($betCodes);
-            //p(['method_id'=>$method_id, 'siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo]);
-            switch ($method_id){
-                case MethodMatchService::METHOD_ID_ZX_FS: # 直选复式
-                    $betCodes = AoZhou5BetService::resetOneZhiXuanFuShi($betCodes);
-                    break;
-                default:
-                    $err_msg = '未知玩法ID:'.$method_id;
-                    //throw_info($err_msg, 10003);
-            }
+            p(['method_id'=>$method_id, 'betCodes'=>$betCodes, 'siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo]);
             $postRst = self::postBet($betRow, $betCodes);
 
             $resultData = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'postRst'=>$postRst, 'err_msg'=>'处理结束'];
-            Tool_Common::log('/bet_sx/'.__FUNCTION__, 'ERR', '推送盘口处理结束99', $resultData);
+            Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'ERR', '推送盘口处理结束99', $resultData);
             var_dump(date('Y-m-d H:i:s ').'处理成功：betRowId:'.$betRow->id.'_method_id:'.$method_id);
         }catch (\Exception $e){
             $err_msg = $e->getMessage();
             $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$err_msg];
-            Tool_Common::log('/bet_sx/'.__FUNCTION__, 'ERR', '推送盘口处理异常11', $logArr);
+            Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'ERR', '推送盘口处理异常11', $logArr);
             var_dump($err_msg);
             $betRow->push_status = ($e->getCode() > SsxxBetJobs::INVALID_STATUS_CODE) ? BetsBackend::PUSH_STATUS_CANNOT : BetsBackend::PUSH_STATUS_FAIL;
             $betRow->push_desc = $err_msg;
