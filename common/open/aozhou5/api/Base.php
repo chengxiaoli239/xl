@@ -1,6 +1,8 @@
 <?php
 namespace common\open\aozhou5\api;
 
+use common\models\open\aozhou5\Aozhou5RequestLog;
+use common\models\open\OutSiteRequestLog;
 use common\models\open\SsxxRequestLog;
 use common\open\thirdD\api\SiteOauthApi;
 use common\open\OpenBase;
@@ -130,15 +132,11 @@ class Base extends OpenBase
             }
             $content = $response->getBody()->getContents();
             $statusCode = $response->getStatusCode();  // 获取成功响应的状态码
-            #p(['content'=>$content]);
+            //p(['content'=>$content]);
             if($apiMethod == SiteOauthApi::API_GET_CAPTCHA){
                 $fileContent = $content;
                 return ['fileContent'=>$fileContent];
             }
-            #if($apiMethod == SiteOauthApi::API_ACTION_LOGIN){
-            #    $result = $content;
-            #    #d(['headers'=>$headers, 'result'=>$result]);
-            #}
 
             if (!empty($content)) {
                 $result = Json::decode($content);
@@ -146,15 +144,15 @@ class Base extends OpenBase
                 throw_info('异常', 30000);
             }
 
-            Tool_Common::log('/out_site/request', 'INFO', '接口请求', ['url'=>$url, 'req'=>$params, 'statusCode'=>$statusCode, /*'result'=>$result*/]);
-            $status = SsxxRequestLog::REQUEST_STATUS_SUCCESS;
+            Tool_Common::log('/aozhou5/request', 'INFO', '接口请求', ['url'=>$url, 'req'=>$params, 'statusCode'=>$statusCode, 'result'=>$result]);
+            $status = OutSiteRequestLog::REQUEST_STATUS_SUCCESS;
             return $result;
         } catch(\Exception $e) {
             $code = $e->getCode();
             $errorMsg = $e->getMessage();
             //$statusCode = $response->getStatusCode();  // 获取成功响应的状态码
-            Tool_Common::log('/out_site/request', 'ERR', '接口请求-异常', ['url'=>$url, 'req'=>$params, 'result'=>$result ?? [], 'code'=>$code, 'content'=>$content, 'msg'=>$errorMsg, 'statusCode'=>$statusCode]);
-            $status = SsxxRequestLog::REQUEST_STATUS_FAIL;
+            Tool_Common::log('/aozhou5/request', 'ERR', '接口请求-异常', ['url'=>$url, 'req'=>$params, 'result'=>$result ?? [], 'code'=>$code, 'content'=>$content, 'msg'=>$errorMsg, 'statusCode'=>$statusCode]);
+            $status = OutSiteRequestLog::REQUEST_STATUS_FAIL;
             push_queue(ErrorLogStaticsJobs::class, ['err_msg'=>$errorMsg, 'statusCode'=>$statusCode, 'result'=>$result ?? [], 'url'=>$url, 'req'=>$params]);
             if (($e instanceof \common\exceptions\InfoException)) {
                 $result = $e->data;
@@ -162,7 +160,7 @@ class Base extends OpenBase
 
             throw_info($errorMsg, $code);
         } finally {
-            $status = $status ?? SsxxRequestLog::REQUEST_STATUS_FAIL;
+            $status = $status ?? OutSiteRequestLog::REQUEST_STATUS_FAIL;
             $endtime = microtime(true) * 10000;
             self::resetResult($result);
             // 记录请求日志
@@ -179,7 +177,7 @@ class Base extends OpenBase
                 'status' => $status,
                 'remark' => $errorMsg ?? '',
             ];
-            SsxxRequestLog::find()->createCommand()->insert(SsxxRequestLog::tableName(), $logData)->execute();
+            Aozhou5RequestLog::find()->createCommand()->insert(Aozhou5RequestLog::tableName(), $logData)->execute();
         }
     }
 
