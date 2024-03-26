@@ -164,7 +164,7 @@ class Base extends OpenBase
             $endtime = microtime(true) * 10000;
             self::resetResult($result);
             // 记录请求日志
-            $result = $result ? Json::encode($result) : '';
+            $result = (is_array($result)) ? Json::encode($result) : '';
             $logData = [
                 'send_time' => (int)($now / 10000),
                 'api_method' => $apiMethod,

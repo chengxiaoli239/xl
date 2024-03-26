@@ -273,7 +273,7 @@ class AoZhou5BetService extends CommonBaseService
         $result = OrderApi::push($site['ssc_domain'], $postData);
         $logArr = ['betRowId'=>$betRowId, 'user_id'=>$user_id, 'method_id'=>$method_id, 'methodData'=>$methodData, 'post_data'=>$postData, 'lottery_type'=>$lottery_type, 'result'=>$result];
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', $logArr);
-        if(empty($result) OR !empty($result['error'])){ # 错误码：2成功、9918 登录超时....
+        if(!empty($result['error'])){ # 错误码：2成功、9918 登录超时....
             $logArr['result'] = $result;
             Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘20', $logArr);
             throw_info($result['m']??'推送盘口异常', 30001);

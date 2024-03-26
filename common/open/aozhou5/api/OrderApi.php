@@ -24,6 +24,7 @@ class OrderApi extends Base
     {
         $object = self::createObject();
         $object->apiUrl = $domain;
+        //p([$domain, $params, $headers, $object]);
 
         $headers = array_merge([
             'Accept' => 'application/json, text/javascript, */*; q=0.01',
