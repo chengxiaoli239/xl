@@ -82,7 +82,7 @@ class AoZhou5BetService extends CommonBaseService
             var_dump(date('Y-m-d H:i:s ').'处理成功：betRowId:'.$betRow->id.'_method_id:'.$method_id);
         }catch (\Exception $e){
             $err_msg = $e->getMessage();
-            $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$err_msg];
+            $logArr = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'err_msg'=>$err_msg.$e->getFile().$e->getLine()];
             Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'ERR', '推送盘口处理异常11', $logArr);
             var_dump($err_msg);
             $betRow->push_status = ($e->getCode() > SsxxBetJobs::INVALID_STATUS_CODE) ? BetsBackend::PUSH_STATUS_CANNOT : BetsBackend::PUSH_STATUS_FAIL;
