@@ -11,6 +11,7 @@ use common\service\CommonService;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\jobs\SsxxBetJobs;
 use common\service\thirdD\MethodMatchService;
+use common\service\thirdD\Odds3dService;
 use common\tools\Tool_Common;
 
 class AoZhou5BetService extends CommonBaseService
@@ -73,7 +74,7 @@ class AoZhou5BetService extends CommonBaseService
             Tool_Common::log('/betSite/'.__FUNCTION__, 'INFO', '盘口信息', $logArr);
             $betCodes = $betRow->codes;
             //p($betCodes);
-            p(['method_id'=>$method_id, 'betCodes'=>$betCodes, 'siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo]);
+            //p(['method_id'=>$method_id, 'betCodes'=>$betCodes, 'siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo]);
             $postRst = self::postBet($betRow, $betCodes);
 
             $resultData = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'postRst'=>$postRst, 'err_msg'=>'处理结束'];
@@ -250,24 +251,28 @@ class AoZhou5BetService extends CommonBaseService
         $site = self::$siteSystemInfo;
         $methodData = self::$localToSiteMethodInfo;
 
-        #p(['site'=>$site, 'methodData'=>$methodData, 'betRow'=>$betRow]);
+        //p(['site'=>$site, 'methodData'=>$methodData, 'betRow'=>$betRow]);
         $codes = str_replace(MethodMatchService::ZU_SPLIT_FLAG, ',', $betCodes);
         if(empty($codes) && $codes !== '0'){
             throw_info('推送盘口异常:号码为空');
+        }
+        $Odds = Odds3dService::getOdds($betRow->user_id, $betRow->play_method); # 玩法赔率
+        if(!isset($Odds['odds'])){
+            throw_info('赔率获取异常user_id:'.$betRow->user_id.'_play_method:'.$betRow->play_method);
         }
         $postData = [
             '__'=>'isAutoOdds',
             'gameId'=>601,
             'rebate' => 'A',
             'data' => [
-                [$methodData['site_method_id'], '赔率', $betRow->bet_money], // 赔率待处理
+                [$methodData['site_method_id'], $Odds['odds'], $betRow->bet_money], // 赔率待处理
             ],
             'cbk' => '0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6',
         ];
 
-        $logArr = ['betRowId'=>$betRowId, 'user_id'=>$user_id, 'method_id'=>$method_id, 'methodData'=>$methodData, 'post_data'=>$postData, 'lottery_type'=>$lottery_type, /*'result'=>$result*/];
-        Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘10', $logArr);
         $result = OrderApi::push($site['ssc_domain'], $postData);
+        $logArr = ['betRowId'=>$betRowId, 'user_id'=>$user_id, 'method_id'=>$method_id, 'methodData'=>$methodData, 'post_data'=>$postData, 'lottery_type'=>$lottery_type, 'result'=>$result];
+        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', $logArr);
         if(empty($result) OR !empty($result['error'])){ # 错误码：2成功、9918 登录超时....
             $logArr['result'] = $result;
             Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘20', $logArr);

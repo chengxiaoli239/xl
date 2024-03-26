@@ -31,7 +31,7 @@ class Odds3dService extends CommonBaseService
                     'status' => BaseService::STATUS_ACTIVE,
                     'money' => str_replace('元', '', $odd['money']),
                     'bouns' => str_replace('元', '', $odd['bouns']),
-                    'odds' => round((int)str_replace('元', '', $odd['bouns'])/(int)str_replace('元', '', $odd['money']), 2),
+                    'odds' => round(str_replace('元', '', $odd['bouns'])/str_replace('元', '', $odd['money']), 2),
                     'created_at' => time(),
                 ];
             }
