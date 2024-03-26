@@ -4,13 +4,12 @@ namespace common\service\open\telegram;
 use backend\models\DataDealStatus;
 use backend\models\thirdD\BetsBackend;
 use backend\service\agent\AgentUsersBalanceService;
-use backend\service\SscDataService;
 use common\helpers\LotteryType;
 use common\helpers\SscMethod;
 use common\service\chat\Tool_Common;
+use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\CommonBaseService;
-use common\service\thirdD\jobs\SsxxBetJobs;
 use common\service\thirdD\PlayMethodService;
 use common\service\wechat\WechatUserService;
 use yii\helpers\Json;
@@ -238,7 +237,7 @@ class MessageOperateService  extends BaseService
         $logArr = ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$from['id'], 'setData'=>$setData, 'replyTxts'=>$replyTxts, 'pushSiteData'=>$pushSiteData];
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '消息处理-成功', $logArr);
         foreach ($pushSiteData as $pushData){
-            push_queue_open(SsxxBetJobs::class, $pushData);
+            push_queue_open(AoZhou5BetJobs::class, $pushData);
         }
         $data = [
             'type' => WechatUserService::TYPE_ORDER_BET,

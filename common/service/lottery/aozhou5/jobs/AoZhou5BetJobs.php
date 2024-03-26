@@ -4,7 +4,6 @@ namespace common\service\lottery\aozhou5\jobs;
 use common\service\chat\Tool_Common;
 use common\service\jobs\CommonJob;
 use common\service\lottery\aozhou5\AoZhou5BetService;
-use common\service\thirdD\sx\Ssxx3dBetService;
 
 class AoZhou5BetJobs extends CommonJob {
     # 无效状态，无需处理
