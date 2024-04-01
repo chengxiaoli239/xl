@@ -2434,10 +2434,7 @@ class SscDataService extends BaseService {
             $kjDatas = SscKjData::find()->select(['code_str', 'qihao', 'index_id'])->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->limit($limit)->all();
             $zj_nums = 0;
             foreach ($kjDatas as $kjData){
-                $zjResult = OpKjService::opKjData4($codes, $kjData['code_str']);
-                if(isset($zjResult['data']) && $zjResult['data']['zjTimes'] == 1){
-                    $zj_nums += 1;
-                }
+                $zj_nums += OpKjService::opKjData4($codes, $kjData['code_str']);
             }
         }else{
             # 用户下注记录统计
@@ -2484,8 +2481,8 @@ class SscDataService extends BaseService {
 
             $kjData = SscKjData::find()->where($where)->andWhere(['>', 'created_at', strtotime($s_time)])->orderBy(['id'=>SORT_DESC])->asArray()->one();
             $qihao = $kjData['qihao'];
-            $zjResult = OpKjService::opKjData4($codes, $kjData['code_str']);
-            if(isset($zjResult['data']) && $zjResult['data']['zjTimes'] == 1){
+            $zjTimes = OpKjService::opKjData4($codes, $kjData['code_str']);
+            if($zjTimes == 1){
                 return $importPlanCode->plan_id_sort_key;
             }
         }
@@ -2512,8 +2509,8 @@ class SscDataService extends BaseService {
 
             $kjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->one();
             $qihao = $current_qihao;
-            $zjResult = OpKjService::opKjData4($codes, $kjData['code_str']);
-            if(isset($zjResult['data']) && $zjResult['data']['zjTimes'] == 1){
+            $zjTimes = OpKjService::opKjData4($codes, $kjData['code_str']);
+            if($zjTimes > 0){
                 return $importPlanCode->plan_id_sort_key;
             }
         }

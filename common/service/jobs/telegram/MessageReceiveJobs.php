@@ -48,12 +48,10 @@ class MessageReceiveJobs extends CommonJob
             $message = $params['message'];
             $from = $message['from'];
             $chat = $message['chat'];
-
             $userId = $params['user_id']; # 代理用户id，系统用户id
             $fromId = $from['id']; # 发送者用户id
             $chatId = $chat['id']; # 聊天所属用户id
 
-            $data = $params['data']; # 消息内容体
             $content = $message['text'];
             $mkey = md5(self::class_basename(__CLASS__).'_'.$userId.'_'.$fromId.'_'.$content);
             //p([$mkey, self::class_basename(__CLASS__).'_'.$userId.'_'.$fromUser.'_'.$content]);
@@ -79,10 +77,10 @@ class MessageReceiveJobs extends CommonJob
             $fromUser = $messageService->platformUser;
             //p($fromUser);
 
-            $data['fromUserNickName'] = $fromUser['nickName'];
+            $message['fromUserNickName'] = $fromUser['nickName'];
             Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'INFO', self::$name.'00', ['fromId'=>$fromId, 'params'=>$params, 'fromUser'=>$fromUser]);
 
-            $data['targetUser'] = $fromId;  # 目标用户
+            $message['targetUser'] = $fromId;  # 目标用户
             list($code, $vdata, $msg) = $messageService->receive($message);
             $rstData = [$code, $vdata, $msg];
             Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'INFO', self::$name.'01', ['user_id'=>$userId, 'rstData'=>$rstData]);
@@ -91,17 +89,16 @@ class MessageReceiveJobs extends CommonJob
             }
             $replyTxts = $vdata['replyTxts'];
             if(!empty($replyTxts)){
-                self::reply($userId, $replyTxts, $data); # 回复消息
+                self::reply($userId, $replyTxts, $params); # 回复消息
             }
         }catch (\Exception $e){
             $err_msg =  ($e->getCode() == CommonBaseService::CODE_FOR_USER) ? $e->getMessage() : '处理异常，请正确输入';
             if($e->getCode()>50000){ # 大于50000
-                Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'ERR', self::$name.'11', ['user_id'=>$userId, 'data'=>$data, 'err_msg'=>$e->getMessage(), 'code'=>$e->getCode()]);
+                Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'ERR', self::$name.'11', ['user_id'=>$userId, 'params'=>$params, 'err_msg'=>$e->getMessage(), 'code'=>$e->getCode()]);
                 return '忽略回复：'.$e->getMessage();
             }
-            p(['dkdkkkkk', $code, $e->getMessage()]);
-            $r = self::reply($userId, [$err_msg], $data); # 回复消息
-            Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$userId, 'data'=>$data, 'r'=>$r, 'err_msg'=>$e->getMessage(), 'file'=>$e->getFile().'_'.$e->getLine()]);
+            $r = self::reply($userId, [$err_msg], $params); # 回复消息
+            Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$userId, 'params'=>$params, 'r'=>$r, 'err_msg'=>$e->getMessage(), 'file'=>$e->getFile().'_'.$e->getLine()]);
 
             $message = $err_msg;
         }
@@ -121,16 +118,20 @@ class MessageReceiveJobs extends CommonJob
      * @throws InfoException
      */
     public static function reply($user_id, $replyTxts=[], array $data=[]){
-        $targetUser = $data['targetUser']??$data['fromUser']; # 目标微信好友
+        $message = $data['message'];
+        $from = $message['from'];
+        $chat = $message['chat'];
+
+        $targetUser = $from['id']??$chat['id']; # 目标微信好友
         $mkey = md5(__FUNCTION__.'_x1_'.$user_id.'_'.Json::encode($replyTxts).'_'.$targetUser);
         $incr = \Yii::$app->redis->incr($mkey);
-        Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '消息回复前处理', ['user_id'=>$user_id, 'replyTxts'=>$replyTxts, 'data'=>$data]);
+        Tool_Common::log('/telegram/'.__FUNCTION__, 'INFO', '消息回复前处理', ['user_id'=>$user_id, 'replyTxts'=>$replyTxts, 'data'=>$data]);
         if($incr>1){
             return false;
         }
         \Yii::$app->redis->expire($mkey, 2);
         if(empty($targetUser)){
-            return '接收的微信好友Id不能为空0';
+            return '接收的平台好友Id不能为空0';
         }
         if(empty($replyTxts)){
             throw_info('回复消息replyTxts为空');
@@ -152,6 +153,7 @@ class MessageReceiveJobs extends CommonJob
                 //'queue_delay_time' => rand(2, 4), # self::$waitSeconds,
                 'content' => $content, # 测试阶段调试信息 - 用户下注完回复
                 'business_id' => $user_id,
+                'token' => $data['token'],
             ];
             if(!empty($order_ids)){
                 $sendData['order_ids'] = $order_ids;
@@ -160,7 +162,7 @@ class MessageReceiveJobs extends CommonJob
                 $sendData['fromGroup'] = $data['fromGroup'];
                 $sendData['content'] = '@'.$data['fromUserNickName']."\n". $sendData['content']."\n";
             }
-            push_queue_open(SendWechatMsgJobs::class, $sendData);
+            push_queue(SendMessageJobs::class, $sendData); # TG消息发送
         }
 
         return true;

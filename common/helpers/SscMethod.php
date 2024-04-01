@@ -11,20 +11,16 @@ class SscMethod
     const FT_FAN_ID = 96;
     const FT_JIAO_ID = 97;
     const FT_NIAN_ID = 98;
-    const FT_DA_ID = 99;
-    const FT_XIAO_ID = 100;
-    const FT_DAN_ID = 101;
-    const FT_SHUANG_ID = 102;
+    const FT_DS_ID = 99;
+    const FT_DX_ID = 100;
 
     const TYPE_FT_OPTIONS = [
         self::FT_ZHENG_ID => '正',
         self::FT_FAN_ID => '番',
         self::FT_JIAO_ID => '角',
         self::FT_NIAN_ID => '念',
-        self::FT_DA_ID => '大',
-        self::FT_XIAO_ID => '小',
-        self::FT_DAN_ID => '单',
-        self::FT_SHUANG_ID => '双',
+        self::FT_DS_ID => '单双',
+        self::FT_DX_ID => '大小',
     ];
 
     public static function getName($lottery_type=DEFAULT_LOTTERY_TYPE): string
@@ -53,26 +49,18 @@ class SscMethod
             case strpos($text, '角') !== false:
                 $methodId = self::FT_JIAO_ID;
                 break;
-            case strpos($text, '大') !== false:
-                $methodId = self::FT_DA_ID;
+            case strpos($text, '单') !== false OR strpos($text, '双') !== false:
+                $methodId = self::FT_DS_ID;
                 break;
-            case strpos($text, '小') !== false:
-                $methodId = self::FT_XIAO_ID;
-                break;
-            case strpos($text, '单') !== false:
-                $methodId = self::FT_DAN_ID;
-                break;
-            case strpos($text, '双') !== false:
-                $methodId = self::FT_SHUANG_ID;
+            case strpos($text, '大') !== false OR strpos($text, '小') !== false:
+                $methodId = self::FT_DX_ID;
                 break;
             default:
                 $d = explode('/', $text);
                 if(strlen($d[0]) == 1){
                     $methodId = self::FT_ZHENG_ID;
-                }elseif($d[0] == '13'){
-                    $methodId = self::FT_DAN_ID;
-                }elseif($d[0] == '24'){
-                    $methodId = self::FT_SHUANG_ID;
+                }elseif($d[0] == '13' OR $d[0] == '24'){
+                    $methodId = self::FT_DS_ID;
                 }elseif(strlen($d[0]) == 2){
                     $methodId = self::FT_JIAO_ID;
                 }

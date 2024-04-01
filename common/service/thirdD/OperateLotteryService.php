@@ -1038,7 +1038,7 @@ class OperateLotteryService extends CommonBaseService
                 throw_info(Json::encode($betRow->getErrors()));
             }
             if($zjCount>0){
-                $vData = AgentUsersBalanceService::updateBalance((string)$betRow->order_id, $bonus, $betRow->wechat_user_id, WechatUserService::TYPE_ORDER_AWARD); # 撤单返还
+                $vData = AgentUsersBalanceService::updateBalance((string)$betRow->order_id, $bonus, $betRow->wechat_user_id, WechatUserService::TYPE_ORDER_AWARD); # 派奖
             }
             $logArr = ['status'=>$status, 'bonus'=>$bonus, 'Odds'=>$Odds, 'zjCount'=>$zjCount, 'kjCode'=>$kjCode, 'vData'=>$vData, 'betRecord'=>$betRow->getAttributes()];
             $playMethod = \common\service\CommonService::getPlayMethods()[$betRow->play_method];

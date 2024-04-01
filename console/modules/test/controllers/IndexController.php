@@ -1,6 +1,7 @@
 <?php
 namespace console\modules\test\controllers;
 
+use backend\models\BettingRecords;
 use backend\models\searchs\wechat\Bets;
 use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
@@ -17,6 +18,7 @@ use backend\service\StaticService;
 use common\kj\qxc\QxcTcw;
 use common\kj\ssc\Aozhou;
 use common\service\cache\CacheKeyService;
+use common\service\CommonService;
 use common\service\helpers\ThirdD;
 use common\service\lottery\aozhou5\AoZhou5BetService;
 use common\service\lottery\LotteryTypeService;
@@ -46,7 +48,9 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-
+            $bet = Bets::findOne(32126);
+            $r = \common\service\lottery\aozhou5\AoZhou5Service::opOneBettingRecord($bet->id, $bet);p($r);
+            $rst = CommonService::getVoteCode(); p($rst);
             list($code, $data, $msg) = AoZhou5BetService::postToSite($betRowId=32123);p([$code, $data, $msg]);
             $params = Json::decode('{"user_id":21,"business_id":6830978835,"token":"6902259997:AAEsg51soXNS1MYPdmHNnpj0YWBo6J3aeyo","update_id":840228241,"message":{"message_id":27,"from":{"id":6830978835,"is_bot":false,"first_name":"破局","last_name":"Mr","language_code":"zh-hans"},"chat":{"id":6830978835,"first_name":"破局","last_name":"Mr","type":"private"},"date":1709564365,"text":"1正/10"}}');
             $d = \common\service\jobs\telegram\MessageReceiveJobs::handle($params);

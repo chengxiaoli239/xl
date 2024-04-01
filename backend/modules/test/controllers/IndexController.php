@@ -1019,8 +1019,6 @@ class IndexController extends Controller
         d($flag);# 上期是否中奖，第一次下注认为是上期不中 中则投
         $flag = SscDataService::isZjBefore($plan_id = 6);
         d($flag);# 上期是否中奖，第一次下注认为是上期不中 中则投
-        $rst = CommonService::getVoteCode();
-        p($rst);
         p(urldecode('czt_openinfo=%257B%2522uid%2522%253A%252211599625%2522%252C%2522token%2522%253A%25224584d583f1730a193e6d0ccc3f8a8cad%2522%257D'));
         $str = '01234,13579,X,01234@01234,X,13579,01234@01234,13579,X,02468@01234,X,13579,02468@02468,X,13579,01234@02468,13579,X,01234@02468,13579,X,02468@02468,X,13579,02468';
         p(substr_count($str, 'X'));
@@ -1125,8 +1123,6 @@ class IndexController extends Controller
         p($rst);
         $qihao = HN0898Service::getQihao($lottery_type = 8);
         p(['即将开奖期号' => $qihao, 'lottery_type' => $lottery_type]);
-        $rst = OpKjService::opKjData4('3,X,2,9@X,2,4,9@3,9,X,9@3,9,7,X', '3,9,7,9,5');
-        p($rst);
         $rst = BaseDataService::insertCodeType5();
         p($rst);
         $str = '0,9,1,0';

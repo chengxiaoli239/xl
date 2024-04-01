@@ -41,11 +41,13 @@ class CommonBaseService extends BaseService
     const STATUS_LT_FAIL = 2;
 
     const STATUS_LT_CANCEL = 3;
+    const STATUS_LT_DRAWN = 4;
     const STATUS_OPTIONS = [
         self::STATUS_LT_WAIT => '待处理',
         self::STATUS_LT_SUCCESS => '已中奖',
         self::STATUS_LT_FAIL => '未中奖',
         self::STATUS_LT_CANCEL => '已撤单',
+        self::STATUS_LT_DRAWN => '和局',
     ];
 
     const VALID_STATUS = [

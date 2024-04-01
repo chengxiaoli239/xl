@@ -41,7 +41,7 @@ class OpKjService extends BaseService {
                 $rst = ['code'=>$code, 'data'=>$data, 'msg'=>$msg];
                 break;
             case $lottery_type == CommonBaseService::LOTTERY_TYPE_AOZHOU5:
-                AoZhou5Service::afterKj($lottery_type);
+                AoZhou5Service::afterKj();
                 break;
             default:
                 $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type, 'is_batch_simulate'=>0])->orderBy('id DESC')->limit(100)->all();
@@ -87,28 +87,22 @@ class OpKjService extends BaseService {
                     return $rst = ['status'=>300, 'msg'=>$qihao.'期未开奖!'];
                 }
 
-                $profitsData = self::calcuProfits($playway, $codes, $kjData, $single, $BettingRecord->uid);
+                $profitsData = self::calcProfits($playway, $codes, $kjData, $single, $BettingRecord->uid);
 
-                $bouns = $profitsData['bouns'];
-                $profits = $bouns - $BettingRecord['betting_money'];
-                $zjResult = $profitsData['zjResult'];
+                $bonus = $profitsData['bonus'];
+                $profits = $bonus - $BettingRecord['betting_money'];
 
                 $updateData = [
-                    'bonus' => $bouns,
+                    'bonus' => $bonus,
                     'profits' => $profits,
                     'kj_codes' => $kjData,
                     'updated_at' => time(),
                     'status' => 1
                 ];
                 $BettingRecord->setAttributes($updateData);
-                $status = $BettingRecord->save();
-                $logArr = [
-                    'qihao'=>$qihao,
-                    'opRst'=>$status,'playway'=>$playway,'codes'=>$codes,'is_simulate'=>$is_simulate,
-                    'kjData'=>$kjData, 'single'=>$single,'zjResult'=>$zjResult,'bouns'=>$bouns, 'profits'=>$profits,
-                ];
-
-                #Tool_Common::log('opSscKjData','INFO','投注记录', $logArr);
+                if(!$BettingRecord->save()){
+                    throw_info(yii\helpers\Json::encode($BettingRecord->getErrors()));
+                }
             }catch (\Exception $exception){
                 Tool_Common::log('opSscKjData','ERR','投注记录-处理失败', ['record_id'=>$record_id, 'err_msg'=>$exception->getMessage(), 'file'=>$exception->getFile().'_'.$exception->getLine()]);
                 $rst = ['status'=>302, 'msg'=>$exception->getMessage(), 'file'=>$exception->getFile().'_'.$exception->getLine()];
@@ -223,9 +217,10 @@ class OpKjService extends BaseService {
      * @param string $kjData 格式：3,6,3,3,5
      * @return array
      */
-    public static function calcuProfits($playway, $codes, $kjData = '', $single = 0.1, $uid=''){
+    public static function calcProfits($playway, $codes, $kjData = '', $single = 0.1, $uid=''){
         if(!$kjData) return [];
         $rstData = [];
+        $zjTimes = 0;
         # 开奖数据 start
 
         //$fun = 'opKjData'.$bettingRecord['playway']; // opKjData1、opKjData4、opKjData10
@@ -240,35 +235,31 @@ class OpKjService extends BaseService {
             case 3: // 四字定
                 //$kjData_n = substr($kjData, 0,7); // 开奖截取前4位号码
                 $kjData_n = $kjData; // 开奖截取前4位号码
-                $zjResult = OpKjService::opKjData4($codes, $kjData_n);
+                $zjTimes = OpKjService::opKjData4($codes, $kjData_n);
                 break;
             case 10:
             case 4:
-                $zjResult = OpKjService::opKjData10($codes, $kjData, $groupSplit = '@', $codeSplit = ',',$nullCode = '');
+                $zjTimes = OpKjService::opKjData10($codes, $kjData, $groupSplit = '@', $codeSplit = ',',$nullCode = '');
                 break;
             default:;
         }
-        if($zjResult['status'] == 200){
-            $times = $zjResult['data']['zjTimes'];
-        }
-        //$n = count(explode('@',$codes));
         $betting_money = SscDataService::calTzTotalMoney($codes, $single, $playway);
 
         $odds = CommonService::getOdds($playway, $uid);
-        $bouns = $odds * $single * $times;
-        # 投注号码
-        $rstData['codes'] = $codes;
-        # 开奖号码
-        $rstData['kjCodes'] = $kjData;
-        # 投注金额
-        $rstData['betting_money'] = $betting_money;
-        # 中奖金额 = 赔率 * 倍数 * 注数
-        $rstData['bouns'] = $bouns;
-
-        # 利润 = 中奖金额 - 投注金额
-        $profits = $rstData['bouns'] - $betting_money;
-        $rstData['profits'] = $profits;
-        $rstData['zjResult'] = $zjResult;
+        $bonus = $odds * $single * $zjTimes;
+        $rstData = array_merge($rstData, [
+            # 投注号码
+            'codes' => $codes,
+            # 开奖号码
+            'kjCodes' => $kjData,
+            # 投注金额
+            'betting_money' => $betting_money,
+            # 中奖金额 = 赔率 * 倍数 * 注数
+            'bonus' => $bonus,
+            # 利润 = 中奖金额 - 投注金额
+            'profits' => $bonus - $betting_money,
+            'zjTimes' => $zjTimes,
+        ]);
 
         //Tool_Common::log('/kj/'.__FUNCTION__, 'INFO', '开奖处理', ['uid'=>$uid, 'playway'=>$playway, 'odds'=>$odds, 'betting_money'=>$betting_money, 'profits'=>$profits, 'bouns'=>$bouns]);
 
@@ -317,10 +308,10 @@ class OpKjService extends BaseService {
      * @desc 开奖处理，主要判断四字定位
      * @param string $codes 格式： 01234,01234,56789,56789@01234,01234,56789,X
      * @param $kjData
-     * @return array
+     * @return int
      */
-    public static function opKjData4($codes = '', $kjData = '', $zhuSplit = '@'){
-        $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
+    public static function opKjData4($codes = '', $kjData = '', $zhuSplit = '@'): int
+    {
         $tzCodesArr = self::explodeCodes($codes);
         $kjCodesArr = explode(',', $kjData);
         $zjTimes = 0;
@@ -334,9 +325,7 @@ class OpKjService extends BaseService {
             }
             if($flag) $zjTimes += 1;
         }
-        $rst['data'] = ['zjTimes'=>$zjTimes, 'kjData'=>$kjData];
-
-        return $rst;
+        return $zjTimes;
     }
 
     /**
@@ -370,18 +359,17 @@ class OpKjService extends BaseService {
         }
     }
 
-
     /**
      * @description 判断是否中奖，如果中奖则返回中奖金额，定位胆，playway:10
-     * @param int $playway  投注方式，具体见 CommonService::getOdds( ) 方法
-     * @param string $codes 投注号码 0,X,8,X@0,X,8,X@1,X,7,X@1,X,7,X@2,X,6,X@2,X,6,X@3,X,5,X@3,X,5,X@4,X,4,X
-     * @param string $kjData   开奖号码 3,4,5,6,7
-     * @param float $single 投注倍数
-     * @param int $dw 定位数，默认二字定
-     * @return array
+     * @param $codes - 投注号码 0,X,8,X@0,X,8,X@1,X,7,X@1,X,7,X@2,X,6,X@2,X,6,X@3,X,5,X@3,X,5,X@4,X,4,X
+     * @param $kjData - 开奖号码 3,4,5,6,7
+     * @param $groupSplit
+     * @param $codeSplit
+     * @param $nullCode
+     * @return int
      */
-    public static function opKjData10($codes = '', $kjData, $groupSplit = '@', $codeSplit=',', $nullCode='X'){
-        $rst = ['status'=>200, 'msg'=>'开奖数据处理完成!'];
+    public static function opKjData10($codes = '', $kjData, $groupSplit = '@', $codeSplit=',', $nullCode='X'): int
+    {
         $zjTimes = 0;   // 中奖倍数、次数
         $tzCodes = CommonService::genDw10($codes, $groupSplit, $codeSplit, $nullCode);
         foreach ($tzCodes as $tzCode){
@@ -406,9 +394,7 @@ class OpKjService extends BaseService {
                 $zjTimes += 1;
             }
         }
-        $rst['data'] = ['zjTimes'=>$zjTimes];
-
-        return $rst;
+        return $zjTimes;
     }
 
 }

@@ -1,6 +1,9 @@
 <?php
 
 use backend\models\thirdD\BetsBackend;
+use common\helpers\lottery\DrawLottery;
+use common\helpers\LotteryType;
+use common\service\lottery\aozhou5\AoZhou5Service;
 use yii\helpers\BaseStringHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -83,6 +86,10 @@ $columns = array_merge(
                 'value' => function($model) {
                     $txt = $model->status==3? '<strong><font color="red">已撤单</font></strong>' :
                         (($model->status===0) ? '<strong><font color="green">待开奖</font></strong>' : $model->kj_codes);
+                    if($model->lottery_type == LotteryType::AZ_LUCKY_5 && !empty($model->kj_codes)){
+                        list($kjCode, $heZhi, $gui, $ds) = DrawLottery::getGuiDrawData($model->kj_codes, $codeNum=AoZhou5Service::KJ_CODE_NUM); # 4个或者5个
+                        $txt .= " 和".$heZhi.'('.$ds.','.$gui.')';
+                    }
                     return $txt;
                 }
             ],

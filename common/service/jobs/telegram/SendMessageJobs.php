@@ -21,7 +21,7 @@ class SendMessageJobs extends CommonJob {
     public static function handle($params): string
     {
         try {
-            $chat_id = $params['chat_id']; # 群/好友id
+            $chat_id = $params['targetUser']; # 群/好友id
             if(empty($chat_id)){
                 throw_info('群/好友id不能为空');
             }

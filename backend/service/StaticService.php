@@ -302,7 +302,7 @@ class StaticService extends BaseService {
         $where = ['>=', 'id', $id];
         $SscKjDatas = SscKjData::find()->select(['id', 'index_id', 'kj_code', 'qihao', 'code_str'])->where($where)->limit($num)->all();
         $allCost = 0.00; # 成本
-        $allZjBouns = 0.00; # 中奖金额
+        $allZjBonus = 0.00; # 中奖金额
         $allProfits = 0.00; # 利润
         $zjCount = 0;
         foreach ($SscKjDatas as $codeKey => $SscKjData) {
@@ -315,19 +315,19 @@ class StaticService extends BaseService {
                 $resultCodes = self::getSameCodes($kjData, 1);
             }
             $kjCodes = substr($SscKjDatas[$codeKey + 1]['code_str'], 0, 7);
-            $rst = OpKjService::opKjData4($resultCodes, $kjCodes);
+            $zjTimes = OpKjService::opKjData4($resultCodes, $kjCodes);
             //p([$kjData, $resultCodes, $kjCodes, $rst],0); //p($rst);
 
             $cost = 9 * 62.5;
-            $zjBouns = 999.5 * $rst['data']['zjTimes'];
-            if ($zjBouns > 0) $zjCount = $zjCount + 1;
-            $profits = $zjBouns - $cost;
+            $zjBonus = 999.5 * $zjTimes;
+            if ($zjBonus > 0) $zjCount = $zjCount + 1;
+            $profits = $zjBonus - $cost;
 
             $allCost += $cost;
-            $allZjBouns += $zjBouns;
+            $allZjBonus += $zjBonus;
             $allProfits += $profits;
         }
-        return ['staticQihao'=>$SscKjData['qihao'], 'zjCount'=>$zjCount, 'allCost'=>$allCost, 'allZjBouns'=>$allZjBouns, 'allProfits'=>$allProfits];
+        return ['staticQihao'=>$SscKjData['qihao'], 'zjCount'=>$zjCount, 'allCost'=>$allCost, 'allZjBonus'=>$allZjBonus, 'allProfits'=>$allProfits];
     }
 
     /**
@@ -2669,7 +2669,7 @@ class StaticService extends BaseService {
                }
                $codes = implode('@', $buyCodes);
 
-               $profitsData = OpKjService::calcuProfits(3, $codes, $SscKjData->code_str, 0.1);
+               $profitsData = OpKjService::calcProfits(3, $codes, $SscKjData->code_str, 0.1);
                unset($profitsData['codes']);
                $logArr[] = [/*'codes'=>$codes, */'qihao'=>$qihao, 'counts'=>count($buyCodes), 'profitsData'=>$profitsData];
                $m->set($mkey_profits, $profitsData, 30*24*3600);
