@@ -19,8 +19,10 @@ class AoZhouKjService  extends BaseService
 
         if(AoZhou5Service::KJ_CODE_NUM==5){
             $codeHz = $kjData['codes_hz'];
+            $kjCode = $kjData['code_str'];
         }else{
             $codeHz = $kjData['codes_4nums_hz'];
+            $kjCode = $kjData['code_4n_str'];
         }
 
         $ds = ($codeHz%2==0) ? '双' : '单';
@@ -28,7 +30,7 @@ class AoZhouKjService  extends BaseService
         $text = "============================\n";
         $text .= LotteryType::TYPE_OPTIONS[$this->lottery_type].'（前'.(AoZhou5Service::KJ_CODE_NUM).'位数番摊）'."\n\n".
             "第 {$qiHao} 期\n".
-            str_replace(',', '', $kjData['code_4n_str'])."总和{$kjData['codes_4nums_hz']}(".$ds.",".$ft.")\n\n".
+            str_replace(',', '', $kjCode)."总和{$kjData['codes_4nums_hz']}(".$ds.",".$ft.")\n\n".
             "以下是历史课程表\n\n";
         $historyKjData = SscKjData::find()->where(['lottery_type'=>$this->lottery_type])->andWhere(['>', 'qihao', $qiHao-135])
             ->asArray()->all();
