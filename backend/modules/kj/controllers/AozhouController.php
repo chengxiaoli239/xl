@@ -45,7 +45,7 @@ class AozhouController extends Controller
      * @param string $type
      * @return array
      */
-    public function actionLucky5Out(string $type = 'json'): array
+    public function actionLucky5Out(string $type = 'json')
     {
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
