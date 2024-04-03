@@ -117,7 +117,7 @@ class MessageReceiveJobs extends CommonJob
      * @return bool
      * @throws InfoException
      */
-    public static function reply($user_id, $replyTxts=[], array $data=[]){
+    public static function reply($user_id, array $replyTxts=[], array $data=[]){
         $message = $data['message'];
         $from = $message['from'];
         $chat = $message['chat'];
@@ -125,7 +125,11 @@ class MessageReceiveJobs extends CommonJob
         $targetUser = $from['id']??$chat['id']; # 目标微信好友
         $mkey = md5(__FUNCTION__.'_x1_'.$user_id.'_'.Json::encode($replyTxts).'_'.$targetUser);
         $incr = \Yii::$app->redis->incr($mkey);
-        Tool_Common::log('/telegram/'.__FUNCTION__, 'INFO', '消息回复前处理', ['user_id'=>$user_id, 'replyTxts'=>$replyTxts, 'data'=>$data]);
+        $switch = \Yii::$app->params['AZ_MESSAGE_SWITCH']??0;
+        Tool_Common::log('/telegram/'.__FUNCTION__, 'INFO', '消息回复前处理', ['user_id'=>$user_id, 'replyTxts'=>$replyTxts, 'data'=>$data,'switch'=>$switch]);
+        if(!empty($switch)){
+            return false;
+        }
         if($incr>1){
             return false;
         }

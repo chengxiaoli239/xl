@@ -12,6 +12,8 @@ class AoZhouKjService  extends BaseService
 
     public function operateSendKjData($qiHao='')
     {
+        $switch = \Yii::$app->params['AZ_MESSAGE_SWITCH']??0;
+        if(!$switch) return false;
         $kjData = SscKjData::find()->where(['lottery_type'=>$this->lottery_type, 'qihao'=>$qiHao])->asArray()->one();
 
         $ds = ($kjData['codes_4nums_hz']%2==0) ? '双' : '单';
@@ -40,7 +42,7 @@ class AoZhouKjService  extends BaseService
             'chat_id' => $config['GROUP_ID'],
             'token' => $config['TOKEN'],
         ];
-        #push_queue(SendMessageJobs::class, $params); # TG消息发送
+        push_queue(SendMessageJobs::class, $params); # TG消息发送
 
     }
 
