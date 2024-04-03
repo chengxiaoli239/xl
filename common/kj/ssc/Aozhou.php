@@ -18,7 +18,7 @@ class Aozhou extends BaseKj {
      * @param string $returnType
      * @return array|bool
      */
-    public static function getLucky5(string $returnType = 'json', $is_auto = 1){
+    public static function getLucky5(string $returnType = 'json', $is_auto = 1, $isAut=0){
         try {
             $lottery_type = self::$lottery_type;
             $kjData = self::getCurrentKjData($lottery_type, $currentQiHao);
@@ -29,7 +29,7 @@ class Aozhou extends BaseKj {
             list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
             if($is_auto==2 OR !$kjData) {
                 try {
-                    $domain = BaseKj::getApiHostByRoute('/kj/aozhou/lucky5');
+                    $domain = BaseKj::getApiHostByRoute('/kj/aozhou/lucky5'.($isAut?'-out':''));
 
                     // 创建 CookieJar 来存储 cookie
                     $cookieJar = new CookieJar();
