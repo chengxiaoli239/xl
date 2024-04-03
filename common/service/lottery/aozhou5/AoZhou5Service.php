@@ -80,14 +80,14 @@ class AoZhou5Service extends CommonLotteryService
         try {
             $transaction = \Yii::$app->db->beginTransaction();
             $is_simulate = $bet->is_simulate;
-            $qihao = $bet->qihao;
+            $qiHao = $bet->qihao;
             $single = $bet->single;
             $codes = $bet->codes;
             $lottery_type = $bet->lottery_type;
 
             # 开奖数据
-            if(!$kjData = CommonService::getAwardNumberByQihao($qihao, $lottery_type)){ // 3,4,5,6,7
-                throw_info(LotteryType::TYPE_OPTIONS[$lottery_type].$qihao.'期未开奖!');
+            if(!$kjData = CommonService::getAwardNumberByQihao($qiHao, $lottery_type)){ // 3,4,5,6,7
+                throw_info(LotteryType::TYPE_OPTIONS[$lottery_type].$qiHao.'期未开奖!');
             }
             $drawData = DrawLottery::getGuiDrawData($kjData, $codeNum=self::KJ_CODE_NUM); # 4个或者5个
 
@@ -96,7 +96,7 @@ class AoZhou5Service extends CommonLotteryService
 
             $bonus = $profitsData['bonus'];
             $profits = $bonus - $bet['bet_money'];
-            $zjResult = $profitsData['zjResult'];
+            $zjTimes = $profitsData['zjTimes'];
 
             $updateData = [
                 'bonus' => $bonus,
@@ -109,16 +109,16 @@ class AoZhou5Service extends CommonLotteryService
             $bet->setAttributes($updateData);
             $status = $bet->save();
             $logArr = [
-                'qihao'=>$qihao,
-                'opRst'=>$status,'playway'=>LotteryType::TYPE_OPTIONS,'codes'=>$codes,'is_simulate'=>$is_simulate,
-                'kjData'=>$kjData, 'single'=>$single,'zjResult'=>$zjResult,'bonus'=>$bonus, 'profits'=>$profits,
+                'qiHao'=>$qiHao,
+                'opRst'=>$status,'codes'=>$codes,'is_simulate'=>$is_simulate,
+                'kjData'=>$kjData, 'single'=>$single,'zjTimes'=>$zjTimes,'bonus'=>$bonus, 'profits'=>$profits,
             ];
 
             if($bonus>0){
                 AgentUsersBalanceService::updateBalance((string)$bet->order_id, $bonus, $bet->wechat_user_id, WechatUserService::TYPE_ORDER_AWARD); # 派奖
             }
 
-            #Tool_Common::log('opSscKjData','INFO','投注记录', $logArr);
+            Tool_Common::log('/kj_aozhou5/'.__FUNCTION__,'INFO','投注记录处理', $logArr);
             $transaction->commit();
         }catch (\Exception $e){
             $transaction->rollBack();
