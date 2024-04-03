@@ -48,6 +48,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $rst = KjDataGet::grabOneLotteryKjData($lottery_type=28);p($rst); # 开奖
             $bet = Bets::findOne(32126);
             $r = \common\service\lottery\aozhou5\AoZhou5Service::opOneBettingRecord($bet->id, $bet);p($r);
             $rst = CommonService::getVoteCode(); p($rst);
@@ -57,7 +58,6 @@ class IndexController extends Controller
             $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%telegram_message}}'); p($r);
             $current_qihao = HN0898Service::getCurrentQihao($lottery_type = 28); # 针对哪一期过滤，默认为：当前期号
             p($current_qihao);
-            $rst = KjDataGet::grabOneLotteryKjData($lottery_type=28);p($rst); # 开奖
             LotteryTypeService::getLotteryTypeData($grabDataStatus=1, $useCache=0);
             $lottery_types = StaticService::getGrabDataLotteryTypes($useCache=0);
             p($lottery_types);

@@ -172,7 +172,7 @@ class KjDataGet
                     throw_info('短时间内操作-暂不处理');
                 }
 
-                $url = $kjConfig->host.$kjConfig->path;
+                $url = trim($kjConfig->host).trim($kjConfig->path);
                 $data = CurlService::httpGet($url);
                 Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖任务获取', ['lottery_type'=>$lottery_type, 'url'=>$url, 'data'=>$data]);
                 if(isset($data['status']) && $data['status'] != 200){
