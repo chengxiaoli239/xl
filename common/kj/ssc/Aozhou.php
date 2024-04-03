@@ -1,20 +1,12 @@
 <?php
 # 开彩网
 namespace common\kj\ssc;
-use backend\models\SystemConfig;
-use backend\models\TzSystemsUsers;
-use backend\service\CurlService;
-use backend\service\Lucky5\LuckyBaseService;
 use common\helpers\LotteryType;
 use common\kj\BaseKj;
-use common\service\CommonService;
-use common\service\proxy\ProxyBaseService;
 use common\service\ssc\QihaoService;
-use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
-use  yii;
 use yii\helpers\Json;
 
 class Aozhou extends BaseKj {
@@ -29,7 +21,7 @@ class Aozhou extends BaseKj {
     public static function getLucky5(string $returnType = 'json', $is_auto = 1){
         try {
             $lottery_type = self::$lottery_type;
-            $kjData = self::getCurrentKjData($lottery_type, $current_qihao);
+            $kjData = self::getCurrentKjData($lottery_type, $currentQiHao);
             if($is_auto==1){
                 self::lockGrab($lottery_type, $seconds=120);
             }
@@ -47,7 +39,6 @@ class Aozhou extends BaseKj {
                     $firstUrl = $domain.'/view/aozxy5/ssc_index.html';
 
                     $now_time = time();
-
                     // 第二个请求的 URL
                     $secondUrl = $domain.'/api/CQShiCai/getBaseCQShiCaiList.do?lotCode=10010';
 
@@ -84,11 +75,11 @@ class Aozhou extends BaseKj {
                     Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type,'name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);
                 }
             }else{
-                Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-缓存', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'cq'=>$current_qihao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
+                Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-缓存', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'cq'=>$currentQiHao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
             }
         }catch (\Exception $e){
             $kjData = self::getCurrentKjData($lottery_type);
-            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$current_qihao, 'currentQiHao'=>$currentQiHao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$currentQiHao, 'currentQiHao'=>$currentQiHao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
         }
         if(empty($kjData)){
             return false;

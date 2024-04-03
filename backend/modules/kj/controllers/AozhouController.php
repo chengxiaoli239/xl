@@ -29,11 +29,24 @@ class AozhouController extends Controller
     }
 
     /**
-     * @desc 澳洲幸运五星彩 - 实时资讯网 https://cc138001.com
+     * @desc 澳洲幸运五星彩 - 实时资讯网 https://1680632.com
      * @param string $type
      * @return array
      */
     public function actionLucky5($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $post = \Yii::$app->request->post();
+        $data = Aozhou::getLucky5($type, $post['is_auto']??1);
+        return $data;
+    }
+
+    /**
+     * @desc 澳洲幸运五星彩 - 实时资讯网 https://1680632.com
+     * @param string $type
+     * @return array
+     */
+    public function actionLucky5Out(string $type = 'json'): array
+    {
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
         $data = Aozhou::getLucky5($type, $post['is_auto']??1);
