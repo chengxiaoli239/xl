@@ -153,7 +153,7 @@ class MessageReceiveJobs extends CommonJob
             }
             $sendData = [
                 'user_id' => $user_id,
-                'targetUser' => $targetUser, # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
+                'chat_id' => $targetUser, # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
                 //'queue_delay_time' => rand(2, 4), # self::$waitSeconds,
                 'content' => $content, # 测试阶段调试信息 - 用户下注完回复
                 'business_id' => $user_id,
