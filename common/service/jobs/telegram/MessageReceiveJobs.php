@@ -20,7 +20,7 @@ class MessageReceiveJobs extends CommonJob
         return self::$name;
     }
 
-    public function exec($params): string
+    public function exec($params): array
     {
         return self::handle($params);
     }
@@ -104,7 +104,7 @@ class MessageReceiveJobs extends CommonJob
         }
         //push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$userId, 'type'=>$vdata['type'], 'msg'=>'', 'wechat_user_id'=>$wechatUser['id']]);
 
-        Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'INFO', self::$name.'13', ['text'=>$data['text'], 'replyTxts'=>$replyTxts]);
+        Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'INFO', self::$name.'13', ['text'=>$content, 'replyTxts'=>$replyTxts]);
 
         return $message;
     }

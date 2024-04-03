@@ -234,8 +234,6 @@ class MessageOperateService  extends BaseService
         }
         //p('llll');
 
-        $logArr = ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$from['id'], 'setData'=>$setData, 'replyTxts'=>$replyTxts, 'pushSiteData'=>$pushSiteData];
-        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '消息处理-成功', $logArr);
         foreach ($pushSiteData as $pushData){
             push_queue_open(AoZhou5BetJobs::class, $pushData);
         }
@@ -245,6 +243,8 @@ class MessageOperateService  extends BaseService
             'replyTxts' => $replyTxts,
             'allMoneys' => $allMoneys,
         ];
+        $logArr = ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$from['id'], 'setData'=>$setData, 'replyTxts'=>$replyTxts, 'pushSiteData'=>$pushSiteData, 'data'=>$data];
+        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '消息处理-成功', $logArr);
 
         return [0, $data, '接收成功'];
     }
