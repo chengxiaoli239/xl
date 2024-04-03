@@ -47,7 +47,7 @@ class AoZhouKjService  extends BaseService
         $config = \Yii::$app->params['TELEGRAM'];
         $params = [
             'business_id' => $qiHao,
-            'text' => $text,
+            'content' => $text,
             'chat_id' => $config['GROUP_ID'],
             'token' => $config['TOKEN'],
         ];
