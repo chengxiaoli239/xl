@@ -49,7 +49,7 @@ class AozhouController extends Controller
     {
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
-        $data = Aozhou::getLucky5($type, $post['is_auto']??1, $isOut=1);
+        $data = Aozhou::getLucky5Out($type, $post['is_auto']??1, $isOut=1);
         return $data;
     }
 

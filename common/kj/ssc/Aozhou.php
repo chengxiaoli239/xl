@@ -7,6 +7,7 @@ use common\service\ssc\QihaoService;
 use common\tools\Tool_Common;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Psr7\Request;
 use yii\helpers\Json;
 
 class Aozhou extends BaseKj {
@@ -18,7 +19,7 @@ class Aozhou extends BaseKj {
      * @param string $returnType
      * @return array|bool
      */
-    public static function getLucky5(string $returnType = 'json', $is_auto = 1, $isAut=0){
+    public static function getLucky5(string $returnType = 'json', $is_auto = 1){
         try {
             $lottery_type = self::$lottery_type;
             $kjData = self::getCurrentKjData($lottery_type, $currentQiHao);
@@ -29,7 +30,7 @@ class Aozhou extends BaseKj {
             list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
             if($is_auto==2 OR !$kjData) {
                 try {
-                    $domain = BaseKj::getApiHostByRoute('/kj/aozhou/lucky5'.($isAut?'-out':''));
+                    $domain = BaseKj::getApiHostByRoute('/kj/aozhou/lucky5');
 
                     // 创建 CookieJar 来存储 cookie
                     $cookieJar = new CookieJar();
@@ -71,6 +72,53 @@ class Aozhou extends BaseKj {
 
                     $kjData = ['expect'=>$qihao, 'opencode'=>$opencode, 'opentime'=>$kjData['preDrawTime']];
                     Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'domain'=>$domain, 'kjData'=>$kjData, 'headers'=>$headers]);
+                }catch (\Exception $e){
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type,'name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);
+                }
+            }else{
+                Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-缓存', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'cq'=>$currentQiHao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
+            }
+        }catch (\Exception $e){
+            $kjData = self::getCurrentKjData($lottery_type);
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$currentQiHao, 'currentQiHao'=>$currentQiHao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
+        }
+        if(empty($kjData)){
+            return false;
+        }
+        return self::extracted($kjData, $lottery_type, $returnType, $is_auto);
+    }
+
+    /**
+     * @desc 澳洲幸运五，内部
+     * @param string $returnType
+     * @return array|bool
+     */
+    public static function getLucky5Out(string $returnType = 'json', $is_auto = 1){
+        try {
+            $lottery_type = self::$lottery_type;
+            $kjData = self::getCurrentKjData($lottery_type, $currentQiHao);
+            if($is_auto==1){
+                self::lockGrab($lottery_type, $seconds=120);
+            }
+
+            list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+            if($is_auto==2 OR !$kjData) {
+                try {
+                    $domain = BaseKj::getApiHostByRoute('/kj/aozhou/lucky5-out');
+
+                    $client = new Client();
+                    $request = new Request('POST', $domain.'/kj/aozhou/lucky5-out');
+                    $response = $client->sendAsync($request)->wait();
+
+                    // 获取响应内容
+                    $body = $response->getBody()->getContents();
+                    $content = Json::decode($body);
+                    if(empty($content['expect'])){
+                        throw_info($content['message']??'查询异常');
+                    }
+
+                    $kjData = $content;
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'domain'=>$domain, 'kjData'=>$kjData]);
                 }catch (\Exception $e){
                     Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type,'name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);
                 }
