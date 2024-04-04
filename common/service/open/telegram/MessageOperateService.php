@@ -1,10 +1,10 @@
 <?php
 namespace common\service\open\telegram;
 
-use backend\models\DataDealStatus;
 use backend\models\SscKjData;
 use backend\models\thirdD\BetsBackend;
 use backend\service\agent\AgentUsersBalanceService;
+use backend\service\agent\AgentUsersService;
 use common\helpers\LotteryType;
 use common\helpers\SscMethod;
 use common\service\chat\Tool_Common;
@@ -12,6 +12,7 @@ use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\PlayMethodService;
+use common\service\wechat\eyun\EYunMessageOperateService;
 use common\service\wechat\WechatUserService;
 use yii\helpers\Json;
 
@@ -64,32 +65,43 @@ class MessageOperateService  extends BaseService
     }
 
     /**
-     * @return void
+     * @return array
      */
-    private function getBetData(): void
+    private function getBetData()
     {
-        $betData = explode($this->split, $this->text);
-        foreach ($betData as $data){
-            list($methodId, $methodName) = SscMethod::getMethod($data);
-            $datum = explode($this->mSplit, $data);
-            if($methodId == SscMethod::FT_JIAO_ID && strpos((string)$datum[0], '角') === false){
-                $datum[0] .= '角';
-            }
-            if($methodId == SscMethod::FT_ZHENG_ID && strpos((string)$datum[0], '正') === false){
-                $datum[0] .= '正';
-            }
-            $allMoneys = 1 * $datum[1];
-            $this->betData[] = [
-                'codes' => $datum[0],
-                'single' => $datum[1],
-                'count' => 1,
-                'all_moneys' => $allMoneys,
-                'id' => $methodId,
-                'name' => $methodName,
-            ];
-            if($allMoneys<20){
-                throw_info('单注最低:'.self::ONE_MINI_MONEY.'，请核实后重新下注', CommonBaseService::CODE_FOR_USER);
-            }
+        $text = $this->text;
+        switch (true){
+            case strpos($text, '查') !== false: // 查余额
+                return AgentUsersService::userGetInfo($this->platformUser);
+            case strpos($text, '撤') !== false: // 撤单
+                return EYunMessageOperateService::operateCancel($text, $this->wechatUser);
+            case strpos($text, '上') !== false OR strpos($text, '下') !== false: // 上下分
+                return AgentUsersBalanceService::operateBalanceChange($text, $this->wechatUser);
+            default:
+                $betData = explode($this->split, $this->text);
+                foreach ($betData as $data){
+                    list($methodId, $methodName) = SscMethod::getMethod($data);
+                    $datum = explode($this->mSplit, $data);
+                    if($methodId == SscMethod::FT_JIAO_ID && strpos((string)$datum[0], '角') === false){
+                        $datum[0] .= '角';
+                    }
+                    if($methodId == SscMethod::FT_ZHENG_ID && strpos((string)$datum[0], '正') === false){
+                        $datum[0] .= '正';
+                    }
+                    $allMoneys = 1 * $datum[1];
+                    $this->betData[] = [
+                        'codes' => $datum[0],
+                        'single' => $datum[1],
+                        'count' => 1,
+                        'all_moneys' => $allMoneys,
+                        'id' => $methodId,
+                        'name' => $methodName,
+                    ];
+                    if($allMoneys<20){
+                        throw_info('单注最低:'.self::ONE_MINI_MONEY.'，请核实后重新下注', CommonBaseService::CODE_FOR_USER);
+                    }
+                }
+                break;
         }
     }
 
