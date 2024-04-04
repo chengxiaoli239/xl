@@ -52,7 +52,7 @@ class AoZhou5Service extends CommonLotteryService
         try {
             $lotteryType = self::LOTTERY_TYPE_AOZHOU5;
             list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
-            $bets = Bets::find()->where(['status'=>1, 'lottery_type'=>$lotteryType, 'qihao'=>$currentKjQiHao])
+            $bets = Bets::find()->where(['status'=>0, 'lottery_type'=>$lotteryType]) # , 'qihao'=>$currentKjQiHao
                 ->orderBy('id DESC')->limit(100)->all();
             $replyData = [];
             foreach ($bets as $bet){
@@ -71,7 +71,7 @@ class AoZhou5Service extends CommonLotteryService
                     $userId = $value['user_id'];
                     $replyContent = $value['reply_content'];
 
-                    $betRows = Bets::find()->where(['id'=>$value['betIds'],'qihao'=>$qiHao])->asArray()->all();
+                    $betRows = Bets::find()->where(['id'=>$value['betIds'],'qihao'=>$qiHao, 'status'=>1])->asArray()->all();
                     foreach ($betRows as $betRow){
                         $profits = $betRow['profits'];
                         $text .= $betRow['codes'].'/'.floatval($betRow['bet_money']).'，'.(
