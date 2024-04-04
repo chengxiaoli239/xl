@@ -53,7 +53,7 @@ class AoZhou5Service extends CommonLotteryService
         try {
             $lotteryType = self::LOTTERY_TYPE_AOZHOU5;
             list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
-            if(!SscKjData::find()->where(['lottery_type'=>$lotteryType, 'qihao'=>$currentKjQiHao])->asArray()->one())){
+            if(!SscKjData::find()->where(['lottery_type'=>$lotteryType, 'qihao'=>$currentKjQiHao])->asArray()->one()){
                 return false;
             }
             $bets = Bets::find()->where(['status'=>0, 'lottery_type'=>$lotteryType]) # , 'qihao'=>$currentKjQiHao
