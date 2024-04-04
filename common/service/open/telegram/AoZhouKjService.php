@@ -9,24 +9,15 @@ use common\tools\Tool_Common;
 
 class AoZhouKjService  extends BaseService
 {
-    public int $lottery_type = LotteryType::AZ_LUCKY_5;
+    public static int $lottery_type = LotteryType::AZ_LUCKY_5;
 
     public function operateSendKjData($qiHao='')
     {
         $switch = \Yii::$app->params['AZ_MESSAGE_SWITCH']??0;
         if(!$switch) return false;
-        $kjData = SscKjData::find()->where(['lottery_type'=>$this->lottery_type, 'qihao'=>$qiHao])->asArray()->one();
 
-        if(AoZhou5Service::KJ_CODE_NUM==5){
-            $codeHz = $kjData['codes_hz'];
-            $kjCode = $kjData['code_str'];
-        }else{
-            $codeHz = $kjData['codes_4nums_hz'];
-            $kjCode = $kjData['code_4n_str'];
-        }
+        list($codeHz, $kjCode, $ds, $ft) = AoZhouKjService::getAoZhouKjData($qiHao);
 
-        $ds = ($codeHz%2==0) ? '双' : '单';
-        $ft = ($codeHz%4)?:4;
         $text = "============================\n";
         $text .= LotteryType::TYPE_OPTIONS[$this->lottery_type].'（前'.(AoZhou5Service::KJ_CODE_NUM).'位数番摊）'."\n\n".
             "第 {$qiHao} 期\n".
@@ -46,7 +37,7 @@ class AoZhouKjService  extends BaseService
                 $text .= "\n\n";
             }
         }
-        $text .= "\n\n============================";
+        $text .= "\n============================";
         Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', '开奖后群消息', ['lottery_type'=>$this->lottery_type, 'qihao'=>$qiHao, 'text'=>$text]);
 
         $config = \Yii::$app->params['TELEGRAM'];
@@ -63,5 +54,28 @@ class AoZhouKjService  extends BaseService
     public static function getFanTan($heZhi=0): int
     {
         return ($heZhi%4)?:4;
+    }
+
+    /**
+     * 获取开奖结果描述
+     * @param $qiHao
+     * @return array
+     */
+    public static function getAoZhouKjData($qiHao): array
+    {
+        $kjData = SscKjData::find()->where(['lottery_type'=>self::$lottery_type, 'qihao'=>$qiHao])->asArray()->one();
+
+        if(AoZhou5Service::KJ_CODE_NUM==5){
+            $codeHz = $kjData['codes_hz'];
+            $kjCode = $kjData['code_str'];
+        }else{
+            $codeHz = $kjData['codes_4nums_hz'];
+            $kjCode = $kjData['code_4n_str'];
+        }
+
+        $ds = ($codeHz%2==0) ? '双' : '单';
+        $ft = ($codeHz%4)?:4;
+
+        return [$codeHz, $kjCode, $ds, $ft];
     }
 }

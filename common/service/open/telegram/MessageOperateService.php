@@ -70,6 +70,12 @@ class MessageOperateService  extends BaseService
         $betData = explode($this->split, $this->text);
         foreach ($betData as $datum){
             list($methodId, $methodName) = SscMethod::getMethod($datum);
+            if($methodId == SscMethod::FT_JIAO_ID && strpos($datum[0], '角') === false){
+                $datum[0] .= '角';
+            }
+            if($methodId == SscMethod::FT_ZHENG_ID && strpos($datum[0], '正') === false){
+                $datum[0] .= '正';
+            }
             $datum = explode($this->mSplit, $datum);
             $allMoneys = 1 * $datum[1];
             $this->betData[] = [
@@ -118,9 +124,9 @@ class MessageOperateService  extends BaseService
      * @param $message
      * @return array
      */
-    public function receive($message): array
+    public function receive($message, $token): array
     {
-        list($message_id , $from, $chat, $date, $text) = [$message['message_id'], $message['from'], $message['chat'], $message['date'], $message['text']];
+        list($messageId , $from, $chat, $date, $text) = [$message['message_id'], $message['from'], $message['chat'], $message['date'], $message['text']];
         //p([$message_id , $from, $chat, $date, $text]);
 
         //$text = "1正/20 2念1/20";
@@ -164,6 +170,7 @@ class MessageOperateService  extends BaseService
                     'fromUser' => $from['id'],
                     'fromNickName' => $this->platformUser['nickName'],
                     'fromGroup' => $messageData['fromGroup'],
+                    'token' => $token,
                 ];
                 $Bets = new BetsBackend();
                 $setData = [

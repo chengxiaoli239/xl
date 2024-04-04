@@ -3,16 +3,20 @@
 namespace common\service\lottery\aozhou5;
 
 use backend\models\wechat\Bets;
+use backend\models\wechat\WechatUser;
 use backend\service\agent\AgentUsersBalanceService;
 use common\helpers\lottery\DrawLottery;
 use common\helpers\LotteryType;
 use common\helpers\SscMethod;
 use common\service\CommonService;
+use common\service\jobs\telegram\SendMessageJobs;
 use common\service\lottery\CommonLotteryService;
+use common\service\open\telegram\AoZhouKjService;
 use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\Odds3dService;
 use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
+use yii\helpers\Json;
 
 class AoZhou5Service extends CommonLotteryService
 {
@@ -48,9 +52,42 @@ class AoZhou5Service extends CommonLotteryService
             $lottery_type = self::LOTTERY_TYPE_AOZHOU5;
             $bets = Bets::find()->where(['status'=>0, 'lottery_type'=>$lottery_type])
                 ->orderBy('id DESC')->limit(100)->all();
-            Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', LotteryType::getName($lottery_type).'开奖之后业务处理', ['lottery_type'=>$lottery_type, 'count'=>count($bets)]);
+            $replyData = [];
             foreach ($bets as $bet){
-                self::opOneBettingRecord($bet->id, $bet);
+                $result = self::opOneBettingRecord($bet->id, $bet);
+                $replyData[$bet->wechat_user_id][$bet->qihao]['betIds'][] = $bet->id;
+                $replyData[$bet->wechat_user_id][$bet->qihao]['userId'][] = $bet->user_id;
+                $replyData[$bet->wechat_user_id][$bet->qihao]['reply_content'] = Json::decode($bet->reply_content);
+                $replyData[$bet->wechat_user_id]['result'][] = $result;
+            }
+            Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', LotteryType::getName($lottery_type).'开奖之后业务处理', ['lottery_type'=>$lottery_type, 'count'=>count($bets), 'replyData'=>$replyData]);
+
+            foreach ($replyData as $wechatUserId=>$replyDatum){
+                foreach ($replyDatum as $qiHao=>$value){
+                    list($codeHz, $kjCode, $ds, $ft) = AoZhouKjService::getAoZhouKjData($qiHao);
+                    $text = "第".$qiHao."期\n\n".$kjCode.'总和'.$codeHz;
+                    $text .= $kjCode."总和{$codeHz}(".$ds.",".$ft.")\n\n";
+                    $userId = $value['user_id'];
+                    $replyContent = $value['reply_content'];
+
+                    $betRows = Bets::find()->where(['id'=>$value['betIds']]);
+                    foreach ($betRows as $betRow){
+                        $text .= $betRow->codes.','.(
+                            $betRow->profits==0 ?
+                                ('平') : ($betRow->profits>0?('中，得'.$betRow->profits):('不中，亏'.$betRows->profits)))."\n";
+                    }
+                    $platformUser = WechatUser::find()->where(['id'=>$wechatUserId])->asArray()->one();
+                    $text .= "\n余额：".$platformUser->balance;
+                    $sendData = [
+                        'user_id' => $userId,
+                        'chat_id' => $replyContent['fromUser'], # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
+                        'content' => $text, # 测试阶段调试信息 - 用户下注完回复
+                        'business_id' => $userId,
+                        'token' => $replyContent['token'], # 机器人的token
+                    ];
+                    //todo 开奖结果私发用户
+                    push_queue(SendMessageJobs::class, $sendData); # TG消息发送
+                }
             }
         }catch (\Exception $e){
             Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'ERR', '开奖处理异常', ['lottery_type'=>$lottery_type, 'name'=>LotteryType::TYPE_OPTIONS[$lottery_type], 'err_msg'=>$e->getMessage()]);
@@ -110,12 +147,13 @@ class AoZhou5Service extends CommonLotteryService
             $status = $bet->save();
             $logArr = [
                 'qiHao'=>$qiHao,
-                'opRst'=>$status,'codes'=>$codes,'is_simulate'=>$is_simulate,
-                'kjData'=>$kjData, 'single'=>$single,'zjTimes'=>$zjTimes,'bonus'=>$bonus, 'profits'=>$profits,
+                'opRst'=>$status,'codes'=>$codes,'is_simulate'=>$is_simulate, 'profits'=>$profits,
+                'kjData'=>$kjData, 'single'=>$single,'zjTimes'=>$zjTimes,'bonus'=>$bonus,
             ];
 
             if($bonus>0){
-                AgentUsersBalanceService::updateBalance((string)$bet->order_id, $bonus, $bet->wechat_user_id, WechatUserService::TYPE_ORDER_AWARD); # 派奖
+                # 派奖
+                AgentUsersBalanceService::updateBalance((string)$bet->order_id, $bonus, $bet->wechat_user_id, WechatUserService::TYPE_ORDER_AWARD);
             }
 
             Tool_Common::log('/kj_aozhou5/'.__FUNCTION__,'INFO','投注记录处理', $logArr);
@@ -125,8 +163,6 @@ class AoZhou5Service extends CommonLotteryService
             Tool_Common::log('/kj_aozhou5/'.__FUNCTION__,'ERR','投注记录-处理失败', ['record_id'=>$recordId, 'err_msg'=>$e->getMessage(), 'file'=>$e->getFile().'_'.$e->getLine()]);
             return false;
         }
-
-        # 开奖结果私发用户
 
         return true;
     }
