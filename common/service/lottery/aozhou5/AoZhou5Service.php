@@ -62,7 +62,7 @@ class AoZhou5Service extends CommonLotteryService
                 $replyData[$bet->wechat_user_id][$bet->qihao]['reply_content'] = Json::decode($bet->reply_content);
                 $replyData[$bet->wechat_user_id]['result'][] = $result;
             }
-            Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', LotteryType::getName($lotteryType).'开奖之后业务处理', ['lottery_type'=>$lotteryType, 'count'=>count($bets), 'replyData'=>$replyData]);
+            Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', LotteryType::getName($lotteryType).'开奖之后业务处理', ['lottery_type'=>$lotteryType, 'currentKjQiHao'=>$currentKjQiHao, 'count'=>count($bets), 'replyData'=>$replyData]);
 
             foreach ($replyData as $wechatUserId=>$replyDatum){
                 foreach ($replyDatum as $qiHao=>$value){

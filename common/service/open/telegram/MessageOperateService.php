@@ -153,7 +153,7 @@ class MessageOperateService  extends BaseService
             $replyTxts = [];
             $now_time = time();
             //p($this->betData);
-            $oneReplyTxt = '【课号】'.$lotteryName.$qiHao;
+            $oneReplyTxt = '【课号】'.$lotteryName.'-'.$qiHao;
             $betContent = "\n【内容】";
             $betOrderId = LotteryType::getOrderId();
             foreach ($this->betData as $method){
@@ -165,7 +165,7 @@ class MessageOperateService  extends BaseService
                 }
 
                 $replyMethodName = PlayMethodService::getReplyMethodName($method['name']);
-                $oneBetContent = "\n".$replyMethodName.':'.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
+                $oneBetContent = "\n".$replyMethodName.'：'.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
                 $replyContent = [
                     'replyTxt' => $oneBetContent,
                     'fromUser' => $from['id'],
