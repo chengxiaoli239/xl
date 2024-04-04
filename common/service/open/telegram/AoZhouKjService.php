@@ -19,7 +19,7 @@ class AoZhouKjService  extends BaseService
         list($codeHz, $kjCode, $ds, $ft) = AoZhouKjService::getAoZhouKjData($qiHao);
 
         $text = "============================\n";
-        $text .= LotteryType::TYPE_OPTIONS[$this->lottery_type].'（前'.(AoZhou5Service::KJ_CODE_NUM).'位数番摊）'."\n\n".
+        $text .= LotteryType::TYPE_OPTIONS[self::$lottery_type].'（前'.(AoZhou5Service::KJ_CODE_NUM).'位数番摊）'."\n\n".
             "第 {$qiHao} 期\n".
             str_replace(',', '', $kjCode)."总和{$codeHz}(".$ds.",".$ft.")\n\n".
             "以下是历史课程表\n\n";
