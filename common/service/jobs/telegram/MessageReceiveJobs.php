@@ -80,7 +80,6 @@ class MessageReceiveJobs extends CommonJob
             $message['fromUserNickName'] = $fromUser['nickName'];
             Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'INFO', self::$name.'00', ['fromId'=>$fromId, 'params'=>$params, 'fromUser'=>$fromUser]);
 
-            $message['targetUser'] = $fromId;  # 目标用户
             list($code, $vdata, $msg) = $messageService->receive($message, $params['token']);
             $rstData = [$code, $vdata, $msg];
             Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'INFO', self::$name.'01', ['user_id'=>$userId, 'rstData'=>$rstData]);

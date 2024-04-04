@@ -47,7 +47,7 @@ class SendMessageJobs extends CommonJob {
             throw_info($e->getMessage());
         }
 
-        return 'TG消息发送完成[chat_id:'.$params['chat_id'].', name:'.$params['name'].']';
+        return 'TG消息发送完成[chat_id:'.$params['chat_id'].', name:'.($params['name']??'').']';
     }
 
 }

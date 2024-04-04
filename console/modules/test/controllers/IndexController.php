@@ -22,6 +22,7 @@ use common\service\CommonService;
 use common\service\helpers\ThirdD;
 use common\service\lottery\aozhou5\AoZhou5BetService;
 use common\service\lottery\LotteryTypeService;
+use common\service\open\telegram\AoZhouKjService;
 use common\service\thirdD\match\MatchCodeService;
 use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\OperateLotteryService;
@@ -48,6 +49,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $rst = (new AoZhouKjService())->operateSendKjData($qihao='51093373');p($rst);
             $rst = KjDataGet::grabOneLotteryKjData($lottery_type=28);p($rst); # 开奖
             $bet = Bets::findOne(32126);
             $r = \common\service\lottery\aozhou5\AoZhou5Service::opOneBettingRecord($bet->id, $bet);p($r);

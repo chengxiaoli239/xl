@@ -27,11 +27,6 @@ class AoZhouKjService  extends BaseService
             ->asArray()->all();
         foreach ($historyKjData as $k=>$historyKjDatum){
             $kk = $k + 1;
-            if(AoZhou5Service::KJ_CODE_NUM==5){
-                $codeHz = $historyKjDatum['codes_hz'];
-            }else{
-                $codeHz = $historyKjDatum['codes_4nums_hz'];
-            }
             $text .= self::getFanTan((int)$codeHz).' ';
             if($kk%15==0){
                 $text .= "\n\n";
@@ -47,7 +42,7 @@ class AoZhouKjService  extends BaseService
             'chat_id' => $config['GROUP_ID'],
             'token' => $config['TOKEN'],
         ];
-        push_queue(SendMessageJobs::class, $params); # TG消息发送
+        push_queue(SendMessageJobs::class, $params); # 开奖结果消息发送 - 群
 
     }
 

@@ -70,10 +70,10 @@ class MessageOperateService  extends BaseService
         $betData = explode($this->split, $this->text);
         foreach ($betData as $datum){
             list($methodId, $methodName) = SscMethod::getMethod($datum);
-            if($methodId == SscMethod::FT_JIAO_ID && strpos($datum[0], '角') === false){
+            if($methodId == SscMethod::FT_JIAO_ID && strpos((string)$datum[0], '角') === false){
                 $datum[0] .= '角';
             }
-            if($methodId == SscMethod::FT_ZHENG_ID && strpos($datum[0], '正') === false){
+            if($methodId == SscMethod::FT_ZHENG_ID && strpos((string)$datum[0], '正') === false){
                 $datum[0] .= '正';
             }
             $datum = explode($this->mSplit, $datum);

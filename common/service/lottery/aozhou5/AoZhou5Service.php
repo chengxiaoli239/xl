@@ -86,7 +86,7 @@ class AoZhou5Service extends CommonLotteryService
                         'token' => $replyContent['token'], # 机器人的token
                     ];
                     //todo 开奖结果私发用户
-                    push_queue(SendMessageJobs::class, $sendData); # TG消息发送
+                    push_queue(SendMessageJobs::class, $sendData); # 中奖结果消息发送
                 }
             }
         }catch (\Exception $e){
