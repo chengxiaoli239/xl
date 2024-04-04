@@ -157,7 +157,7 @@ class AoZhou5Service extends CommonLotteryService
             $status = $bet->save();
             $logArr = [
                 'qiHao'=>$qiHao,
-                'opRst'=>$status,'codes'=>$codes,'is_simulate'=>$is_simulate, 'profits'=>$profits,
+                'opRst'=>$status,'codes'=>$codes, 'drawData'=>$drawData,'is_simulate'=>$is_simulate, 'profits'=>$profits,
                 'kjData'=>$kjData, 'single'=>$single,'zjTimes'=>$zjTimes,'bonus'=>$bonus,
             ];
 
