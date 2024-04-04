@@ -11,4 +11,9 @@ class BaseService  extends \common\service\BaseService
         self::CHAT_TYPE_GROUP => '群聊',
     ];
 
+    public static function tableName()
+    {
+        return "{{%bets}}";
+    }
+
 }
