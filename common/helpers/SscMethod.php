@@ -23,6 +23,11 @@ class SscMethod
         self::FT_DX_ID => '大小',
     ];
 
+    const TYPE_DS_OPTIONS = [
+        '13' => '单',
+        '24' => '双',
+    ];
+
     public static function getName($lottery_type=DEFAULT_LOTTERY_TYPE): string
     {
         return self::TYPE_FT_OPTIONS[$lottery_type]??'未知玩法';
@@ -37,7 +42,7 @@ class SscMethod
     public static function getMethod($text): array
     {
         switch (true){
-            case strpos($text, '番') !== false:
+            case strpos($text, '番') !== false OR strpos($text, '高') !== false:
                 $methodId = self::FT_FAN_ID;
                 break;
             case strpos($text, '正') !== false:

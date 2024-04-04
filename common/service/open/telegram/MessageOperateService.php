@@ -88,9 +88,15 @@ class MessageOperateService  extends BaseService
                     if($methodId == SscMethod::FT_ZHENG_ID && strpos((string)$datum[0], '正') === false){
                         $datum[0] .= '正';
                     }
+
+                    $codes = $datum[0];
+                    if($methodId == SscMethod::FT_DS_ID){
+                        $codes = SscMethod::TYPE_DS_OPTIONS[$codes]??$codes;
+                    }
+
                     $allMoneys = 1 * $datum[1];
                     $this->betData[] = [
-                        'codes' => $datum[0],
+                        'codes' => $codes,
                         'single' => $datum[1],
                         'count' => 1,
                         'all_moneys' => $allMoneys,

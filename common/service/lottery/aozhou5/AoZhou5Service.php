@@ -200,13 +200,20 @@ class AoZhou5Service extends CommonLotteryService
                 switch ($methodId){
                     case SscMethod::FT_ZHENG_ID:
                     case strpos($codes, '番') !== false:
+                    case strpos($codes, '高') !== false:
                     case strpos($codes, '角') !== false:
-                    case strpos($codes, '单') !== false OR strpos($codes, '双') !== false:
-                    case strpos($codes, '大') !== false OR strpos($codes, '小') !== false:
                         if(strpos($codes, (string)$gui) !== false){
                             $zjTimes += 1;
                             $bonus += $Odds['odds'] * $single;
                         }
+                        break;
+                    case $methodId == SscMethod::FT_DS_ID OR strpos($codes, '单') !== false OR strpos($codes, '双') !== false:
+                        if(($codes=='单' && in_array($gui, [1, 3])) OR ($codes=='双' && in_array($gui, [2, 4]))){
+                            $zjTimes += 1;
+                            $bonus += $Odds['odds'] * $single;
+                        }
+                        break;
+                    case $methodId == SscMethod::FT_DX_ID OR strpos($codes, '大') !== false OR strpos($codes, '小') !== false:
                         break;
                     case strpos($codes, '念') !== false:
                         list($firstCode, $nianCode) = explode('念', trim($codes));
