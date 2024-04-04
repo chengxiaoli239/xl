@@ -36,7 +36,12 @@ class AoZhouKjService  extends BaseService
             ->asArray()->all();
         foreach ($historyKjData as $k=>$historyKjDatum){
             $kk = $k + 1;
-            $text .= self::getFanTan((int)$historyKjDatum['codes_4nums_hz']).' ';
+            if(AoZhou5Service::KJ_CODE_NUM==5){
+                $codeHz = $historyKjDatum['codes_hz'];
+            }else{
+                $codeHz = $historyKjDatum['codes_4nums_hz'];
+            }
+            $text .= self::getFanTan((int)$codeHz).' ';
             if($kk%15==0){
                 $text .= "\n\n";
             }

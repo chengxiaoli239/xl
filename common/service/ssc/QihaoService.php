@@ -44,15 +44,15 @@ class QihaoService extends CommonService
      */
     public static function getKjQiHao(int $lottery_type=DEFAULT_LOTTERY_TYPE)
     {
-        $mkey = CacheKeyService::lotteryQiHaoInfo($lottery_type);
-        $data = commonRedis()->get($mkey);
+        $mKey = CacheKeyService::lotteryQiHaoInfo($lottery_type);
+        $data = commonRedis()->get($mKey);
         if(empty($data)){
             $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
             $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
             $currentKjQihao = $DataDealStatus['qihao'];
             $nextQihao = $DataDealStatus['next_qihao'];
             $data = [$currentKjQihao, $nextQihao];
-            commonRedis()->setex($mkey, 8, $data);
+            commonRedis()->setex($mKey, 8, $data);
         }
 
         return $data;
