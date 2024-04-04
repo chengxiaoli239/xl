@@ -2,6 +2,7 @@
 
 namespace common\service\lottery\aozhou5;
 
+use backend\models\SscKjData;
 use backend\models\wechat\Bets;
 use backend\models\wechat\WechatUser;
 use backend\service\agent\AgentUsersBalanceService;
@@ -45,13 +46,16 @@ class AoZhou5Service extends CommonLotteryService
 
     /**
      * 开奖数据处理
-     * @return void
+     * @return bool
      */
     public static function afterKj()
     {
         try {
             $lotteryType = self::LOTTERY_TYPE_AOZHOU5;
             list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+            if(!SscKjData::findOne(['qihao'=>$currentKjQiHao, 'lottery_type'=>$lotteryType])){
+                return false;
+            }
             $bets = Bets::find()->where(['status'=>0, 'lottery_type'=>$lotteryType]) # , 'qihao'=>$currentKjQiHao
                 ->orderBy('id DESC')->limit(100)->all();
             $replyData = [];
@@ -95,6 +99,7 @@ class AoZhou5Service extends CommonLotteryService
             Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'ERR', '开奖处理异常', ['lottery_type'=>$lotteryType, 'name'=>LotteryType::TYPE_OPTIONS[$lotteryType], 'err_msg'=>$e->getMessage()]);
         }
 
+        return true;
     }
 
     /**
