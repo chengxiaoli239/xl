@@ -222,12 +222,11 @@ class MessageOperateService  extends BaseService
                     $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $oneAllMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
                     $oneReplyTxt .= ("\n【剩余】".$vData['balance'].'咪');
                 }
-                if($this->platformUser['is_need_confirm']==BetsBackend::NEED_CONFIRM_YES OR $this->platformUser['reply_type']==BetsBackend::REPLY_TYPE_QUICK){
-                    # 即时回复
-                    $replyTxts[] = ['order_ids'=>[$betOrderId], 'replyTxt'=>$oneReplyTxt];
-                }
-
                 $allMoneys += $oneAllMoneys;
+            }
+            if($this->platformUser['is_need_confirm']==BetsBackend::NEED_CONFIRM_YES OR $this->platformUser['reply_type']==BetsBackend::REPLY_TYPE_QUICK){
+                # 即时回复
+                $replyTxts[] = ['order_ids'=>[$betOrderId], 'replyTxt'=>$oneReplyTxt];
             }
             $transaction->commit();;
             //p([$message, $text, $this->betData]);
@@ -239,7 +238,6 @@ class MessageOperateService  extends BaseService
             }
 
         }
-        //p('llll');
 
         foreach ($pushSiteData as $pushData){
             push_queue_open(AoZhou5BetJobs::class, $pushData);
