@@ -147,7 +147,7 @@ class MessageOperateService  extends BaseService
 
             list($lotteryType, $lotteryName) = [LotteryType::AZ_LUCKY_5, LotteryType::TYPE_OPTIONS[LotteryType::AZ_LUCKY_5]];
             list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lotteryType);
-            if(!SscKjData::findOne(['lottery_type'=>$lotteryType, 'qihao'=>$qiHao])){
+            if(SscKjData::findOne(['lottery_type'=>$lotteryType, 'qihao'=>$qiHao])){
                 return [CommonBaseService::CODE_FOR_USER, [], '未开盘请稍后'];
             }
 
