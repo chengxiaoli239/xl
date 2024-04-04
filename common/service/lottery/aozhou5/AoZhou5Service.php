@@ -65,19 +65,18 @@ class AoZhou5Service extends CommonLotteryService
             foreach ($replyData as $wechatUserId=>$replyDatum){
                 foreach ($replyDatum as $qiHao=>$value){
                     list($codeHz, $kjCode, $ds, $ft) = AoZhouKjService::getAoZhouKjData($qiHao);
-                    $text = "第".$qiHao."期\n\n".$kjCode.'总和'.$codeHz;
-                    $text .= $kjCode."总和{$codeHz}(".$ds.",".$ft.")\n\n";
+                    $text = "第".$qiHao."期\n\n".$kjCode.'总和'.$codeHz."(".$ds.",".$ft.")\n\n";
                     $userId = $value['user_id'];
                     $replyContent = $value['reply_content'];
 
-                    $betRows = Bets::find()->where(['id'=>$value['betIds']]);
+                    $betRows = Bets::find()->where(['id'=>$value['betIds'],'qihao'=>$qiHao])->asArray()->all();
                     foreach ($betRows as $betRow){
-                        $text .= $betRow->codes.','.(
-                            $betRow->profits==0 ?
-                                ('平') : ($betRow->profits>0?('中，得'.$betRow->profits):('不中，亏'.$betRows->profits)))."\n";
+                        $text .= $betRow['codes'].','.(
+                            $betRow['profits']==0 ?
+                                ('平') : ($betRow['profits']>0?('中，得'.$betRow['profits']):('不中，亏'.$betRows['profits'])))."\n";
                     }
                     $platformUser = WechatUser::find()->where(['id'=>$wechatUserId])->asArray()->one();
-                    $text .= "\n余额：".$platformUser->balance;
+                    $text .= "\n余额：".$platformUser['balance'];
                     $sendData = [
                         'user_id' => $userId,
                         'chat_id' => $replyContent['fromUser'], # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
