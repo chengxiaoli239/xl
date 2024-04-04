@@ -165,7 +165,7 @@ class MessageOperateService  extends BaseService
                 }
 
                 $replyMethodName = PlayMethodService::getReplyMethodName($method['name']);
-                $oneBetContent = $replyMethodName.':'.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
+                $oneBetContent = "\n".$replyMethodName.':'.str_replace([':',','],'',$method['codes']).'各'.$method['single'].'共'.$method['all_moneys'];
                 $replyContent = [
                     'replyTxt' => $oneBetContent,
                     'fromUser' => $from['id'],
@@ -224,7 +224,7 @@ class MessageOperateService  extends BaseService
             }
             if($this->platformUser['is_need_confirm']==BetsBackend::NEED_CONFIRM_YES OR $this->platformUser['reply_type']==BetsBackend::REPLY_TYPE_QUICK){
                 # 即时回复
-                $replyTxts[] = ['order_ids'=>[$betOrderId], 'replyTxt'=>$betContent];
+                $replyTxts[] = ['order_ids'=>[$betOrderId], 'replyTxt'=>$oneReplyTxt.$betContent];
             }
             $transaction->commit();;
             //p([$message, $text, $this->betData]);
