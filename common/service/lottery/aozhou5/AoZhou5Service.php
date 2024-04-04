@@ -71,9 +71,9 @@ class AoZhou5Service extends CommonLotteryService
 
                     $betRows = Bets::find()->where(['id'=>$value['betIds'],'qihao'=>$qiHao])->asArray()->all();
                     foreach ($betRows as $betRow){
-                        $text .= $betRow['codes'].','.(
+                        $text .= $betRow['codes'].'/'.$betRow['bet_money'].'，'.(
                             $betRow['profits']==0 ?
-                                ('平') : ($betRow['profits']>0?('中，得'.$betRow['profits']):('不中，亏'.$betRows['profits'])))."\n";
+                                ('平') : ($betRow['profits']>0?('中，得'.$betRow['profits']):('不中，亏'.$betRow['profits'])))."\n";
                     }
                     $platformUser = WechatUser::find()->where(['id'=>$wechatUserId])->asArray()->one();
                     $text .= "\n余额：".$platformUser['balance'];
