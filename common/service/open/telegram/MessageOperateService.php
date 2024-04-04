@@ -150,6 +150,7 @@ class MessageOperateService  extends BaseService
             $oneAllMoneys = 0.00;
             $oneAllCounts = 0;
             $pushSiteData = [];
+            $replyTxts = [];
             $now_time = time();
             //p($this->betData);
             $oneReplyTxt = '【课号】'.$lotteryName.$qiHao;
