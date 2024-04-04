@@ -61,6 +61,9 @@ class AoZhou5Service extends CommonLotteryService
             $replyData = [];
             foreach ($bets as $bet){
                 $result = self::opOneBettingRecord($bet->id, $bet);
+                if(!$result){
+                    continue;
+                }
                 $replyData[$bet->wechat_user_id][$bet->qihao]['betIds'][] = $bet->id;
                 $replyData[$bet->wechat_user_id][$bet->qihao]['userId'][] = $bet->user_id;
                 $replyData[$bet->wechat_user_id][$bet->qihao]['reply_content'] = Json::decode($bet->reply_content);
