@@ -206,28 +206,25 @@ class MessageOperateService  extends BaseService
                 $oneAllMoneys += $method['all_moneys']; # 总投
                 $oneAllCounts += $method['count']; # 总投
 
-                $betContent .= "\n".$oneBetContent;
-
                 if(!$this->platformUser['is_need_confirm']){ # 无需确认即可直接上盘口
                     # 推送网盘任务：
                     $pushSiteData[] = ['betRowId'=>$Bets->id, 'orderId'=>$Bets->order_id, 'business_id'=>$Bets->order_id];
                 }
-
-                $oneReplyTxt .= str_replace(';', ',', $betContent);
-                $oneReplyTxt .= ("\n【单号】".$betOrderId);
-                if($this->platformUser['is_need_confirm']){
-                    $oneReplyTxt .= ("\n【合计】 共".$oneAllCounts."组，共".$oneAllMoneys.'咪');
-                    $oneReplyTxt .= ("\n【状态】 待确认");
-                }else{
-                    $oneReplyTxt .= ("\n【成功】√  共".$oneAllCounts."组，共".$oneAllMoneys.'咪');
-                    $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $oneAllMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
-                    $oneReplyTxt .= ("\n【剩余】".$vData['balance'].'咪');
-                }
                 $allMoneys += $oneAllMoneys;
+                $betContent .= str_replace(';', ',', $oneBetContent);
+            }
+            $betContent .= ("\n【单号】".$betOrderId);
+            if($this->platformUser['is_need_confirm']){
+                $betContent .= ("\n【合计】 共".$oneAllCounts."组，共".$oneAllMoneys.'咪');
+                $betContent .= ("\n【状态】 待确认");
+            }else{
+                $betContent .= ("\n【成功】√  共".$oneAllCounts."组，共".$oneAllMoneys.'咪');
+                $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $oneAllMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
+                $betContent .= ("\n【剩余】".$vData['balance'].'咪');
             }
             if($this->platformUser['is_need_confirm']==BetsBackend::NEED_CONFIRM_YES OR $this->platformUser['reply_type']==BetsBackend::REPLY_TYPE_QUICK){
                 # 即时回复
-                $replyTxts[] = ['order_ids'=>[$betOrderId], 'replyTxt'=>$oneReplyTxt];
+                $replyTxts[] = ['order_ids'=>[$betOrderId], 'replyTxt'=>$betContent];
             }
             $transaction->commit();;
             //p([$message, $text, $this->betData]);
