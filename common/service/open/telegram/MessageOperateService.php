@@ -68,15 +68,15 @@ class MessageOperateService  extends BaseService
     private function getBetData(): void
     {
         $betData = explode($this->split, $this->text);
-        foreach ($betData as $datum){
-            list($methodId, $methodName) = SscMethod::getMethod($datum);
+        foreach ($betData as $data){
+            list($methodId, $methodName) = SscMethod::getMethod($data);
+            $datum = explode($this->mSplit, $data);
             if($methodId == SscMethod::FT_JIAO_ID && strpos((string)$datum[0], '角') === false){
                 $datum[0] .= '角';
             }
             if($methodId == SscMethod::FT_ZHENG_ID && strpos((string)$datum[0], '正') === false){
                 $datum[0] .= '正';
             }
-            $datum = explode($this->mSplit, $datum);
             $allMoneys = 1 * $datum[1];
             $this->betData[] = [
                 'codes' => $datum[0],
