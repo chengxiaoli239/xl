@@ -8,6 +8,7 @@ use backend\service\agent\AgentUsersService;
 use common\helpers\LotteryType;
 use common\helpers\SscMethod;
 use common\service\chat\Tool_Common;
+use common\service\jobs\statics_3d\UserDayStaticsJobs;
 use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\CommonBaseService;
@@ -158,7 +159,10 @@ class MessageOperateService  extends BaseService
         $this->resetText($text);
         try {
             $transaction = static::getDb()->beginTransaction();
-            $this->getBetData();
+            list($code, $data, $msg) = $this->getBetData();
+            if($code == CommonBaseService::CODE_FOR_USER){
+                return [CommonBaseService::CODE_FOR_USER, $data, $msg];
+            }
             if(empty($this->betData)){
                 return [CommonBaseService::CODE_FOR_USER, [], '下注格式错误'];
             }
@@ -248,6 +252,7 @@ class MessageOperateService  extends BaseService
                 $replyTxts[] = ['order_ids'=>[$betOrderId], 'replyTxt'=>$oneReplyTxt.$betContent];
             }
             $transaction->commit();;
+            push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$this->user_id, 'type'=>$data['type'], 'msg'=>'下单/撤单之后计算', 'wechat_user_id'=>$this->member_id]);
             //p([$message, $text, $this->betData]);
         }catch (\Exception $e){
             $transaction->rollBack();

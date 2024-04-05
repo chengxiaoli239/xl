@@ -227,7 +227,7 @@ class Statics3dUserDataService extends BaseService {
         if(empty($wechatUserIds)) return false;
 
         foreach ($wechatUserIds as $wechatUserId){
-            $params = ['user_id'=>$wechatUserId['user_id'], 'type'=>WechatUserService::TYPE_ORDER_BET, 'msg'=>'定时搅拌后报表计算', 'wechat_user_id'=>$wechatUserId['wechat_user_id']];
+            $params = ['user_id'=>$wechatUserId['user_id'], 'type'=>WechatUserService::TYPE_ORDER_BET, 'msg'=>'定时加分后报表计算', 'wechat_user_id'=>$wechatUserId['wechat_user_id']];
             push_queue_fast(UserDayStaticsJobs::class, $params); # 处理数据入列
         }
         Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据-3d', ['wechatUserIds'=>$wechatUserIds]);
