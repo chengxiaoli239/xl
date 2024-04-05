@@ -25,7 +25,9 @@ class SscMethod
 
     const TYPE_DS_OPTIONS = [
         '13' => '单',
+        '13单' => '单',
         '24' => '双',
+        '24双' => '双',
     ];
 
     public static function getName($lottery_type=DEFAULT_LOTTERY_TYPE): string
