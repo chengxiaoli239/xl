@@ -99,7 +99,7 @@ class MessageReceiveJobs extends CommonJob
             $r = self::reply($userId, [$err_msg], $params); # 回复消息
             Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$userId, 'params'=>$params, 'r'=>$r, 'err_msg'=>$e->getMessage(), 'file'=>$e->getFile().'_'.$e->getLine()]);
 
-            $message = $err_msg;
+            $message['err_msg'] = $err_msg;
         }
         //push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$userId, 'type'=>$vdata['type'], 'msg'=>'', 'wechat_user_id'=>$wechatUser['id']]);
 
