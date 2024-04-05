@@ -92,7 +92,7 @@ class AgentUsersBalanceService extends BaseService {
                 $msg = current($Flows->getErrors());
                 $logArr = ['matches'=>$matches, 'msg'=>$msg, 'attributes'=>$Flows->attributes];
                 \common\tools\Tool_Common::log('upOrDownBalance', 'ERR', '用户上下分', $logArr);
-                throw_info($desc.'失败'.$msg);
+                throw_info($desc.'失败'.(is_array($msg)?Json::encode($msg):$msg));
             }
             $logArr =  ['desc'=>$desc, 'WechatUser'=>$WechatUser->attributes, 'attributes'=>$Flows->attributes];
             Tool_Common::log('upOrDownBalance', 'INFO', '用户上下分',$logArr);

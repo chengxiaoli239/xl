@@ -55,7 +55,8 @@ class AgentUsersBalanceFlows extends \common\models\base\BaseModel
             [['balance', 'balance_now', 'balance_after'], 'number'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
-            [['member_id', 'member_account', 'desc', 'message'], 'string', 'max' => 64],
+            [['member_id', 'member_account', 'desc'], 'string', 'max' => 64],
+            [['message'], 'string', 'max' => 1000],
             [['check_time'], 'string', 'max' => 12],
         ];
     }
