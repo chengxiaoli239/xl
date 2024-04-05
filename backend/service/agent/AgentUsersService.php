@@ -222,8 +222,8 @@ class AgentUsersService extends BaseService {
                 "\n【盛鱼】".floatval($after_balance);
             $PlatformRobot = PlatformRobot::find()->where(['user_id'=>$user_id])->one();
             if($PlatformRobot->platform_id == Platform::TELEGRAM){
-                $messageData=Json::decode($flows->message);
-                MessageReceiveJobs::reply($user_id,  [$replyTxt], ['message'=>$messageData]);
+                $messageData = array_merge(Json::decode($flows->message), ['token'=>$PlatformRobot->token]);
+                MessageReceiveJobs::reply($user_id,  [$replyTxt], $messageData);
             }else{
                 WechatPrivateMsgReceiveJobs::reply($user_id, [$replyTxt], ['fromUser' => $WechatUser->userName]); # 回复消息
             }
