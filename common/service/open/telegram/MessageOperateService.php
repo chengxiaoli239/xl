@@ -109,7 +109,7 @@ class MessageOperateService  extends BaseService
      * @param $text
      * @return array
      */
-    private function matchOtherOperate($text): array
+    private function matchOtherOperate($text, $message=[]): array
     {
         // 判断数组中是否有匹配的元素
         $matches = array_intersect(['+', '上', '-', '下'], preg_split('//u', $text, -1, PREG_SPLIT_NO_EMPTY));
@@ -126,7 +126,7 @@ class MessageOperateService  extends BaseService
                 case strpos($text, '下') !== false:
                 case strpos($text, '-') !== false:
                     # 上分逻辑
-                    return AgentUsersBalanceService::operateBalanceChange($text, $this->platformUser);
+                    return AgentUsersBalanceService::operateBalanceChange($text, $this->platformUser, $message);
             }
             return [CommonBaseService::CODE_FOR_USER, [], '申请成功待审核'];
         }
@@ -144,7 +144,7 @@ class MessageOperateService  extends BaseService
         //p([$message_id , $from, $chat, $date, $text]);
 
         //$text = "1正/20 2念1/20";
-        list($code, $vData, $msg) = $this->matchOtherOperate($text);
+        list($code, $vData, $msg) = $this->matchOtherOperate($text, $message);
         if($code == CommonBaseService::CODE_FOR_USER){
             return [$code, $vData, $msg];
         }

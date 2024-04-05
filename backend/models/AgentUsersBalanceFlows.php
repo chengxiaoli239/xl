@@ -18,6 +18,7 @@ use Yii;
  * @property string $balance_now 当前剩余
  * @property string $balance_after 变动结果
  * @property string $desc 备注
+ * @property string $message 消息内容
  * @property int $status 审核状态(0未审核1通过2未通过)
  * @property string $check_time 审核时间
  * @property int $created_at 创建时间
@@ -54,7 +55,7 @@ class AgentUsersBalanceFlows extends \common\models\base\BaseModel
             [['balance', 'balance_now', 'balance_after'], 'number'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
-            [['member_id', 'member_account', 'desc'], 'string', 'max' => 64],
+            [['member_id', 'member_account', 'desc', 'message'], 'string', 'max' => 64],
             [['check_time'], 'string', 'max' => 12],
         ];
     }

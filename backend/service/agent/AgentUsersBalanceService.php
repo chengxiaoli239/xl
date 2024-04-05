@@ -35,7 +35,7 @@ class AgentUsersBalanceService extends BaseService {
      * @return array
      * @throws Exception
      */
-    public static function operateBalanceChange(string $text='', array $wechatUser=[]): array
+    public static function operateBalanceChange(string $text='', array $wechatUser=[], $message=[]): array
     {
         try {
             $transaction = \Yii::$app->db->beginTransaction();
@@ -80,6 +80,7 @@ class AgentUsersBalanceService extends BaseService {
                 'balance_now' => $now_balance, # 申请前积分
                 'balance_after' => $after_balance, # 上分：申请不加审核时处理，下分申请时候扣掉，审核不扣
                 'desc' => '用户'.$desc,
+                'message' => Json::encode(is_array($message)?$message:[]),
                 'status' => 0,
                 'created_at' =>time(),
                 'updated_at' =>time(),

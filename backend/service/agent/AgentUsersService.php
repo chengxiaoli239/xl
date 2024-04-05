@@ -2,19 +2,23 @@
 namespace backend\service\agent;
 use backend\models\AgentUsers;
 use backend\models\AgentUsersBalanceFlows;
+use backend\models\open\PlatformRobot;
 use backend\models\statics\Static3dUserProfitsDayAll;
 use backend\models\TzSystemsUsers;
 use backend\service\BaseService;
 use backend\service\UserService;
+use common\helpers\Platform;
 use common\models\wechat\WechatUser;
 use common\service\CommonService;
 use common\service\jobs\robots\message\WechatPrivateMsgReceiveJobs;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
+use common\service\jobs\telegram\MessageReceiveJobs;
 use common\service\thirdD\CommonBaseService;
 use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
+use yii\helpers\Json;
 
 class AgentUsersService extends BaseService {
 
@@ -216,7 +220,12 @@ class AgentUsersService extends BaseService {
                 "\n【结果】".AgentUsersBalanceService::$s['status'][$status].
                 "\n【操作前】".floatval($before_balance).
                 "\n【盛鱼】".floatval($after_balance);
-            WechatPrivateMsgReceiveJobs::reply($user_id, [$replyTxt], ['fromUser' => $WechatUser->userName]); # 回复消息
+            $PlatformRobot = PlatformRobot::find()->where(['user_id'=>$user_id])->one();
+            if($PlatformRobot->platform_id == Platform::TELEGRAM){
+                MessageReceiveJobs::reply($user_id,  [$replyTxt], $messageData=Json::decode($flows->message));
+            }else{
+                WechatPrivateMsgReceiveJobs::reply($user_id, [$replyTxt], ['fromUser' => $WechatUser->userName]); # 回复消息
+            }
             push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$user_id, 'type'=>$balanceType, 'msg'=>'上下分后报表计算', 'wechat_user_id'=>$WechatUser->id]);
         }catch (\Exception $e){
             $transaction->rollBack();
