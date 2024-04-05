@@ -161,16 +161,16 @@ class MessageOperateService  extends BaseService
             $transaction = static::getDb()->beginTransaction();
             list($code, $data, $msg) = $this->getBetData();
             if($code == CommonBaseService::CODE_FOR_USER){
-                return [CommonBaseService::CODE_FOR_USER, $data, $msg];
+                throw_info($msg, CommonBaseService::CODE_FOR_USER);
             }
             if(empty($this->betData)){
-                return [CommonBaseService::CODE_FOR_USER, [], '下注格式错误'];
+                throw_info('下注格式错误', CommonBaseService::CODE_FOR_USER);
             }
 
             list($lotteryType, $lotteryName) = [LotteryType::AZ_LUCKY_5, LotteryType::TYPE_OPTIONS[LotteryType::AZ_LUCKY_5]];
             list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lotteryType);
             if(SscKjData::findOne(['lottery_type'=>$lotteryType, 'qihao'=>$qiHao])){
-                return [CommonBaseService::CODE_FOR_USER, [], '未开盘请稍后'];
+                throw_info('未开盘请稍后', CommonBaseService::CODE_FOR_USER);
             }
 
             $allMoneys = 0.00;
