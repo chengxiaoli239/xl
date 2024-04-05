@@ -126,7 +126,8 @@ class MessageOperateService  extends BaseService
                 # 上分逻辑
                 return AgentUsersBalanceService::operateBalanceChange($text, $this->platformUser, $message);
         }
-        return [CommonBaseService::CODE_FOR_USER, [], '申请成功待审核'];
+
+        return [0, [], '下注逻辑'];
     }
 
     /**
