@@ -131,13 +131,13 @@ class MessageOperateService  extends BaseService
                 case strpos($text, '查') !== false: // 查余额
                     return AgentUsersService::userGetInfo($this->platformUser);
                 case strpos($text, '撤') !== false: // 撤单
-                    return EYunMessageOperateService::operateCancel($text, $this->wechatUser);
+                    return EYunMessageOperateService::operateCancel($text, $this->platformUser);
                 case strpos($text, '+') !== false:
                 case strpos($text, '上') !== false:
                 case strpos($text, '下') !== false:
                 case strpos($text, '-') !== false:
                     # 上分逻辑
-                    return AgentUsersBalanceService::operateBalanceChange($text, $this->wechatUser);
+                    return AgentUsersBalanceService::operateBalanceChange($text, $this->platformUser);
             }
             return [CommonBaseService::CODE_FOR_USER, [], '申请成功待审核'];
         }
