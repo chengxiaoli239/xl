@@ -82,7 +82,7 @@ class AoZhou5Service extends CommonLotteryService
                     foreach ($betRows as $betRow){
                         $profits = $betRow['profits'];
                         $text .= $betRow['codes'].'/'.floatval($betRow['bet_money']).'，'.(
-                            $betRow['profits']==0 ? ('平') : ($profits>0?('中，得'.$betRow['bonus']):('不中，亏'.abs($profits)))
+                            $betRow['profits']==0 ? ('和，得'.$betRow['bonus']) : ($profits>0?('中，得'.$betRow['bonus']):('不中，亏'.abs($profits)))
                             )."\n";
                     }
                     $platformUser = WechatUser::find()->where(['id'=>$wechatUserId])->asArray()->one();
