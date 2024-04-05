@@ -116,7 +116,7 @@ class MessageOperateService  extends BaseService
         if (!empty($matches)) {
             //todo 待处理逻辑
             // 匹配到了其中一个元素，执行逻辑 A
-            switch (current($matches)){
+            switch ($text){
                 case strpos($text, '查') !== false: // 查余额
                     return AgentUsersService::userGetInfo($this->platformUser);
                 case strpos($text, '撤') !== false: // 撤单
