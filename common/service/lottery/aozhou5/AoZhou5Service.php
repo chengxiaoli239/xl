@@ -199,6 +199,17 @@ class AoZhou5Service extends CommonLotteryService
             try {
                 switch ($methodId){
                     case SscMethod::FT_ZHENG_ID:
+                        if(strpos($codes, $gui) !== false){
+                            $zjTimes += 1;
+                            $bonus += $Odds['odds'] * $single;
+                        }else{
+                            $betGui = str_replace('正', '', $codes);
+                            if($gui != ($betGui+2) && $gui != ($betGui-2)){ # 和局
+                                $zjTimes += 1;
+                                $bonus += $single;
+                            }
+                        }
+                        break;
                     case strpos($codes, '番') !== false:
                     case strpos($codes, '高') !== false:
                     case strpos($codes, '角') !== false:
@@ -220,7 +231,7 @@ class AoZhou5Service extends CommonLotteryService
                         if($gui == $firstCode){
                             $zjTimes += 1;
                             $bonus += $Odds['odds'] * $single;
-                        }elseif($gui == $nianCode){
+                        }elseif($gui == $nianCode){ # 和局
                             $zjTimes += 1;
                             $bonus += $single;
                         }
