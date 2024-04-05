@@ -94,6 +94,9 @@ class MessageOperateService  extends BaseService
                     if($methodId == SscMethod::FT_DS_ID){
                         $codes = SscMethod::TYPE_DS_OPTIONS[$codes]??$codes;
                     }
+                    if($methodId == SscMethod::FT_FAN_ID){
+                        $codes = str_replace(['番高', '高番', '高'], '番', $codes);
+                    }
 
                     $allMoneys = 1 * $datum[1];
                     $this->betData[] = [
@@ -117,7 +120,7 @@ class MessageOperateService  extends BaseService
      * @param $text
      * @return array
      */
-    private static function matchOtherOperate($text): array
+    private function matchOtherOperate($text): array
     {
         // 判断数组中是否有匹配的元素
         $matches = array_intersect(['+', '上', '-', '下'], preg_split('//u', $text, -1, PREG_SPLIT_NO_EMPTY));
@@ -125,14 +128,16 @@ class MessageOperateService  extends BaseService
             //todo 待处理逻辑
             // 匹配到了其中一个元素，执行逻辑 A
             switch (current($matches)){
-                case '+':
-                case '上':
+                case strpos($text, '查') !== false: // 查余额
+                    return AgentUsersService::userGetInfo($this->platformUser);
+                case strpos($text, '撤') !== false: // 撤单
+                    return EYunMessageOperateService::operateCancel($text, $this->wechatUser);
+                case strpos($text, '+') !== false:
+                case strpos($text, '上') !== false:
+                case strpos($text, '下') !== false:
+                case strpos($text, '-') !== false:
                     # 上分逻辑
-                    break;
-                case '-':
-                case '下':
-                    # 下分逻辑
-                    break;
+                    return AgentUsersBalanceService::operateBalanceChange($text, $this->wechatUser);
             }
             return [CommonBaseService::CODE_FOR_USER, [], '申请成功待审核'];
         }
@@ -150,7 +155,7 @@ class MessageOperateService  extends BaseService
         //p([$message_id , $from, $chat, $date, $text]);
 
         //$text = "1正/20 2念1/20";
-        list($code, $vData, $msg) = self::matchOtherOperate($text);
+        list($code, $vData, $msg) = $this->matchOtherOperate($text);
         if($code == CommonBaseService::CODE_FOR_USER){
             return [$code, $vData, $msg];
         }
