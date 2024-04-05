@@ -17,7 +17,7 @@ class DrawLottery
         $gui = $heZhi%4 ? : 4;
         $ds = ($heZhi%2)? '单' : '双';
 
-        return [$kjCode, $heZhi, $gui, $ds];
+        return [$kjCode, $heZhi, (string)$gui, $ds];
     }
 
 }
