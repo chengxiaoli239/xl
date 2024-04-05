@@ -22,6 +22,7 @@ class MessageReceiveJobs extends CommonJob
 
     public function exec($params)
     {
+        Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'INFO', self::$name.'000', ['params'=>$params]);
         return self::handle($params);
     }
 
