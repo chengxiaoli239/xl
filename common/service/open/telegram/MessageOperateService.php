@@ -112,26 +112,21 @@ class MessageOperateService  extends BaseService
     private function matchOtherOperate($text, $message=[]): array
     {
         // 判断数组中是否有匹配的元素
-        $matches = array_intersect(['+', '上', '-', '下'], preg_split('//u', $text, -1, PREG_SPLIT_NO_EMPTY));
-        if (!empty($matches)) {
-            //todo 待处理逻辑
-            // 匹配到了其中一个元素，执行逻辑 A
-            switch ($text){
-                case strpos($text, '查') !== false: // 查余额
-                    return AgentUsersService::userGetInfo($this->platformUser);
-                case strpos($text, '撤') !== false: // 撤单
-                    return EYunMessageOperateService::operateCancel($text, $this->platformUser);
-                case strpos($text, '+') !== false:
-                case strpos($text, '上') !== false:
-                case strpos($text, '下') !== false:
-                case strpos($text, '-') !== false:
-                    # 上分逻辑
-                    return AgentUsersBalanceService::operateBalanceChange($text, $this->platformUser, $message);
-            }
-            return [CommonBaseService::CODE_FOR_USER, [], '申请成功待审核'];
+        //$matches = array_intersect(['+', '上', '-', '下'], preg_split('//u', $text, -1, PREG_SPLIT_NO_EMPTY));
+        //todo 待处理逻辑 匹配到了其中一个元素，执行逻辑 A
+        switch ($text){
+            case strpos($text, '查') !== false: // 查余额
+                return AgentUsersService::userGetInfo($this->platformUser);
+            case strpos($text, '撤') !== false: // 撤单
+                return EYunMessageOperateService::operateCancel($text, $this->platformUser);
+            case strpos($text, '+') !== false:
+            case strpos($text, '上') !== false:
+            case strpos($text, '下') !== false:
+            case strpos($text, '-') !== false:
+                # 上分逻辑
+                return AgentUsersBalanceService::operateBalanceChange($text, $this->platformUser, $message);
         }
-
-        return [0, [], '下注逻辑'];
+        return [CommonBaseService::CODE_FOR_USER, [], '申请成功待审核'];
     }
 
     /**
