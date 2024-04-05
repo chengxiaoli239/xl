@@ -20,7 +20,7 @@ class MessageReceiveJobs extends CommonJob
         return self::$name;
     }
 
-    public function exec($params): array
+    public function exec($params)
     {
         return self::handle($params);
     }
