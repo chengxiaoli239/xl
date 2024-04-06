@@ -23,7 +23,7 @@ class AoZhouKjService  extends BaseService
             "第 {$qiHao} 期\n".
             str_replace(',', '', $kjCode)."总和{$codeHz}(".$ds.",".$ft.")\n\n".
             "以下是历史课程表\n\n";
-        $historyKjData = SscKjData::find()->where(['lottery_type'=>self::$lottery_type])->andWhere(['>', 'qihao', $qiHao-135])
+        $historyKjData = SscKjData::find()->where(['lottery_type'=>self::$lottery_type])->andWhere(['>', 'qihao', (int)$qiHao-135])
             ->asArray()->all();
         foreach ($historyKjData as $k=>$historyKjDatum){
             $kk = $k + 1;
@@ -33,7 +33,7 @@ class AoZhouKjService  extends BaseService
                 $text .= "\n\n";
             }
         }
-        $text .= "============================";
+        $text .= "\n============================";
         Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', '开奖后群消息', ['lottery_type'=>self::$lottery_type, 'qihao'=>$qiHao, 'text'=>$text]);
 
         $config = \Yii::$app->params['TELEGRAM'];
