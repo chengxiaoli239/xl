@@ -464,6 +464,7 @@ class KjDataGet
             Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖记录-错误', $logArr);
             return ['status' => 300, 'msg' => $msg];
         }
+        Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖记录-插入', ['lottery_type'=>$lottery_type, 'kjData'=>$kjData]);
 
         return ['status'=>200, 'msg'=>'开奖数据写入成功', 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'insertData'=>$insertData, 'insertRst'=>$insertRst, 'id'=>$SscKjData->id];
     }
