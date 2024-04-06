@@ -5,6 +5,7 @@ use backend\models\SscKjData;
 use backend\models\thirdD\BetsBackend;
 use backend\service\agent\AgentUsersBalanceService;
 use backend\service\agent\AgentUsersService;
+use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
 use common\helpers\SscMethod;
 use common\service\chat\Tool_Common;
@@ -35,6 +36,7 @@ class MessageOperateService  extends BaseService
 
     /** @var array $betData */
     public array $betData=[];
+    public $lottery_type;
     /** @var int 单注最低金额 */
     const ONE_MINI_MONEY = 20;
 
@@ -43,6 +45,7 @@ class MessageOperateService  extends BaseService
         $this->user_id = $userId;
         $this->platformUser = WechatUserService::getWechatUsers($userId)[$fromId];
         $this->member_id = $this->platformUser['member_id'];
+        $this->lottery_type = LotteryType::AZ_LUCKY_5;
         self::validateWechatUser();
 
         parent::__construct();
@@ -125,6 +128,12 @@ class MessageOperateService  extends BaseService
             case strpos($text, '-') !== false:
                 # 上分逻辑
                 return AgentUsersBalanceService::operateBalanceChange($text, $this->platformUser, $message);
+            default:
+                if(!LotteryBet::isCanBet($this->lottery_type)){
+                    throw_info('后台尚未开盘', CommonBaseService::CODE_FOR_USER);
+                }
+
+                break;
         }
 
         return [0, [], '下注逻辑'];

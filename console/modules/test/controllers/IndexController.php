@@ -15,6 +15,7 @@ use backend\service\NumService;
 use backend\service\SscDataService;
 use backend\service\statics\statics_3d\Statics3dUserDataService;
 use backend\service\StaticService;
+use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
 use common\kj\qxc\QxcTcw;
 use common\kj\ssc\Aozhou;
@@ -51,6 +52,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $isCanBet = LotteryBet::isCanBet(LotteryType::AZ_LUCKY_5);p($isCanBet);
+            $isCanBet = LotteryBet::isCanBet(LotteryType::LUCKY_5);d($isCanBet);
             list($lotteryType, $lotteryName) = [LotteryType::AZ_LUCKY_5, LotteryType::TYPE_OPTIONS[LotteryType::AZ_LUCKY_5]];
             list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lotteryType);
             p([$currentKjQiHao, $qiHao]);
