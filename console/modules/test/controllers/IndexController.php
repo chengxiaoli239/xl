@@ -52,8 +52,8 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $isCanBet = LotteryBet::isCanBet(LotteryType::AZ_LUCKY_5);p($isCanBet);
-            $isCanBet = LotteryBet::isCanBet(LotteryType::LUCKY_5);d($isCanBet);
+            $isCanBet = LotteryBet::isEntertained(LotteryType::AZ_LUCKY_5);p($isCanBet);
+            $isCanBet = LotteryBet::isEntertained(LotteryType::LUCKY_5);d($isCanBet);
             list($lotteryType, $lotteryName) = [LotteryType::AZ_LUCKY_5, LotteryType::TYPE_OPTIONS[LotteryType::AZ_LUCKY_5]];
             list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lotteryType);
             p([$currentKjQiHao, $qiHao]);

@@ -129,7 +129,7 @@ class MessageOperateService  extends BaseService
                 # 上分逻辑
                 return AgentUsersBalanceService::operateBalanceChange($text, $this->platformUser, $message);
             default:
-                if(!LotteryBet::isCanBet($this->lottery_type)){
+                if(LotteryBet::isEntertained($this->lottery_type)){
                     throw_info('后台尚未开盘', CommonBaseService::CODE_FOR_USER);
                 }
 

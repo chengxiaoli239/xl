@@ -7,11 +7,11 @@ use DateTime;
 class LotteryBet
 {
     /**
-     * 彩种是否可以下注，不可以下注期间便是可以获取开奖之时
+     * 彩种是否封盘，封盘：也就是不可以下注，期间便是可以抓去开奖数据之时
      * @param int $lotteryType
      * @return bool
      */
-    public static function isCanBet(int $lotteryType=DEFAULT_LOTTERY_TYPE): bool
+    public static function isEntertained(int $lotteryType=DEFAULT_LOTTERY_TYPE): bool
     {
         // 获取当前时间
         $now = new DateTime();
@@ -24,11 +24,15 @@ class LotteryBet
         switch (true){
             case $lotteryType == LotteryType::AZ_LUCKY_5:
                 // 开奖时间偏移（分钟）
-                $drawOffset = 4;
+                $betsCloseOffset = 3 * 60 + 30; // 3分30秒
+                // 开盘时间偏移（秒）
+                $betsOpenOffset = 4 * 60 + 20; // 4分20秒
                 break;
             case $lotteryType == LotteryType::LUCKY_5:
-                // 开奖时间偏移（秒）
-                $drawOffset = 5;
+                // 开奖封盘时间偏移（秒）
+                $betsCloseOffset = 4 * 60 + 30; // 4分30秒
+                // 开盘时间偏移（秒）
+                $betsOpenOffset = 5 * 60 + 50; // 4分20秒
                 break;
             default:
                 var_dump('ddd');
@@ -37,11 +41,6 @@ class LotteryBet
         $nowTime = time();
         $nowBetZoneTime = $nowTime - ($nowTime%(60*$drawFrequency)); # 当前开奖时间区间
         //p(['nowBetZoneTime'=>date('Y-m-d H:i:s', $nowBetZoneTime)], 0);
-
-        // 封盘开始时间偏移（秒）
-        $betsCloseOffset = ($drawOffset-1) * 60 + 30; // 3分30秒
-        // 开盘时间偏移（秒）
-        $betsOpenOffset = $drawOffset * 60 + 20; // 4分20秒
         //p(['当前时间'=>date('Y-m-d H:i:s', $now->getTimestamp()), 'betsCloseOffset'=>$betsCloseOffset, 'betsOpenOffset'=>$betsOpenOffset], 0);
 
         // 获取当前小时的第0分钟的时间戳
@@ -57,19 +56,29 @@ class LotteryBet
 
         // 计算封盘和开盘的时间戳
         //$betsNowTimestamp = $cycleStartSeconds + $betsCloseOffset;
+        $betsNowOpenTimestamp = $cycleStartSeconds + $betsOpenOffset - $drawFrequency*60;
         $betsCloseTimestamp = $cycleStartSeconds + $betsCloseOffset;
         $betsOpenTimestamp = $cycleStartSeconds + $betsOpenOffset;
-        //p([ '当前时间'=>date('Y-m-d H:i:s', $now->getTimestamp()), '即将封盘时间'=>date('Y-m-d H:i:s', $betsCloseTimestamp), '下个开盘时间'=>date('Y-m-d H:i:s', $betsOpenTimestamp) ], 0);
+        p([
+            'lottery_type'=>$lotteryType,
+            '当前时间'=>date('Y-m-d H:i:s', $now->getTimestamp()),
+            '当前开盘时间'=>date('Y-m-d H:i:s', $betsNowOpenTimestamp),
+            '即将封盘时间'=>date('Y-m-d H:i:s', $betsCloseTimestamp),
+            '下个开盘时间'=>date('Y-m-d H:i:s', $betsOpenTimestamp),
+        ], 0);
 
         // 判断当前时间是否处于封盘时间
-        if ($now->getTimestamp() >= $betsCloseTimestamp && $now->getTimestamp() < $betsOpenTimestamp) {
+        if (
+            ($now->getTimestamp() >= $betsCloseTimestamp && $now->getTimestamp() < $betsOpenTimestamp)
+            OR ($now->getTimestamp() < $betsNowOpenTimestamp)
+        ) {
             // 目前是封盘时间，不能下注
-            var_dump('目前是封盘时间，不能下注');
-            return false;
+            var_dump('目前是封盘时间');
+            return true;
         }
         var_dump('目前是开盘时间，可以下注');
 
-        return true;
+        return false;
     }
 
     /**

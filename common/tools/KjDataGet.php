@@ -18,6 +18,7 @@ use backend\service\NumService;
 use backend\service\SscDataService;
 use backend\service\SystemService;
 use backend\service\TzService;
+use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
 use common\kj\cqssc\CqsscKcw;
 use common\service\CommonService;
@@ -39,6 +40,7 @@ use common\service\thirdD\OperateLotteryService;
 use common\tools\Tools;
 use backend\models\BettingRecords;
 use backend\service\StaticService;
+use DateTime;
 use yii;
 class KjDataGet
 {
@@ -312,6 +314,9 @@ class KjDataGet
             if ('00:00' < $date_time && $date_time < '21:00') {
                 //$isCanGrab = $flag = false;
             }
+        }elseif($lottery_type == LotteryType::AZ_LUCKY_5){ # 澳洲5 3分40秒-4分02秒 区间开始抓开奖数据
+            $isEntertained = LotteryBet::isEntertained(LotteryType::AZ_LUCKY_5); # 是否封盘
+            $flag = $isEntertained;
         }
 
         return $flag;
