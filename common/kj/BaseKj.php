@@ -49,15 +49,15 @@ class BaseKj extends BaseService {
     /**
      * @desc 获取当前开奖数据，如果有则返回
      */
-    public static function getCurrentKjData($lottery_type = DEFAULT_LOTTERY_TYPE, &$current_qihao=''){
+    public static function getCurrentKjData($lotteryType = DEFAULT_LOTTERY_TYPE, &$currentQiHao=''){
         $m = \Yii::$app->cache;
 
-        $qihao = HN0898Service::getCurrentQihao($lottery_type);
-        $mkey = self::buildKjDataKey($lottery_type, $qihao);
+        $qiHao = HN0898Service::getCurrentQihao($lotteryType);
+        $mKey = self::buildKjDataKey($lotteryType, $qiHao);
 
-        $current_qihao = $qihao;
+        $currentQiHao = $qiHao;
 
-        return $m->get($mkey);
+        return $m->get($mKey);
     }
 
     /**

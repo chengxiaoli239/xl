@@ -10,7 +10,7 @@ class LotteryBet
     const STATUS_START = 2;
     const STATUS_CLOSE = 3;
     const STATUS_OPTIONS = [
-        self::STATUS_DRAW => '号码抓取-封盘',
+        self::STATUS_DRAW => '封盘-号码抓取',
         self::STATUS_START => '开盘',
         self::STATUS_CLOSE => '封盘',
     ];

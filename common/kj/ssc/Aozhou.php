@@ -1,9 +1,11 @@
 <?php
 # 开彩网
 namespace common\kj\ssc;
+use backend\models\SscKjData;
 use common\helpers\LotteryType;
 use common\kj\BaseKj;
 use common\service\ssc\QihaoService;
+use common\service\ssc\SscKjDataService;
 use common\tools\Tool_Common;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -13,6 +15,7 @@ use yii\helpers\Json;
 class Aozhou extends BaseKj {
     public static int $lottery_type = LotteryType::AZ_LUCKY_5;
     CONST SUCCESS_CODE = 20000;
+    const LIMIT_GRAB_TIME = 180; # 新数据刚抓完3分钟内不允许再次抓取
 
     /**
      * @desc 澳洲幸运五，官网：https://1680632.com/view/aozxy5/ssc_index.html
@@ -23,8 +26,11 @@ class Aozhou extends BaseKj {
         try {
             $lottery_type = self::$lottery_type;
             $kjData = self::getCurrentKjData($lottery_type, $currentQiHao);
-            if($is_auto==1){
-                self::lockGrab($lottery_type, $seconds=120);
+
+            $SscKjData = SscKjDataService::getKjData($lottery_type, $currentQiHao);
+            if(!empty($SscKjData) && ((time()-self::LIMIT_GRAB_TIME)<$SscKjData['created_at'])){
+                $kjData = ['expect'=>$SscKjData['qihao'], 'opencode'=>$SscKjData['code_str'], 'opentime'=>date('Y-m-d H:i:s', $SscKjData['created_at'])];
+                throw_info('3分钟内新数据不需再次抓取');
             }
 
             list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
@@ -71,7 +77,7 @@ class Aozhou extends BaseKj {
                     }
 
                     $kjData = ['expect'=>$qihao, 'opencode'=>$opencode, 'opentime'=>$kjData['preDrawTime']];
-                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'domain'=>$domain, 'kjData'=>$kjData, 'headers'=>$headers]);
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'domain'=>$domain, 'kjData'=>$kjData, /*'headers'=>$headers*/]);
                 }catch (\Exception $e){
                     Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type,'name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);
                 }
@@ -79,7 +85,7 @@ class Aozhou extends BaseKj {
                 Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-缓存', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'cq'=>$currentQiHao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
             }
         }catch (\Exception $e){
-            $kjData = self::getCurrentKjData($lottery_type);
+            //$kjData = self::getCurrentKjData($lottery_type);
             Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$currentQiHao, 'currentQiHao'=>$currentQiHao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
         }
         if(empty($kjData)){
@@ -96,9 +102,12 @@ class Aozhou extends BaseKj {
     public static function getLucky5Out(string $returnType = 'json', $is_auto = 1){
         try {
             $lottery_type = self::$lottery_type;
+
             $kjData = self::getCurrentKjData($lottery_type, $currentQiHao);
-            if($is_auto==1){
-                self::lockGrab($lottery_type, $seconds=120);
+            $SscKjData = SscKjDataService::getKjData($lottery_type, $currentQiHao);
+            if(!empty($SscKjData) && ((time()-self::LIMIT_GRAB_TIME)<$SscKjData['created_at'])){
+                $kjData = ['expect'=>$SscKjData['qihao'], 'opencode'=>$SscKjData['code_str'], 'opentime'=>date('Y-m-d H:i:s', $SscKjData['created_at'])];
+                throw_info('3分钟内新数据不需再次抓取');
             }
 
             list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
@@ -126,7 +135,6 @@ class Aozhou extends BaseKj {
                 Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-缓存', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'cq'=>$currentQiHao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
             }
         }catch (\Exception $e){
-            $kjData = self::getCurrentKjData($lottery_type);
             Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$currentQiHao, 'currentQiHao'=>$currentQiHao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
         }
         if(empty($kjData)){
