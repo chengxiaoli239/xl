@@ -53,9 +53,9 @@ class IndexController extends Controller
 
         try {
             $rst = [];
-            foreach ([28] as $lotteryType){
+            foreach ([8] as $lotteryType){
                 //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
-                $r = (new LotteryBet())->checkLotteryStatus($lotteryType, '2024-04-11 13:38:39');//p($r);
+                $r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
                 $rst[$lotteryType] = $r;
             }
             p(['rst'=>$rst]);
