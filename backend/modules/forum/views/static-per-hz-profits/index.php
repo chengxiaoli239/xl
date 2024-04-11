@@ -9,7 +9,7 @@ use yii\grid\GridView;
 
 $this->title = Yii::t('app', 'Static Per Hz Profits');
 $this->params['breadcrumbs'][] = $this->title;
-$update_time = \backend\models\searchs\StaticPerHzPerdateProfits::find()->select(['max(update_time) AS update_time'])->one()['update_time'];
+$update_time = \backend\models\searchs\StaticPerHzPerdateProfits::find()->select(['max(update_time) AS update_time'])->limit(1)->one()['update_time'];
 ?>
 <section class="static-per-hz-profits-index wrapper site-min-height">
     <!-- page start-->

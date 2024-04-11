@@ -1239,7 +1239,7 @@ class NineNineBaseService extends BaseTZService {
                     $rst['actionNo'] = 42;
                 }elseif('00:00:00'<$time && $time<'02:00:00'){
                     $where = ['AND',['=','type', $lottery_type],['>=', 'actionTime', $time],['between', 'actionTime','00:00:00','02:00:00']];
-                    $rst = DataTime::find($where)->where($where)->asArray()->one();
+                    $rst = DataTime::find()->where($where)->asArray()->limit(1)->one();
                     $date = '20'.date("ymd") - 1;
                     $qihao = $date.sprintf("%02d", $rst['actionNo']);
                 }else{
@@ -1377,7 +1377,7 @@ class NineNineBaseService extends BaseTZService {
      */
     public static function getTzData($account){
         $fields = ['id', 'account', 'code', 'status', 'playway', 'single'];
-        $tzData = UserFollowData::find()->select($fields)->where(['status'=>1,'account'=>$account])->asArray()->one();
+        $tzData = UserFollowData::find()->select($fields)->where(['status'=>1,'account'=>$account])->limit(1)->asArray()->one();
 
         return $tzData;
     }

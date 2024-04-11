@@ -149,7 +149,7 @@ class StaticService extends BaseService {
 
                 # 上一期记录
                 $where = ['uid'=>(int)$bettingRecord->uid, 'playway'=>$bettingRecord->playway, 'lottery_type'=>$lottery_type];
-                $LastStaticProfits = StaticProfits::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
+                $LastStaticProfits = StaticProfits::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(1)->one();
                 //p([$where, $LastStaticProfits],0);
 
                 $upData['cut_profits'] = floatval($LastStaticProfits->cut_profits) + floatval($bettingRecord->profits); # 截止利润
@@ -459,7 +459,7 @@ class StaticService extends BaseService {
         if(!$static_date = $staticModel::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one()['date']){
             $date = SscKjData::find()->select(['date'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_ASC])->one()['date']; # 历史开奖第一期日期
         }else{
-            $last_date = SscKjData::find()->select(['date', 'qihao'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one()['date']; # 截止目前开奖日期
+            $last_date = SscKjData::find()->select(['date', 'qihao'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one()['date']; # 截止目前开奖日期
             if($static_date<$last_date){
                 $date = Tools::getNextDate($static_date, '-');
             }else{
@@ -635,7 +635,7 @@ class StaticService extends BaseService {
         $mkey = 'getCodeTypeCount_'.$code_type;
         if($count = $m->get($mkey)) return $count;
 
-        $count = SscStaticVal::find()->select(['count'])->where(['val'=>$code_type])->one()['count'];
+        $count = SscStaticVal::find()->select(['count'])->where(['val'=>$code_type])->limit(1)->one()['count'];
         if(!$count) $count = 10000;
         $m->set($mkey, $count, 20*60);
 
@@ -2482,7 +2482,7 @@ class StaticService extends BaseService {
                         $where = array_merge($where,[[ 'IN', $codeKey, $tmpCodesArr]]);
                     }
                 }
-                $record = SscKjData::find()->select(['qihao','code_str'])->where($where)->andWhere(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+                $record = SscKjData::find()->select(['qihao','code_str'])->where($where)->andWhere(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
                 $last_Qihao = SscDataService::getKjDataLastQihao($lottery_type); # 表记录最后一条id
                 $yl = self::qihaoSpace($record['qihao'], $last_Qihao);
                 break;
@@ -2586,7 +2586,7 @@ class StaticService extends BaseService {
                    }
                }
                $query = SscKjData::find()->select(['qihao','code_str','code_4n_str'])->where($where)->andWhere(['lottery_type'=>$lottery_type]);
-               $record = $query->orderBy(['id'=>SORT_DESC])->asArray()->one();
+               $record = $query->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
                $last_Qihao = SscDataService::getKjDataLastQihao($lottery_type); # 表记录最后一条id
                $yl = self::qihaoSpace($record['qihao'], $last_Qihao);
                break;

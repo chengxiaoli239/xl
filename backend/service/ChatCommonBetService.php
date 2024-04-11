@@ -47,7 +47,7 @@ class ChatCommonBetService extends BaseService {
             $rst = array_merge(ChatCommonBetService::upOrDownBalance($desc, $userInfo), $rst);
             return $rst;
         }elseif ($type == 3){   # 查询最新开奖
-            $SscKjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one();
+            $SscKjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
             $rst = array_merge(['msg'=>'【号码】'.$SscKjData->code_str], $rst);
             return $rst;
 

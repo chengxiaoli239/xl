@@ -122,7 +122,7 @@ class NumCodeService extends BaseService
         $playway = $plan->playway;
         if($plan->is_batch_simulate){
             $endBettedRecord = BettingRecords::find()->select(['qihao'])
-                ->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+                ->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
             if(empty($endBettedRecord)){
                 $endQihao = SscKjData::find()->where(['lottery_type'=>$lottery_type])->limit(1)->asArray()->one()['qihao'];
             }else{
@@ -159,7 +159,7 @@ class NumCodeService extends BaseService
         $playway = $plan->playway;
         if($plan->is_batch_simulate){
             $endBettedRecord = BettingRecords::find()->select(['qihao'])
-                ->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+                ->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
             if(empty($endBettedRecord)){
                 $endQihao = SscKjData::find()->where(['lottery_type'=>$lottery_type])->limit(1)->asArray()->one()['qihao'];
             }else{
@@ -192,7 +192,7 @@ class NumCodeService extends BaseService
         $playway = $plan->playway;
         if($plan->is_batch_simulate){
             $endBettedRecord = BettingRecords::find()->select(['qihao'])
-                ->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+                ->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
             if(empty($endBettedRecord)){
                 $endQihao = SscKjData::find()->where(['lottery_type'=>$lottery_type])->limit(1)->asArray()->one()['qihao'];
             }else{
@@ -225,7 +225,7 @@ class NumCodeService extends BaseService
         $playway = $plan->playway;
         if($plan->is_batch_simulate){
             $endBettedRecord = BettingRecords::find()->select(['qihao'])
-                ->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+                ->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
             if(empty($endBettedRecord)){
                 $endQihao = SscKjData::find()->where(['lottery_type'=>$lottery_type])->limit(1)->asArray()->one()['qihao'];
             }else{
@@ -304,7 +304,7 @@ class NumCodeService extends BaseService
         if($plan->is_batch_simulate){
             $endBettedRecord = BettingRecords::find()->select(['qihao'])
                 ->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan->id])->andWhere(['<=', 'qihao', $current_kj_qihao])
-                ->orderBy(['id'=>SORT_DESC])->asArray()->one();
+                ->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
             if(empty($endBettedRecord)){
                 $endQihao = SscKjData::find()->where(['lottery_type'=>$lottery_type])->limit(1)->asArray()->one()['qihao'];
             }else{
@@ -1174,7 +1174,7 @@ class NumCodeService extends BaseService
             }
         }else{
             # 同位置
-            $CurrentKjDatas = SscKjData::find()->where(['lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+            $CurrentKjDatas = SscKjData::find()->where(['lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
             foreach ($positions as $position){
                 $filterCodes['code_'.$position] = $CurrentKjDatas['code'.$position];
             }

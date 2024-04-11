@@ -402,7 +402,7 @@ class NumService extends BaseService {
                     if($m->get($mckey)) continue;
                     $allCodes[] = $num;
                 }
-                $kjCodes = SscKjData::find()->select(['qihao', 'LEFT(code_str, 7) AS code_str'])->where(['qihao'=>$qihao])->asArray()->one();
+                $kjCodes = SscKjData::find()->select(['qihao', 'LEFT(code_str, 7) AS code_str'])->where(['qihao'=>$qihao])->limit(1)->asArray()->one();
                 if(in_array($kjCodes['code_str'], $allCodes)){
                     $r = 1;
                     $m->set($zjKey, $r, 10*60);
@@ -1465,7 +1465,7 @@ class NumService extends BaseService {
                 }
                 if($lottery_type && !empty($filters['filter_xQ_before'])){
                     $qihao = HN0898Service::getCurrentQihao($lottery_type);
-                    $index_id = SscKjData::find()->where(['AND', ['=', 'qihao', $qihao], ['=','lottery_type', $lottery_type]])->asArray()->one()['index_id'];
+                    $index_id = SscKjData::find()->where(['AND', ['=', 'qihao', $qihao], ['=','lottery_type', $lottery_type]])->limit(1)->asArray()->one()['index_id'];
                     $filter_index_ids = [];
                     if(!empty($filters['filter_xQ_before'])){ # 1,2;4~6 前x期
                         $tmp_filter_index_Arrs = explode(';', $filters['filter_xQ_before']);
@@ -4101,13 +4101,13 @@ class NumService extends BaseService {
                 $qihao = $SscKjData->qihao;
                 # 存在记录则 continue
                 $where = ['AND', ['=', 'qihao', $qihao], ['=', 'plan_id', $plan->id]];
-                if($StaticProfits = StaticProfits::find()->where($where)->one()){
+                if($StaticProfits = StaticProfits::find()->where($where)->limit(1)->one()){
                     continue;
                 }
 
                 # static_profits 表
                 $where = ['AND', ['=', 'plan_id', $plan->id], ['=', 'qihao', $SscKjData->qihao], ['=', 'lottery_type', $lottery_type]];
-                if($StaticProfits = StaticProfits::find()->where($where)->one()){
+                if($StaticProfits = StaticProfits::find()->where($where)->limit(1)->one()){
                     continue;
                 }
 
@@ -4170,7 +4170,7 @@ class NumService extends BaseService {
     public static function getLastStaticProfitsQihao($lottery_type, $plan_id = ''){
 
         $where = ['AND', ['=', 'plan_id', $plan_id], ['=', 'lottery_type', $lottery_type]];
-        $StaticProfits = StaticProfits::find()->where($where)->orderBy(['qihao'=>SORT_DESC])->one();
+        $StaticProfits = StaticProfits::find()->where($where)->orderBy(['qihao'=>SORT_DESC])->limit(1)->one();
         $last_qihao = $StaticProfits->qihao;
         if(!$last_qihao){
             $last_qihao = '';
@@ -4203,7 +4203,7 @@ class NumService extends BaseService {
         $profits = 0.00;
 
         $where = ['AND', ['<', 'qihao', $qihao], ['=', 'plan_id', $plan_id], ['=', 'lottery_type', $lottery_type]];
-        $StaticProfits = StaticProfits::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
+        $StaticProfits = StaticProfits::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(1)->one();
         if($StaticProfits){
             $profits = $StaticProfits->cut_profits;
         }

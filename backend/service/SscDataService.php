@@ -453,13 +453,13 @@ class SscDataService extends BaseService {
                         if(is_array($num)){
                             $zhi = implode(',',$num);
                             $where = ['positions'=>$position, 'zhi'=>$zhi, 'lottery_type'=>$lottery_type];
-                            $SscDsYl = SscDsYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
+                            $SscDsYl = SscDsYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(1)->one();
                             $type = 4;
                             //if(!$SscDsYl)p([$zhi, $position, $SscDsYl]);
                         }else{
                             $zhi = $num;
                             $where = ['AND', ['=', 'positions', $position], ['=','zhi', $num], ['=', 'lottery_type', $lottery_type], ['=', 'LENGTH(zhi)', strlen($num)]];
-                            $SscDsYl = SscDsYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
+                            $SscDsYl = SscDsYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(1)->one();
                             $type = 3;
                         }
                         if(empty($SscDsYl)){
@@ -688,7 +688,7 @@ class SscDataService extends BaseService {
             foreach ($vals as $val){
                 $where  = array_merge($where, [['=', $val, 1]]);
             }
-            $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where($where)->asArray()->one();
+            $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where($where)->limit(1)->asArray()->one();
             $SscStaticYl->theory_nums_perdate = (string)round(($Num4Type['count']*$qishu*0.1) / 995, 2); # 理论次数/天
             $today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', date('Y-m-d')]]);
             //$today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', '2019-05-24']]);
@@ -727,7 +727,7 @@ class SscDataService extends BaseService {
         $SscStaticYls = self::getSscStaticYls($lottery_type, $type);
         $yDate = date('Y-m-d',strtotime("-1 day"));
         $tDate = date('Y-m-d');
-        $SscKjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->one();
+        $SscKjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->limit(1)->one();
         foreach ($SscStaticVals as $dsData){
             # 是否中奖
             #$SscKjDatas = self::getTabLastKjData($lottery_type);
@@ -1728,7 +1728,7 @@ class SscDataService extends BaseService {
                 $zuHes = explode(',', $Data['val']);
                 $where = [ 'AND',[ 'IN', 'val', $Data['val']], ['=', 'lottery_type', $lottery_type] ];
 
-                if(!$SscSdHzYl = SscSdHzYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->one()){
+                if(!$SscSdHzYl = SscSdHzYl::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(1)->one()){
                     $SscSdHzYl = new SscSdHzYl();
                     $SscSdHzYl->created_at = time();
                     $SscSdHzYl->val = $Data['val'];
@@ -1741,7 +1741,7 @@ class SscDataService extends BaseService {
                 //$SscDsYl->zhi = (string)$num;
                 $qishu = SscDataService::getQishus($lottery_type);
                 $SscSdHzYl->theory_nums_perdate = (string)round(($count*$qishu*0.1) / 995, 2); # 理论次数/天
-                $SscSdHzYl->today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where(['date'=>date('Y-m-d'),'codes_4nums_hz'=>$zuHes, 'lottery_type'=>$lottery_type])->asArray()->one()['nums'];
+                $SscSdHzYl->today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where(['date'=>date('Y-m-d'),'codes_4nums_hz'=>$zuHes, 'lottery_type'=>$lottery_type])->asArray()->limit(1)->one()['nums'];
 
                 $SscSdHzYl->updated_at = time();
                 $miss = SscDataService::getSdHzYlHistoryMiss($zuHes, $lottery_type, $Data['static_nums']);
@@ -1788,7 +1788,7 @@ class SscDataService extends BaseService {
         $m = \Yii::$app->cache;
         $mkey = 'getCountByHzs_Z_'.implode(',', $hzs);
         if(!$counts = $m->get($mkey)){
-            $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where(['AND', ['=', 'code_type', $code_type], ['IN', 'codes_hz', $hzs]])->asArray()->one();
+            $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where(['AND', ['=', 'code_type', $code_type], ['IN', 'codes_hz', $hzs]])->limit(1)->asArray()->one();
             $counts = $Num4Type['count'];
             $m->set($mkey, $counts, 3600);
         }
@@ -2479,7 +2479,7 @@ class SscDataService extends BaseService {
             $codes = $importPlanCode->codes;
             $where = ['lottery_type'=>$lottery_type];
 
-            $kjData = SscKjData::find()->where($where)->andWhere(['>', 'created_at', strtotime($s_time)])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+            $kjData = SscKjData::find()->where($where)->andWhere(['>', 'created_at', strtotime($s_time)])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
             $qihao = $kjData['qihao'];
             $zjTimes = OpKjService::opKjData4($codes, $kjData['code_str']);
             if($zjTimes == 1){
@@ -2507,7 +2507,7 @@ class SscDataService extends BaseService {
             $codes = $importPlanCode->codes;
             $where = ['lottery_type'=>$lottery_type, 'qihao'=>$current_qihao];
 
-            $kjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->one();
+            $kjData = SscKjData::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
             $qihao = $current_qihao;
             $zjTimes = OpKjService::opKjData4($codes, $kjData['code_str']);
             if($zjTimes > 0){
@@ -3381,7 +3381,7 @@ class SscDataService extends BaseService {
                     $rst[$sscKjData['qihao']] = SscDataService::setOnePeiShuTrueFalse($lottery_type, $sscKjData);
                 }
             }else{
-                $sscKjData = SscKjData::find()->select(['code_4n_str', 'date', 'code_str', 'qihao'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one();
+                $sscKjData = SscKjData::find()->select(['code_4n_str', 'date', 'code_str', 'qihao'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
                 $rst = SscDataService::setOnePeiShuTrueFalse($lottery_type, $sscKjData);
             }
             Tool_Common::log('staticPerShuTrueFalse', 'INFO', '配数每期对错处理', ['rst'=>$rst]);
@@ -3460,7 +3460,7 @@ class SscDataService extends BaseService {
      */
     public static function getPeiShuIsEmpty($lottery_type = DEFAULT_LOTTERY_TYPE){
         $isEmpty = 1;
-        $r = StaticPeiShuCodeTrueFalse::find()->where(['lottery_type'=>$lottery_type])->one();
+        $r = StaticPeiShuCodeTrueFalse::find()->where(['lottery_type'=>$lottery_type])->limit(1)->one();
         if(!empty($r)){
             $isEmpty = 0;
         }
@@ -3677,7 +3677,6 @@ class SscDataService extends BaseService {
         try {
             if(empty($qihao)){
                 $SscKjDataQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1);
-                //$sql = $SscKjDataQuery->createCommand()->getRawSql();p($sql);
                 $SscKjData = $SscKjDataQuery->one();
                 $qihao = $SscKjData->qihao;
             }

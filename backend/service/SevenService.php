@@ -1442,7 +1442,7 @@ class SevenService extends BaseTZService {
      */
     public static function getTzData($account){
         $fields = ['id', 'account', 'code', 'status', 'playway', 'single'];
-        $tzData = UserFollowData::find()->select($fields)->where(['status'=>1,'account'=>$account])->asArray()->one();
+        $tzData = UserFollowData::find()->select($fields)->where(['status'=>1,'account'=>$account])->limit(1)->asArray()->one();
 
         return $tzData;
     }
@@ -1498,9 +1498,9 @@ class SevenService extends BaseTZService {
     public static function dwHzZuHeYL($zuhe = [2,3],$hezhis = [8,9]){
         $field = 'code_'.implode('_',$zuhe);
         $where = [ $field => $hezhis];
-        $id = SscKjData::find()->where($where)->orderBy('id DESC')->one()['id'];
+        $id = SscKjData::find()->where($where)->orderBy('id DESC')->limit(1)->one()['id'];
 
-        $maxId = SscKjData::find()->orderBy('id DESC')->one()['id'];
+        $maxId = SscKjData::find()->orderBy('id DESC')->limit(1)->one()['id'];
         $times = $maxId - $id;
 
         return $times;

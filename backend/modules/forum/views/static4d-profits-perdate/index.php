@@ -9,7 +9,7 @@ use yii\grid\GridView;
 
 $this->title = Yii::t('app', 'Static4d Profits Perdates');
 $this->params['breadcrumbs'][] = $this->title;
-$update_time = \backend\models\Static4dProfitsPerdate::find()->orderBy(['update_time'=>SORT_DESC])->one()->update_time;
+$update_time = \backend\models\Static4dProfitsPerdate::find()->orderBy(['update_time'=>SORT_DESC])->limit(1)->one()->update_time;
 ?>
 <section class="static4d-profits-perdate-index wrapper site-min-height">
     <!-- page start-->

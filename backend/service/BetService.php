@@ -229,7 +229,7 @@ abstract class BetService extends BaseBetService {
 
         # 2、下注任务检测
         $where = ['AND', ['=', 'uid', $uid], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
-        $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
+        $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(1)->one();
         $tz_system_id = $BetErrorPlansTasks->tz_system_id;
         $task_id = $BetErrorPlansTasks->id;
         if(empty($BetErrorPlansTasks)){
@@ -459,7 +459,7 @@ abstract class BetService extends BaseBetService {
                         if(!empty($t_rst['snid'])){
                             # 记录方案号
                             $where = ['plan_id'=>$plan_id, 'qihao'=>(string)$activeQiHao, 'lottery_type'=>$lottery_type];
-                            $BettingRecords = BettingRecords::find()->where($where)->one();
+                            $BettingRecords = BettingRecords::find()->where($where)->limit(1)->one();
                             $BettingRecords->snid = trim($BettingRecords->snid.';'.$t_rst['snid'], ';');
                             $BettingRecords->sn = trim($BettingRecords->sn.';'.$t_rst['sn'], ';');
                             $flag = $BettingRecords->save();
@@ -2102,7 +2102,7 @@ abstract class BetService extends BaseBetService {
         $mkey = CacheKeyService::lotteryDealStatus($lottery_type, $qihao, $status_key);
         $status = $m->get($mkey);
         if(empty($status)){
-            $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type, 'next_qihao'=>$qihao])->one();
+            $DataDealStatus = DataDealStatus::find()->where(['lottery_type'=>$lottery_type, 'next_qihao'=>$qihao])->limit(1)->one();
             Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '数据处理状态', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus->attributes]);
             $status = 0;
             if(!empty($DataDealStatus)){
@@ -2266,7 +2266,7 @@ abstract class BetService extends BaseBetService {
             $plan = UserSysPlans::findOne($plan_id);
             $lottery_type = $plan->lottery_type;
             if(empty($filters['current_kj_qihao'])){
-                $filterNumsQihao = BettingRecords::find()->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan_id])->one()->qihao;
+                $filterNumsQihao = BettingRecords::find()->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan_id])->limit(1)->one()->qihao;
                 if(empty($betMaxQihao)){
                     $filterNumsQihao = $filters['start_qihao'];
                 }

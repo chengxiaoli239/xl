@@ -204,7 +204,7 @@ class BaseNumService extends BaseService {
         $start = $zuhe[0];
         $end = $zuhe[1];
 
-        $last = SscKjData::find()->select(['max(id) as last_id'])->asArray()->one();
+        $last = SscKjData::find()->select(['max(id) as last_id'])->limit(1)->asArray()->one();
         $max_id = $last['last_id'] - $interval;
         $field = 'code_'.$start.'_'.$end;
         $counts = SscKjData::find()->select($field.',COUNT(id) as nums')->where('id>'.$max_id)->groupBy($field)->orderBy('nums DESC')->asArray()->all();

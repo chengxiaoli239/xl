@@ -38,7 +38,7 @@ class BaseDataService extends BaseService
             foreach ($numsArr as $zhi) {
                 $start_id = $last_id;
                 $end_id = $last_id + $interval;
-                $nums = SscKjData::find()->select('COUNT(id) as nums')->where([$field=>$zhi])->andWhere(['between', 'id', $start_id, $end_id ])->asArray()->one()['nums'];
+                $nums = SscKjData::find()->select('COUNT(id) as nums')->where([$field=>$zhi])->andWhere(['between', 'id', $start_id, $end_id ])->limit(1)->asArray()->one()['nums'];
                 //p(['start_id'=>$start_id, 'end_id'=>$end_id, 'nums'=>$nums,$field=>$zhi]);
                 $opData = [
                     'hezhi' => $zhi,
