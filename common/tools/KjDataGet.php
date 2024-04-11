@@ -134,7 +134,11 @@ class KjDataGet
                 $m->set($initLotteryKey, 1, $cacheTime);
 
                 $status = KjDataGet::isCanGrab($lottery_type);
-                $status1 = (new LotteryBet())->checkLotteryStatus($lottery_type); # 是否封盘, 封盘之时即是抓去之时
+                try {
+                    $status1 = (new LotteryBet())->checkLotteryStatus($lottery_type); # 是否封盘, 封盘之时即是抓去之时
+                }catch (\Exception $e){
+
+                }
                 if(!$status && $status1 != LotteryBet::STATUS_DRAW) {
                     Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取-异常1', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'err_msg'=>'该时间点不可抓取', 'status'=>$status, 'status1'=>$status1]);
                     throw_info('该时间点不可抓取');
