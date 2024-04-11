@@ -272,7 +272,7 @@ class KjDataGet
      * @param boolean $isCanGrab
      * @return bool
      */
-    public static function isCanGrab($lottery_type = DEFAULT_LOTTERY_TYPE, &$isCanGrab = true): bool
+    public static function isCanGrab($lottery_type = DEFAULT_LOTTERY_TYPE, &$isCanGrab = true)
     {
         $flag = true;
         $isCanGrab = true;
