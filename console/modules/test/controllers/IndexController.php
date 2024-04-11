@@ -52,7 +52,6 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $rst = KjDataGet::grabOneLotteryKjData($lottery_type=8);p($rst);
             $rst = [];
             foreach ([28] as $lotteryType){
                 //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
