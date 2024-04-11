@@ -107,7 +107,7 @@ class BaseKj extends BaseService {
      * @param string $route
      * @return string
      */
-    public static function getApiHostByRoute(string $route = '/kj/cqssc/nine-num'): string
+    public static function getApiHostByRoute(string $route = '/kj/cqssc/nine-num')
     {
         $domain = KjConfig::findOne(['path'=>$route])->api_host;
 
