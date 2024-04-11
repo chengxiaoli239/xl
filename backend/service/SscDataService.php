@@ -3676,7 +3676,9 @@ class SscDataService extends BaseService {
     {
         try {
             if(empty($qihao)){
-                $SscKjData = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one();
+                $SscKjDataQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1);
+                //$sql = $SscKjDataQuery->createCommand()->getRawSql();p($sql);
+                $SscKjData = $SscKjDataQuery->one();
                 $qihao = $SscKjData->qihao;
             }
 
