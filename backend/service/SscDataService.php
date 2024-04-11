@@ -3683,7 +3683,6 @@ class SscDataService extends BaseService {
             }
 
             $where = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao];
-
             $DataDealStatus = DataDealStatus::findOne($where);
             if(!empty($DataDealStatus)){
                 throw new \Exception('数据处理任务记录已存在'.$lottery_type.'_'.$qihao);
