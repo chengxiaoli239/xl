@@ -135,10 +135,8 @@ class KjDataGet
 
                 $status = KjDataGet::isCanGrab($lottery_type);
                 try {
-                    $err_msg1 = '';
                     $status1 = (new LotteryBet())->checkLotteryStatus($lottery_type); # 是否封盘, 封盘之时即是抓去之时
                 }catch (\Exception $e1){
-                    $err_msg1 = $e1->getMessage();
                 }
                 if(!$status && $status1 != LotteryBet::STATUS_DRAW) {
                     Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取-异常1', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'err_msg'=>'该时间点不可抓取', 'status'=>$status, 'status1'=>$status1]);
@@ -149,7 +147,7 @@ class KjDataGet
                 var_dump('lottery_type:'.$lottery_type.' '.date('Y-m-d H:i:s'));
 
                 push_queue(GrabKjDatasJob::class, $params);
-                Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'cacheTime'=>$cacheTime, 'flag'=>$flag, 'status1'=>$status1, 'status1Txt'=>LotteryBet::STATUS_OPTIONS[$status1], 'err_msg1'=>$err_msg1]);
+                Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'cacheTime'=>$cacheTime, 'flag'=>$flag, 'status1'=>$status1, 'status1Txt'=>LotteryBet::STATUS_OPTIONS[$status1]]);
                 \Yii::$app->redis->srem($exist_key, $lottery_type);
             }catch (\Exception $e){
                 var_dump('lottery_type:'.$lottery_type.' '.$e->getMessage().' '.date('Y-m-d H:i:s'));
