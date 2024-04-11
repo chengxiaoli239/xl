@@ -268,6 +268,29 @@ class NumService extends BaseService {
         #159=>'两数合分-除-上期百十位置',
         #160=>'两数合分-除-上期百个位置',
         #161=>'两数合分-除-上期十个位置',
+        162=>'过滤12位置各1个冷码 ',
+        163=>'过滤13位置各1个冷码 ',
+        164=>'过滤14位置各1个冷码 ',
+        165=>'过滤15位置各1个冷码 ',
+        166=>'过滤23位置各1个冷码 ',
+        167=>'过滤24位置各1个冷码 ',
+        168=>'过滤25位置各1个冷码 ',
+        169=>'过滤34位置各1个冷码 ',
+        170=>'过滤35位置各1个冷码 ',
+        171=>'过滤45位置各1个冷码 ',
+    ];
+
+    const TYPE_POSITIONS = [
+        162=>[1,2],
+        163=>[1,3],
+        164=>[1,4],
+        165=>[1,5],
+        166=>[2,3],
+        167=>[2,4],
+        168=>[2,5],
+        169=>[3,4],
+        170=>[3,5],
+        171=>[4,5],
     ];
 
     /**
@@ -2574,7 +2597,7 @@ class NumService extends BaseService {
         }
 
         # 导入方式，号码轮换号码组
-        if($hz_Arr['change_per']==1){
+        if(!empty($hz_Arr['change_per'])){
             $desc .= '组:'.(int)$hz_Arr['turn_key'].'. ';
         }
 
@@ -3314,6 +3337,18 @@ class NumService extends BaseService {
                 case 156: # 两数合分-除-上期千百位置
                     $codes = NumCodeService::getBeforeKjCodesDynamic123($plan, $positions=[1,2]);
                     break;
+                case 162: # 过滤两个位置的各一个冷码
+                case 163:
+                case 164:
+                case 165:
+                case 166:
+                case 167:
+                case 168:
+                case 169:
+                case 170:
+                case 171:
+                $codes = NumCodeService::getBeforeKjCodesDynamic124($plan, self::TYPE_POSITIONS[$filter_dynamic_type]);
+                    break;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }
@@ -3432,7 +3467,7 @@ class NumService extends BaseService {
             'hefen'=>'合分',
         ];
 
-        if($typeArr[$type]) return $typeArr[$type];
+        if(isset($typeArr[$type])) return $typeArr[$type];
 
         return $typeArr;
     }

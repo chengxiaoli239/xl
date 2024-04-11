@@ -52,8 +52,15 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
-            $isCanBet = LotteryBet::isEntertained(LotteryType::AZ_LUCKY_5);p($isCanBet);
-            $isCanBet = LotteryBet::isEntertained(LotteryType::LUCKY_5);d($isCanBet);
+            $rst = [];
+            foreach ([28] as $lotteryType){
+                //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
+                $r = (new LotteryBet())->checkLotteryStatus($lotteryType, '2024-04-10 21:49:31');//p($r);
+                $rst[$lotteryType] = $r;
+            }
+            p(['rst'=>$rst]);
+            list($entertainedStatus, $grabStatus) = LotteryBet::isEntertained(LotteryType::LUCKY_5);p([$entertainedStatus, $grabStatus]);
+            list($entertainedStatus, $grabStatus) = LotteryBet::isEntertained(LotteryType::AZ_LUCKY_5);p([$entertainedStatus, $grabStatus]);
             list($lotteryType, $lotteryName) = [LotteryType::AZ_LUCKY_5, LotteryType::TYPE_OPTIONS[LotteryType::AZ_LUCKY_5]];
             list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lotteryType);
             p([$currentKjQiHao, $qiHao]);
@@ -188,12 +195,12 @@ class IndexController extends Controller
     public function actionDw1(){
         try {
 
+            $plan = UserSysPlans::findOne(8387);
+            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan, $filter_dynamic_types=[162]);p(count($codes));
             $data = Aozhou::getLucky5($type='json', $is_auto=2);p($data);
             $r = \backend\service\BetService::getTypeNameByTzType($tz_type=25);p($r);
-            $plan = UserSysPlans::findOne(8121);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             $historyKjData = NumCodeService::getKjData($qihao='20240224120', $lottery_type=8);p($historyKjData);
-            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive(['content'=>'体组六组三 1拖2345、23456 各10元', 'fromUser'=>'wxid_875i1kgd38x122']); p($rst);
         }catch (\Exception $e){

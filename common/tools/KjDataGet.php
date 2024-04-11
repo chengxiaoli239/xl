@@ -134,7 +134,9 @@ class KjDataGet
                 $m->set($initLotteryKey, 1, $cacheTime);
 
                 $status = KjDataGet::isCanGrab($lottery_type);
-                if(!$status) {
+                $status1 = (new LotteryBet())->checkLotteryStatus($lottery_type); # 是否封盘, 封盘之时即是抓去之时
+                if(!$status && $status1 != LotteryBet::STATUS_DRAW) {
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取-异常', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'err_msg'=>'该时间点不可抓取', 'status'=>$status, 'status1'=>$status1]);
                     throw_info('该时间点不可抓取');
                 }
 
@@ -314,9 +316,6 @@ class KjDataGet
             if ('00:00' < $date_time && $date_time < '21:00') {
                 //$isCanGrab = $flag = false;
             }
-        }elseif($lottery_type == LotteryType::AZ_LUCKY_5){ # 澳洲5 3分40秒-4分02秒 区间开始抓开奖数据
-            $isEntertained = LotteryBet::isEntertained(LotteryType::AZ_LUCKY_5); # 是否封盘
-            $flag = $isEntertained;
         }
 
         return $flag;
@@ -382,7 +381,7 @@ class KjDataGet
             return ['status'=>301, 'msg'=>'开奖号码存在'];
         }
         $SscKjData = new SscKjData();
-        list($lastQihao, $lastIndexId, $lastId) = SscDataService::getKjDataLastIndexId($lottery_type);
+        list($lastQiHao, $lastIndexId, $lastId) = SscDataService::getKjDataLastIndexId($lottery_type);
         $index_id = $lastIndexId + 1;
 
         $kjDatasArr = explode(',',$kjData);

@@ -2050,4 +2050,46 @@ class NumCodeService extends BaseService
 
         return $codes;
     }
+
+    /**
+     * 过滤类型号码 - # 过滤两个位置的冷码
+     * @param object $plan
+     * @param int[] $positions
+     * @return array
+     */
+    public static function getBeforeKjCodesDynamic124(object $plan, array $positions=[1,2]): array
+    {
+        $playway = $plan->playway;
+        $lottery_type = $plan->lottery_type;
+
+        list($current_kj_qihao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+        $filterCodes = [];
+        $latelyCode1 = NumService::getPosLatelyCode($positions[0], $num=8, $lottery_type); # 最近8个热码
+        $latelyCode1Other = array_values(array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode1));
+        $latelyCode2 = NumService::getPosLatelyCode($positions[1], $num=8, $lottery_type); # 最近8个热码
+        $latelyCode2Other = array_values(array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode2));
+
+        $filterCodes = [$latelyCode1Other[0], $latelyCode2Other[0], $latelyCode1Other[1], $latelyCode2Other[1]];
+        $filterCodes = array_values(array_unique($filterCodes));
+        $filterCodes = [$filterCodes[0], $filterCodes[1]];
+
+        //p([\backend\service\NumService::$ALL_CODES, $latelyCode,  $filterCodes]);
+        $andWhere = ['AND'];
+        foreach ($positions as $position){
+            $andWhere[] = ['NOT IN', 'code_'.$position, array_merge($filterCodes, ['X'])];
+        }
+
+        $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
+            ->where($andWhere)
+            ->andWhere(['=', 'code_type', $playway+1]);
+        //$sql = $query->createCommand()->getRawSql();p($sql);
+        $NumTypes = $query->asArray()->all();
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤某两个位置各一个冷码', ['lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'filterCodes'=>$filterCodes]);
+        $filterCodes = ArrayHelper::getColumn($NumTypes, 'code');
+        #p(count($filterCodes));
+
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        return $codes;
+    }
 }

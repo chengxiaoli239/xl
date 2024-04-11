@@ -23,6 +23,11 @@ class LotteryType
         self::AZ_LUCKY_5 => '澳洲五',
     ];
 
+    const LOTTERY_TIME_CONFIG = [
+        self::LUCKY_5 => [4*60+30, 5*60+30, 5*60+50], # 封盘偏移时间:betsCloseOffset、开始抓取时间:grabOffset、开盘偏移时间:betsOpenOffset
+        self::AZ_LUCKY_5 => [3*60+30, 4*60, 4*60+20], # 封盘偏移时间:betsCloseOffset、开始抓取时间:grabOffset、开盘偏移时间:betsOpenOffset
+    ];
+
     public static function getName($lottery_type=DEFAULT_LOTTERY_TYPE): string
     {
         return self::TYPE_OPTIONS[$lottery_type]??'未知彩种';
