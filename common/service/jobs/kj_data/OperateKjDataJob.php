@@ -3,6 +3,7 @@ namespace common\service\jobs\kj_data;
 
 use common\service\jobs\CommonJob;
 use common\tools\KjDataGet;
+use common\tools\Tool_Common;
 
 class OperateKjDataJob extends CommonJob {
 
@@ -25,6 +26,11 @@ class OperateKjDataJob extends CommonJob {
             $openTime = $kjData['opentime'];
 
             $rst = KjDataGet::insertKjData($qiHao, $lotteryType, $kjCode, $openTime);
+            Tool_Common::log('/kj_data/'.self::class_basename(__CLASS__), 'INFO', '开奖数据接收', [
+                'kjData' => $kjData,
+                'lottery_type' => $lotteryType,
+                'rst' => $rst,
+            ]);
             if($rst['status'] != 200){
                 throw_info('非最新开奖数据不处理业务');
             }
