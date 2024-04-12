@@ -34,7 +34,7 @@ class PushKjDataToOutSiteJob extends CommonJob {
             ];
             $SscKjData = SscKjData::find()->select($select)
                 ->where(['lottery_type'=>$lotteryType])
-                ->asArray()->limit(1)->one();
+                ->asArray()->orderBy('id DESC')->limit(1)->one();
             $kjData = [
                 'expect' => $SscKjData['qihao'],
                 'opencode' => $SscKjData['code_str'],
