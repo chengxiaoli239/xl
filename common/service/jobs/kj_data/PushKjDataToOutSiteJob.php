@@ -43,7 +43,7 @@ class PushKjDataToOutSiteJob extends CommonJob {
             $pushData = [
                 'lottery_type' => $lotteryType,
                 'kjData' => $kjData,
-                'token' => $outSites['token'],
+                'access_token' => $outSites['token'],
             ];
 
             foreach ($outSites['list'] as $outSite){
