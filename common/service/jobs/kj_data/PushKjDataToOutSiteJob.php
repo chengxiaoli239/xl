@@ -30,7 +30,7 @@ class PushKjDataToOutSiteJob extends CommonJob {
             $select = [
                 'qihao',
                 'code_str',
-                'create_time',
+                'created_at',
             ];
             $SscKjData = SscKjData::find()->select($select)
                 ->where(['lottery_type'=>$lotteryType])
