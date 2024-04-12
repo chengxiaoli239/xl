@@ -58,6 +58,7 @@ class PushKjDataToOutSiteJob extends CommonJob {
                     ]);
                     $body = $response->getBody()->getContents();
                     $result = Json::decode($body) ?: false;
+                    $errMsg1 = $result['msg']??'已推送';
                 }catch (\Exception $e1){
                     $errMsg1 = $e1->getMessage();
                 }
