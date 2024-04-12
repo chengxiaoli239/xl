@@ -18,7 +18,7 @@ class OperateKjDataJob extends CommonJob {
 
     public static function handle($params){
         $lotteryType = $params['lottery_type'];
-        $kjData = $params['kjData'];
+        $kjData = $params['kj_data'];
         try {
             $qiHao = $kjData['expect'];
             $kjCode = $kjData['opencode'];

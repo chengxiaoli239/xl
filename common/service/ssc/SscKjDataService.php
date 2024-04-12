@@ -45,9 +45,11 @@ class SscKjDataService extends CommonService
                 throw_info('开奖时间不能为空');
             }
             $params = [
-                'expect' => $qiHao,
-                'opencode' => $openCode,
-                'opentime' => $openTime,
+                'kj_data' => [
+                    'expect' => $qiHao,
+                    'opencode' => $openCode,
+                    'opentime' => $openTime,
+                ],
                 'lottery_type' => $lotteryType,
                 'business_id' => $lotteryType,
             ];
