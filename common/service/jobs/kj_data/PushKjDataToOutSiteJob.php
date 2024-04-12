@@ -64,7 +64,6 @@ class PushKjDataToOutSiteJob extends CommonJob {
                 }
                 Tool_Common::log('/pushData/'.self::class_basename(__CLASS__), 'INFO', '推送kj数据异常0', ['lottery_type'=>$lotteryType, 'url'=>$url, 'data'=>$pushData, 'result'=>$result, 'err_msg1'=>$errMsg1]);
             }
-            Tool_Common::log('/pushData/'.self::class_basename(__CLASS__), 'INFO', '推送kj数据异常1', ['lottery_type'=>$lotteryType]);
         }catch (\Exception $e){
             Tool_Common::log('/pushData/'.self::class_basename(__CLASS__), 'INFO', '推送kj数据异常', ['lottery_type'=>$lotteryType, 'err_msg'=>$e->getMessage()]);
             return $e->getMessage();
