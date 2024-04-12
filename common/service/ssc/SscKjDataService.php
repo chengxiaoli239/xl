@@ -9,6 +9,7 @@ namespace common\service\ssc;
 
 use backend\models\SscKjData;
 use common\service\CommonService;
+use common\service\jobs\kj_data\OperateKjDataJob;
 
 class SscKjDataService extends CommonService
 {
@@ -25,5 +26,37 @@ class SscKjDataService extends CommonService
         return $SscKjData?:[];
     }
 
+    /**
+     * 接收开奖数据 - 接收外部数据
+     * @param array $kjData
+     * @param int $lotteryType
+     * @return array
+     */
+    public static function acceptKjData(array $kjData=[], int $lotteryType=DEFAULT_LOTTERY_TYPE): array
+    {
+        try {
+            if(!$openCode = $kjData['opencode']){
+                throw_info('开奖数据不能为空');
+            }
+            if(!$qiHao = $kjData['expect']){
+                throw_info('开奖期号不能为空');
+            }
+            if(!$openTime = $kjData['opentime']){
+                throw_info('开奖时间不能为空');
+            }
+            $params = [
+                'expect' => $qiHao,
+                'opencode' => $openCode,
+                'opentime' => $openTime,
+                'lottery_type' => $lotteryType,
+                'business_id' => $lotteryType,
+            ];
+            push_queue_fast(OperateKjDataJob::class, $params);
+        }catch (\Exception $e){
+            return ['status'=>300, 'msg'=>$e->getMessage()];
+        }
+
+        return ['status' => 200, 'msg'=>'接收成功'];
+    }
 
 }

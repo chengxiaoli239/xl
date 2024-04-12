@@ -10,7 +10,7 @@ namespace backend\modules\api\controllers;
 use backend\service\BaseService;
 use backend\service\BetService;
 use backend\service\clients\TzSystemUsersService;
-use backend\service\FootBallService;
+use common\service\ssc\SscKjDataService;
 use common\tools\Tool_Common;
 use Yii;
 use yii\web\Controller;
@@ -144,6 +144,24 @@ class TzSystemUsersController extends Controller
 
         $rst = TzSystemUsersService::syncClientKjDatas($post['kj_datas'], $post['access_token'], $post['lottery_type']);
         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端开奖数据同步', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
+
+        return $rst;
+    }
+
+    /**
+     * @desc 接收开奖号码
+     * @return array
+     */
+    public function actionAcceptKjData(): array
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        if(empty($post['access_token'])){
+            return ['status'=>301, 'msg'=>'缺少access_token参数'];
+        }
+
+        $rst = SscKjDataService::acceptKjData($post['kj_data'], $post['lottery_type']);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '接收开奖数据同步', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }

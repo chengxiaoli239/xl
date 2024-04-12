@@ -24,6 +24,7 @@ use common\kj\cqssc\CqsscKcw;
 use common\service\CommonService;
 use common\service\jobs\kj_data\GrabKjDatasJob;
 use common\service\jobs\kj_data\PeiShuProfitsJob;
+use common\service\jobs\kj_data\PushKjDataToOutSiteJob;
 use common\service\jobs\kj_data\StaticAll2NumsYlJob;
 use common\service\jobs\kj_data\StaticHzProfitsJob;
 use common\service\jobs\kj_data\StaticPeiShuTrueFalseJob;
@@ -348,6 +349,7 @@ class KjDataGet
                 OperateLotteryService::operate($lottery_type);  # 3D 处理3D下注记录
                 break;
             case $lottery_type == CommonBaseService::LOTTERY_TYPE_AOZHOU5:
+                push_queue_fast(PushKjDataToOutSiteJob::class, ['lottery_type'=>$lottery_type, 'business_id'=>$lottery_type]);
                 $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
                 # 1、队列处理下注数据
                 push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name, 'business_id'=>$qihao]);
@@ -355,6 +357,7 @@ class KjDataGet
                 (new AoZhouKjService())->operateSendKjData($qihao);
                 break;
             case $lottery_type == CommonBaseService::LOTTERY_TYPE_LUCKY5:
+                push_queue_fast(PushKjDataToOutSiteJob::class, ['lottery_type'=>$lottery_type, 'business_id'=>$lottery_type]);
                 $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
                 # 1、队列处理下注数据
                 push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name, 'business_id'=>$qihao]);
@@ -368,7 +371,7 @@ class KjDataGet
                 push_queue(UpdateCodeTypeYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>30]);
                 break;
         }
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '统计数据入列', ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'msg'=>'数据入列成功']);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '统计数据入列', ['qiHao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'msg'=>'数据入列成功']);
         return $rst;
     }
 
