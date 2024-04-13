@@ -20,10 +20,11 @@ class Send
         $this->robotAdmin = WechatUser::find()->where(['user_id'=>$userId, 'is_admin'=>1])->asArray()->limit(1)->one();
     }
 
-    public function replyAfterRecharge($platformUser, $targetId, $replyTxts): bool
+    public function replyAfterRecharge($platformUser, $replyTxts): bool
     {
+        $targetId=  $platformUser['userName'];
         Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复', ['platform_id'=>$this->platformRobot->platform_id, 'targetId'=>$targetId, 'replyTxts'=>$replyTxts]);
-        list($replyTxt1, $replyTxt2) = $replyTxts;
+        list($replyTxt1, $replyTxt2) = $replyTxts; # 分别为：用户消息、管理员消息
         if($this->platformRobot->platform_id == Platform::TELEGRAM){
             $messageData = ['targetId'=>$targetId, 'token'=>$this->platformRobot->token];
             Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复01-用户', ['messageData'=>$messageData]);
@@ -32,7 +33,7 @@ class Send
             MessageReceiveJobs::reply($this->userId,  [$replyUserTxt], $messageData);
             //todo 2、审核之后给用户和管理员同时发消息，目前只有用户收到，管理员未处理
             # 2、给管理员发信息
-            $replyAdminTxt = '【内容】"'.$platformUser->nickName.'" '.$replyTxt2;
+            $replyAdminTxt = '【内容】"'.$platformUser['nickName'].'" '.$replyTxt2;
             $messageData = ['targetId'=>$this->robotAdmin['userName'], 'token'=>$this->platformRobot->token];
             Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复02-管理员', ['messageData'=>$messageData]);
             MessageReceiveJobs::reply($this->userId,  [$replyAdminTxt], $messageData);
