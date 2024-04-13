@@ -6,6 +6,7 @@ use common\helpers\Platform;
 use common\models\wechat\WechatUser;
 use common\service\jobs\robots\message\WechatPrivateMsgReceiveJobs;
 use common\service\jobs\telegram\MessageReceiveJobs;
+use common\tools\Tool_Common;
 
 class Send
 {
@@ -21,8 +22,10 @@ class Send
 
     public function replyAfterRecharge($platformUser, $targetId, $replyTxt): bool
     {
+        Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复', ['platform_id'=>$this->platformRobot->platform_id, 'targetId'=>$targetId, 'replyTxt'=>$replyTxt]);
         if($this->platformRobot->platform_id == Platform::TELEGRAM){
             $messageData = ['targetId'=>$targetId, 'token'=>$this->platformRobot->token];
+            Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复01', ['messageData'=>$messageData]);
             $replyUserTxt = '【内容】'.$replyTxt;
             # 1、给用户发信息
             MessageReceiveJobs::reply($this->userId,  [$replyUserTxt], $messageData);
@@ -30,6 +33,7 @@ class Send
             # 2、给管理员发信息
             $replyAdminTxt = '【内容】"'.$platformUser->nickName.'" '.$replyTxt;
             $messageData = ['targetId'=>$this->robotAdmin['userName'], 'token'=>$this->platformRobot->token];
+            Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复02', ['messageData'=>$messageData]);
             MessageReceiveJobs::reply($this->userId,  [$replyAdminTxt], $messageData);
         }else{
             $replyUserTxt = '【内容】'.$replyTxt;
