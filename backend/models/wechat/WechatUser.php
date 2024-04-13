@@ -21,8 +21,8 @@ use Yii;
  * @property int $is_private 私
  * @property int $is_cha 查
  * @property int $is_bind 绑定
- * @property int $is_need_confirm 是否需确认
  * @property int $is_admin 是否管理员
+ * @property int $is_need_confirm 是否需确认
  * @property int $reply_type 回类型
  * @property string $all_bet_money 投分
  * @property string $today_profits_loss 今盈亏
