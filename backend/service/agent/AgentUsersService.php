@@ -113,7 +113,7 @@ class AgentUsersService extends BaseService {
                         //$rst = ['status'=>303, 'msg'=>$AgentUsers->getFirstError()];
                         throw_info('用户['.$WechatUser->nickName.']'.$f.'分：'.$balance.', 结果：失败');
                     }
-                    $operateDesc = $f.'分：'.$balance.', 成功&nbsp;<font color="green"><strong>√</strong></font> 当前积分：'.$WechatUser->balance;
+                    $operateDesc = $f.'分：'.$balance.', 成功&nbsp;<font color="green"><strong>√</strong></font> 当前积分：'.floatval($WechatUser->balance);
                     $rst['msg'] = '用户['.$WechatUser->nickName.']'.$operateDesc;
                     $rst['balance_now'] = $WechatUser->balance;
                 }

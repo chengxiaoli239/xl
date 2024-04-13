@@ -7,6 +7,7 @@ use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\models\VBets;
+use backend\service\agent\AgentUsersService;
 use backend\service\BetService;
 use backend\service\clients\AgentClientsService;
 use backend\service\HN0898Service;
@@ -52,6 +53,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $rst = AgentUsersService::userFlowsCheck(['id'=>16791, 'status'=>1], 21, '管理员消息回复处理');p($rst);
             $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%wechat_user}}'); p($r);
             $rst = [];
             foreach ([8] as $lotteryType){
