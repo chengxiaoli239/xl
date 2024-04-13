@@ -113,12 +113,13 @@ class AgentUsersService extends BaseService {
                         //$rst = ['status'=>303, 'msg'=>$AgentUsers->getFirstError()];
                         throw_info('用户['.$WechatUser->nickName.']'.$f.'分：'.$balance.', 结果：失败');
                     }
-                    $operateDesc = $f.'分：'.$balance.', 成功&nbsp;<font color="green"><strong>√</strong></font> 当前积分：'.floatval($WechatUser->balance);
-                    $rst['msg'] = '用户['.$WechatUser->nickName.']'.$operateDesc;
+                    $operateDesc1 = $f.'分：'.$balance.', 成功&nbsp;<font color="green"><strong>√</strong></font> 当前积分：'.floatval($WechatUser->balance);
+                    $operateDesc2 = $f.'分：'.$balance.', 成功 √ 当前积分：'.floatval($WechatUser->balance);
+                    $rst['msg'] = '用户['.$WechatUser->nickName.']'.$operateDesc1;
                     $rst['balance_now'] = $WechatUser->balance;
                 }
                 //todo 1、上下分之后给用户和管理员同时发消息
-                (new Send($WechatUser->user_id))->replyAfterRecharge($WechatUser, [$operateDesc, '后台操作：给['.$WechatUser->nickName.']'.$operateDesc]);
+                (new Send($WechatUser->user_id))->replyAfterRecharge($WechatUser, [$operateDesc2, '后台操作：给['.$WechatUser->nickName.']'.$operateDesc2]);
             }elseif ($act == 'act-user-edit'){
                 if(empty($post['name'])){
                     throw_info('用户名不能为空');
