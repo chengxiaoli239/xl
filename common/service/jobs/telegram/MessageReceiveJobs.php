@@ -67,7 +67,7 @@ class MessageReceiveJobs extends CommonJob
                     AgentUsersService::userFlowsCheck($data, $userId, '管理员通过消息回复处理');
                     return [CommonBaseService::CODE_FOR_IGNORE, [], ['管理员已通过消息回复处理']];
                 }
-                return [CommonBaseService::CODE_FOR_USER, [], ['管理员发送：'.$content.'，未匹配到关键词']];
+                throw_info('管理员发送：'.$content.'，未匹配到关键词', CommonBaseService::CODE_FOR_USER);
             }
 
             $mkey = md5(self::class_basename(__CLASS__).'_'.$userId.'_'.$fromId.'_'.$content);

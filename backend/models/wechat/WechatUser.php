@@ -22,6 +22,7 @@ use Yii;
  * @property int $is_cha 查
  * @property int $is_bind 绑定
  * @property int $is_need_confirm 是否需确认
+ * @property int $is_admin 是否管理员
  * @property int $reply_type 回类型
  * @property string $all_bet_money 投分
  * @property string $today_profits_loss 今盈亏
@@ -58,7 +59,7 @@ class WechatUser extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['user_id', 'status', 'is_tuo', 'is_chi', 'is_private', 'is_cha', 'is_bind', 'is_need_confirm', 'reply_type', 'is_credit', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['user_id', 'status', 'is_tuo', 'is_chi', 'is_private', 'is_cha', 'is_bind', 'is_admin', 'is_need_confirm', 'reply_type', 'is_credit', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['balance', 'all_bet_money', 'today_profits_loss', 'all_profits_loss'], 'number'],
             [['created_at', 'updated_at'], 'required'],
             [['update_at'], 'safe'],
@@ -89,6 +90,7 @@ class WechatUser extends \common\models\base\BaseModel
             'is_private' => Yii::t('app', '私'),
             'is_cha' => Yii::t('app', '查'),
             'is_bind' => Yii::t('app', '绑定'),
+            'is_admin' => Yii::t('app', '是否管理员'),
             'is_need_confirm' => Yii::t('app', '是否需确认'),
             'reply_type' => Yii::t('app', '回类型'),
             'all_bet_money' => Yii::t('app', '投分'),

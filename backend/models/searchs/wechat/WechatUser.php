@@ -19,7 +19,7 @@ class WechatUser extends WechatUserModel
     public function rules()
     {
         return [
-            [['id', 'user_id', 'status', 'is_tuo', 'is_chi', 'is_private', 'is_cha', 'is_bind', 'is_need_confirm', 'reply_type', 'is_credit', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'user_id', 'status', 'is_tuo', 'is_chi', 'is_private', 'is_cha', 'is_bind', 'is_admin', 'is_need_confirm', 'reply_type', 'is_credit', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['robot_wechat', 'userName', 'nickName', 'aliasName', 'bet_url', 'token', 'bigHead', 'smallHead', 'labelList', 'remark', 'update_at'], 'safe'],
             [['balance', 'all_bet_money', 'today_profits_loss', 'all_profits_loss'], 'number'],
             [['username'], 'string'],  // 微信好友微信账号
@@ -73,6 +73,7 @@ class WechatUser extends WechatUserModel
             'a.is_private' => $this->is_private,
             'a.is_cha' => $this->is_cha,
             'a.is_bind' => $this->is_bind,
+            'a.is_admin' => $this->is_admin,
             'a.is_need_confirm' => $this->is_need_confirm,
             'a.reply_type' => $this->reply_type,
             'a.all_bet_money' => $this->all_bet_money,

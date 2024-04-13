@@ -52,6 +52,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%wechat_user}}'); p($r);
             $rst = [];
             foreach ([8] as $lotteryType){
                 //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
@@ -72,7 +73,6 @@ class IndexController extends Controller
             $r = \common\service\lottery\aozhou5\AoZhou5Service::opOneBettingRecord($bet->id, $bet);p($r);
             $rst = CommonService::getVoteCode(); p($rst);
             list($code, $data, $msg) = AoZhou5BetService::postToSite($betRowId=32123);p([$code, $data, $msg]);
-            $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%telegram_message}}'); p($r);
             $current_qihao = HN0898Service::getCurrentQihao($lottery_type = 28); # 针对哪一期过滤，默认为：当前期号
             p($current_qihao);
             LotteryTypeService::getLotteryTypeData($grabDataStatus=1, $useCache=0);
