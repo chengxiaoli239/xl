@@ -110,6 +110,7 @@ class AgentUsersBalanceService extends BaseService {
             $data = [ ];
             $msg = ($e->getCode()== CommonBaseService::CODE_FOR_USER) ? $e->getMessage() : '申请上下分异常';
             Tool_Common::log('/wechat/'.__FUNCTION__, 'ERR', '消息接收处理异常', ['text'=>$text, 'err_msg'=>$e->getMessage().'_'.$e->getFile().'_'.$e->getLine()]);
+            return [CommonBaseService::CODE_FOR_USER, $data, $msg];
         }
 
         return [CommonBaseService::CODE_FOR_IGNORE, $data, $msg];
