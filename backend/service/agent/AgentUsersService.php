@@ -222,7 +222,7 @@ class AgentUsersService extends BaseService {
                 "\n【操作前】".floatval($before_balance).
                 "\n【盛鱼】".floatval($after_balance);
             $d = Json::decode($flows->message);
-            (new Send($user_id))->replyAfterRecharge($WechatUser, $d['message']['from']['id'], $replyTxt); # 发送消息
+            (new Send($user_id))->replyAfterRecharge($WechatUser, $d['message']['from']['id'], [$replyTxt, $replyTxt]); # 发送消息
             push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$user_id, 'type'=>$balanceType, 'msg'=>'上下分后报表计算', 'wechat_user_id'=>$WechatUser->id]);
         }catch (\Exception $e){
             $transaction->rollBack();
