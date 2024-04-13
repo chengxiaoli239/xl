@@ -141,7 +141,7 @@ class MessageReceiveJobs extends CommonJob
         $mkey = md5(__FUNCTION__.'_x1_'.$user_id.'_'.Json::encode($replyTxts).'_'.$targetUser);
         $incr = \Yii::$app->redis->incr($mkey);
         $switch = \Yii::$app->params['AZ_MESSAGE_SWITCH']??0;
-        Tool_Common::log('/telegram/'.__FUNCTION__, 'INFO', '消息回复前处理', ['user_id'=>$user_id, 'replyTxts'=>$replyTxts, 'data'=>$data,'switch'=>$switch]);
+        Tool_Common::log('/telegram/'.__FUNCTION__, 'INFO', '消息回复前处理1', ['user_id'=>$user_id, 'replyTxts'=>$replyTxts, 'data'=>$data,'switch'=>$switch]);
         if(empty($switch)){
             return false;
         }

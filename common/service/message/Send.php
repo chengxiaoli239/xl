@@ -22,22 +22,22 @@ class Send
 
     public function replyAfterRecharge($platformUser, $targetId, $replyTxt): bool
     {
-        Tool_Common::log('/message/'.__FUNCTION__, 'INFO', 'ÏûÏ¢»Ø¸´', ['platform_id'=>$this->platformRobot->platform_id, 'targetId'=>$targetId, 'replyTxt'=>$replyTxt]);
+        Tool_Common::log('/message/'.__FUNCTION__, 'INFO', 'æ¶ˆæ¯å›å¤', ['platform_id'=>$this->platformRobot->platform_id, 'targetId'=>$targetId, 'replyTxt'=>$replyTxt]);
         if($this->platformRobot->platform_id == Platform::TELEGRAM){
             $messageData = ['targetId'=>$targetId, 'token'=>$this->platformRobot->token];
-            Tool_Common::log('/message/'.__FUNCTION__, 'INFO', 'ÏûÏ¢»Ø¸´01', ['messageData'=>$messageData]);
-            $replyUserTxt = '¡¾ÄÚÈİ¡¿'.$replyTxt;
-            # 1¡¢¸øÓÃ»§·¢ĞÅÏ¢
+            Tool_Common::log('/message/'.__FUNCTION__, 'INFO', 'æ¶ˆæ¯å›å¤01', ['messageData'=>$messageData]);
+            $replyUserTxt = 'ã€å†…å®¹ã€‘'.$replyTxt;
+            # 1ã€ç»™ç”¨æˆ·å‘ä¿¡æ¯
             MessageReceiveJobs::reply($this->userId,  [$replyUserTxt], $messageData);
-            //todo 2¡¢ÉóºËÖ®ºó¸øÓÃ»§ºÍ¹ÜÀíÔ±Í¬Ê±·¢ÏûÏ¢£¬Ä¿Ç°Ö»ÓĞÓÃ»§ÊÕµ½£¬¹ÜÀíÔ±Î´´¦Àí
-            # 2¡¢¸ø¹ÜÀíÔ±·¢ĞÅÏ¢
-            $replyAdminTxt = '¡¾ÄÚÈİ¡¿"'.$platformUser->nickName.'" '.$replyTxt;
+            //todo 2ã€å®¡æ ¸ä¹‹åç»™ç”¨æˆ·å’Œç®¡ç†å‘˜åŒæ—¶å‘æ¶ˆæ¯ï¼Œç›®å‰åªæœ‰ç”¨æˆ·æ”¶åˆ°ï¼Œç®¡ç†å‘˜æœªå¤„ç†
+            # 2ã€ç»™ç®¡ç†å‘˜å‘ä¿¡æ¯
+            $replyAdminTxt = 'ã€å†…å®¹ã€‘"'.$platformUser->nickName.'" '.$replyTxt;
             $messageData = ['targetId'=>$this->robotAdmin['userName'], 'token'=>$this->platformRobot->token];
-            Tool_Common::log('/message/'.__FUNCTION__, 'INFO', 'ÏûÏ¢»Ø¸´02', ['messageData'=>$messageData]);
+            Tool_Common::log('/message/'.__FUNCTION__, 'INFO', 'æ¶ˆæ¯å›å¤02', ['messageData'=>$messageData]);
             MessageReceiveJobs::reply($this->userId,  [$replyAdminTxt], $messageData);
         }else{
-            $replyUserTxt = '¡¾ÄÚÈİ¡¿'.$replyTxt;
-            WechatPrivateMsgReceiveJobs::reply($this->userId, [$replyUserTxt], ['fromUser' => $platformUser->userName]); # »Ø¸´ÏûÏ¢
+            $replyUserTxt = 'ã€å†…å®¹ã€‘'.$replyTxt;
+            WechatPrivateMsgReceiveJobs::reply($this->userId, [$replyUserTxt], ['fromUser' => $platformUser->userName]); # å›å¤æ¶ˆæ¯
         }
 
         return true;

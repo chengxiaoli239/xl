@@ -125,7 +125,7 @@ class WechatPrivateMsgReceiveJobs extends CommonJob
         $targetUser = $data['targetUser']??$data['fromUser']; # 目标微信好友
         $mkey = md5(__FUNCTION__.'_x1_'.$user_id.'_'.Json::encode($replyTxts).'_'.$targetUser);
         $incr = \Yii::$app->redis->incr($mkey);
-        Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '消息回复前处理', ['user_id'=>$user_id, 'replyTxts'=>$replyTxts, 'data'=>$data]);
+        Tool_Common::log('/wechat/'.__FUNCTION__, 'INFO', '消息回复前处理2', ['user_id'=>$user_id, 'replyTxts'=>$replyTxts, 'data'=>$data]);
         if($incr>1){
             return false;
         }
