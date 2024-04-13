@@ -82,7 +82,8 @@ class WechatUserController extends BaseController
         if(!empty($row)){
             if($field == 'is_admin' && $val==1){
                 # 检测是否有别的管理员，仅允许设置一个管理员
-                if(WechatUser::find()->where(['is_admin'=>1])->andWhere(['!=', 'user_id', $this->_user_id])->limit(1)->one()){
+                $flag = WechatUser::find()->where(['is_admin'=>1, 'user_id'=>$this->_user_id])->andWhere(['!=', 'id', $id])->limit(1)->one();
+                if($flag){
                     echo '<script>alert("仅允许设置一个管理员");</script>';
                     echo '<script>';
                     echo 'setTimeout(function() { history.go(-1); }, 2000);'; // 2秒后回退到上一页面

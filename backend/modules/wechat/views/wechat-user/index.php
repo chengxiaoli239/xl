@@ -183,11 +183,11 @@ $columns = array_merge(
             'value'=>function($model){
                 $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_admin&val=1'; # 点击开启
                 $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_admin&val=0'; # 点击关闭
-                if($model->is_need_confirm == 1){
+                if($model->is_admin == 1){
                     $txt = "<font color='green'>√</font>" ;
                     return Html::a($txt, $url1, ['title' => '取消管理员']);
                 }
-                if(!$model->is_need_confirm){
+                if(!$model->is_admin){
                     $txt = "<font color='red'>X</font>";
                     return Html::a($txt, $url0, ['title' => '设为管理员']);
                 }

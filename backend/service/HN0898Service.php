@@ -593,8 +593,8 @@ class HN0898Service extends BaseTZService {
                 return ['status'=>300, 'msg'=>current($M->getErrors())];
             }
             TzSystemUsersService::delTzsystemUserData();
-        }catch (\Exception $exception){
-            return ['status'=>300, 'msg'=>$exception->getMessage()];
+        }catch (\Exception $e){
+            return ['status'=>300, 'msg'=>$e->getMessage()];
         }
 
         return ['status'=>200, 'msg'=>'状态更新成功~', 'data'=>[]];
