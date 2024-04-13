@@ -49,7 +49,7 @@ $columns = array_merge(
                 return BaseStringHelper::truncate($model->nickName,10);
             }
         ],
-        ['attribute' => 'userName', 'label'=>'微信ID','headerOptions'=>['width'=>'3%'], // 图片字段的属性
+        ['attribute' => 'userName', 'label'=>'平台ID','headerOptions'=>['width'=>'3%'], // 图片字段的属性
             'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
             'value' => function ($model) {
                 return $model->userName;
@@ -174,6 +174,22 @@ $columns = array_merge(
                 if(!$model->reply_type){
                     $txt = "<font color='red'>X</font>";
                     return Html::a($txt, $url0, ['title' => '即时回']);
+                }
+                return '';
+            }
+        ],
+        ['attribute'=>'is_admin','label'=>'管理员','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+            'format'=>'raw',
+            'value'=>function($model){
+                $url0 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_admin&val=1'; # 点击开启
+                $url1 = "/wechat/wechat-user/switch-status?id=".$model->id.'&field=is_admin&val=0'; # 点击关闭
+                if($model->is_need_confirm == 1){
+                    $txt = "<font color='green'>√</font>" ;
+                    return Html::a($txt, $url1, ['title' => '取消管理员']);
+                }
+                if(!$model->is_need_confirm){
+                    $txt = "<font color='red'>X</font>";
+                    return Html::a($txt, $url0, ['title' => '设为管理员']);
                 }
                 return '';
             }

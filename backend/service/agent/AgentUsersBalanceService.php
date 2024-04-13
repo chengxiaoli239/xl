@@ -94,6 +94,11 @@ class AgentUsersBalanceService extends BaseService {
                 \common\tools\Tool_Common::log('upOrDownBalance', 'ERR', '用户上下分', $logArr);
                 throw_info($desc.'失败'.(is_array($msg)?Json::encode($msg):$msg));
             }
+            $data = [
+                'apply_id' => $Flows->id,
+                'money' => $balance,
+                'type_desc' => WechatUserService::$s['balance_type'][$type]
+            ];
             $logArr =  ['desc'=>$desc, 'WechatUser'=>$WechatUser->attributes, 'attributes'=>$Flows->attributes];
             Tool_Common::log('upOrDownBalance', 'INFO', '用户上下分',$logArr);
             $msg = $desc;

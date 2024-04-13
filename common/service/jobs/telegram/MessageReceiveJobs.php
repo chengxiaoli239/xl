@@ -1,7 +1,10 @@
 <?php
 namespace common\service\jobs\telegram;
 
+use backend\service\agent\AgentUsersBalanceService;
+use backend\service\agent\AgentUsersService;
 use common\exceptions\InfoException;
+use common\models\wechat\WechatUser;
 use common\service\chat\Tool_Common;
 use common\service\jobs\CommonJob;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
@@ -52,8 +55,21 @@ class MessageReceiveJobs extends CommonJob
             $userId = $params['user_id']; # 代理用户id，系统用户id
             $fromId = $from['id']; # 发送者用户id
             $chatId = $chat['id']; # 聊天所属用户id
+            $content = trim($message['text']);
 
-            $content = $message['text'];
+            if(WechatUser::find()->where(['user_id'=>$userId, 'userName'=>$fromId, 'is_admin'=>WechatUser::MEMBER_TYPE_ADMIN])){
+                # 管理员，处理上下分等业务
+                preg_match('/上\s*(\d+)/', $content,$matches);
+                $applyId = (int)$matches[1];
+                $data = ['id'=>$applyId];
+                if(preg_match('/通过|拒绝/', $content, $matches)) {
+                    $data['status'] = ($matches[0] === '通过') ? AgentUsersBalanceService::FLOW_CHECK_STATUS_PASS : AgentUsersBalanceService::FLOW_CHECK_STATUS_REFUSE;
+                    AgentUsersService::userFlowsCheck($data, $userId, '管理员通过消息回复处理');
+                    return [CommonBaseService::CODE_FOR_IGNORE, [], ['管理员已通过消息回复处理']];
+                }
+                return [CommonBaseService::CODE_FOR_USER, [], ['管理员发送：'.$content.'，未匹配到关键词']];
+            }
+
             $mkey = md5(self::class_basename(__CLASS__).'_'.$userId.'_'.$fromId.'_'.$content);
             //p([$mkey, self::class_basename(__CLASS__).'_'.$userId.'_'.$fromUser.'_'.$content]);
             $num = \Yii::$app->redis->incr($mkey);
@@ -84,12 +100,15 @@ class MessageReceiveJobs extends CommonJob
             list($code, $vdata, $msg) = $messageService->receive($message, $params['token']);
             $rstData = [$code, $vdata, $msg];
             Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'INFO', self::$name.'01', ['user_id'=>$userId, 'rstData'=>$rstData]);
+            if($code == CommonBaseService::CODE_FOR_IGNORE){
+                return ['message'=>CommonBaseService::CODE_FOR_OPTIONS[CommonBaseService::CODE_FOR_IGNORE]];
+            }
             if($code>0){
                 throw_info($msg, $code);
             }
             $replyTxts = $vdata['replyTxts'];
             if(!empty($replyTxts)){
-                self::reply($userId, $replyTxts, $params); # 回复消息
+                self::reply($userId, $replyTxts, ['targetId'=>$params['message']['from']['id'], 'token'=>$params['token']]); # 回复消息
             }
         }catch (\Exception $e){
             $err_msg =  ($e->getCode() == CommonBaseService::CODE_FOR_USER) ? $e->getMessage() : '处理异常，请正确输入';
@@ -97,7 +116,7 @@ class MessageReceiveJobs extends CommonJob
                 Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'ERR', self::$name.'11', ['user_id'=>$userId, 'params'=>$params, 'err_msg'=>$e->getMessage(), 'code'=>$e->getCode()]);
                 return '忽略回复：'.$e->getMessage();
             }
-            $r = self::reply($userId, [$err_msg], $params); # 回复消息
+            $r = self::reply($userId, [$err_msg], ['targetId'=>$params['message']['from']['id'], 'token'=>$params['token']]); # 回复消息
             Tool_Common::log('/telegram/'.self::class_basename(__CLASS__), 'ERR', self::$name.'12', ['user_id'=>$userId, 'params'=>$params, 'r'=>$r, 'err_msg'=>$e->getMessage(), 'file'=>$e->getFile().'_'.$e->getLine()]);
 
             $message['err_msg'] = $err_msg;
@@ -113,16 +132,12 @@ class MessageReceiveJobs extends CommonJob
      * 消息回复前处理
      * @param $user_id
      * @param array $replyTxts ['你好', '您好，您的申请已通过']
-     * @param array $data ['fromUser'=>'wxid_875i1kgd38x122'];
+     * @param array $data ['fromUser'=>'wxid_875i1kgd38x122']; 机器人要回复用到相关的id、token等
      * @return bool
      * @throws InfoException
      */
     public static function reply($user_id, array $replyTxts=[], array $data=[]){
-        $message = $data['message'];
-        $from = $message['from'];
-        $chat = $message['chat'];
-
-        $targetUser = $from['id']??$chat['id']; # 目标微信好友
+        $targetUser = $data['targetId'];# 目标微信好友
         $mkey = md5(__FUNCTION__.'_x1_'.$user_id.'_'.Json::encode($replyTxts).'_'.$targetUser);
         $incr = \Yii::$app->redis->incr($mkey);
         $switch = \Yii::$app->params['AZ_MESSAGE_SWITCH']??0;

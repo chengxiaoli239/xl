@@ -11,6 +11,7 @@ use common\helpers\SscMethod;
 use common\service\chat\Tool_Common;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
 use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
+use common\service\message\Send;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\PlayMethodService;
@@ -126,8 +127,14 @@ class MessageOperateService  extends BaseService
             case strpos($text, '上') !== false:
             case strpos($text, '下') !== false:
             case strpos($text, '-') !== false:
-                # 上分逻辑
-                return AgentUsersBalanceService::operateBalanceChange($text, $this->platformUser, $message);
+                # 上下分逻辑
+                list($code, $data, $msg) = AgentUsersBalanceService::operateBalanceChange($text, $this->platformUser, $message);
+                Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '充值申请处理结果', ['code'=>$code, 'data'=>$data, 'msg'=>$msg]);
+                if($code==CommonBaseService::CODE_FOR_IGNORE && !empty($data)){
+                    (new Send($this->user_id))->replyAfterRecharge($this->platformUser, $this->platformUser->userName, $msg.'，申请ID:'.$data['apply_id']."\n".'，输入："'.$data['apply_id'].'通过" 或 "'.$data['apply_id'].'拒绝“');
+                    return [CommonBaseService::CODE_FOR_IGNORE, [], '异步处理'];
+                }
+                return [$code, $code, $msg];
             default:
                 $status = (new LotteryBet())->checkLotteryStatus($this->lottery_type);
                 Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '盘口状态检测', ['lottery_type'=>$this->lottery_type, 'status'=>$status]);

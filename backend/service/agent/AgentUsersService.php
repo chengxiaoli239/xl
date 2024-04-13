@@ -13,6 +13,7 @@ use common\service\CommonService;
 use common\service\jobs\robots\message\WechatPrivateMsgReceiveJobs;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
 use common\service\jobs\telegram\MessageReceiveJobs;
+use common\service\message\Send;
 use common\service\thirdD\CommonBaseService;
 use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
@@ -115,7 +116,7 @@ class AgentUsersService extends BaseService {
                     $rst['msg'] = '用户['.$WechatUser->nickName.']'.$f.'分：'.$balance.', 操作成功&nbsp;<font color="green"><strong>√</strong></font> 当前积分：'.$WechatUser->balance;
                     $rst['balance_now'] = $WechatUser->balance;
                 }
-
+                //todo 1、上下分之后给用户和管理员同时发消息
             }elseif ($act == 'act-user-edit'){
                 if(empty($post['name'])){
                     throw_info('用户名不能为空');
@@ -216,17 +217,12 @@ class AgentUsersService extends BaseService {
             }
             $transaction->commit();
 
-            $replyTxt = '【内容】申请'.WechatUserService::$s['balance_type'][$balanceType].floatval($flows->balance).
+            $replyTxt = '申请'.WechatUserService::$s['balance_type'][$balanceType]. $flows->balance .
                 "\n【结果】".AgentUsersBalanceService::$s['status'][$status].
                 "\n【操作前】".floatval($before_balance).
                 "\n【盛鱼】".floatval($after_balance);
-            $PlatformRobot = PlatformRobot::find()->where(['user_id'=>$user_id])->one();
-            if($PlatformRobot->platform_id == Platform::TELEGRAM){
-                $messageData = array_merge(Json::decode($flows->message), ['token'=>$PlatformRobot->token]);
-                MessageReceiveJobs::reply($user_id,  [$replyTxt], $messageData);
-            }else{
-                WechatPrivateMsgReceiveJobs::reply($user_id, [$replyTxt], ['fromUser' => $WechatUser->userName]); # 回复消息
-            }
+            $d = Json::decode($flows->message);
+            (new Send($user_id))->replyAfterRecharge($WechatUser, $d['message']['from']['id'], $replyTxt); # 发送消息
             push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$user_id, 'type'=>$balanceType, 'msg'=>'上下分后报表计算', 'wechat_user_id'=>$WechatUser->id]);
         }catch (\Exception $e){
             $transaction->rollBack();

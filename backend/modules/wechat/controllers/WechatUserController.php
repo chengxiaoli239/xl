@@ -80,6 +80,16 @@ class WechatUserController extends BaseController
         #p([$id, $field, $val]);
         $row = $this->findModel(['id'=>$id, 'user_id'=>$this->_user_id]);
         if(!empty($row)){
+            if($field == 'is_admin' && $val==1){
+                # 检测是否有别的管理员，仅允许设置一个管理员
+                if(WechatUser::find()->where(['is_admin'=>1])->andWhere(['!=', 'user_id', $this->_user_id])->limit(1)->one()){
+                    echo '<script>alert("仅允许设置一个管理员");</script>';
+                    echo '<script>';
+                    echo 'setTimeout(function() { history.go(-1); }, 2000);'; // 2秒后回退到上一页面
+                    echo '</script>';
+                    die();
+                }
+            }
             HN0898Service::updateStatus($id, $model = '\backend\models\wechat\WechatUser', $field, $val);
             WechatUserService::getWechatUsers($this->_user_id, false);
         }

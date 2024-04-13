@@ -126,9 +126,6 @@ class AgentUsersController extends BaseController
         return $rst;
     }
 
-    public function actionUserBalanceFlows(){
-    }
-
     /**
      * @desc 获取用户信息接口
      * @return array

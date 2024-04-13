@@ -11,8 +11,13 @@ use common\service\lottery\aozhou5\MethodMapService;
 class CommonBaseService extends BaseService
 {
     const CODE_FOR_USER = 33333; # 回复用户
-    const CODE_FOR_IGNORE = 44444; # 忽略
+    const CODE_FOR_IGNORE = 44444; # 忽略处理
     const CODE_FOR_IGNORE_U = 77777; # 聊天忽略
+    const CODE_FOR_OPTIONS = [
+        self::CODE_FOR_USER => '回复用户',
+        self::CODE_FOR_IGNORE => '忽略或无需处理',
+        self::CODE_FOR_IGNORE_U => '忽略聊天',
+    ];
 
     # lottery_type:26 福彩3d、27 排列三
     const LOTTERY_TYPE_LUCKY5 = 8;
