@@ -25,7 +25,7 @@ class Send
         Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复', ['platform_id'=>$this->platformRobot->platform_id, 'targetId'=>$targetId, 'replyTxt'=>$replyTxt]);
         if($this->platformRobot->platform_id == Platform::TELEGRAM){
             $messageData = ['targetId'=>$targetId, 'token'=>$this->platformRobot->token];
-            Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复01', ['messageData'=>$messageData]);
+            Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复01-用户', ['messageData'=>$messageData]);
             $replyUserTxt = '【内容】'.$replyTxt;
             # 1、给用户发信息
             MessageReceiveJobs::reply($this->userId,  [$replyUserTxt], $messageData);
@@ -33,7 +33,7 @@ class Send
             # 2、给管理员发信息
             $replyAdminTxt = '【内容】"'.$platformUser->nickName.'" '.$replyTxt;
             $messageData = ['targetId'=>$this->robotAdmin['userName'], 'token'=>$this->platformRobot->token];
-            Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复02', ['messageData'=>$messageData]);
+            Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复02-管理员', ['messageData'=>$messageData]);
             MessageReceiveJobs::reply($this->userId,  [$replyAdminTxt], $messageData);
         }else{
             $replyUserTxt = '【内容】'.$replyTxt;
