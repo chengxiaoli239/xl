@@ -124,11 +124,11 @@ class PlatformRobotController extends BaseController
 
         $model = $this->findModel($id);
         $loginRst = PlatformRobotService::login($model);
-        if($loginRst['code'] != 1000){
-            return ['status'=>301, 'msg'=>'��½ʧ�ܣ�'.$loginRst['message']];
+        if($loginRst['status'] != 200){
+            return ['status'=>301, 'msg'=>'登陆失败：'.$loginRst['message']];
         }
 
-        return ['status'=>200, 'msg'=>'��½�ɹ�'];
+        return ['status'=>200, 'msg'=>'登陆成功'];
     }
 
     /**

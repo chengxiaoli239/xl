@@ -14,27 +14,30 @@ class PlatformRobotService
     }
 
     /**
-     * ƽ̨��¼
+     * 平台登录
      * @param object $platformRobotModel
-     * @return bool
-     * @throws \yii\base\InvalidConfigException
+     * @return array|false
      */
-    public static function login(object $platformRobotModel): bool
+    public static function login(object $platformRobotModel)
     {
         $platformId = $platformRobotModel->platform_id;
         $token = $platformRobotModel->token;
         $url = \Yii::$app->params['SELF_DOMAIN'].'/api/telegram/callback?token='.$token;
-        switch ($platformId){
-            case Platform::TELEGRAM:
-                $result = WebHookApi::setWebHook(['url'=>$url]);
-                if($result != 'ok'){
-                    Tool_Common::log('/platform/'.__FUNCTION__, 'INFO', 'ƽ̨����������', ['result'=>$result, 'token'=>$token]);
-                    return false;
-                }
-                break;
+        try {
+            switch ($platformId){
+                case Platform::TELEGRAM:
+                    $result = WebHookApi::setWebHook(['callbackUrl'=>$url, 'token'=>$token]);
+                    if(!$result['ok']){
+                        Tool_Common::log('/platform/'.__FUNCTION__, 'INFO', '平台机器人设置', ['url'=>$url, 'result'=>$result, 'token'=>$token]);
+                        throw_info('设置回调失败');
+                    }
+                    break;
+            }
+        }catch (\Exception $e){
+            return ['status'=>301, 'msg'=>$e->getMessage()];
         }
 
-        return true;
+        return ['status'=>200, 'msg'=>'登录失败'];
     }
 
 }
