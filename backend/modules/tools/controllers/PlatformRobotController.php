@@ -2,6 +2,7 @@
 
 namespace backend\modules\tools\controllers;
 
+use common\service\open\actions\PlatformRobotService;
 use Yii;
 use backend\models\open\PlatformRobot;
 use backend\models\searchs\PlatformRobot as PlatformRobotSearch;
@@ -68,6 +69,9 @@ class PlatformRobotController extends BaseController
 
         if ($model->load(Yii::$app->request->post())) {
             $now_time = time();
+            $platform_robot_id = explode(':', trim($model->token))[0];
+            $model->platform_robot_id = $platform_robot_id;
+            $model->user_id = $this->_user_id;
             $model->updated_at = $now_time;
             $model->created_at = $now_time;
             if(!$model->save()){
@@ -92,13 +96,39 @@ class PlatformRobotController extends BaseController
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            $now_time = time();
+            $platform_robot_id = explode(':', trim($model->token))[0];
+            $model->platform_robot_id = $platform_robot_id;
+            $model->user_id = $this->_user_id;
+            $model->updated_at = $now_time;
+            $model->save();
             return $this->redirect(['index']);
         }
 
         return $this->renderAjax('update', [
             'model' => $model,
         ]);
+    }
+
+    /**
+     * login platform eg:telegram.
+     * If login is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionLogin($id)
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $model = $this->findModel($id);
+        $loginRst = PlatformRobotService::login($model);
+        if($loginRst['code'] != 1000){
+            return ['status'=>301, 'msg'=>'µÇÂ½Ê§°Ü£º'.$loginRst['message']];
+        }
+
+        return ['status'=>200, 'msg'=>'µÇÂ½³É¹¦'];
     }
 
     /**

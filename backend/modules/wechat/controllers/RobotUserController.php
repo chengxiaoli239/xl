@@ -3,6 +3,7 @@ namespace backend\modules\wechat\controllers;
 
 use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
 use backend\models\TzSystemsUsers;
+use common\models\AdminModel;
 use common\models\eyun\HistoryRobots;
 use common\service\wechat\RobotUserService;
 use common\service\wechat\WechatUserService;
@@ -62,28 +63,56 @@ class RobotUserController extends BaseController
     public function actionView()
     {
         $user_id = $this->_user_id;
-        $allModels = RobotUser::find()->alias('r')
-            ->select(['h.id', 'h.user_id', 'h.nickName', 'h.wechat_status', 'h.wcId', 'h.smallHeadImgUrl', 'h.update_at'])
-            ->leftJoin(HistoryRobots::tableName().' h', 'r.user_id=h.user_id')
-            ->where(['=', 'r.user_id', $user_id])
-            ->asArray()->all();
-        $dataProvider = new ArrayDataProvider([
-            'allModels' => $allModels
-        ]);
+        $adminModel = AdminModel::findOne($user_id);
+        if($adminModel->user_type == AdminModel::USER_TYPE_GUI){
+            $allModels = RobotUser::find()->alias('r')
+                ->select(['h.id', 'h.user_id', 'h.nickName', 'h.wechat_status', 'h.wcId', 'h.smallHeadImgUrl', 'h.update_at'])
+                ->leftJoin(HistoryRobots::tableName().' h', 'r.user_id=h.user_id')
+                ->where(['=', 'r.user_id', $user_id])
+                ->asArray()->all();
+            $dataProvider = new ArrayDataProvider([
+                'allModels' => $allModels
+            ]);
 
-        #$SystemModels = TzSystemsUsers::find()->where(['uid'=>$user_id])->orderBy(['balance'=>SORT_DESC])->all();
-        $tzSystemsUserSearchModel = new TzSystemsUsersSearch();
-        $queryParams = Yii::$app->request->queryParams;
-        if($this->_user_id != 1){
-            $queryParams['TzSystemsUsers']['uid'] = $this->_user_id;
+            $model = $this->findModel(['user_id'=>$user_id]);
+            #$SystemModels = TzSystemsUsers::find()->where(['uid'=>$user_id])->orderBy(['balance'=>SORT_DESC])->all();
+            $tzSystemsUserSearchModel = new TzSystemsUsersSearch();
+            $queryParams = Yii::$app->request->queryParams;
+            if($this->_user_id != 1){
+                $queryParams['TzSystemsUsers']['uid'] = $this->_user_id;
+            }
+            $systemDataProvider = $tzSystemsUserSearchModel->search($queryParams);
+            return $this->render('view5', [
+                'model' => $model,
+                'dataProvider' => $dataProvider,
+                'systemDataProvider' => $systemDataProvider,
+                #'SystemModels' => $SystemModels,
+            ]);
+        }else{
+            $allModels = RobotUser::find()->alias('r')
+                ->select(['h.id', 'h.user_id', 'h.nickName', 'h.wechat_status', 'h.wcId', 'h.smallHeadImgUrl', 'h.update_at'])
+                ->leftJoin(HistoryRobots::tableName().' h', 'r.user_id=h.user_id')
+                ->where(['=', 'r.user_id', $user_id])
+                ->asArray()->all();
+            $dataProvider = new ArrayDataProvider([
+                'allModels' => $allModels
+            ]);
+
+            $model = $this->findModel(['user_id'=>$user_id]);
+            #$SystemModels = TzSystemsUsers::find()->where(['uid'=>$user_id])->orderBy(['balance'=>SORT_DESC])->all();
+            $tzSystemsUserSearchModel = new TzSystemsUsersSearch();
+            $queryParams = Yii::$app->request->queryParams;
+            if($this->_user_id != 1){
+                $queryParams['TzSystemsUsers']['uid'] = $this->_user_id;
+            }
+            $systemDataProvider = $tzSystemsUserSearchModel->search($queryParams);
+            return $this->render('view', [
+                'model' => $model,
+                'dataProvider' => $dataProvider,
+                'systemDataProvider' => $systemDataProvider,
+                #'SystemModels' => $SystemModels,
+            ]);
         }
-        $systemDataProvider = $tzSystemsUserSearchModel->search($queryParams);
-        return $this->render('view', [
-            'model' => $this->findModel(['user_id'=>$user_id]),
-            'dataProvider' => $dataProvider,
-            'systemDataProvider' => $systemDataProvider,
-            #'SystemModels' => $SystemModels,
-        ]);
     }
 
     /**

@@ -15,6 +15,7 @@ use yii\web\IdentityInterface;
  * @property string $password_hash
  * @property string $password_reset_token
  * @property string $email
+ * @property integer $user_type
  * @property string $auth_key
  * @property integer $status
  * @property integer $created_at
@@ -32,12 +33,14 @@ class AdminModel extends BaseModel implements IdentityInterface
     const USER_TYPE_3D_ADMIN = 2;
     const USER_TYPE_3D = 3;
     const USER_TYPE_3D_CHILD = 4;
+    const USER_TYPE_GUI = 5;
     const USER_TYPE_OPTIONS = [
         self::USER_TYPE_SUPER_ADMIN => '超级管理员',
         self::USER_TYPE_QX => '七星',
         self::USER_TYPE_3D_ADMIN => '3d总管',
         self::USER_TYPE_3D => '3d代理',
         self::USER_TYPE_3D_CHILD => '3d代理下级',
+        self::USER_TYPE_GUI => '龟',
     ];
 
     public $password;

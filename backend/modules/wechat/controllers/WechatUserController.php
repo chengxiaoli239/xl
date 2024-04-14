@@ -86,7 +86,7 @@ class WechatUserController extends BaseController
                 if($flag){
                     echo '<script>alert("仅允许设置一个管理员");</script>';
                     echo '<script>';
-                    echo 'setTimeout(function() { history.go(-1); }, 2000);'; // 2秒后回退到上一页面
+                    echo 'setTimeout(function() { history.go(-1); }, 1000);'; // 1秒后回退到上一页面
                     echo '</script>';
                     die();
                 }

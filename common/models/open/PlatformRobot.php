@@ -8,15 +8,15 @@ use Yii;
  * This is the model class for table "{{%platform_robot}}".
  *
  * @property int $id
- * @property int $platform_robot_id
+ * @property int $platform_robot_id 机器人平台ID
  * @property int $platform_id 平台ID
  * @property int $user_id user.id,系统用户id
  * @property string $name 机器人名称
  * @property int $status 状态-0禁用1启用
  * @property string $token 机器人token
  * @property string $remark 备注
- * @property int $created_at
- * @property int $updated_at
+ * @property int $created_at 创建时间
+ * @property int $updated_at 更新时间
  * @property string $update_at 更新时间
  */
 class PlatformRobot extends \common\models\base\BaseModel
@@ -52,15 +52,15 @@ class PlatformRobot extends \common\models\base\BaseModel
     {
         return [
             'id' => 'ID',
-            'platform_robot_id' => 'Platform Robot ID',
+            'platform_robot_id' => '机器人平台ID',
             'platform_id' => '平台ID',
             'user_id' => 'user.id,系统用户id',
             'name' => '机器人名称',
             'status' => '状态-0禁用1启用',
             'token' => '机器人token',
             'remark' => '备注',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
+            'created_at' => '创建时间',
+            'updated_at' => '更新时间',
             'update_at' => '更新时间',
         ];
     }
