@@ -6,7 +6,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model backend\models\searchs\EyunAuth */
 /* @var $form yii\widgets\ActiveForm */
-$platforms = \backend\models\EyunAuthBackend::PLATFORM_ID_OPTIONS;
+$platforms = \common\helpers\Platform::TYPE_OPTIONS;
 ?>
 
 <div class="eyun-auth-search">

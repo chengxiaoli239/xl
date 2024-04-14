@@ -7,7 +7,7 @@ class Platform
     const TELEGRAM = 2;
     const TYPE_OPTIONS = [
         self::WECHAT => '微信',
-        self::TELEGRAM => 'TG',
+        self::TELEGRAM => 'telegram',
     ];
 
     public static function getName($platformId=0): string

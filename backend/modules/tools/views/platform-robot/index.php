@@ -106,11 +106,23 @@ $this->registerJs($js);
                         ['attribute' => 'platform_id', 'label'=>'类型','headerOptions'=>['width'=>'6%'], // 图片字段的属性
                             'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
                             'value' => function ($model) {
-                                return \backend\models\EyunAuthBackend::PLATFORM_ID_OPTIONS[$model->platform_id];
+                                return \common\helpers\Platform::TYPE_OPTIONS[$model->platform_id];
                             },
                         ],
-                        'platform_robot_id',
-                        'name',
+                        //'platform_robot_id',
+                        ['attribute' => 'platform_robot_id', 'label'=>'平台ID','headerOptions'=>['width'=>'6%'], // 图片字段的属性
+                            'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
+                            'value' => function ($model) {
+                                return $model->platform_robot_id;
+                            },
+                        ],
+                        //'name',
+                        ['attribute' => 'name', 'label'=>'名称','headerOptions'=>['width'=>'6%'], // 图片字段的属性
+                            'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
+                            'value' => function ($model) {
+                                return $model->name;
+                            },
+                        ],
                         //'status',
                         ['attribute' => 'status', 'label'=>'类型','headerOptions'=>['width'=>'6%'], // 图片字段的属性
                             'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
@@ -118,7 +130,12 @@ $this->registerJs($js);
                                 return Html::a('<a href="#"><strong><font color="'.($model->status>0?'green':'red').'">'.\backend\models\open\PlatformRobot::STATUS_OPTIONS[$model->status].'</font></strong></a>');
                             },
                         ],
-                        'token:ntext',
+                        ['attribute' => 'name', 'label'=>'token',//'headerOptions'=>['width'=>'6%'], // 图片字段的属性
+                            'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
+                            'value' => function ($model) {
+                                return $model->token;
+                            },
+                        ],
                         //'callback_url:url',
                         //'base_url:url',
                         //'desc:ntext',

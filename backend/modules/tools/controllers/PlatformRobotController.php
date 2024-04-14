@@ -140,7 +140,7 @@ class PlatformRobotController extends BaseController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        PlatformRobot::deleteRecord(['id'=>$id]);
 
         return $this->redirect(['index']);
     }

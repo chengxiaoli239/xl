@@ -18,7 +18,7 @@ class PlatformRobot extends PlatformRobotModel
     public function rules()
     {
         return [
-            [['id', 'platform_id', 'user_id', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'platform_robot_id', 'platform_id', 'user_id', 'status', 'created_at', 'updated_at'], 'integer'],
             [['name', 'token', 'remark', 'update_at'], 'safe'],
         ];
     }
@@ -60,6 +60,7 @@ class PlatformRobot extends PlatformRobotModel
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
+            'platform_robot_id' => $this->platform_robot_id,
             'platform_id' => $this->platform_id,
             'user_id' => $this->user_id,
             'status' => $this->status,
