@@ -23,14 +23,14 @@ class AoZhouKjService  extends BaseService
             "第 {$qiHao} 期\n".
             str_replace(',', '', $kjCode)."总和{$codeHz}(".$ds.",".$ft.")\n\n".
             "以下是历史课程表\n\n";
-        $historyKjDataQuery = SscKjData::find()->where(['lottery_type'=>self::$lottery_type])->andWhere(['>', 'qihao', (int)$qiHao-140]);
+        $historyKjDataQuery = SscKjData::find()->where(['lottery_type'=>self::$lottery_type])->andWhere(['>', 'qihao', (int)$qiHao-135]);
         //$sql = $historyKjDataQuery->createCommand()->getRawSql();p($sql);
         $historyKjData = $historyKjDataQuery->asArray()->all();
         foreach ($historyKjData as $k=>$historyKjDatum){
             $kk = $k + 1;
             $heZhi = (AoZhou5Service::KJ_CODE_NUM==5)? $historyKjDatum['codes_hz']:$historyKjDatum['codes_4nums_hz'];
             $text .= self::getFanTan((int)$heZhi).' ';
-            if($kk%20==0){
+            if($kk%15==0){
                 $text .= "\n\n";
             }
         }
