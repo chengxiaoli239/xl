@@ -6,6 +6,7 @@ use backend\models\TzSystemsUsers;
 use backend\service\BaseService;
 use backend\service\CurlService;
 use backend\service\Lucky5\LuckyBaseService;
+use common\helpers\LotteryType;
 use common\kj\BaseKj;
 use common\service\CommonService;
 use common\service\proxy\ProxyBaseService;
@@ -94,7 +95,7 @@ class Lucky5 extends BaseKj {
                 }
             }
         }catch (\Exception $e){
-
+            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', LotteryType::TYPE_OPTIONS[self::$lottery_type].'取本地', ['kjData'=>$kjData, 'lottery_type'=>self::$lottery_type]);
         }
         if(empty($kjData['opencode'])) return false;
         $opencode = $kjData['opencode'];
