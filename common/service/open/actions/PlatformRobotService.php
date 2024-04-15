@@ -2,6 +2,7 @@
 
 namespace common\service\open\actions;
 
+use backend\models\open\PlatformRobot;
 use common\helpers\Platform;
 use common\open\telegram\api\WebHookApi;
 use common\tools\Tool_Common;
@@ -33,6 +34,9 @@ class PlatformRobotService
                     }
                     break;
             }
+            $platformRobotModel->status = PlatformRobot::STATUS_ACTIVE;
+            $platformRobotModel->updated_at = time();
+            $platformRobotModel->save();
         }catch (\Exception $e){
             return ['status'=>301, 'msg'=>$e->getMessage()];
         }
