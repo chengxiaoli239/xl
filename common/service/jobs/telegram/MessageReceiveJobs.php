@@ -78,7 +78,7 @@ class MessageReceiveJobs extends CommonJob
                             .'上周下单金额：'.$lastWeekBet."\n"
                             .'上周实际盈亏：'.$lastWeekPl;
 
-                        throw_info($text, CommonBaseService::CODE_FOR_USER)
+                        throw_info($text, CommonBaseService::CODE_FOR_USER);
                 }
 
                 throw_info('管理员发送：'.$content.'，未匹配到关键词', CommonBaseService::CODE_FOR_USER);
