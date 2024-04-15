@@ -30,7 +30,7 @@ class Aozhou extends BaseKj {
             $SscKjData = SscKjDataService::getKjData($lottery_type, $currentQiHao);
             if(!empty($SscKjData) && ((time()-self::LIMIT_GRAB_TIME)<$SscKjData['created_at'])){
                 $kjData = ['expect'=>$SscKjData['qihao'], 'opencode'=>$SscKjData['code_str'], 'opentime'=>date('Y-m-d H:i:s', $SscKjData['created_at'])];
-                throw_info('3分钟内新数据不需再次抓取');
+                throw_info('3分钟内新数据不需再次抓取'.$currentQiHao);
             }
 
             list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);

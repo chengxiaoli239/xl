@@ -9,6 +9,7 @@ use backend\service\Lucky5\LuckyBaseService;
 use common\kj\BaseKj;
 use common\service\CommonService;
 use common\service\proxy\ProxyBaseService;
+use common\service\ssc\SscKjDataService;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use  yii;
@@ -28,6 +29,13 @@ class Lucky5 extends BaseKj {
         $status = KjDataGet::isCanGrab(self::$lottery_type);
         if(in_array(self::$lottery_type, [8]) && (!$hasActivePlan OR !$status)){
             return false;
+        }
+
+        $kjData = self::getCurrentKjData(self::$lottery_type, $currentQiHao);
+        $SscKjData = SscKjDataService::getKjData(self::$lottery_type, $currentQiHao);
+        if(!empty($SscKjData) && ((time()-SscKjDataService::LIMIT_GRAB_TIME)<$SscKjData['created_at'])){
+            $kjData = ['expect'=>$SscKjData['qihao'], 'opencode'=>$SscKjData['code_str'], 'opentime'=>date('Y-m-d H:i:s', $SscKjData['created_at'])];
+            throw_info('3分钟内新数据不需再次抓取'.$currentQiHao);
         }
 
         if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {

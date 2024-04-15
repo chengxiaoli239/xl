@@ -13,6 +13,7 @@ use common\service\jobs\kj_data\OperateKjDataJob;
 
 class SscKjDataService extends CommonService
 {
+    const LIMIT_GRAB_TIME = 180;
     /**
      * @description 获取本地开奖数据记录
      * @param int $lotteryType
