@@ -78,8 +78,8 @@ class Lucky5 extends BaseKj {
                         }
 
                         if (!isset($data['Status']) OR $data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) {
-                            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '幸运五号码抓取异常', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
-                            throw_info('幸运五号码抓取异常');
+                            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '幸运五号码抓取异常1', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
+                            throw_info('幸运五号码抓取异常2');
                         }
                         $row = $data['Data']['draw_info'][0];
                         $opencode = $row['thousand_no'].','.$row['hundred_no'].','.$row['ten_no'].','.$row['one_no'].','.$row['ball5'];
@@ -90,7 +90,7 @@ class Lucky5 extends BaseKj {
                         Tool_Common::log('luck5', 'INFO', '号码网盘抓取-幸运网1', ['domain'=>$domain, 'kjData'=>$kjData]);
                     }catch (\Exception $e){
                         $m->srem($exsit_key, $TzSystemsUsers->id);
-                        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '网盘开奖数据获取异常', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
+                        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '网盘开奖数据获取异常3', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
                     }
                 }
             }
