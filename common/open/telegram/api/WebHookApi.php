@@ -27,7 +27,7 @@ class WebHookApi extends TelegramBase
         $token = $queryParams['token'];
         $callbackUrl = $queryParams['callbackUrl'];
 
-        $path = '/bot'.$token.self::API_SET_WEB_HOOK.'?url='.$callbackUrl.'?'.$token;
+        $path = '/bot'.$token.self::API_SET_WEB_HOOK.'?url='.$callbackUrl.'?token='.$token;
         $res = $object->get($path, $params, $headers);
 
         return $res;

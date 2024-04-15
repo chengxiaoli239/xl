@@ -23,7 +23,7 @@ class PlatformRobotService
     {
         $platformId = $platformRobotModel->platform_id;
         $token = $platformRobotModel->token;
-        $url = \Yii::$app->params['SELF_DOMAIN'].'/api/telegram/callback?token='.$token;
+        $url = \Yii::$app->params['SELF_DOMAIN'].'/api/telegram/callback';
         try {
             switch ($platformId){
                 case Platform::TELEGRAM:
