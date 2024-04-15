@@ -100,7 +100,7 @@ class MessageService  extends BaseService
     {
         $robotPlatformUserId = explode(':', $token)[0];
         $platformUserId = $from['id'];
-        $wechatUser = WechatUser::findOne(['userName'=>$platformUserId, 'robot_wechat'=>$robotPlatformUserId]);
+        $wechatUser = WechatUser::findOne(['user_id'=>$userId, 'userName'=>$platformUserId]);
         $nowTime = time();
         $setData = [];
         if(empty($wechatUser)){
