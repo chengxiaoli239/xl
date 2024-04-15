@@ -68,7 +68,7 @@ class Lucky5 extends BaseKj {
                     }
 
                     if (!isset($data['Status']) OR $data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) {
-                        Tool_Common::log('getLotteryLucky', 'ERR', '幸运五号码抓取异常', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
+                        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '幸运五号码抓取异常', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
                         throw_info('幸运五号码抓取异常');
                     }
                     $row = $data['Data']['draw_info'][0];
