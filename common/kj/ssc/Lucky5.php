@@ -25,72 +25,76 @@ class Lucky5 extends BaseKj {
      */
     public static function getLotteryLucky($returnType = 'json', $is_auto = 1){
 
-        $hasActivePlan = CommonService::hasPlansActive(self::$lottery_type);
-        $status = KjDataGet::isCanGrab(self::$lottery_type);
-        if(in_array(self::$lottery_type, [8]) && (!$hasActivePlan OR !$status)){
-            return false;
-        }
+        try {
+            $hasActivePlan = CommonService::hasPlansActive(self::$lottery_type);
+            $status = KjDataGet::isCanGrab(self::$lottery_type);
+            if(in_array(self::$lottery_type, [8]) && (!$hasActivePlan OR !$status)){
+                return false;
+            }
 
-        $kjData = self::getCurrentKjData(self::$lottery_type, $currentQiHao);
-        $SscKjData = SscKjDataService::getKjData(self::$lottery_type, $currentQiHao);
-        if(!empty($SscKjData) && ((time()-SscKjDataService::LIMIT_GRAB_TIME)<$SscKjData['created_at'])){
-            $kjData = ['expect'=>$SscKjData['qihao'], 'opencode'=>$SscKjData['code_str'], 'opentime'=>date('Y-m-d H:i:s', $SscKjData['created_at'])];
-            throw_info('3分钟内新数据不需再次抓取'.$currentQiHao);
-        }
+            $kjData = self::getCurrentKjData(self::$lottery_type, $currentQiHao);
+            $SscKjData = SscKjDataService::getKjData(self::$lottery_type, $currentQiHao);
+            if(!empty($SscKjData) && ((time()-SscKjDataService::LIMIT_GRAB_TIME)<$SscKjData['created_at'])){
+                $kjData = ['expect'=>$SscKjData['qihao'], 'opencode'=>$SscKjData['code_str'], 'opentime'=>date('Y-m-d H:i:s', $SscKjData['created_at'])];
+                throw_info('3分钟内新数据不需再次抓取'.$currentQiHao);
+            }
 
-        if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
-            $where = ['AND', ['=', 'status',1], ['>', 'balance', 0],['IN', 'tz_system_id', [7, 9]], ['!=', 'ssc_domain', '']];
-            $TzSystemsUserses = TzSystemsUsers::find()->where($where)->all();
-            $m = \Yii::$app->redis;
-            foreach ($TzSystemsUserses as $TzSystemsUsers){ # 用户账号去网盘抓数据
-                try {
-                    sleep(2);
-                    $exsit_key = 'ssc_kj_data_wangpan_x0'.self::$lottery_type;
-                    $is_exsit = $m->sadd($exsit_key, $TzSystemsUsers->id);
-                    if(!$is_exsit){
-                        throw_info('频繁操作');
+            if($is_auto==2 OR !$kjData = self::getCurrentKjData(self::$lottery_type)) {
+                $where = ['AND', ['=', 'status',1], ['>', 'balance', 0],['IN', 'tz_system_id', [7, 9]], ['!=', 'ssc_domain', '']];
+                $TzSystemsUserses = TzSystemsUsers::find()->where($where)->all();
+                $m = \Yii::$app->redis;
+                foreach ($TzSystemsUserses as $TzSystemsUsers){ # 用户账号去网盘抓数据
+                    try {
+                        sleep(2);
+                        $exsit_key = 'ssc_kj_data_wangpan_x0'.self::$lottery_type;
+                        $is_exsit = $m->sadd($exsit_key, $TzSystemsUsers->id);
+                        if(!$is_exsit){
+                            throw_info('频繁操作');
+                        }
+                        //$domain = BaseKj::getApiHost(18);
+                        $domain = $TzSystemsUsers->ssc_domain;
+
+                        $t = microtime(true) * 10000;
+                        $url = $domain.'/Member/GetMemberPrint?_='.$t; #当前开奖号码
+                        # 当前开奖链接：http://f9.ww99865.xyz:5678/Member/GetMemberPrint?_=1570547160015
+
+                        $headers = [
+                            'Accept: application/json, text/javascript, */*',
+                            'Accept-Encoding: gunzip, deflate',
+                            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                            'Connection: keep-alive',
+                            'Cookie: '.$TzSystemsUsers->cookie,
+                            'Host: '.str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
+                            'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$t,
+                            $TzSystemsUsers->user_agent,
+                            'X-Requested-With: XMLHttpRequest',
+                        ];
+                        $content = LuckyBaseService::getCurl($url, $headers, $TzSystemsUsers->uid);
+                        //$data = json_decode($content,320);
+                        $data = $content;
+                        if(isset($data['Status']) && $data['Status'] == 1){
+
+                        }
+
+                        if (!isset($data['Status']) OR $data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) {
+                            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '幸运五号码抓取异常', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
+                            throw_info('幸运五号码抓取异常');
+                        }
+                        $row = $data['Data']['draw_info'][0];
+                        $opencode = $row['thousand_no'].','.$row['hundred_no'].','.$row['ten_no'].','.$row['one_no'].','.$row['ball5'];
+                        if($opencode == '0,0,0,0,0'){
+                            throw_info('开奖号码异常');
+                        }
+                        $kjData = ['expect'=>$row['period_no'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
+                        Tool_Common::log('luck5', 'INFO', '号码网盘抓取-幸运网1', ['domain'=>$domain, 'kjData'=>$kjData]);
+                    }catch (\Exception $e){
+                        $m->srem($exsit_key, $TzSystemsUsers->id);
+                        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '网盘开奖数据获取异常', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
                     }
-                    //$domain = BaseKj::getApiHost(18);
-                    $domain = $TzSystemsUsers->ssc_domain;
-
-                    $t = microtime(true) * 10000;
-                    $url = $domain.'/Member/GetMemberPrint?_='.$t; #当前开奖号码
-                    # 当前开奖链接：http://f9.ww99865.xyz:5678/Member/GetMemberPrint?_=1570547160015
-
-                    $headers = [
-                        'Accept: application/json, text/javascript, */*',
-                        'Accept-Encoding: gunzip, deflate',
-                        'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-                        'Connection: keep-alive',
-                        'Cookie: '.$TzSystemsUsers->cookie,
-                        'Host: '.str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
-                        'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$t,
-                        $TzSystemsUsers->user_agent,
-                        'X-Requested-With: XMLHttpRequest',
-                    ];
-                    $content = LuckyBaseService::getCurl($url, $headers, $TzSystemsUsers->uid);
-                    //$data = json_decode($content,320);
-                    $data = $content;
-                    if(isset($data['Status']) && $data['Status'] == 1){
-
-                    }
-
-                    if (!isset($data['Status']) OR $data['Status'] != 1 OR !isset($data['Data']['draw_info'][0])) {
-                        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '幸运五号码抓取异常', ['url'=>$url, 'headers'=>$headers, 'content'=>$content]);
-                        throw_info('幸运五号码抓取异常');
-                    }
-                    $row = $data['Data']['draw_info'][0];
-                    $opencode = $row['thousand_no'].','.$row['hundred_no'].','.$row['ten_no'].','.$row['one_no'].','.$row['ball5'];
-                    if($opencode == '0,0,0,0,0'){
-                        throw_info('开奖号码异常');
-                    }
-                    $kjData = ['expect'=>$row['period_no'], 'opencode'=>$opencode, 'opentime'=>date('Y-m-d H:i:s')];
-                    Tool_Common::log('luck5', 'INFO', '号码网盘抓取-幸运网1', ['domain'=>$domain, 'kjData'=>$kjData]);
-                }catch (\Exception $e){
-                    $m->srem($exsit_key, $TzSystemsUsers->id);
-                    Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '网盘开奖数据获取异常', ['lottery_type'=>self::$lottery_type, 'err_msg'=>$e->getMessage()]);
                 }
             }
+        }catch (\Exception $e){
+
         }
         if(empty($kjData['opencode'])) return false;
         $opencode = $kjData['opencode'];
