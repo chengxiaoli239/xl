@@ -1,6 +1,7 @@
 <?php
 namespace common\service\jobs\telegram;
 
+use backend\service\agent\AgentService;
 use backend\service\agent\AgentUsersBalanceService;
 use backend\service\agent\AgentUsersService;
 use common\exceptions\InfoException;
@@ -58,15 +59,28 @@ class MessageReceiveJobs extends CommonJob
             $content = trim($message['text']);
 
             if(WechatUser::find()->where(['user_id'=>$userId, 'userName'=>$fromId, 'is_admin'=>WechatUser::MEMBER_TYPE_ADMIN])->limit(1)->one()){
-                # 管理员，处理上下分等业务
+                # 管理员，处理上下分、查等业务
                 preg_match('/上\s*(\d+)/', $content,$matches);
                 $applyId = (int)$matches[1];
                 $data = ['id'=>$applyId];
-                if(preg_match('/通过|拒绝/', $content, $matches)) {
-                    $data['status'] = ($matches[0] === '通过') ? AgentUsersBalanceService::FLOW_CHECK_STATUS_PASS : AgentUsersBalanceService::FLOW_CHECK_STATUS_REFUSE;
-                    AgentUsersService::userFlowsCheck($data, $userId, '管理员通过消息回复处理');
-                    return [CommonBaseService::CODE_FOR_IGNORE, [], ['管理员已通过消息回复处理']];
+                switch (true){
+                    case preg_match('/通过|拒绝/', $content, $matches):
+                        $data['status'] = ($matches[0] === '通过') ? AgentUsersBalanceService::FLOW_CHECK_STATUS_PASS : AgentUsersBalanceService::FLOW_CHECK_STATUS_REFUSE;
+                        AgentUsersService::userFlowsCheck($data, $userId, '管理员通过消息回复处理');
+                        return [CommonBaseService::CODE_FOR_IGNORE, [], ['管理员已通过消息回复处理']];
+                    case strpos($content, '查') !== false:
+                        list($balance, $todayPl, $todayBet, $weekBet, $weekPl, $lastWeekBet, $lastWeekPl) = AgentService::getCalcMoney($userId);
+                        $text = '盘口余额：'.$balance."\n"
+                            .'今日盈亏：'.$todayPl."\n"
+                            .'有效金额：'.$todayBet."\n"
+                            .'本周下单金额：'.$weekBet."\n"
+                            .'本周实际盈亏：'.$weekPl."\n"
+                            .'上周下单金额：'.$lastWeekBet."\n"
+                            .'上周实际盈亏：'.$lastWeekPl;
+
+                        return [CommonBaseService::CODE_FOR_USER, [], $text];
                 }
+
                 throw_info('管理员发送：'.$content.'，未匹配到关键词', CommonBaseService::CODE_FOR_USER);
             }
 
