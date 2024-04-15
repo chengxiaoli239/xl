@@ -108,13 +108,13 @@ class MessageService  extends BaseService
             $setData = [
                 'user_id' => $userId,
                 'userName' => $platformUserId,
-                'robot_wechat' => $robotPlatformUserId,
                 'created_at' => $nowTime,
             ];
         }
         $setData = array_merge($setData, [
             'user_id' => $userId, # 本系统用户id
             'nickName' => $chat['first_name'].$chat['last_name'],
+            'robot_wechat' => $robotPlatformUserId,
             'updated_at' => $nowTime,
         ]);
         $wechatUser->setAttributes($setData, false);
