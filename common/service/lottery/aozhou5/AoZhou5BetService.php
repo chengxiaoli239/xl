@@ -292,6 +292,7 @@ class AoZhou5BetService extends CommonBaseService
         $result2 = OrderApi::pushBettingSingle($url, $postData2);
         $logArr = ['betRowId'=>$betRowId, 'user_id'=>$user_id, 'method_id'=>$method_id, 'methodData'=>$methodData, 'post_data1'=>$postData1, 'post_data2'=>$postData2, 'lottery_type'=>$lottery_type, 'result1'=>$result1, 'result2'=>$result2];
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', $logArr);
+
         if(!empty($result['error'])){ # 错误码：2成功、9918 登录超时....
             $logArr['result'] = $result;
             Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘20', $logArr);
