@@ -117,7 +117,7 @@ class ActionService
         // 获取响应中设置的 Cookie end
 
         $result = Json::decode($body);
-        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'ERR', '登录结束', ['params'=>$params, 'parsed_url'=>$result]);
+        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'ERR', '登录结束', ['params'=>$params, 'code'=>$code, 'result'=>$result, 'cookieStr'=>$cookieStr]);
 
         return $result;
     }

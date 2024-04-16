@@ -14,11 +14,11 @@ use backend\service\Juhua\JuHuaBaseService;
 use backend\service\LeCai\ZhongFaService;
 use backend\service\Lucky5\Lucky5Service;
 use backend\service\NineNine\NineNineNewService;
-use backend\service\NineNine\NineNineService6;
 use backend\service\pingbo\PingBoBaseService;
 use backend\service\qilin\QiLinBaseService;
+use common\helpers\LotteryType;
 use common\service\CommonService;
-use common\service\open\aozhou5\ActionService;
+use common\service\open\ActionBaseService;
 use common\service\proxy\ProxyBaseService;
 use common\service\thirdD\sx\Sx3dUserService;
 use common\tools\RedisLock;
@@ -44,7 +44,7 @@ class BaseService{
             }
 
             $tz_system_id = $TzSystemsUser->tz_system_id;
-            if(!in_array($tz_system_id, [17, 18])){
+            if(!in_array($tz_system_id, [17, 18, LotteryType::AZ_LUCKY_5])){
                 # 是否有激活的计划
                 $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id, $TzSystemsUser->uid);
                 if($is_auto == 1 && !$hasActivePlan){
@@ -111,7 +111,7 @@ class BaseService{
                     $rst = Sx3dUserService::login($TzSystemsUser);
                     break;
                 case 19: # 澳洲五
-                    $rst = (new ActionService())->login($TzSystemsUser);
+                    $rst = (new ActionBaseService())->login($TzSystemsUser);
                     break;
             }
             if($rst['status'] != 200){
