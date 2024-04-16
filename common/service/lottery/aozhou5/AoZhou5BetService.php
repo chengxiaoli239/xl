@@ -10,6 +10,7 @@ use common\open\aozhou5\api\OrderApi;
 use common\service\CommonService;
 use common\service\open\ActionBaseService;
 use common\service\open\aozhou5\ActionService;
+use common\service\ssc\QihaoService;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\jobs\SsxxBetJobs;
 use common\service\thirdD\MethodMatchService;
@@ -279,13 +280,17 @@ class AoZhou5BetService extends CommonBaseService
 
         $result1 = OrderApi::push($url, $postData1);
 
+        list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao(self::LOTTERY_TYPE_AOZHOU5);
         $postData2 = [
             '__'=>'bettingSingle',
-            'gameId'=>601,
-            'pusId' => 8,
-            'rebate' => 'A',
             'data' => [
-                [$methodData['site_method_id'], $Odds['odds'], (string)floatval($betRow->bet_money)], // 赔率待处理
+                'gameId'=>601,
+                'pusId' => 8,
+                'openingNum' => $nextQiHao,
+                'rebate' => 'A',
+                'data' => [
+                    [$methodData['site_method_id'], $Odds['odds'], (string)floatval($betRow->bet_money)], // 赔率待处理
+                ]
             ],
             'cbk' => explode('=', trim($site['cookie']))[1],
         ];
