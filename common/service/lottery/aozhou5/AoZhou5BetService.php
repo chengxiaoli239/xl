@@ -262,7 +262,7 @@ class AoZhou5BetService extends CommonBaseService
         if(!isset($Odds['odds'])){
             throw_info('赔率获取异常user_id:'.$betRow->user_id.'_play_method:'.$betRow->play_method);
         }
-        $postData = [
+        $postData1 = [
             '__'=>'isAutoOdds',
             'gameId'=>601,
             'rebate' => 'A',
@@ -277,8 +277,20 @@ class AoZhou5BetService extends CommonBaseService
         $parsed_url = parse_url($site['ssc_domain']); # Array ( [scheme] => https [host] => ac3868.com )
         $url = "https://url{$objectClass->line_number}.{$parsed_url['host']}";
 
-        $result = OrderApi::push($url, $postData);
-        $logArr = ['betRowId'=>$betRowId, 'user_id'=>$user_id, 'method_id'=>$method_id, 'methodData'=>$methodData, 'post_data'=>$postData, 'lottery_type'=>$lottery_type, 'result'=>$result];
+        $result1 = OrderApi::push($url, $postData1);
+
+        $postData2 = [
+            '__'=>'bettingSingle',
+            'gameId'=>601,
+            'pusId' => 8,
+            'rebate' => 'A',
+            'data' => [
+                [$methodData['site_method_id'], $Odds['odds'], (string)floatval($betRow->bet_money)], // 赔率待处理
+            ],
+            'cbk' => explode('=', trim($site['cookie']))[1],
+        ];
+        $result2 = OrderApi::pushBettingSingle($url, $postData2);
+        $logArr = ['betRowId'=>$betRowId, 'user_id'=>$user_id, 'method_id'=>$method_id, 'methodData'=>$methodData, 'post_data1'=>$postData1, 'post_data2'=>$postData2, 'lottery_type'=>$lottery_type, 'result1'=>$result1, 'result2'=>$result2];
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', $logArr);
         if(!empty($result['error'])){ # 错误码：2成功、9918 登录超时....
             $logArr['result'] = $result;
