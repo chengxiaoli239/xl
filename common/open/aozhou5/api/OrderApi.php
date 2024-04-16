@@ -33,7 +33,7 @@ class OrderApi extends Base
             "X-Requested-With"=> "XMLHttpRequest",
         ], $headers);
         $data[RequestOptions::FORM_PARAMS] = $params;
-        #$data['verify']  = false; // 禁用 SSL 验证，不推荐在生产环境中使用
+        $data['verify']  = false; // 禁用 SSL 验证，不推荐在生产环境中使用
         //p([self::API_CREATE_ORDER, $data, $headers]);
         $result = $object->post(self::API_CREATE_ORDER, $data, $headers);
         
