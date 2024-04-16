@@ -9,17 +9,12 @@ use common\tools\Tool_Common;
 
 class PlatformRobotService
 {
-    public static function getClass($platformId)
-    {
-
-    }
-
     /**
      * 平台登录
      * @param object $platformRobotModel
      * @return array|false
      */
-    public static function login(object $platformRobotModel)
+    public static function setWebHook(object $platformRobotModel)
     {
         $platformId = $platformRobotModel->platform_id;
         $token = $platformRobotModel->token;

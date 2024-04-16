@@ -133,13 +133,13 @@ class Base extends OpenBase
             $content = $response->getBody()->getContents();
             $statusCode = $response->getStatusCode();  // 获取成功响应的状态码
             //p(['content'=>$content]);
-            if($apiMethod == SiteOauthApi::API_GET_CAPTCHA){
-                $fileContent = $content;
-                return ['fileContent'=>$fileContent];
-            }
 
             if (!empty($content)) {
-                $result = Json::decode($content);
+                if(is_json($content)){
+                    $result = Json::decode($content);
+                }else{
+                    $result = ['content'=>$content];
+                }
             }else{
                 throw_info('异常', 30000);
             }

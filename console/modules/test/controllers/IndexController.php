@@ -26,6 +26,7 @@ use common\service\CommonService;
 use common\service\helpers\ThirdD;
 use common\service\lottery\aozhou5\AoZhou5BetService;
 use common\service\lottery\LotteryTypeService;
+use common\service\open\ActionBaseService;
 use common\service\open\telegram\AoZhouKjService;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\match\MatchCodeService;
@@ -54,6 +55,9 @@ class IndexController extends Controller
         $dateString = '20231114002';
 
         try {
+            $tzSystemUser = TzSystemsUsers::findOne(68);
+            #$r = (new ActionBaseService())->login($tzSystemUser);p($r);
+            $r = (new ActionBaseService())->getUserInfo($tzSystemUser);p($r);
             $data = AgentService::getCalcMoney($userId=21);p($data);
             $rst = AgentUsersService::userFlowsCheck(['id'=>16791, 'status'=>1], 21, '管理员消息回复处理');p($rst);
             $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%wechat_user}}'); p($r);

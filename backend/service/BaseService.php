@@ -16,9 +16,9 @@ use backend\service\Lucky5\Lucky5Service;
 use backend\service\NineNine\NineNineNewService;
 use backend\service\NineNine\NineNineService6;
 use backend\service\pingbo\PingBoBaseService;
-use backend\service\qilin\BingDaoService;
 use backend\service\qilin\QiLinBaseService;
 use common\service\CommonService;
+use common\service\open\aozhou5\ActionService;
 use common\service\proxy\ProxyBaseService;
 use common\service\thirdD\sx\Sx3dUserService;
 use common\tools\RedisLock;
@@ -109,6 +109,9 @@ class BaseService{
                 case 17: # 排sx
                 case 18: # 福sx
                     $rst = Sx3dUserService::login($TzSystemsUser);
+                    break;
+                case 19: # 澳洲五
+                    $rst = (new ActionService())->login($TzSystemsUser);
                     break;
             }
             if($rst['status'] != 200){

@@ -1,0 +1,70 @@
+<?php
+namespace common\open\aozhou5\api;
+
+use common\service\wechat\eyun\api\EventServiceTrait;
+use common\tools\Common;
+use GuzzleHttp\RequestOptions;
+
+
+class UserApi extends Base
+{
+
+    # 忽略code
+    const IGNORE_CODE = 40000;
+
+    // 下单订单
+    const API_SEARCH_LINE = '/user-search-result.aspx';
+    const API_PRE_LOGIN = '/user-search-result.aspx';
+    const API_USER_INFO = '/api/';
+
+    /**
+     * 搜索线路
+     * @param string $domain
+     * @param array $params 参数
+     * @param array $headers
+     * @return array
+     */
+    public static function searchLine(string $domain, array $params, array $headers=[]): array
+    {
+        $object = self::createObject();
+        $object->apiUrl = $domain;
+
+        $headers = array_merge([
+            'Accept' => 'application/json, text/javascript, */*; q=0.01',
+            'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
+            "X-Requested-With"=> "XMLHttpRequest",
+        ], $headers);
+        $data[RequestOptions::QUERY] = $params;
+        $data['verify'] = false;
+        $result = $object->get(self::API_SEARCH_LINE, $data, $headers);
+        //p([$domain, $params, $headers, $result]);
+
+        return $result;
+    }
+
+    /**
+     * 用户信息
+     * @param string $domain
+     * @param array $params 参数
+     * @param array $headers
+     * @return array
+     */
+    public static function getUserInfo(string $domain, array $params, array $headers=[]): array
+    {
+        $object = self::createObject();
+        $object->apiUrl = $domain;
+
+        $headers = array_merge([
+            'Accept' => 'application/json, text/javascript, */*; q=0.01',
+            'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
+            "X-Requested-With"=> "XMLHttpRequest",
+        ], $headers);
+        $data[RequestOptions::FORM_PARAMS] = $params;
+        $data['verify'] = false;
+        $result = $object->post(self::API_USER_INFO, $data, $headers);
+
+        return $result;
+    }
+}

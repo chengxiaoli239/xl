@@ -123,7 +123,7 @@ class PlatformRobotController extends BaseController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $model = $this->findModel($id);
-        $loginRst = PlatformRobotService::login($model);
+        $loginRst = PlatformRobotService::setWebHook($model);
         if($loginRst['status'] != 200){
             return ['status'=>301, 'msg'=>'登陆失败：'.$loginRst['message']];
         }

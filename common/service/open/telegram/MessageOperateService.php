@@ -39,7 +39,7 @@ class MessageOperateService  extends BaseService
     public array $betData=[];
     public $lottery_type;
     /** @var int 单注最低金额 */
-    const ONE_MINI_MONEY = 20;
+    const ONE_MINI_MONEY = 1;
 
     public function __construct($userId, $fromId)
     {
@@ -102,7 +102,7 @@ class MessageOperateService  extends BaseService
                 'id' => $methodId,
                 'name' => $methodName,
             ];
-            if($allMoneys<20){
+            if($allMoneys<self::ONE_MINI_MONEY){
                 throw_info('单注最低:'.self::ONE_MINI_MONEY.'，请核实后重新下注', CommonBaseService::CODE_FOR_USER);
             }
         }
