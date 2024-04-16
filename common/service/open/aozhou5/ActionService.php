@@ -100,7 +100,6 @@ class ActionService
             'Sec-Fetch-Site' => 'same-origin',
             'User-Agent' => $this->userAgent,
         ];
-
         $params[RequestOptions::HEADERS] = $headers;
         $params['verify'] = false;
         //p(['thirdUrl'=>$thirdUrl, 'params'=>$params]);
