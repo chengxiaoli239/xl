@@ -3,6 +3,7 @@
 namespace common\service\lottery\aozhou5;
 
 use backend\models\thirdD\BetsBackend;
+use backend\models\TzSystemsUsers;
 use backend\models\wechat\Bets;
 use common\helpers\RequestHelper;
 use common\models\wechat\WechatUser;
@@ -277,6 +278,7 @@ class AoZhou5BetService extends CommonBaseService
         ];
         $objectClass = ActionBaseService::getClass($site['tz_system_id']);
         $objectClass->domain = $site['ssc_domain'];
+        $objectClass->tzSystemUsers = TzSystemsUsers::findOne($site['id']);
         $parsed_url = parse_url($site['ssc_domain']); # Array ( [scheme] => https [host] => ac3868.com )
         $url = "https://url{$objectClass->line_number}.{$parsed_url['host']}";
 
