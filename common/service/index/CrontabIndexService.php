@@ -14,6 +14,7 @@ class  CrontabIndexService{
             ->where(['AND',['=', 'u.status', 1], ['=', 'u.is_auto_login', 1], ['<>', 'u.ssc_domain', ''], ['=', 's.status', 1]]);
         $sql = $query->createCommand()->getRawSql();
         $TzSystemsUsers = $query->asArray()->all();
+        if(empty($TzSystemsUsers)) return ['status'=>200, 'msg'=>'为空'];
 
         foreach ($TzSystemsUsers as $TzSystemsUser){
             try {
@@ -37,7 +38,7 @@ class  CrontabIndexService{
             }
         }
 
-        return $rst;
+        return $rst??[];
     }
 
 }
