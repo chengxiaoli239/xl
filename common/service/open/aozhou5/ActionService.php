@@ -156,6 +156,7 @@ class ActionService
         ];
         $url = "https://url{$this->line_number}.{$host}";
         $userInfo = UserApi::getUserInfo($url, $params, $headers);
+        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '获取用户信息', ['account'=>$this->tzSystemUsers->account, 'userInfo'=>$userInfo]);
         if(!isset($userInfo)){
             return false;
         }
