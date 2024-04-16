@@ -27,8 +27,10 @@ class ActionBaseService
         $objectClass->password = $tzSystemsUser->password;
         $objectClass->tzSystemUsers = $tzSystemsUser;
 
-        $objectClass->login();
-        $objectClass->getUserInfo();
+        if(!$objectClass->getUserInfo()){
+            $objectClass->login();
+            $objectClass->getUserInfo();
+        }
 
         return [0, '完成'];
     }
