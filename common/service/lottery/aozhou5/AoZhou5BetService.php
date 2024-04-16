@@ -16,6 +16,7 @@ use common\service\thirdD\jobs\SsxxBetJobs;
 use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\Odds3dService;
 use common\tools\Tool_Common;
+use yii\helpers\Json;
 
 class AoZhou5BetService extends CommonBaseService
 {
@@ -283,15 +284,15 @@ class AoZhou5BetService extends CommonBaseService
         list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao(self::LOTTERY_TYPE_AOZHOU5);
         $postData2 = [
             '__'=>'bettingSingle',
-            'data' => [
+            'data' => Json::encode([
                 'gameId'=>601,
                 'pusId' => 8,
-                'openingNum' => $nextQiHao,
+                'openingNum' => (int)$nextQiHao,
                 'rebate' => 'A',
                 'data' => [
                     [$methodData['site_method_id'], $Odds['odds'], (string)floatval($betRow->bet_money)], // 赔率待处理
                 ]
-            ],
+            ]),
             'cbk' => explode('=', trim($site['cookie']))[1],
         ];
         $result2 = OrderApi::pushBettingSingle($url, $postData2);
