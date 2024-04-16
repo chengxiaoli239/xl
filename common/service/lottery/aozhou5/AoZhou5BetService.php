@@ -8,6 +8,8 @@ use common\helpers\RequestHelper;
 use common\models\wechat\WechatUser;
 use common\open\aozhou5\api\OrderApi;
 use common\service\CommonService;
+use common\service\open\ActionBaseService;
+use common\service\open\aozhou5\ActionService;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\jobs\SsxxBetJobs;
 use common\service\thirdD\MethodMatchService;
@@ -270,8 +272,12 @@ class AoZhou5BetService extends CommonBaseService
             #'cbk' => '0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6',
             'cbk' => explode('=', trim($site['cookie']))[1],
         ];
+        $objectClass = ActionBaseService::getClass($site['ssc_domain']);
+        $objectClass->domain = $site['ssc_domain'];
+        $parsed_url = parse_url($site['ssc_domain']); # Array ( [scheme] => https [host] => ac3868.com )
+        $url = "https://url{$objectClass->line_number}.{$parsed_url['host']}";
 
-        $result = OrderApi::push($site['ssc_domain'], $postData);
+        $result = OrderApi::push($url, $postData);
         $logArr = ['betRowId'=>$betRowId, 'user_id'=>$user_id, 'method_id'=>$method_id, 'methodData'=>$methodData, 'post_data'=>$postData, 'lottery_type'=>$lottery_type, 'result'=>$result];
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', $logArr);
         if(!empty($result['error'])){ # 错误码：2成功、9918 登录超时....
