@@ -44,7 +44,7 @@ class BaseService{
             }
 
             $tz_system_id = $TzSystemsUser->tz_system_id;
-            if(!in_array($tz_system_id, [17, 18, LotteryType::AZ_LUCKY_5])){
+            if(!in_array($tz_system_id, [17, 18, 19])){
                 # 是否有激活的计划
                 $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id, $TzSystemsUser->uid);
                 if($is_auto == 1 && !$hasActivePlan){
