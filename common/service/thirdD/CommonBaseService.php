@@ -69,7 +69,7 @@ class CommonBaseService extends BaseService
      */
     public static function getSystemBaseInfo(int $user_id, int $lottery_type=26){
         $system = TzSystemsUsers::find()->alias('tsu')
-            ->select(['user_id'=>'tsu.uid', 'tz.system_type_id', 'tsu.ssc_domain', 'cookie'=>'tsu.cookie'])
+            ->select(['user_id'=>'tsu.uid', 'tsu.tz_system_id', 'tz.system_type_id', 'tsu.ssc_domain', 'cookie'=>'tsu.cookie'])
             ->leftJoin(TzSystems::tableName().' tz', 'tsu.tz_system_id=tz.id')
             ->where(['AND', ['=', 'tz.lottery_type', $lottery_type], ['=', 'tsu.uid', $user_id]])
             ->asArray()->one();

@@ -272,7 +272,7 @@ class AoZhou5BetService extends CommonBaseService
             #'cbk' => '0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6',
             'cbk' => explode('=', trim($site['cookie']))[1],
         ];
-        $objectClass = ActionBaseService::getClass($site['ssc_domain']);
+        $objectClass = ActionBaseService::getClass($site['tz_system_id']);
         $objectClass->domain = $site['ssc_domain'];
         $parsed_url = parse_url($site['ssc_domain']); # Array ( [scheme] => https [host] => ac3868.com )
         $url = "https://url{$objectClass->line_number}.{$parsed_url['host']}";
