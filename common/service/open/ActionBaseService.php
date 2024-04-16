@@ -19,7 +19,7 @@ class ActionBaseService
         return $classes[$tzSystemId]??false;
     }
 
-    public function login($tzSystemsUser)
+    public function login($tzSystemsUser): array
     {
         $objectClass = self::getClass($tzSystemsUser->tz_system_id);
         $objectClass->domain = $tzSystemsUser->ssc_domain;
@@ -30,7 +30,7 @@ class ActionBaseService
         $objectClass->login();
         $objectClass->getUserInfo();
 
-        return true;
+        return [0, '完成'];
     }
 
     public function getUserInfo($tzSystemsUser): bool
