@@ -7,6 +7,7 @@ use backend\models\wechat\Bets;
 use common\helpers\RequestHelper;
 use common\models\wechat\WechatUser;
 use common\open\aozhou5\api\OrderApi;
+use common\open\aozhou5\api\UserApi;
 use common\service\CommonService;
 use common\service\open\ActionBaseService;
 use common\service\open\aozhou5\ActionService;
@@ -304,6 +305,7 @@ class AoZhou5BetService extends CommonBaseService
             Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘20', $logArr);
             throw_info($result['m']??'推送盘口异常', 30001);
         }
+        $objectClass->getUserInfo(); # 同步余额
 
         return true;
     }
