@@ -9,6 +9,7 @@ use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
 use common\helpers\SscMethod;
 use common\service\chat\Tool_Common;
+use common\service\helpers\ThirdD;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
 use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
 use common\service\message\Send;
@@ -66,7 +67,9 @@ class MessageOperateService  extends BaseService
 
     private function resetText($text): void
     {
-        $this->text = str_replace([',', '，', ' ','。', "\n"], ',', trim($text));
+        $text = str_replace([',', '，', ' ','。', "\n"], ',', trim($text));
+
+        $this->text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
     }
 
     /**
