@@ -53,8 +53,9 @@ class IndexController extends Controller
     public function actionDw(): array
     {
         $dateString = '20231114002';
-
         try {
+            $d = ["2念1/10","","","","4念3/5"];
+            p(array_values(array_filter($d)));
             $tzSystemUser = TzSystemsUsers::findOne(68);
             #$r = (new ActionBaseService())->login($tzSystemUser);p($r);
             $r = (new ActionBaseService())->getUserInfo($tzSystemUser);p($r);

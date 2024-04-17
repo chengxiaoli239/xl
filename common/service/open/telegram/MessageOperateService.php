@@ -67,9 +67,8 @@ class MessageOperateService  extends BaseService
 
     private function resetText($text): void
     {
-        $text = str_replace([',', '，', ' ','。', "\n"], ',', trim($text));
-
-        $this->text = ThirdD::replaceManyNull($text); # 多个空格替换成单个空格
+        $text = ThirdD::replaceManyNull($text);
+        $this->text = str_replace([',', '，', ' ','。', "\n"], ',', trim($text));  # 多个空格替换成单个空格
     }
 
     /**
@@ -77,7 +76,7 @@ class MessageOperateService  extends BaseService
      */
     private function getBetData()
     {
-        $betData = explode($this->split, $this->text);
+        $betData = array_values(array_filter(explode($this->split, $this->text)));
         foreach ($betData as $data){
             list($methodId, $methodName) = SscMethod::getMethod($data);
             $datum = explode($this->mSplit, $data);
