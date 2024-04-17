@@ -305,7 +305,7 @@ class AoZhou5BetService extends CommonBaseService
         if(!empty($result2['error'])){ # 错误码：2成功、9918 登录超时....
             $logArr['result'] = $result2;
             Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘20', $logArr);
-            throw_info($result['m']??'推送盘口异常', 30001);
+            throw_info($result2['error']??'推送盘口异常', 30001);
         }
         $objectClass->getUserInfo(); # 同步余额
         Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘30', ['result2'=>$result2]);
