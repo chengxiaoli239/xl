@@ -106,6 +106,7 @@ class MessageOperateService  extends BaseService
                 'name' => $methodName,
             ];
             if($allMoneys<self::ONE_MINI_MONEY){
+                Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '下注金额异常', ['oBetData'=>$betData, 'betData'=>$this->betData, 'text'=>$this->text, 'data'=>$data, 'datum'=>$datum]);
                 throw_info('单注最低:'.self::ONE_MINI_MONEY.'，请核实后重新下注', CommonBaseService::CODE_FOR_USER);
             }
         }
