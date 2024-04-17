@@ -58,7 +58,7 @@ class MessageReceiveJobs extends CommonJob
             $chatId = $chat['id']; # 聊天所属用户id
             $content = trim($message['text']);
 
-            if(WechatUser::find()->where(['user_id'=>$userId, 'userName'=>$fromId, 'is_admin'=>WechatUser::MEMBER_TYPE_ADMIN])->limit(1)->one()){
+            if($content=='查查' OR WechatUser::find()->where(['user_id'=>$userId, 'userName'=>$fromId, 'is_admin'=>WechatUser::MEMBER_TYPE_ADMIN])->limit(1)->one()){
                 # 管理员，处理上下分、查等业务
                 preg_match('/上\s*(\d+)/', $content,$matches);
                 $applyId = (int)$matches[1];
