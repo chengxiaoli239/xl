@@ -153,7 +153,7 @@ class Aozhou extends BaseKj {
             $siteData = $lotteryInfo['drawList'][0]??[];
             $kjData = [
                 'expect'=>$siteData['drawNumber'],
-                'opencode'=>implode(',', $siteData['drawNumber']),
+                'opencode'=>implode(',', $siteData['numbers']),
                 'opentime'=>$siteData['drawTime']
             ];
 
