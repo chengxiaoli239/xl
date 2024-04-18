@@ -151,15 +151,16 @@ class Aozhou extends BaseKj {
             $url = "https://url{$objectClass->line_number}.{$host}";
             $lotteryInfo = UserApi::getLotteryRecord($url, $params, $headers);
             $siteData = $lotteryInfo['drawList'][0]??[];
+            $kjData = [
+                'expect'=>$siteData['drawNumber'],
+                'opencode'=>implode(',', $siteData['drawNumber']),
+                'opentime'=>$siteData['drawTime']
+            ];
 
             Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', [
                 'lottery_type'=>$lottery_type,
                 LotteryType::getName($lottery_type),
-                'kjData'=>[
-                    'expect'=>$siteData['drawNumber'],
-                    'opencode'=>implode(',', $siteData['drawNumber']),
-                    'opentime'=>$siteData['drawTime']
-                ],
+                'kjData'=>$kjData,
                 'lotteryInfo'=>$lotteryInfo,
             ]);
         }catch (\Exception $e){
