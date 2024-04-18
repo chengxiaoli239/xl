@@ -109,7 +109,7 @@ class Aozhou extends BaseKj {
         try {
             $lottery_type = self::$lottery_type;
             list($code, $currentQiHao, $kjData, $msg) = BaseKj::checkHasOpened($lottery_type);
-            if(false && $code>0){
+            if($code>0){
                 throw_info($msg);
             }
 
@@ -161,7 +161,7 @@ class Aozhou extends BaseKj {
                 'lottery_type'=>$lottery_type,
                 LotteryType::getName($lottery_type),
                 'kjData'=>$kjData,
-                'lotteryInfo'=>$lotteryInfo,
+                //'lotteryInfo'=>$lotteryInfo,
             ]);
         }catch (\Exception $e){
             Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>$lottery_type,'name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);

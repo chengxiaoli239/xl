@@ -14,7 +14,7 @@ class AozhouController extends Controller
      */
     public function actionIndex($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = Aozhou::getSiteLucky5($type);
+        $data = Aozhou::getSiteLucky5($type, $post['is_auto']??1);
         return $data;
     }
 
