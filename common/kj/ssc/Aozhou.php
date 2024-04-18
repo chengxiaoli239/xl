@@ -81,16 +81,16 @@ class Aozhou extends BaseKj {
                     }
 
                     $kjData = ['expect'=>$qihao, 'opencode'=>$opencode, 'opentime'=>$kjData['preDrawTime']];
-                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'domain'=>$domain, 'kjData'=>$kjData, /*'headers'=>$headers*/]);
+                    Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'domain'=>$domain, 'kjData'=>$kjData, /*'headers'=>$headers*/]);
                 }catch (\Exception $e){
-                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type,'name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);
+                    Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type,'name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);
                 }
             }else{
-                Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-缓存', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'cq'=>$currentQiHao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
+                Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-缓存', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'cq'=>$currentQiHao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
             }
         }catch (\Exception $e){
             //$kjData = self::getCurrentKjData($lottery_type);
-            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$currentQiHao, 'currentQiHao'=>$currentQiHao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$currentQiHao, 'currentQiHao'=>$currentQiHao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
         }
         if(empty($kjData)){
             return false;
@@ -113,7 +113,7 @@ class Aozhou extends BaseKj {
                 throw_info($msg);
             }
 
-            list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+            //list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
             $where = ['AND', ['=', 'status',1], ['>', 'balance', 0],['=', 'tz_system_id', 19], ['!=', 'ssc_domain', '']];
             $TzSystemsUser = TzSystemsUsers::find()->where($where)->limit(1)->one();
 
@@ -152,10 +152,18 @@ class Aozhou extends BaseKj {
             $lotteryInfo = UserApi::getLotteryRecord($url, $params, $headers);
             $siteData = $lotteryInfo['drawList'][0]??[];
 
-            $kjData = ['expect'=>$siteData['drawNumber'], 'opencode'=>implode(',', $siteData['drawNumber']), 'opentime'=>$siteData['drawTime']];
-            Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>$lottery_type, LotteryType::getName($lottery_type), 'kjData'=>$kjData, 'lotteryInfo'=>$lotteryInfo]);
+            Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', [
+                'lottery_type'=>$lottery_type,
+                LotteryType::getName($lottery_type),
+                'kjData'=>[
+                    'expect'=>$siteData['drawNumber'],
+                    'opencode'=>implode(',', $siteData['drawNumber']),
+                    'opentime'=>$siteData['drawTime']
+                ],
+                'lotteryInfo'=>$lotteryInfo,
+            ]);
         }catch (\Exception $e){
-            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>$lottery_type,'name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>$lottery_type,'name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);
         }
         if(empty($kjData)){
             return false;
@@ -196,9 +204,9 @@ class Aozhou extends BaseKj {
                     }
 
                     $kjData = $content;
-                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'domain'=>$domain, 'kjData'=>$kjData]);
+                    Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'domain'=>$domain, 'kjData'=>$kjData]);
                 }catch (\Exception $e){
-                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type,'name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);
+                    Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type,'name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);
                 }
             }else{
                 Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-缓存', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'cq'=>$currentQiHao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
