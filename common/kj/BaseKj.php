@@ -46,6 +46,7 @@ class BaseKj extends BaseService {
                 'opencode'=>$SscKjData['code_str'],
                 'opentime'=>date('Y-m-d H:i:s', $SscKjData['created_at'])
             ];
+            Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, ' INFO', '已存在号码？', ['lottery_type'=>$lotteryType, 'currentQiHao'=>$currentQiHao, 'kjData'=>$kjData]);
             return [self::SUCCESS_CODE, $currentQiHao, $kjData, '3分钟内新数据不需再次抓取'.$currentQiHao];
         }
 
