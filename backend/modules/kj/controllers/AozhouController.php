@@ -9,17 +9,7 @@ use yii\web\Controller;
 class AozhouController extends Controller
 {
     /**
-     * @desc 澳洲幸运五星 - 批量
-     * @return json|xml
-     */
-    public function actionBatchLucky5($type = 'json'){
-        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
-        $data = Aozhou::batch($type);
-        return $data;
-    }
-
-    /**
-     * @desc 幸运五星 - 抓网盘 - 在用
+     * @desc 澳洲五 - 抓网盘 - 在用
      * @return json|xml
      */
     public function actionIndex($type = 'json'){

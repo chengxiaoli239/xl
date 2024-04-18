@@ -4,6 +4,7 @@ use backend\models\KjConfig;
 use backend\service\HN0898Service;
 use common\exceptions\InfoException;
 use common\service\BaseService;
+use common\service\ssc\SscKjDataService;
 use common\tools\Tool_Common;
 use  yii;
 use common\tools\KjDataGet;
@@ -11,6 +12,8 @@ use common\tools\KjDataGet;
 class BaseKj extends BaseService {
     private static $currentQihao = '190125023';
     private static $tblEndQihao = '190125023';
+    const LIMIT_GRAB_TIME = 180; # 新数据刚抓完3分钟内不允许再次抓取
+    CONST SUCCESS_CODE = 20000;
 
     public static function _init($lotteryType = DEFAULT_LOTTERY_TYPE){
         self::$currentQihao = HN0898Service::getCurrentQihao($lotteryType);
@@ -25,6 +28,28 @@ class BaseKj extends BaseService {
         }
 
         return $status;
+    }
+
+    /**
+     * 检测是否已经抓取
+     * @param int $lotteryType
+     * @return array
+     */
+    public static function checkHasOpened(int $lotteryType=DEFAULT_LOTTERY_TYPE): array
+    {
+        $kjData = self::getCurrentKjData($lotteryType, $currentQiHao);
+
+        $SscKjData = SscKjDataService::getKjData($lotteryType, $currentQiHao);
+        if(!empty($SscKjData) && ((time()-self::LIMIT_GRAB_TIME)<$SscKjData['created_at'])){
+            $kjData = [
+                'expect'=>$SscKjData['qihao'],
+                'opencode'=>$SscKjData['code_str'],
+                'opentime'=>date('Y-m-d H:i:s', $SscKjData['created_at'])
+            ];
+            return [self::SUCCESS_CODE, $currentQiHao, $kjData, '3分钟内新数据不需再次抓取'.$currentQiHao];
+        }
+
+        return [0, $kjData, '可以正常抓取'];
     }
 
     /**

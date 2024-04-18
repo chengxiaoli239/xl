@@ -2,25 +2,29 @@
 # 开彩网
 namespace common\kj\ssc;
 use backend\models\SscKjData;
+use backend\models\TzSystemsUsers;
 use common\helpers\LotteryType;
 use common\kj\BaseKj;
+use common\open\aozhou5\api\UserApi;
+use common\service\open\ActionBaseService;
 use common\service\ssc\QihaoService;
 use common\service\ssc\SscKjDataService;
 use common\tools\Tool_Common;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use yii\helpers\Json;
 
 class Aozhou extends BaseKj {
     public static int $lottery_type = LotteryType::AZ_LUCKY_5;
-    CONST SUCCESS_CODE = 20000;
-    const LIMIT_GRAB_TIME = 180; # 新数据刚抓完3分钟内不允许再次抓取
 
     /**
      * @desc 澳洲幸运五，官网：https://1680632.com/view/aozxy5/ssc_index.html
      * @param string $returnType
+     * @param int $is_auto
      * @return array|bool
+     * @throws GuzzleException
      */
     public static function getLucky5(string $returnType = 'json', $is_auto = 1){
         try {
@@ -87,6 +91,71 @@ class Aozhou extends BaseKj {
         }catch (\Exception $e){
             //$kjData = self::getCurrentKjData($lottery_type);
             Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-异常', ['lottery_type'=>self::$lottery_type, 'cq'=>$currentQiHao, 'currentQiHao'=>$currentQiHao, 'kjData'=>$kjData, 'err_msg'=>$e->getMessage()]);
+        }
+        if(empty($kjData)){
+            return false;
+        }
+        return self::extracted($kjData, $lottery_type, $returnType, $is_auto);
+    }
+
+    /**
+     * @desc 澳洲幸运五，盘口
+     * @param string $returnType
+     * @param int $is_auto
+     * @return array|bool
+     * @throws GuzzleException
+     */
+    public static function getSiteLucky5(string $returnType = 'json', $is_auto = 1){
+        try {
+            $lottery_type = self::$lottery_type;
+            list($code, $currentQiHao, $kjData, $msg) = BaseKj::checkHasOpened($lottery_type);
+            if($code>0){
+                throw_info($msg);
+            }
+
+            list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+            $where = ['AND', ['=', 'status',1], ['>', 'balance', 0],['=', 'tz_system_id', 19], ['!=', 'ssc_domain', '']];
+            $TzSystemsUser = TzSystemsUsers::find()->where($where)->limit(1)->one();
+
+            $objectClass = ActionBaseService::getClass($TzSystemsUser->tz_system_id);
+            $objectClass->domain = $TzSystemsUser->ssc_domain;
+            $objectClass->tzSystemUsers = $TzSystemsUser;
+            $parsed_url = parse_url($objectClass->domain); # Array ( [scheme] => https [host] => ac3868.com )
+            $cookie = explode('=', $objectClass->tzSystemUsers->cookie)[1];
+            $params = [
+                #'__' => 'lotteryRecord', #'memberoddsdata',
+                '__' => 'memberoddsdata',
+                'gameId' => 601,
+                'pusId' => 8,
+                'tId' => 1,
+                'pId' => -1,
+                'rebate' => 'A',
+                'cbk' => $cookie,
+            ];
+            $host = $parsed_url['host'];
+            $headers = [
+                'User-Agent' => str_replace('User-Agent:', '', $objectClass->tzSystemUsers->user_agent),
+                'cookie' => $objectClass->tzSystemUsers->cookie,
+                'origin' => "https://url{$objectClass->line_number}.{$host}",
+                'referer' => "https://url{$objectClass->line_number}.{$host}/member/",
+                'sec-ch-ua' => '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+                'Origin' => "{$parsed_url['scheme']}://url{$objectClass->line_number}.{$host}",
+                'Referer' => "{$parsed_url['scheme']}://url{$objectClass->line_number}.{$host}/member/",
+                'sec-ch-ua-mobile' => '?0',
+                'sec-ch-ua-platform' => '"Windows"',
+                'sec-fetch-dest' => 'empty',
+                'sec-fetch-mode' => 'cors',
+                'sec-fetch-site' => 'same-origin',
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ];
+            $url = "https://url{$objectClass->line_number}.{$host}";
+            $lotteryInfo = UserApi::getLotteryRecord($url, $params, $headers);
+            $siteData = $lotteryInfo['drawList'][0]??[];
+
+            $kjData = ['expect'=>$siteData['drawNumber'], 'opencode'=>implode(',', $siteData['drawNumber']), 'opentime'=>$siteData['drawTime']];
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>$lottery_type, LotteryType::getName($lottery_type), 'kjData'=>$kjData, 'lotteryInfo'=>$lotteryInfo]);
+        }catch (\Exception $e){
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>$lottery_type,'name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);
         }
         if(empty($kjData)){
             return false;
