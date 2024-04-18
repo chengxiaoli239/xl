@@ -46,6 +46,11 @@ trait LotteryCacheKeyTrait
         return 'lottery:userBetPlan:account_'.$account.'_'.$activeQiHao.'_'.$planId;
     }
 
+    public static function lotteryBetPostSiteKey($betRowId='', $activeQiHao=''): string
+    {
+        return 'lottery:betPostSite:account_'.$betRowId.'_'.$activeQiHao;
+    }
+
     /**
      * @param $tz_type
      * @return string

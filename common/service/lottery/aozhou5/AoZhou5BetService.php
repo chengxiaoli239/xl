@@ -69,7 +69,7 @@ class AoZhou5BetService extends CommonBaseService
             }
             $betRow = $data['betRow']; # object
             $lottery_type = $betRow->lottery_type;
-            $qihao = $betRow->qihao;
+            $qiHao = $betRow->qihao;
             $user_id = $betRow->user_id;
             $method_id = $betRow->play_method;
             Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推盘口', ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'method_id'=>$method_id]);
@@ -83,7 +83,7 @@ class AoZhou5BetService extends CommonBaseService
             //p(['method_id'=>$method_id, 'betCodes'=>$betCodes, 'siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo]);
             $postRst = self::postBet($betRow, $betCodes);
 
-            $resultData = ['betRowId'=>$betRow->id, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'postRst'=>$postRst, 'err_msg'=>'处理结束'];
+            $resultData = ['betRowId'=>$betRow->id, 'betQiHao'=>$qiHao, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'postRst'=>$postRst, 'err_msg'=>'处理结束'];
             Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'ERR', '推送盘口处理结束99', $resultData);
             var_dump(date('Y-m-d H:i:s ').'处理成功：betRowId:'.$betRow->id.'_method_id:'.$method_id);
         }catch (\Exception $e){
@@ -304,7 +304,7 @@ class AoZhou5BetService extends CommonBaseService
 
         if(!empty($result2['error'])){ # 错误码：2成功、9918 登录超时....
             $logArr['result'] = $result2;
-            Tool_Common::log('/bet_sx/'.__FUNCTION__, 'INFO', '推网盘20', $logArr);
+            Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘20', $logArr);
             throw_info($result2['error']??'推送盘口异常', 30001);
         }
         $objectClass->getUserInfo(); # 同步余额
