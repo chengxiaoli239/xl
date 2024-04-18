@@ -109,7 +109,7 @@ class Aozhou extends BaseKj {
         try {
             $lottery_type = self::$lottery_type;
             list($code, $currentQiHao, $kjData, $msg) = BaseKj::checkHasOpened($lottery_type);
-            if($code>0){
+            if($is_auto==1 && $code>0){
                 throw_info($msg);
             }
 
