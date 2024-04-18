@@ -1,9 +1,13 @@
 <?php
 namespace common\service\lottery\aozhou5\jobs;
 
+use common\models\thirdD\Bets;
 use common\service\chat\Tool_Common;
 use common\service\jobs\CommonJob;
+use common\service\jobs\telegram\MessageReceiveJobs;
 use common\service\lottery\aozhou5\AoZhou5BetService;
+use common\service\open\telegram\MessageOperateService;
+use yii\helpers\Json;
 
 class AoZhou5BetJobs extends CommonJob {
     # 无效状态，无需处理
@@ -31,9 +35,14 @@ class AoZhou5BetJobs extends CommonJob {
             if($code>0){
                 throw_info($msg, $code);
             }
-            Tool_Common::log('/statics_3d/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params, 'data'=>$data]);
+            Tool_Common::log('/bet_aozhou5/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params, 'data'=>$data]);
         }catch (\Exception $e){
-            Tool_Common::log('/statics_3d/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['params'=>$params, 'err_msg'=>$e->getMessage()]);
+            $err_msg = $e->getMessage();
+            Tool_Common::log('/bet_aozhou5/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['params'=>$params, 'err_msg'=>$err_msg]);
+            $BetRow = Bets::findOne($betRowId);
+            $AdminInfo = MessageOperateService::getAdminInfo($BetRow->user_id);
+            $replyContent = Json::decode($BetRow->reply_content);
+            MessageReceiveJobs::reply($BetRow->user_id, [$err_msg], ['targetId'=>$AdminInfo['userName'], 'token'=>$replyContent['token']]); # 回复消息
             throw_info($e->getMessage());
         }
 

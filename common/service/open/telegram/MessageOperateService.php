@@ -8,6 +8,7 @@ use backend\service\agent\AgentUsersService;
 use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
 use common\helpers\SscMethod;
+use common\models\wechat\WechatUser;
 use common\service\chat\Tool_Common;
 use common\service\helpers\ThirdD;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
@@ -289,6 +290,16 @@ class MessageOperateService  extends BaseService
         return [0, $data, '接收成功'];
     }
 
+
+    public static function getAdminInfo($userId)
+    {
+        $WechatUser = WechatUser::find()->where(['user_id'=>$userId, 'is_admin'=>WechatUser::MEMBER_TYPE_ADMIN])->asArray()->limit(1)->one();
+        if(empty($WechatUser)){
+            throw_info('没设置管理员');
+        }
+
+        return $WechatUser;
+    }
 
 
 }
