@@ -100,7 +100,8 @@ $columns = array_merge(
                 'format'=>'raw',
                 'value' => function($model) {
                     $WechatUser = \common\models\wechat\WechatUser::findOne($model->wechat_user_id);
-                    $txt = '<a href="/wechat/bets/index.html?Bets[wechatUserName]='.$WechatUser->userName.'" title="'.$WechatUser->userName.'"><img src="'.$WechatUser->smallHead.'" width="30" height="30" title="'.$WechatUser->userName.'"> '.$WechatUser->nickName.'</a>';
+                    $txt = '<a href="/wechat/bets/index.html?Bets[wechatUserName]='.$WechatUser->userName.'" title="'.$WechatUser->userName.'">'
+                        .($WechatUser->smallHead?'<img src="'.$WechatUser->smallHead.'" width="30" height="30" title="'.$WechatUser->userName.'"> '.$WechatUser->nickName:'').'</a>';
                     return $txt;
                 }
             ],
