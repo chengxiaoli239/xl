@@ -96,7 +96,7 @@ $columns = array_merge(
                     return $txt;
                 }
             ],
-            ['attribute' => 'wechat_user_id','label'=>'微信',//'headerOptions'=>['width'=>'5%'],
+            ['attribute' => 'wechat_user_id','label'=>'客户',//'headerOptions'=>['width'=>'5%'],
                 'format'=>'raw',
                 'value' => function($model) {
                     $WechatUser = \common\models\wechat\WechatUser::findOne($model->wechat_user_id);
