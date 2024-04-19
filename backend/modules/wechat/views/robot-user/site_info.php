@@ -20,7 +20,7 @@ use yii\widgets\DetailView;
 /* @var $model backend\models\wechat\RobotUser */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = '登陆信息';
+$this->title = '个人信息';
 $this->params['breadcrumbs'][] = ['label' => 'Robot Users', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
