@@ -47,8 +47,8 @@ class AoZhou5BetJobs extends CommonJob {
             $messageService = new MessageOperateService($userId, $replyContent['fromUser']);
             list($lotteryType, $lotteryName) = [LotteryType::AZ_LUCKY_5, LotteryType::TYPE_OPTIONS[LotteryType::AZ_LUCKY_5]];
 
-            $betContent = '【课号】'.$lotteryName.'-'.$qiHao;
             $preContent = "\n【内容】";
+            $betContent = '【课号】'.$lotteryName.'-'.$qiHao.$preContent;
 
             $allMoneys = 0.00;
             $allCount = 0;
@@ -75,7 +75,6 @@ class AoZhou5BetJobs extends CommonJob {
             $WechatUser = WechatUser::findOne($betRow->wechat_user_id);
 
             if($haveSuccess){
-                $betContent .= $preContent;
                 $betContent .= ("\n【单号】".$orderId);
                 $betContent .= ("\n【成功】√  共".$allCount."组，共".$allMoneys.'咪');
             }
