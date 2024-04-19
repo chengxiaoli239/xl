@@ -130,10 +130,16 @@ $this->registerJs($js);
                                 return Html::a('<a href="#"><strong><font color="'.($model->status>0?'green':'red').'">'.\backend\models\open\PlatformRobot::STATUS_OPTIONS[$model->status].'</font></strong></a>');
                             },
                         ],
-                        ['attribute' => 'name', 'label'=>'token',//'headerOptions'=>['width'=>'6%'], // 图片字段的属性
+                        ['attribute' => 'token', 'label'=>'token',//'headerOptions'=>['width'=>'6%'], // 图片字段的属性
                             'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
                             'value' => function ($model) {
                                 return $model->token;
+                            },
+                        ],
+                        ['attribute' => 'name', 'label'=>'机器人连接',//'headerOptions'=>['width'=>'6%'], // 图片字段的属性
+                            'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
+                            'value' => function ($model) {
+                                return 'https://t.me/'.$model->name;
                             },
                         ],
                         //'callback_url:url',
