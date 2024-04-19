@@ -240,10 +240,9 @@ class MessageOperateService  extends BaseService
                     Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '消息处理-02', ['user_id'=>$this->user_id, 'text'=>$text, 'member_id'=>$this->member_id, 'setData'=>$setData]);
                     throw_info(Json::encode($Bets->getErrors(), 320));
                 }
-
-                # 推送网盘任务：
-                $pushSiteData[] = ['betRowId'=>$Bets->id, 'orderId'=>$Bets->order_id, 'business_id'=>$Bets->order_id];
             }
+            # 推送网盘任务：
+            $pushSiteData[] = ['orderId'=>$Bets->order_id, 'business_id'=>$Bets->order_id];
             $transaction->commit();;
         }catch (\Exception $e){
             $transaction->rollBack();
