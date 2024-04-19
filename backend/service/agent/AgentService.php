@@ -1,6 +1,7 @@
 <?php
 namespace backend\service\agent;
 
+use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\models\wechat\Bets;
 use backend\service\BaseService;
@@ -48,6 +49,9 @@ class AgentService extends BaseService {
             'AND',
             ['>=', 'created_at', $startTime],
             ['<=', 'created_at', $endTime],
+            ['=', 'push_status', BetsBackend::PUSH_STATUS_SUCCESS],
+            ['IN', 'status', [BetsBackend::STATUS_SUCCESS, BetsBackend::STATUS_FAIL]],
+            ['<=', 'created_at', $endTime],
         ])->scalar();
 
         return $profits?:0.00;
@@ -66,6 +70,7 @@ class AgentService extends BaseService {
             ['>=', 'created_at', $startTime],
             ['<=', 'created_at', $endTime],
             ['!=', 'status', CommonBaseService::STATUS_LT_CANCEL],
+            ['=', 'push_status', BetsBackend::PUSH_STATUS_FAIL],
         ])->scalar();
 
         return $money?:0.00;

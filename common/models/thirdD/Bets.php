@@ -25,7 +25,11 @@ use Yii;
  * @property int $push_status 推送盘口状态
  * @property string $push_desc 推送结果
  * @property int $cancel_status 撤单状态：0未撤单1已撤单
- * @property int $is_simulate 是否模拟投注0否1是
+ * @property int $new_msg_id 消息id
+ * @property int $is_need_confirm 是否需要确认
+ * @property int $reply_type 回复类型
+ * @property int $has_reply 是否已回复
+ * @property int $reply_content 回复相关内容
  * @property string $lottery_name 彩种
  * @property int $lottery_type 彩种类型:26福彩27排列三
  * @property int $is_profits_record 是否计算盈利记录0否1是

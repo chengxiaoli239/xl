@@ -5,6 +5,7 @@ use backend\models\SscKjData;
 use backend\models\thirdD\BetsBackend;
 use backend\service\agent\AgentUsersBalanceService;
 use backend\service\agent\AgentUsersService;
+use common\exceptions\InfoException;
 use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
 use common\helpers\SscMethod;
@@ -12,6 +13,7 @@ use common\models\wechat\WechatUser;
 use common\service\chat\Tool_Common;
 use common\service\helpers\ThirdD;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
+use common\service\jobs\telegram\SendMessageJobs;
 use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
 use common\service\message\Send;
 use common\service\ssc\QihaoService;
@@ -89,18 +91,23 @@ class MessageOperateService  extends BaseService
             }
 
             $codes = $datum[0];
+            $single = $datum[1];
+            $count = 1;
             if($methodId == SscMethod::FT_DS_ID){
                 $codes = SscMethod::TYPE_DS_OPTIONS[$codes]??$codes;
             }
             if($methodId == SscMethod::FT_FAN_ID){
                 $codes = str_replace(['番高', '高番', '高'], '番', $codes);
             }
+            if(empty($codes) OR empty($single)){
+                throw_info('下单格式错误！', CommonBaseService::CODE_FOR_USER);
+            }
 
-            $allMoneys = 1 * $datum[1];
+            $allMoneys = $count * $single;
             $this->betData[] = [
                 'codes' => $codes,
-                'single' => $datum[1],
-                'count' => 1,
+                'single' => $single,
+                'count' => $count,
                 'all_moneys' => $allMoneys,
                 'id' => $methodId,
                 'name' => $methodName,
@@ -127,10 +134,10 @@ class MessageOperateService  extends BaseService
                 return AgentUsersService::userGetInfo($this->platformUser);
             case strpos($text, '撤') !== false: // 撤单
                 return EYunMessageOperateService::operateCancel($text, $this->platformUser);
-            case strpos($text, '+') !== false:
+            #case strpos($text, '+') !== false:
+            #case strpos($text, '-') !== false:
             case strpos($text, '上') !== false:
             case strpos($text, '下') !== false:
-            case strpos($text, '-') !== false:
                 # 上下分逻辑
                 list($code, $data, $msg) = AgentUsersBalanceService::operateBalanceChange($text, $this->platformUser, $message);
                 Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '充值申请处理结果', ['code'=>$code, 'data'=>$data, 'msg'=>$msg]);
@@ -185,14 +192,9 @@ class MessageOperateService  extends BaseService
                 throw_info('未开盘请稍后', CommonBaseService::CODE_FOR_USER);
             }
 
-            $allMoneys = 0.00;
-            $allCounts = 0;
             $pushSiteData = [];
-            $replyTxts = [];
             $now_time = time();
             //p($this->betData);
-            $oneReplyTxt = '【课号】'.$lotteryName.'-'.$qiHao;
-            $betContent = "\n【内容】";
             $betOrderId = LotteryType::getOrderId();
             foreach ($this->betData as $method){
                 if(empty($method['id'])){
@@ -208,7 +210,6 @@ class MessageOperateService  extends BaseService
                     'replyTxt' => $oneBetContent,
                     'fromUser' => $from['id'],
                     'fromNickName' => $this->platformUser['nickName'],
-                    'fromGroup' => $messageData['fromGroup'],
                     'token' => $token,
                 ];
                 $Bets = new BetsBackend();
@@ -225,7 +226,7 @@ class MessageOperateService  extends BaseService
                     'lottery_type' => $lotteryType,
                     'lottery_name' => $lotteryName,
                     'bet_desc' => $text,
-                    'new_msg_id' => $messageData['newMsgId'],
+                    'new_msg_id' => $messageId,
                     'reply_type' => $this->platformUser['is_need_confirm']?0:$this->platformUser['reply_type'],
                     'is_need_confirm' => $this->platformUser['is_need_confirm'],
                     'reply_content' => Json::encode($replyContent)??'',
@@ -236,43 +237,20 @@ class MessageOperateService  extends BaseService
                 //p($setData, 0);
                 $Bets->setAttributes($setData, false);
                 if(!$Bets->save()){
-                    //var_dump('1111');
                     Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '消息处理-02', ['user_id'=>$this->user_id, 'text'=>$text, 'member_id'=>$this->member_id, 'setData'=>$setData]);
                     throw_info(Json::encode($Bets->getErrors(), 320));
                 }
-                //var_dump('id'.$method['codes'].'_'.$Bets->id);
-                $allMoneys += $method['all_moneys']; # 总投
-                $allCounts += $method['count']; # 总投
 
-                if(!$this->platformUser['is_need_confirm']){ # 无需确认即可直接上盘口
-                    # 推送网盘任务：
-                    $pushSiteData[] = ['betRowId'=>$Bets->id, 'orderId'=>$Bets->order_id, 'business_id'=>$Bets->order_id];
-                }
-                $betContent .= str_replace(';', ',', $oneBetContent);
-            }
-            $betContent .= ("\n【单号】".$betOrderId);
-            if($this->platformUser['is_need_confirm']){
-                $betContent .= ("\n【合计】 共".$allCounts."组，共".$allMoneys.'咪');
-                $betContent .= ("\n【状态】 待确认");
-            }else{
-                $betContent .= ("\n【成功】√  共".$allCounts."组，共".$allMoneys.'咪');
-                $vData = AgentUsersBalanceService::updateBalance((string)$betOrderId, $allMoneys, $this->member_id, WechatUserService::TYPE_ORDER_BET); # 下单扣减
-                $betContent .= ("\n【剩余】".$vData['balance'].'咪');
-            }
-            if($this->platformUser['is_need_confirm']==BetsBackend::NEED_CONFIRM_YES OR $this->platformUser['reply_type']==BetsBackend::REPLY_TYPE_QUICK){
-                # 即时回复
-                $replyTxts[] = ['order_ids'=>[$betOrderId], 'replyTxt'=>$oneReplyTxt.$betContent];
+                # 推送网盘任务：
+                $pushSiteData[] = ['betRowId'=>$Bets->id, 'orderId'=>$Bets->order_id, 'business_id'=>$Bets->order_id];
             }
             $transaction->commit();;
-            push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$this->user_id, 'type'=>$data['type'], 'msg'=>'下单/撤单之后计算', 'wechat_user_id'=>$this->member_id]);
-            //p([$message, $text, $this->betData]);
         }catch (\Exception $e){
             $transaction->rollBack();
             Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'ERR', '消息处理-异常', ['code'=>$e->getCode(), 'err_msg'=>$e->getMessage(), 'file'=>$e->getFile().'_'.$e->getLine()]);
             if($e->getCode() == CommonBaseService::CODE_FOR_USER){
                 return [CommonBaseService::CODE_FOR_USER, [], $e->getMessage()];
             }
-
         }
 
         foreach ($pushSiteData as $pushData){
@@ -281,11 +259,15 @@ class MessageOperateService  extends BaseService
         $data = [
             'type' => WechatUserService::TYPE_ORDER_BET,
             'text' => $text,
-            'replyTxts' => $replyTxts,
-            'allMoneys' => $allMoneys,
         ];
-        $logArr = ['user_id'=>$this->user_id, 'text'=>$text, 'fromUser'=>$from['id'], 'setData'=>$setData, 'replyTxts'=>$replyTxts, 'pushSiteData'=>$pushSiteData, 'data'=>$data];
-        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '消息处理-成功', $logArr);
+        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '消息处理-成功', [
+            'user_id'=>$this->user_id,
+            'text'=>$text,
+            'fromUser'=>$from['id'],
+            'setData'=>$setData,
+            'pushSiteData'=>$pushSiteData,
+            'data'=>$data,
+        ]);
 
         return [0, $data, '接收成功'];
     }
@@ -301,5 +283,47 @@ class MessageOperateService  extends BaseService
         return $WechatUser;
     }
 
+    /**
+     * 消息回复前处理
+     * @param $user_id
+     * @param array $replyTxt '您好，您的申请已通过'
+     * @param array $data ['fromUser'=>'wxid_875i1kgd38x122']; 机器人要回复用到相关的id、token等
+     * @return bool
+     * @throws InfoException
+     */
+    public function reply($user_id, $replyTxt='', array $data=[]){
+        $targetUser = $data['targetId'];# 目标微信好友
+        $mkey = md5(__FUNCTION__.'_x1_'.$user_id.'_'.$replyTxt.'_'.$targetUser);
+        $incr = \Yii::$app->redis->incr($mkey);
+        $switch = \Yii::$app->params['AZ_MESSAGE_SWITCH']??0;
+        Tool_Common::log('/telegram/'.__FUNCTION__, 'INFO', '消息回复前处理1', ['user_id'=>$user_id, 'replyTxt'=>$replyTxt, 'data'=>$data,'switch'=>$switch]);
+        if(empty($switch)){
+            return false;
+        }
+        if($incr>1){
+            return false;
+        }
+        \Yii::$app->redis->expire($mkey, 2);
+        if(empty($targetUser)){
+            return '接收的平台好友Id不能为空0';
+        }
+        if(empty($replyTxt)){
+            throw_info('回复消息replyTxt为空');
+        }
+        $sendData = [
+            'user_id' => $user_id,
+            'chat_id' => $targetUser, # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
+            //'queue_delay_time' => rand(2, 4), # self::$waitSeconds,
+            'content' => $replyTxt, # 测试阶段调试信息 - 用户下注完回复
+            'business_id' => $user_id,
+            'token' => $data['token'],
+        ];
+        if(!empty($data['fromGroup'])){
+            $sendData['fromGroup'] = $data['fromGroup'];
+            $sendData['content'] = '@'.$data['fromUserNickName']."\n". $sendData['content']."\n";
+        }
+        push_queue(SendMessageJobs::class, $sendData); # TG消息发送
 
+        return true;
+    }
 }

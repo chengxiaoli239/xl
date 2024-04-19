@@ -5,6 +5,7 @@ namespace common\service\lottery\aozhou5;
 use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\models\wechat\Bets;
+use backend\service\agent\AgentUsersBalanceService;
 use common\helpers\RequestHelper;
 use common\models\wechat\WechatUser;
 use common\open\aozhou5\api\OrderApi;
@@ -12,11 +13,13 @@ use common\open\aozhou5\api\UserApi;
 use common\service\CommonService;
 use common\service\open\ActionBaseService;
 use common\service\open\aozhou5\ActionService;
+use common\service\open\telegram\MessageOperateService;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\jobs\SsxxBetJobs;
 use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\Odds3dService;
+use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
 use yii\helpers\Json;
 
@@ -26,6 +29,7 @@ class AoZhou5BetService extends CommonBaseService
     public static array $siteSystemInfo = [];
     # 本地对盘口 玩法ID
     public static array $localToSiteMethodInfo = [];
+    public static array $platformUser = [];
     public static function preBetValidate($betRowId): array
     {
         try {
@@ -76,13 +80,19 @@ class AoZhou5BetService extends CommonBaseService
 
             self::$siteSystemInfo = CommonBaseService::getSystemBaseInfo($user_id, $lottery_type); # 盘口信息
             self::$localToSiteMethodInfo = CommonBaseService::getLocalToSiteMethods($method_id, self::$siteSystemInfo['system_type_id'], $betRow->codes); #
-            $logArr = ['method_id'=>$method_id, 'siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo];
-            Tool_Common::log('/betSite/'.__FUNCTION__, 'INFO', '盘口信息', $logArr);
+            self::$platformUser = WechatUser::find()->where(['id'=>$betRow->wechat_user_id])->asArray()->limit(1)->one();
+
+            Tool_Common::log('/betSite/'.__FUNCTION__, 'INFO', '盘口信息', [
+                'method_id'=>$method_id,
+                'siteSystemInfo'=>self::$siteSystemInfo,
+                'localToSiteMethodInfo'=>self::$localToSiteMethodInfo,
+            ]);
             $betCodes = $betRow->codes;
-            //p($betCodes);
             //p(['method_id'=>$method_id, 'betCodes'=>$betCodes, 'siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo]);
             $postRst = self::postBet($betRow, $betCodes);
 
+            # 下单扣减
+            AgentUsersBalanceService::updateBalance((string)$betRowId, $betRow->bet_money, $betRow->wechat_user_id, WechatUserService::TYPE_ORDER_BET);
             $resultData = ['betRowId'=>$betRow->id, 'betQiHao'=>$qiHao, 'method_id'=>$method_id, 'lottery_type'=>$lottery_type, 'postRst'=>$postRst, 'err_msg'=>'处理结束'];
             Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'ERR', '推送盘口处理结束99', $resultData);
             var_dump(date('Y-m-d H:i:s ').'处理成功：betRowId:'.$betRow->id.'_method_id:'.$method_id);
@@ -94,8 +104,8 @@ class AoZhou5BetService extends CommonBaseService
             $betRow->push_status = ($e->getCode() > SsxxBetJobs::INVALID_STATUS_CODE) ? BetsBackend::PUSH_STATUS_CANNOT : BetsBackend::PUSH_STATUS_FAIL;
             $betRow->push_desc = $err_msg;
             $betRow->save();
-            throw_info($e->getMessage(), $e->getCode());
-            //return [10004, $logArr, $e->getMessage()];
+            //throw_info($e->getMessage(), $e->getCode());
+            return [10004, $logArr, $err_msg];
         }
 
         $betRow->push_status = BetsBackend::PUSH_STATUS_SUCCESS;
@@ -326,9 +336,9 @@ class AoZhou5BetService extends CommonBaseService
         foreach ($Bets as $bet){
             try {
                 $result = AoZhou5BetService::postToSite($bet['id']);
-                Tool_Common::log('/bet_3d/'.__FUNCTION__, 'INFO', '异常数据补上盘', ['id'=>$bet['id'], 'order_id'=>$bet['order_id'], 'result'=>$result]);
+                Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '异常数据补上盘', ['id'=>$bet['id'], 'order_id'=>$bet['order_id'], 'result'=>$result]);
             }catch (\Exception $e){
-                Tool_Common::log('/bet_3d/'.__FUNCTION__, 'ERR', '异常数据补上盘-异常', ['id'=>$bet['id'], 'order_id'=>$bet['order_id'], 'err_msg'=>$e->getMessage()]);
+                Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'ERR', '异常数据补上盘-异常', ['id'=>$bet['id'], 'order_id'=>$bet['order_id'], 'err_msg'=>$e->getMessage()]);
             }
         }
         var_dump('执行结束 '.date('Y-m-d H:i:s').' 补打'.count($Bets).'条');

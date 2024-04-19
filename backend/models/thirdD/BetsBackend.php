@@ -13,6 +13,19 @@ class BetsBackend extends Bets
         self::LOTTERY_PL3 => '排',
     ];
 
+    const STATUS_WAIT = 0;
+    const STATUS_SUCCESS = 1;
+    const STATUS_FAIL = 2;
+    const STATUS_CANCEL = 3;
+    const STATUS_DRAWN = 4;
+    const STATUS_OPTIONS = [
+        self::STATUS_WAIT => '待处理',
+        self::STATUS_SUCCESS => '已中奖',
+        self::STATUS_FAIL => '未中奖',
+        self::STATUS_CANCEL => '已撤单',
+        self::STATUS_DRAWN => '和局',
+    ];
+
     const PUSH_STATUS_WAIT = 0;
     const PUSH_STATUS_SUCCESS = 2;
     const PUSH_STATUS_FAIL = 3;
