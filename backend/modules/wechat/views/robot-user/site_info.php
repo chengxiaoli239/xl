@@ -97,15 +97,12 @@ $this->registerJs($js);
                                     ['attribute' => 'desc','label'=>'操作','headerOptions'=>['width'=>'5%'],
                                         'format'=>'raw',
                                         'value' => function($model) {
-                                            return '<a href="javascript:;" id="updateSiteInfo">修改盘口</a>'.
-                                                Html::a('<span class="glyphicon glyphicon-pencil"></span>', 'javascript:void(0);', [
-                                                    'class' => 'edit-btn btn btn-xs edit-button',
-                                                    'data-url' => Yii::$app->urlManager->createUrl(['wechat/robot-user/update-site-info', 'id' => $model->id]),
-                                                ]);
+                                            return Html::a('修改盘口 <span class="glyphicon glyphicon-pencil"></span>', 'javascript:void(0);', [
+                                                'class' => 'edit-btn btn btn-xs edit-button',
+                                                'data-url' => Yii::$app->urlManager->createUrl(['wechat/robot-user/update-site-info', 'id' => $model->id]),
+                                            ]);
                                         }
                                     ],
-                                    #'created_at',
-                                    #'updated_at',
                                     'update_time',
                                 ],
                             ]) ?>
@@ -183,100 +180,13 @@ $this->registerJs($js);
 </script>
 
 <script>
-    $(function () {
-        historyLists = <?php if (isset($historyRecords)) {
-            echo \yii\helpers\Json::encode($historyRecords);
-        }?>;
-        function switchWechat(wechatId, switchStatus, nickName='') {
-            var data = {wechatId:wechatId, switchStatus:switchStatus, 'nickName':nickName};
-            if(switchStatus===0 && wechatId !== ''){
-                // 弹出确认对话框
-                layer.confirm('您确定下线该微信 <strong><font color="green">'+nickName+'</font><strong> ？', {
-                    icon: 3,   // 设置对话框图标（3代表警告）
-                    title: '确认操作',  // 设置对话框标题
-                    btn: ['确定', '取消'],  // 自定义按钮文本，可以根据需要修改
-                }, function(){
-                    // 用户点击"确定"按钮后执行的回调函数
-                    // 在这里可以编写确认操作的代码
-                    //layer.msg('操作已执行', {icon: 1});  // 弹出消息提示
-                    actSwitchStatus(data)
-                }, function(){
-                    // 用户点击"取消"按钮后执行的回调函数
-                    //layer.alert('操作已取消', {icon: 2});  // 弹出消息提示
-                });
-            }else {
-                // 获取二维码登录
-                actSwitchStatus(data)
-            }
-        }
-
-        function actSwitchStatus(data){
-            var tip_title = '';
-            $.post("/wechat/robot-user/switch-wechat",data,function(rst) {
-                console.log(rst);
-                switchStatus = data.switchStatus
-                wechatId = data.wechatId
-                if(rst.status === 200) {
-                    tip_title = '操作成功';
-                    msg = rst.msg;
-                    //$("#open_bet_status_"+id).html(msg);
-                    if(switchStatus){
-                        // 获取二维码
-                        wId = rst.data.wId   // 登录实例
-                        qrCodeUrl = rst.data.qrCodeUrl // 二维码图片  exampleModal_QrCode
-                        imgDiv = '<img src="'+qrCodeUrl+'" height="250px;" width="250px;">'
-                        $('#QrCodeImg').html(imgDiv)
-                        $('#exampleModal_QrCode').modal('show');
-
-                        setTimeout(function () {
-                            console.log('5秒后开始进入')
-                            $.post("/wechat/robot-user/act-wechat-login",{wId:wId, 'wcId':wechatId},function(loginRst) {
-                                if(loginRst.status === 200) {
-                                    d = loginRst.data
-                                    var nickName = d.nickName ? d.nickName : '';
-                                    // 返回成功刷新网页
-                                    layer.msg(nickName + ' 登录成功', {icon: 1});
-                                    // 嵌套的 setTimeout
-                                    setTimeout(function () {
-                                        location.reload();
-                                    }, 2000); // 2秒的延迟
-                                }
-                            });
-                        }, 5000)
-                    }else {
-                        location.reload();
-                    }
-                } else {
-                    //Ewin.alert(rst.msg, );
-                    console.log(rst)
-                    layer.msg(rst.msg, {icon: 7});
-                    if(rst.status<40000){
-                        console.log('dddd')
-                        setTimeout(function () {
-                            location.reload();
-                        }, 2000); // 2秒的延迟
-                    }
-                }
-            },'JSON');
-        }
-
-        // 列表微信切换登录货下线操作
-        $(document).on('click', '[id^="change_id_"]', function () {
-            var wechatId = $(this).attr('data-wechatid');
-            var nowStatus = $(this).attr('data-status');
-            var nickName = $(this).attr('data-nickname');
-            switchStatus = (nowStatus==1) ? 0 : 1
-            console.log(wechatId, nowStatus);
-            switchWechat(wechatId, switchStatus, nickName)
-        });
-
-        $(document).on('click', '[id="addNewWechat"]', function () {
-            var wechatId = ''
-            switchStatus = 1
-            switchWechat(wechatId, switchStatus)
-        });
-
-    })
+$(function () {
+    $(document).on('click', '.update-link, .edit-btn', function() {
+        var url = $(this).data('url');
+        // 根据点击的链接执行不同的操作
+        // 你可以使用url来发送异步请求
+    });
+})
 </script>
 
 
@@ -303,31 +213,3 @@ $(function (){
     });
 })
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

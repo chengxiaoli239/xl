@@ -37,7 +37,7 @@ $this->title = '盘口信息修改:'.$model->sys_name;
             </div>
 
             <div class="row">
-                <div class="col-lg-offset-2 col-lg-10">
+                <div class="col-lg-offset-6 col-lg-6">
                         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?>
                 </div>
             </div>

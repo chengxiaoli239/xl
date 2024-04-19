@@ -6,8 +6,13 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model backend\models\TzSystemsUsers */
 /* @var $form yii\widgets\ActiveForm */
-$this->title = '盘口信息修改:'.$model->sys_name;
+$this->title = '盘口修改:'.$model->sys_name;
 ?>
+<style>
+    .user-update.tz-systems-users-form.row {
+        height: 300px;
+    }
+</style>
 <div class="user-update tz-systems-users-form row">
     <section class="user-update user panel">
         <header class="panel-heading">
@@ -37,7 +42,7 @@ $this->title = '盘口信息修改:'.$model->sys_name;
             </div>
 
             <div class="row">
-                <div class="col-lg-offset-2 col-lg-10">
+                <div class="col-lg-offset-6 col-lg-6">
                         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?>
                 </div>
             </div>
