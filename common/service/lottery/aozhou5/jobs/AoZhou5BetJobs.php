@@ -47,10 +47,13 @@ class AoZhou5BetJobs extends CommonJob {
             $messageService = new MessageOperateService($userId, $replyContent['fromUser']);
             list($lotteryType, $lotteryName) = [LotteryType::AZ_LUCKY_5, LotteryType::TYPE_OPTIONS[LotteryType::AZ_LUCKY_5]];
 
-            $betContent = '【课号】'.$lotteryName.'-'.$qiHao."\n【内容】";
+            $betContent = '【课号】'.$lotteryName.'-'.$qiHao;
+            $preContent = "\n【内容】";
+
             $allMoneys = 0.00;
             $allCount = 0;
             $errContent = '';
+            $haveSuccess = 0;
             foreach ($BetRows as $betRow){
                 list($code, $data, $msg) = AoZhou5BetService::postToSite($betRow->id);
                 if($code>0){
@@ -67,13 +70,19 @@ class AoZhou5BetJobs extends CommonJob {
                 $allCount += 1; # 总投
 
                 $betContent .= str_replace(';', ',', $oneBetContent);
+                $haveSuccess = 1;
             }
             $WechatUser = WechatUser::findOne($betRow->wechat_user_id);
 
-            $betContent .= ("\n【单号】".$orderId);
+            if($haveSuccess){
+                $betContent .= $preContent;
+                $betContent .= ("\n【单号】".$orderId);
+                $betContent .= ("\n【成功】√  共".$allCount."组，共".$allMoneys.'咪');
+            }
 
-            $betContent .= ("\n【成功】√  共".$allCount."组，共".$allMoneys.'咪');
-            $betContent .= $errContent?"\n失败：".$errContent:'';
+            if(!empty($errContent)){
+                $betContent .= "\n【失败】".$errContent;
+            }
             $betContent .= ("\n【剩余】".$WechatUser->balance.'咪');
             # 即时回复
             $replyTxt = $betContent;
