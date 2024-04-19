@@ -85,7 +85,7 @@ $columns = array_merge(
                 'format'=>'raw',
                 'value' => function($model) {
                     if($model->push_status==BetsBackend::PUSH_STATUS_CANNOT){
-                        return '无效';
+                        return '<strong><font color="red">无效单</font></strong>';
                     }
                     $txt = $model->status==3? '<strong><font color="red">已撤单</font></strong>' :
                         (($model->status===0) ? '<strong><font color="green">待开奖</font></strong>' : $model->kj_codes);
