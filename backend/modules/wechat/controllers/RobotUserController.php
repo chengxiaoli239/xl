@@ -115,6 +115,38 @@ class RobotUserController extends BaseController
         }
     }
 
+    public function actionSiteInfo(): string
+    {
+        $queryParams = Yii::$app->request->queryParams;
+        if($this->_user_id != 1){
+            $queryParams['TzSystemsUsers']['uid'] = $this->_user_id;
+        }
+        $model = TzSystemsUsers::findOne(['uid'=>$this->_user_id]);
+        return $this->render('site_info', [
+            'model' => $model,
+        ]);
+    }
+
+    public function actionUpdateSiteInfo($id)
+    {
+        $model = (new TzSystemsUsers())->findOne($id);
+
+        $post = $this->_post;
+        if (!empty($post)) {
+            $domain = trim($post['TzSystemsUsers']['ssc_domain'], '/');
+            if(strpos($domain, 'https://') === false){
+                $domain = 'https://'.$domain;
+            }
+            $post['TzSystemsUsers']['ssc_domain'] = $domain;
+            $model->load($post) && $model->save();
+            return $this->redirect(['site-info']);
+        }
+
+        return $this->renderAjax('update_site_info', [
+            'model' => $model,
+        ]);
+    }
+
     /**
      * 如果是获取二维码登录，则前端需要用下面的方法一直等待执行微信登录
      * @return array
