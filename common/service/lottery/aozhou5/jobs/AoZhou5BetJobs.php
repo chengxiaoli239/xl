@@ -83,7 +83,7 @@ class AoZhou5BetJobs extends CommonJob {
                 'user_id'=>$userId,
                 'type'=>WechatUserService::TYPE_ORDER_BET,
                 'msg'=>'下单/撤单之后计算',
-                'wechat_user_id'=>$WechatUser->wechat_user_id,
+                'wechat_user_id'=>$WechatUser->id,
             ]);
             Tool_Common::log('/bet_aozhou5/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params, 'data'=>$data]);
         }catch (\Exception $e){
