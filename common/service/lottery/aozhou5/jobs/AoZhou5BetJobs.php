@@ -57,7 +57,7 @@ class AoZhou5BetJobs extends CommonJob {
             foreach ($BetRows as $betRow){
                 list($code, $data, $msg) = AoZhou5BetService::postToSite($betRow->id);
                 if($code>0){
-                    $errContent .= $betRow->codes.'：'.$msg."\n";
+                    $errContent .= $betRow->bet_desc.'：'.$msg."\n";
                     continue;
                 }else{
                     $allMoneys += $betRow->bet_money; # 总投

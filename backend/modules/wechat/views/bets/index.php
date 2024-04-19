@@ -59,8 +59,8 @@ $columns = array_merge(
             ['attribute' => 'push_status','label'=>'盘口',//'headerOptions'=>['width'=>'5%'],
                 'format'=>'raw',
                 'value' => function($model) {
-                    $title = $model->push_status==BetsBackend::PUSH_STATUS_WAIT ? '2分钟自动推盘口' : '';
-                    $title = $model->push_status==BetsBackend::PUSH_STATUS_FAIL ? $model->push_desc : $title;
+                    $title = $model->push_status==BetsBackend::PUSH_STATUS_WAIT ? '自动推盘口' : '';
+                    $title = in_array($model->push_status, [BetsBackend::PUSH_STATUS_FAIL, BetsBackend::PUSH_STATUS_CANNOT]) ? $model->push_desc : $title;
                     return '<a href="javascript:;" title="'.$title.'"><strong><font color="'.BetsBackend::PUSH_STATUS_CLASSES[$model->push_status].'">'.BetsBackend::PUSH_STATUS_OPTIONS[$model->push_status].'</font></strong></a>';
                 }
             ],
@@ -84,6 +84,9 @@ $columns = array_merge(
             ['attribute' => 'kj_codes','label'=>'开奖', //'headerOptions'=>['width'=>'5%'],
                 'format'=>'raw',
                 'value' => function($model) {
+                    if($model->push_status==BetsBackend::PUSH_STATUS_CANNOT){
+                        return '无效';
+                    }
                     $txt = $model->status==3? '<strong><font color="red">已撤单</font></strong>' :
                         (($model->status===0) ? '<strong><font color="green">待开奖</font></strong>' : $model->kj_codes);
                     if($model->lottery_type == LotteryType::AZ_LUCKY_5 && !empty($model->kj_codes)){

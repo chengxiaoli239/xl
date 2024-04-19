@@ -3,6 +3,7 @@
 namespace common\service\lottery\aozhou5;
 
 use backend\models\SscKjData;
+use backend\models\thirdD\BetsBackend;
 use backend\models\wechat\Bets;
 use backend\models\wechat\WechatUser;
 use backend\service\agent\AgentUsersBalanceService;
@@ -56,7 +57,8 @@ class AoZhou5Service extends CommonLotteryService
             if(!SscKjData::find()->where(['lottery_type'=>$lotteryType, 'qihao'=>$currentKjQiHao])->asArray()->one()){
                 return false;
             }
-            $bets = Bets::find()->where(['status'=>0, 'lottery_type'=>$lotteryType]) # , 'qihao'=>$currentKjQiHao
+            $bets = Bets::find()
+                ->where(['status'=>BetsBackend::STATUS_WAIT, 'lottery_type'=>$lotteryType, 'push_status'=>BetsBackend::PUSH_STATUS_SUCCESS]) # , 'qihao'=>$currentKjQiHao
                 ->orderBy('id DESC')->limit(100)->all();
             $replyData = [];
             foreach ($bets as $bet){
