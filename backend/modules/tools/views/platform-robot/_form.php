@@ -25,7 +25,7 @@ $this->title = '新建机器人';
                         ) ?>
                     </div>
                     <div class="col-lg-3 col-xs-3">
-                        <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+                        <?= $form->field($model, 'name')->label('机器人TG名称')->textInput(['maxlength' => true]) ?>
                     </div>
                 </div>
                 <div class="row">
