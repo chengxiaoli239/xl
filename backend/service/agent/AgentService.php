@@ -70,7 +70,7 @@ class AgentService extends BaseService {
             ['>=', 'created_at', $startTime],
             ['<=', 'created_at', $endTime],
             ['!=', 'status', CommonBaseService::STATUS_LT_CANCEL],
-            ['=', 'push_status', BetsBackend::PUSH_STATUS_FAIL],
+            ['=', 'push_status', BetsBackend::PUSH_STATUS_SUCCESS],
         ])->scalar();
 
         return $money?:0.00;
