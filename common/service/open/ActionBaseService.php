@@ -19,7 +19,7 @@ class ActionBaseService
         return $classes[$tzSystemId]??false;
     }
 
-    public function login($tzSystemsUser): array
+    public function login($tzSystemsUser, $isAuto=1): array
     {
         $objectClass = self::getClass($tzSystemsUser->tz_system_id);
         $objectClass->domain = $tzSystemsUser->ssc_domain;
@@ -27,7 +27,7 @@ class ActionBaseService
         $objectClass->password = $tzSystemsUser->password;
         $objectClass->tzSystemUsers = $tzSystemsUser;
 
-        if(!$objectClass->getUserInfo()){
+        if($isAuto==2 OR !$objectClass->getUserInfo()){
             $objectClass->login();
             $objectClass->getUserInfo();
         }

@@ -139,10 +139,18 @@ class RobotUserController extends BaseController
             if(strpos($domain, 'https://') === false){
                 $domain = 'https://'.$domain;
             }
+            $isAuto = 1;
+            if(
+                $post['TzSystemsUsers']['ssc_domain'] != $model->ssc_domain
+                OR $post['TzSystemsUsers']['account'] != $model->account
+                OR $post['TzSystemsUsers']['password'] != $model->password
+            ){
+                $isAuto = 2;
+            }
             $post['TzSystemsUsers']['ssc_domain'] = $domain;
             $model->load($post) && $model->save();
 
-            (new ActionBaseService())->login($model);
+            (new ActionBaseService())->login($model, $isAuto);
             return $this->redirect(['site-info']);
         }
 
