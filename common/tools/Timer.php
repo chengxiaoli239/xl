@@ -419,7 +419,7 @@ class Timer
      */
     public static function thisMonthTime(): array
     {
-        return [strtotime(date('Y-m-01 00:00:00')), strtotime(date('Y-m-01 23:59:59'))];
+        return [strtotime(date('Y-m-01 00:00:00')), strtotime(date('Y-m-t 23:59:59'))];
     }
 
     /**

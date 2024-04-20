@@ -70,7 +70,7 @@ class PlatformRobotController extends BaseController
         if ($model->load(Yii::$app->request->post())) {
             $now_time = time();
             $platform_robot_id = explode(':', trim($model->token))[0];
-            $model->platform_robot_id = $platform_robot_id;
+            $model->platform_robot_id = (int)$platform_robot_id;
             $model->user_id = $this->_user_id;
             $model->updated_at = $now_time;
             $model->created_at = $now_time;
