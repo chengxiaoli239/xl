@@ -29,6 +29,7 @@ use common\service\jobs\kj_data\StaticAll2NumsYlJob;
 use common\service\jobs\kj_data\StaticHzProfitsJob;
 use common\service\jobs\kj_data\StaticPeiShuTrueFalseJob;
 use common\service\jobs\kj_data\StaticSdProfitsJob;
+use common\service\jobs\kj_data\Update1NumYlJob;
 use common\service\jobs\kj_data\UpdateCodeTypeYlJob;
 use common\service\open\telegram\AoZhouKjService;
 use common\service\ssc\QihaoService;
@@ -365,6 +366,7 @@ class KjDataGet
                 # 2、数据统计处理  底下的统计有待于添加开关控制
                 push_queue(PeiShuProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>5]);
                 push_queue(StaticAll2NumsYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>10]);
+                push_queue(Update1NumYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>10]);
                 push_queue(StaticHzProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>15]);
                 push_queue(StaticPeiShuTrueFalseJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>20]);
                 push_queue(StaticSdProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>25]);
