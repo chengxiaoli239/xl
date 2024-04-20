@@ -16,6 +16,7 @@ use backend\service\numbers\NumCodeService;
 use backend\service\NumService;
 use backend\service\SscDataService;
 use backend\service\statics\statics_3d\Statics3dUserDataService;
+use backend\service\statics\yl\OneNumYl;
 use backend\service\StaticService;
 use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
@@ -38,6 +39,7 @@ use common\service\thirdD\ThirdDTypeService;
 use common\service\wechat\eyun\EYunMessageOperateService;
 use common\service\wechat\WechatUserService;
 use common\tools\KjDataGet;
+use common\tools\Timer;
 use common\tools\Util;
 use DateTime;
 use Yii;
@@ -54,6 +56,7 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $r = OneNumYl::yl($lotteryType=8);p($r);
             $data = Aozhou::getSiteLucky5($type='json');p($data);
             $tzSystemUser = TzSystemsUsers::findOne(68);
             #$r = (new ActionBaseService())->login($tzSystemUser);p($r);

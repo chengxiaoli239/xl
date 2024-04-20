@@ -6,6 +6,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\wechat\Bets;
 use backend\service\BaseService;
 use common\service\thirdD\CommonBaseService;
+use common\tools\Timer;
 
 class AgentService extends BaseService {
 
@@ -17,11 +18,11 @@ class AgentService extends BaseService {
     public static function getCalcMoney($userId): array
     {
         // 今日时间
-        list($startOfDay, $endOfDay) = [strtotime('today'), strtotime('today') + 24 * 3600 - 1];
+        list($startOfDay, $endOfDay) = Timer::todayTime();
         // 本周时间，获取本周的第一天（星期一）的时间戳、 获取本周的最后一天（星期日）的时间戳, 加上一天的秒数，然后减去1秒，以获取当天的最后一秒
-        list($startOfWeek, $endOfWeek) = [strtotime('monday this week'), strtotime('sunday this week') + 24 * 3600 - 1];
+        list($startOfWeek, $endOfWeek) = Timer::thisWeekTime();
         // 上周时间
-        list($startOfLastWeek, $endOfLastWeek) = [strtotime('last monday', strtotime('-1 week')), strtotime('last sunday', strtotime('-1 week')) + 24 * 3600 - 1];
+        list($startOfLastWeek, $endOfLastWeek) = Timer::lastWeekTime();
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$userId]);
 

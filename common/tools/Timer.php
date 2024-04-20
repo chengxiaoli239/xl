@@ -386,4 +386,48 @@ class Timer
         return $time;
     }
 
+    /**
+     * 今日开始、结束时间戳
+     * @return array
+     */
+    public static function todayTime(): array
+    {
+        return [strtotime('today'), strtotime('today') + 24 * 3600 - 1];
+    }
+
+    /**
+     * 本周开始、结束时间戳
+     * @return array
+     */
+    public static function thisWeekTime(): array
+    {
+        return [strtotime('monday this week'), strtotime('sunday this week') + 24 * 3600 - 1];
+    }
+
+    /**
+     * 上周开始、结束时间戳
+     * @return array
+     */
+    public static function lastWeekTime(): array
+    {
+        return [strtotime('last monday', strtotime('-1 week')), strtotime('this sunday', strtotime('-1 week')) + 24 * 3600 - 1];
+    }
+
+    /**
+     * 本月开始、结束时间戳
+     * @return array
+     */
+    public static function thisMonthTime(): array
+    {
+        return [strtotime(date('Y-m-01 00:00:00')), strtotime(date('Y-m-01 23:59:59'))];
+    }
+
+    /**
+     * 上月开始、结束时间戳
+     * @return array
+     */
+    public static function lastMonthTime(): array
+    {
+        return [strtotime(date('Y-m-01 00:00:00', strtotime('first day of last month'))), strtotime(date('Y-m-01 23:59:59', strtotime('first day of last month')))];
+    }
 }
