@@ -5,6 +5,7 @@ use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
 use backend\models\TzSystemsUsers;
 use common\models\AdminModel;
 use common\models\eyun\HistoryRobots;
+use common\open\telegram\api\WebHookApi;
 use common\service\open\ActionBaseService;
 use common\service\wechat\RobotUserService;
 use common\service\wechat\WechatUserService;
@@ -246,7 +247,8 @@ class RobotUserController extends BaseController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $model->delete();
 
         return $this->redirect(['index']);
     }

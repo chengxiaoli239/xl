@@ -57,13 +57,13 @@ class IndexController extends Controller
         $dateString = '20231114002';
         try {
             $r = OneNumYl::yl($lotteryType=8);p($r);
+            $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%ssc_1nums_yl}}'); p($r);
             $data = Aozhou::getSiteLucky5($type='json');p($data);
             $tzSystemUser = TzSystemsUsers::findOne(68);
             #$r = (new ActionBaseService())->login($tzSystemUser);p($r);
             $r = (new ActionBaseService())->getUserInfo($tzSystemUser);p($r);
             $data = AgentService::getCalcMoney($userId=21);p($data);
             $rst = AgentUsersService::userFlowsCheck(['id'=>16791, 'status'=>1], 21, '管理员消息回复处理');p($rst);
-            $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%wechat_user}}'); p($r);
             $rst = [];
             foreach ([8] as $lotteryType){
                 //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);

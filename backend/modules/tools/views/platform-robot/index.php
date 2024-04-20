@@ -8,7 +8,7 @@ use yii\grid\GridView;
 /* @var $searchModel backend\models\searchs\EyunAuth */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = '消息平台';
+$this->title = '机器人';
 $this->params['breadcrumbs'][] = '系统管理';
 $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => ['index']];
 

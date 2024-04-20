@@ -2,6 +2,7 @@
 
 namespace backend\modules\tools\controllers;
 
+use common\open\telegram\api\WebHookApi;
 use common\service\open\actions\PlatformRobotService;
 use Yii;
 use backend\models\open\PlatformRobot;
@@ -140,6 +141,9 @@ class PlatformRobotController extends BaseController
      */
     public function actionDelete($id)
     {
+        $model = $this->findModel($id);
+        $queryParams = ['token'=>$model->token];
+        $result = WebHookApi::deleteWebHookInfo($queryParams);
         PlatformRobot::deleteRecord(['id'=>$id]);
 
         return $this->redirect(['index']);
