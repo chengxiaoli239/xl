@@ -2,6 +2,7 @@
 
 namespace backend\modules\tools\controllers;
 
+use backend\service\HN0898Service;
 use common\open\telegram\api\WebHookApi;
 use common\service\open\actions\PlatformRobotService;
 use Yii;
@@ -78,6 +79,8 @@ class PlatformRobotController extends BaseController
             if(!$model->save()){
                 p($model->getErrors());
             }
+
+            PlatformRobotService::getUpdates($model); # 添加之后立马获取群聊消息，记录群ID
             return $this->redirect(['index']);
         }
 
@@ -110,6 +113,17 @@ class PlatformRobotController extends BaseController
         return $this->renderAjax('update', [
             'model' => $model,
         ]);
+    }
+
+    public function actionSwitchStatus($id){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $Model = $this->findModel($id);
+        if($Model->user_id != $this->_user_id && $this->_user_id != 1){
+            return ['status'=>400, 'msg'=>'非法请求'];
+        }
+        HN0898Service::updateStatus($id, '\backend\models\open\PlatformRobot');
+
+        return $this->redirect(['index']);
     }
 
     /**
@@ -147,6 +161,20 @@ class PlatformRobotController extends BaseController
         PlatformRobot::deleteRecord(['id'=>$id]);
 
         return $this->redirect(['index']);
+    }
+
+    public function actionGetGroup($id)
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $model = $this->findModel($id);
+        $loginRst = PlatformRobotService::getUpdates($model);
+        if($loginRst['status'] != 200){
+            return ['status'=>301, 'msg'=>'登陆失败：'.$loginRst['message']];
+        }
+
+        return ['status'=>200, 'msg'=>'登陆成功'];
+
     }
 
     /**

@@ -1,6 +1,7 @@
 <?php
 namespace common\service\open\telegram;
 
+use backend\models\open\PlatformRobot;
 use backend\models\SscKjData;
 use common\helpers\LotteryType;
 use common\service\jobs\telegram\SendMessageJobs;
@@ -11,7 +12,7 @@ class AoZhouKjService  extends BaseService
 {
     public static int $lottery_type = LotteryType::AZ_LUCKY_5;
 
-    public function operateSendKjData($qiHao='')
+    public function operateSendKjData($qiHao=''): bool
     {
         $switch = \Yii::$app->params['AZ_MESSAGE_SWITCH']??0;
         if(!$switch) return false;
@@ -21,7 +22,7 @@ class AoZhouKjService  extends BaseService
         $text = "============================\n";
         $text .= LotteryType::TYPE_OPTIONS[self::$lottery_type].'（前'.(AoZhou5Service::KJ_CODE_NUM).'位数番摊）'."\n\n".
             "第 {$qiHao} 期\n".
-            str_replace(',', '', $kjCode)."总和{$codeHz}(".$ds.",".$ft.")\n\n".
+            $kjCode."总和{$codeHz}(".$ds.",".$ft.")\n\n".
             "以下是历史课程表\n\n";
         $historyKjDataQuery = SscKjData::find()->where(['lottery_type'=>self::$lottery_type])->andWhere(['>', 'qihao', (int)$qiHao-135]);
         //$sql = $historyKjDataQuery->createCommand()->getRawSql();p($sql);
@@ -36,16 +37,26 @@ class AoZhouKjService  extends BaseService
         }
         $text .= "\n============================";
         Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', '开奖后群消息', ['lottery_type'=>self::$lottery_type, 'qiHao'=>$qiHao, 'text'=>$text, 'beforeQiHao'=>((int)$qiHao)-135]);
+        //p($text, 0);
 
-        $config = \Yii::$app->params['TELEGRAM'];
-        $params = [
-            'business_id' => $qiHao,
-            'content' => $text,
-            'chat_id' => $config['GROUP_ID'],
-            'token' => $config['TOKEN'],
-        ];
-        push_queue(SendMessageJobs::class, $params); # 开奖结果消息发送 - 群
+        $platformRobots = PlatformRobot::find()->where(['status'=>PlatformRobot::STATUS_ACTIVE])->asArray()->all();
+        //p($platformRobots);
+        foreach ($platformRobots as $platformRobot){
+            if(!$platformRobot['group_id']){
+                continue;
+            }
+            $token = $platformRobot['token'];
+            $config = \Yii::$app->params['TELEGRAM'];
+            $params = [
+                'business_id' => $qiHao,
+                'content' => $text,
+                'chat_id' => $config['GROUP_ID'],
+                'token' => $token,
+            ];
+            push_queue(SendMessageJobs::class, $params); # 开奖结果消息发送 - 群
+        }
 
+        return true;
     }
 
     public static function getFanTan($heZhi=0): int
@@ -55,12 +66,16 @@ class AoZhouKjService  extends BaseService
 
     /**
      * 获取开奖结果描述
-     * @param $qiHao
+     * @param string $qiHao
      * @return array
      */
-    public static function getAoZhouKjData($qiHao): array
+    public static function getAoZhouKjData(string $qiHao=''): array
     {
-        $kjData = SscKjData::find()->where(['lottery_type'=>self::$lottery_type, 'qihao'=>$qiHao])->asArray()->one();
+        if($qiHao){
+            $kjData = SscKjData::find()->where(['lottery_type'=>self::$lottery_type, 'qihao'=>$qiHao])->asArray()->limit(1)->one();
+        }else{
+            $kjData = SscKjData::find()->where(['lottery_type'=>self::$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one();
+        }
 
         if(AoZhou5Service::KJ_CODE_NUM==5){
             $codeHz = $kjData['codes_hz'];

@@ -130,17 +130,34 @@ $this->registerJs($js);
                                 return $model->name;
                             },
                         ],
-                        //'status',
-                        ['attribute' => 'status', 'label'=>'类型','headerOptions'=>['width'=>'6%'], // 图片字段的属性
-                            'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
-                            'value' => function ($model) {
-                                return Html::a('<a href="#"><strong><font color="'.($model->status>0?'green':'red').'">'.\backend\models\open\PlatformRobot::STATUS_OPTIONS[$model->status].'</font></strong></a>');
-                            },
+                        ['attribute'=>'status', 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value'=>function($model){
+                                $url0 = "/tools/platform-robot/switch-status?id=".$model->id.'&status=1'; # 点击激活
+                                $url1 = "/tools/platform-robot/switch-status?id=".$model->id.'&status=0'; # 点击禁用
+                                $txt = '<strong>'.\backend\models\open\PlatformRobot::STATUS_OPTIONS[$model->status].'</strong>';
+                                if($model->status == 1){
+                                    $txt = "<font color='green'>{$txt}</font>";
+                                    return Html::a($txt, $url1, ['title' => '点击禁用']).'<i class="icon-refresh"></i>';
+                                }
+                                if(!$model->status){
+                                    $txt = "<font color='red'>{$txt}</font>";
+                                    return Html::a($txt, $url0, ['title' => '点击激活']).'<i class="icon-refresh"></i>';
+                                }
+                            }
                         ],
                         ['attribute' => 'token', 'label'=>'token',//'headerOptions'=>['width'=>'6%'], // 图片字段的属性
                             'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
                             'value' => function ($model) {
                                 return $model->token;
+                            },
+                        ],
+                        ['attribute' => 'group_id', 'label'=>'群',//'headerOptions'=>['width'=>'6%'], // 图片字段的属性
+                            'format' => 'raw', // 使用 raw 格式，允许 HTML 标签
+                            'value' => function ($model) {
+                                $group_name = \common\models\open\PlatformGroup::find()->select(['name'])
+                                    ->where(['group_id'=>$model->group_id])->scalar();
+                                return $group_name;
                             },
                         ],
                         ['attribute' => 'name', 'label'=>'机器人连接',//'headerOptions'=>['width'=>'6%'], // 图片字段的属性
@@ -154,7 +171,7 @@ $this->registerJs($js);
                         //'desc:ntext',
                         [
                             'class' => 'yii\grid\ActionColumn',
-                            'template' => '{update} {delete} {login}',
+                            'template' => '{update} {delete} {login} {get_group}',
                             'buttons' => [
                                 'update' => function ($url, $model, $key) {
                                     return Html::a('<span class="glyphicon glyphicon-pencil"></span>', 'javascript:void(0);', [
@@ -172,8 +189,15 @@ $this->registerJs($js);
                                 'login' => function ($url, $model, $key) {
                                     return Html::a('<span class="glyphicon glyphicon-ok"></span>', ['login', 'id' => $model->id], [
                                         'class' => 'btn btn-xs btn-green login-button',
-                                        'data-confirm' => '确认登录', // 提示信息
+                                        'data-confirm' => '确认激活 ？', // 提示信息
                                         'data-url' => Yii::$app->urlManager->createUrl(['tools/platform-robot/login', 'id' => $model->id]),
+                                    ]);
+                                },
+                                'get_group' => function ($url, $model, $key) {
+                                    return Html::a(\yii\bootstrap\Html::icon('check'), ['get-group', 'id' => $model->id], [
+                                        'class' => 'btn btn-xs btn-green login-button',
+                                        'data-confirm' => '确认获取群 ？', // 提示信息
+                                        'data-url' => Yii::$app->urlManager->createUrl(['tools/platform-robot/get-group', 'id' => $model->id]),
                                     ]);
                                 },
                                 // ...其他按钮...

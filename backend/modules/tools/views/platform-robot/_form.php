@@ -32,6 +32,12 @@ $this->title = '新建/编辑机器人';
                     <div class="col-lg-3 col-xs-6">
                         <?= $form->field($model, 'name')->label('机器人TG名称')->textInput(['maxlength' => true]) ?>
                     </div>
+                    <div class="col-lg-3 col-xs-6">
+                        <?= $form->field($model, 'group_id')->label('更换群聊')->dropDownList(
+                                \backend\models\open\PlatformGroup::getGroups($model->user_id),
+                            ['prompt' => '-请选择-'] // Optional: Add a prompt message
+                        ) ?>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-10 col-xs-12">

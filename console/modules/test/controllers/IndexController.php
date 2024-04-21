@@ -2,6 +2,8 @@
 namespace console\modules\test\controllers;
 
 use backend\models\BettingRecords;
+use backend\models\open\PlatformGroup;
+use backend\models\open\PlatformRobot;
 use backend\models\searchs\wechat\Bets;
 use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
@@ -28,6 +30,7 @@ use common\service\helpers\ThirdD;
 use common\service\lottery\aozhou5\AoZhou5BetService;
 use common\service\lottery\LotteryTypeService;
 use common\service\open\ActionBaseService;
+use common\service\open\actions\PlatformRobotService;
 use common\service\open\telegram\AoZhouKjService;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\match\MatchCodeService;
@@ -56,8 +59,12 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            (new AoZhouKjService())->operateSendKjData();p('dddd');
+            $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%platform_robot}}'); p($r);
+            $groups = PlatformGroup::getGroups($userId=21);p($groups);
+            $model = PlatformRobot::findOne(['platform_robot_id'=>'6744049574']);
+            $rst = PlatformRobotService::getUpdates($model); p($rst);# 添加之后立马获取群聊消息，记录群ID
             $r = OneNumYl::yl($lotteryType=8);p($r);
-            $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%ssc_1nums_yl}}'); p($r);
             $data = Aozhou::getSiteLucky5($type='json');p($data);
             $tzSystemUser = TzSystemsUsers::findOne(68);
             #$r = (new ActionBaseService())->login($tzSystemUser);p($r);

@@ -35,7 +35,7 @@ class PlatformRobot extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['platform_robot_id', 'platform_id', 'user_id', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['platform_robot_id', 'platform_id', 'user_id', 'group_id', 'status', 'created_at', 'updated_at'], 'integer'],
             [['created_at', 'updated_at'], 'required'],
             [['update_at'], 'safe'],
             [['name'], 'string', 'max' => 32],
