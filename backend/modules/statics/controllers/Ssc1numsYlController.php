@@ -41,11 +41,11 @@ class Ssc1numsYlController extends BaseController
         $queryParams = Yii::$app->request->queryParams;
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
         $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
-        $position = $queryParams['Ssc1numsYl']['position']?:1;
+        $queryParams['Ssc1numsYl']['position'] = $queryParams['Ssc1numsYl']['position']?:1;
         $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
-            'position' => $position,
+            'position' => $queryParams['Ssc1numsYl']['position'],
             'lottery_types' => $lottery_types,
             'lottery_type' => $lottery_type,
             'searchModel' => $searchModel,
