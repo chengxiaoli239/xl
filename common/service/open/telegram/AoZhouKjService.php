@@ -50,7 +50,7 @@ class AoZhouKjService  extends BaseService
             $params = [
                 'business_id' => $qiHao,
                 'content' => $text,
-                'chat_id' => $config['GROUP_ID'],
+                'chat_id' => $platformRobot['group_id'],
                 'token' => $token,
             ];
             push_queue(SendMessageJobs::class, $params); # 开奖结果消息发送 - 群
