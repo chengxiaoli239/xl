@@ -81,6 +81,13 @@ JS;
 
 $this->registerJs($js);
 ?>
+<style>
+.modal-content {
+    box-shadow: none;
+    border: none;
+    height: 500px;
+}
+</style>
 
 <section class="eyun-auth-index wrapper site-min-height">
     <!-- page start-->

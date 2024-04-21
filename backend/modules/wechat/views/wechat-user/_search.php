@@ -1,6 +1,7 @@
 <?php
 
 use backend\service\UserService;
+use common\service\CommonService;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -13,6 +14,7 @@ foreach ($robotUsers as $robotUser){
     $robotData[$robotUser['wcId']] = $robotUser['nickName']."(".($robotUser['wechat_status']?'在线':'离线').")";
 }
 $is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
+$lottery_type = CommonService::getIndexLotteryType($model->user_id);
 
 ?>
 <style>
@@ -44,7 +46,7 @@ $is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
         <?}?>
         <div class="col-lg-2 col-xs-4">
             <?= $form->field($model, 'userName')
-                ->label('微信ID', ['class' => 'control-label hidden-xs'])->textInput(['placeholder' => '微信ID'])
+                ->label('平台ID', ['class' => 'control-label hidden-xs'])->textInput(['placeholder' => '平台ID'])
             ?>
         </div>
 
@@ -64,11 +66,13 @@ $is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
                 ['0'=>'禁用', '1'=>'启用'], ['prompt'=>'-状态-']
             )->label('状态', ['class' => 'control-label hidden-xs']); ?>
         </div>
+        <?php if($lottery_type !=\common\helpers\LotteryType::AZ_LUCKY_5){?>
         <div class="col-lg-2 col-xs-4">
             <?php echo $form->field($model, 'robot_wechat')->dropDownList(
                 $robotData, ['prompt'=>'-机器人-']
             )->label('机器人', ['class' => 'control-label hidden-xs']); ?>
         </div>
+        <?php }?>
 
         <?php //$form->field($model, 'aliasName') ?>
 

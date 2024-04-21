@@ -146,6 +146,9 @@ $columns = array_merge(
         //        return '';
         //    }
         //],
+    ],
+    $lottery_type==\common\helpers\LotteryType::AZ_LUCKY_5?[]:
+    [
         ['attribute'=>'is_need_confirm','label'=>'需确认','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
             'format'=>'raw',
             'value'=>function($model){
@@ -178,6 +181,8 @@ $columns = array_merge(
                 return '';
             }
         ],
+    ],
+    [
         ['attribute'=>'is_admin','label'=>'管理员','headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
             'format'=>'raw',
             'value'=>function($model){
@@ -314,11 +319,13 @@ $columns = array_merge(
 
                 <?php echo $this->render('_search', ['model' => $searchModel]); ?>
 
-                <?= Html::button('同步好友', ['class' => 'btn btn-warning btn-xs', 'id' => 'syncFriends']) ?> &nbsp;
                 <?= Html::button("批量关闭 '状态'", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchCloseStatus']) ?> &nbsp;
                 <?= Html::button("批量开启 '状态'", ['class' => 'btn btn-success btn-xs', 'id' => 'batchOpenStatus']) ?> &nbsp;
-                <?= Html::button("批量关闭 '需确认'", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchCloseConfirm']) ?>
-                <?= Html::button("批量开启 '需确认'", ['class' => 'btn btn-success btn-xs', 'id' => 'batchOpenConfirm']) ?>
+                <?php if($lottery_type !=\common\helpers\LotteryType::AZ_LUCKY_5){?>
+                    <?= Html::button('同步好友', ['class' => 'btn btn-warning btn-xs', 'id' => 'syncFriends']) ?> &nbsp;
+                    <?= Html::button("批量关闭 '需确认'", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchCloseConfirm']) ?>
+                    <?= Html::button("批量开启 '需确认'", ['class' => 'btn btn-success btn-xs', 'id' => 'batchOpenConfirm']) ?>
+                <?php }?>
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,

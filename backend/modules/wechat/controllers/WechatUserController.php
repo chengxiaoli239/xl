@@ -4,6 +4,7 @@ namespace backend\modules\wechat\controllers;
 
 use backend\service\HN0898Service;
 use backend\service\UserService;
+use common\service\CommonService;
 use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
 use Yii;
@@ -43,6 +44,7 @@ class WechatUserController extends BaseController
         $queryParams = Yii::$app->request->queryParams;
 
         $is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
 
         if($this->_user_id != 1 && !$is3dAdmin){
             $queryParams['WechatUser']['user_id'] = $this->_user_id;
@@ -54,6 +56,7 @@ class WechatUserController extends BaseController
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'is3dAdmin' => $is3dAdmin,
+            'lottery_type' => $lottery_type,
         ]);
     }
 
