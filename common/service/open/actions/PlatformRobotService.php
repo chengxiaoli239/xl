@@ -55,7 +55,7 @@ class PlatformRobotService
                     $result = WebHookApi::getUpdates(['token'=>$token]);
                     Tool_Common::log('/platform/'.__FUNCTION__, 'INFO', '平台机器人设置', ['result'=>$result, 'token'=>$token]);
                     if(!$result['ok']){
-                        throw_info('获取群信息失败');
+                        throw_info($result['description']??'获取群信息失败');
                     }
                     $groups = [];
                     foreach ($result['result'] as $item){

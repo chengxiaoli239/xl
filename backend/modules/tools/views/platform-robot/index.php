@@ -194,7 +194,7 @@ $this->registerJs($js);
                                     ]);
                                 },
                                 'get_group' => function ($url, $model, $key) {
-                                    return Html::a(\yii\bootstrap\Html::icon('check'), ['get-group', 'id' => $model->id], [
+                                    return Html::a('同步群', ['get-group', 'id' => $model->id], [
                                         'class' => 'btn btn-xs btn-green login-button',
                                         'data-confirm' => '确认获取群 ？', // 提示信息
                                         'data-url' => Yii::$app->urlManager->createUrl(['tools/platform-robot/get-group', 'id' => $model->id]),

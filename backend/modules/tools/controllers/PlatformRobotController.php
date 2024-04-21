@@ -115,13 +115,17 @@ class PlatformRobotController extends BaseController
         ]);
     }
 
-    public function actionSwitchStatus($id){
+    public function actionSwitchStatus($id, $status=0){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $Model = $this->findModel($id);
-        if($Model->user_id != $this->_user_id && $this->_user_id != 1){
+        $model = $this->findModel($id);
+        if($model->user_id != $this->_user_id && $this->_user_id != 1){
             return ['status'=>400, 'msg'=>'非法请求'];
         }
-        HN0898Service::updateStatus($id, '\backend\models\open\PlatformRobot');
+        if(!$status){
+            $queryParams = ['token'=>$model->token];
+            WebHookApi::deleteWebHookInfo($queryParams);
+        }
+        HN0898Service::updateStatus($id, '\backend\models\open\PlatformRobot', 'status', $status);
 
         return $this->redirect(['index']);
     }
@@ -168,13 +172,7 @@ class PlatformRobotController extends BaseController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         $model = $this->findModel($id);
-        $loginRst = PlatformRobotService::getUpdates($model);
-        if($loginRst['status'] != 200){
-            return ['status'=>301, 'msg'=>'登陆失败：'.$loginRst['message']];
-        }
-
-        return ['status'=>200, 'msg'=>'登陆成功'];
-
+        return PlatformRobotService::getUpdates($model);
     }
 
     /**
