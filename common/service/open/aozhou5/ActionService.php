@@ -158,7 +158,7 @@ class ActionService
         $userInfo = UserApi::getUserInfo($url, $params, $headers);
         Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '获取用户信息', ['username'=>$this->tzSystemUsers->username, 'account'=>$this->tzSystemUsers->account, 'balance'=>$userInfo['balance']]);
         if(!isset($userInfo['balance'])){
-            return false;
+            return [];
         }
         $this->tzSystemUsers->balance = $userInfo['balance'];
         $this->tzSystemUsers->updated_at = time();

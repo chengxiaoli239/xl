@@ -21,11 +21,14 @@ $this->title = '盘口修改:'.$model->sys_name;
         <?php $form = ActiveForm::begin(); ?>
         <div class="panel-body">
             <div class="row">
-                <div class="col-lg-6 col-xs-6">
+                <div class="col-lg-4 col-xs-6">
                     <?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?>
                 </div>
-                <div class="col-lg-6 col-xs-6">
+                <div class="col-lg-4 col-xs-6">
                     <?= $form->field($model, 'password')->textInput(['maxlength' => true]) ?>
+                </div>
+                <div class="col-lg-4 col-xs-6">
+                    <?= $form->field($model, 'secure_code')->textInput(['maxlength' => true]) ?>
                 </div>
             </div>
 

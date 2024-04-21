@@ -24,6 +24,7 @@ use Yii;
  * @property string $sys_repassword 机器人重复密码
  * @property string $balance 系统余额
  * @property int $status 系统开启状态
+ * @property string $secure_code 安全码
  * @property int $is_auto_login 是否自动登陆
  * @property string $ssc_domain 网盘地址
  * @property string $cookie 登陆cookie
@@ -73,7 +74,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
         return [
             [['uid', 'is_agent', 'tz_system_id', 'status', 'follow_status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'user_type', 'is_local_bet', 'proxy_type', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['balance', 'flow_wp_player_bs', 'flow_op_player_bs', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
-            [['cookie', 'cookie_wx_web'], 'string'],
+            [['secure_code', 'cookie', 'cookie_wx_web'], 'string'],
             [['updated_at'], 'required'],
             [['update_time'], 'safe'],
             [['sys_password', 'sys_repassword'], 'trim'],
@@ -140,6 +141,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'sys_repassword' => Yii::t('app', '机器人登陆重复密码'),
             'balance' => Yii::t('app', '系统余额'),
             'status' => Yii::t('app', '系统开启状态'),
+            'secure_code' => Yii::t('app', '安全码'),
             'is_auto_login' => Yii::t('app', '是否自动登陆'),
             'follow_status' => Yii::t('app', '是否自动跟'),
             'ssc_domain' => Yii::t('app', '网盘地址'),

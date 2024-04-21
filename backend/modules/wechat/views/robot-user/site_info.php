@@ -8,9 +8,7 @@
 <script type="text/javascript" src="/js/common.js?v={{STATIC_VERSION}}"></script>
 <?php
 
-use backend\models\TzSystemsUsers;
-use izyue\admin\widgets\GridView;
-use izyue\admin\widgets\ListView;
+use backend\service\agent\AgentService;
 use yii\bootstrap\Modal;
 use yii\helpers\BaseStringHelper;
 use yii\helpers\Html;
@@ -70,12 +68,26 @@ $this->registerJs($js);
                                 'attributes' => [
                                     #'id',
                                     'sys_name',
-                                    [ 'attribute'=>'account','label'=>'账号','format'=>'raw',
+                                    [ 'attribute'=>'account','label'=>'盘口账号','format'=>'raw',
                                         'value'=>function($model){
                                             return "<span id='site_".$model->id."'>".$model->account."</span>";
                                         }
                                     ],
-                                    'password',
+                                    [ 'attribute'=>'password','label'=>'盘口密码','format'=>'raw',
+                                        'value'=>function($model){
+                                            return $model->password;
+                                        }
+                                    ],
+                                    ['attribute' => 'ssc_domain', 'label'=>'网盘', //'headerOptions' => ['width' => '170'],
+                                        'value'=> function($model){
+                                            return  $model->ssc_domain;
+                                        },
+                                    ],
+                                    ['attribute' => 'secure_code', 'label'=>'安全码', //'headerOptions' => ['width' => '170'],
+                                        'value'=> function($model){
+                                            return  $model->secure_code;
+                                        },
+                                    ],
                                     ['attribute' => 'status','label'=>'状态','headerOptions'=>['width'=>'5%'],
                                         'format'=>'raw',
                                         'value' => function($model) {
@@ -92,18 +104,13 @@ $this->registerJs($js);
                                             }
                                         }
                                     ],
-                                    ['attribute' => 'ssc_domain', 'label'=>'网盘', //'headerOptions' => ['width' => '170'],
-                                        'value'=> function($model){
-                                            return  $model->ssc_domain;
-                                        },
-                                    ],
                                     //'balance',
-                                    [ 'attribute'=>'balance','label'=>'余额','format'=>'raw',
+                                    [ 'attribute'=>'balance','label'=>'描述情况','format'=>'raw',
                                         'value'=>function($model){
-                                            return "<span id='balance_".$model->id."'>".$model->balance."</span>";
+                                            list($balance, $todayPl, $todayBet, $weekBet, $weekPl, $lastWeekBet, $lastWeekPl) = AgentService::getCalcMoney($model->uid);
+                                            return "余额：<span id='balance_".$model->id."'>".$model->balance."</span>、".'今日盈亏：'.$todayPl.'、有效金额：'.$todayBet;
                                         }
                                     ],
-                                    'desc',
                                     'expire_time:datetime',
                                     ['attribute' => 'desc','label'=>'操作','headerOptions'=>['width'=>'5%'],
                                         'format'=>'raw',

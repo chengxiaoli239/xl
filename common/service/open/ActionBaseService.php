@@ -26,6 +26,7 @@ class ActionBaseService
         $objectClass->account = $tzSystemsUser->account;
         $objectClass->password = $tzSystemsUser->password;
         $objectClass->tzSystemUsers = $tzSystemsUser;
+        $objectClass->securityCode = $tzSystemsUser->secure_code;
 
         $userInfo = $objectClass->getUserInfo();
         if($isAuto==2 OR !$userInfo){
