@@ -77,7 +77,7 @@ class AoZhou5Service extends CommonLotteryService
                 foreach ($replyDatum as $qiHao=>$value){
                     list($codeHz, $kjCode, $ds, $ft) = AoZhouKjService::getAoZhouKjData($qiHao);
                     $text = "第".$qiHao."期\n\n".$kjCode.'总和'.$codeHz."(".$ds.",".$ft.")\n\n";
-                    $userId = $value['user_id'];
+                    $userId = $value['userId'];
                     $replyContent = $value['reply_content'];
 
                     $betRows = Bets::find()->where(['id'=>$value['betIds'],'qihao'=>$qiHao, 'status'=>1])->asArray()->all();
@@ -90,10 +90,10 @@ class AoZhou5Service extends CommonLotteryService
                     $platformUser = WechatUser::find()->where(['id'=>$wechatUserId])->asArray()->one();
                     $text .= "\n余额：".$platformUser['balance'];
                     $sendData = [
-                        'user_id' => $userId,
+                        'user_id' => $platformUser['user_id'],
                         'chat_id' => $replyContent['fromUser'], # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
                         'content' => $text, # 测试阶段调试信息 - 用户下注完回复
-                        'business_id' => $userId,
+                        'business_id' => $platformUser['user_id'],
                         'token' => $replyContent['token'], # 机器人的token
                     ];
                     //todo 开奖结果私发用户
