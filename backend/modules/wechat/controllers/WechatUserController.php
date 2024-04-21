@@ -43,10 +43,11 @@ class WechatUserController extends BaseController
         $queryParams = Yii::$app->request->queryParams;
 
         $is3dAdmin = UserService::is3dAdmin(\Yii::$app->user->identity);
+
         if($this->_user_id != 1 && !$is3dAdmin){
             $queryParams['WechatUser']['user_id'] = $this->_user_id;
         }
-        $queryParams['WechatUser']['robot_wechat'] = WechatUserService::getCurrentRobotWechat($this->_user_id, $queryParams['WechatUser']['robot_wechat']??'');
+        //$queryParams['WechatUser']['robot_wechat'] = WechatUserService::getCurrentRobotWechat($this->_user_id, $queryParams['WechatUser']['robot_wechat']??'');
         $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
