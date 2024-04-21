@@ -49,7 +49,7 @@ class MessageReceiveJobs extends CommonJob
         }
         $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$params['user_id']]);
         if(!$TzSystemUsers->status){
-            throw_info('机器人已停止工作，请稍后');
+            throw_info('机器人已停止工作，请稍后', CommonBaseService::CODE_FOR_USER);
         }
 
     }
