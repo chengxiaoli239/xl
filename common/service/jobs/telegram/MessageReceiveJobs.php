@@ -1,6 +1,7 @@
 <?php
 namespace common\service\jobs\telegram;
 
+use backend\models\TzSystemsUsers;
 use backend\service\agent\AgentService;
 use backend\service\agent\AgentUsersBalanceService;
 use backend\service\agent\AgentUsersService;
@@ -46,6 +47,11 @@ class MessageReceiveJobs extends CommonJob
         if('00:00'<$dataHI && $dataHI<'08:00'){
             //throw_info('本堂未开', CommonBaseService::CODE_FOR_USER);
         }
+        $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$params['user_id']]);
+        if(!$TzSystemUsers->status){
+            throw_info('机器人已停止工作，请稍后');
+        }
+
     }
 
     public static function handle($params){

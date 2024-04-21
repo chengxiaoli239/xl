@@ -8,6 +8,7 @@
 <script type="text/javascript" src="/js/common.js?v={{STATIC_VERSION}}"></script>
 <?php
 
+use backend\models\TzSystemsUsers;
 use izyue\admin\widgets\GridView;
 use izyue\admin\widgets\ListView;
 use yii\bootstrap\Modal;
@@ -75,10 +76,20 @@ $this->registerJs($js);
                                         }
                                     ],
                                     'password',
-                                    ['attribute' => 'status','label'=>'账号状态','headerOptions'=>['width'=>'5%'],
+                                    ['attribute' => 'status','label'=>'状态','headerOptions'=>['width'=>'5%'],
                                         'format'=>'raw',
                                         'value' => function($model) {
-                                            return ($model->status==1) ? '<strong><font color="green">正常</font></strong>' : '<strong><font color="red">已禁用</font></strong>';
+                                            $url0 = "/wechat/robot-user/switch-status?id=".$model->id.'&status=1'; # 点击激活
+                                            $url1 = "/wechat/robot-user/switch-status?id=".$model->id.'&status=0'; # 点击禁用
+                                            $txt = '<strong>'.\common\helpers\Platform::SYSTEM_STATUS_OPTIONS[$model->status].'</strong>';
+                                            if($model->status == 1){
+                                                $txt = "<font color='green'>{$txt}</font>";
+                                                return Html::a($txt, $url1, ['title' => '点击"停止工作"']).'<i class="icon-refresh"></i>';
+                                            }
+                                            if(!$model->status){
+                                                $txt = "<font color='red'>{$txt}</font>";
+                                                return Html::a($txt, $url0, ['title' => '点击开启工作']).'<i class="icon-refresh"></i>';
+                                            }
                                         }
                                     ],
                                     ['attribute' => 'ssc_domain', 'label'=>'网盘', //'headerOptions' => ['width' => '170'],

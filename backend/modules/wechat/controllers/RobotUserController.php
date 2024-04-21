@@ -3,6 +3,7 @@ namespace backend\modules\wechat\controllers;
 
 use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
 use backend\models\TzSystemsUsers;
+use backend\service\HN0898Service;
 use common\models\AdminModel;
 use common\models\eyun\HistoryRobots;
 use common\open\telegram\api\WebHookApi;
@@ -157,6 +158,17 @@ class RobotUserController extends BaseController
         return $this->renderAjax('update_site_info', [
             'model' => $model,
         ]);
+    }
+
+    public function actionSwitchStatus($id, $status=0){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $model = TzSystemsUsers::findOne($id);
+        if($model->uid != $this->_user_id && $this->_user_id != 1){
+            return ['status'=>400, 'msg'=>'非法请求'];
+        }
+        HN0898Service::updateStatus($id, '\backend\models\TzSystemsUsers', 'status', $status);
+
+        return $this->redirect(['site-info']);
     }
 
     /**
