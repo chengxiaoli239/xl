@@ -276,6 +276,10 @@ class AoZhou5BetService extends CommonBaseService
         if(!isset($Odds['odds'])){
             throw_info('赔率获取异常user_id:'.$betRow->user_id.'_play_method:'.$betRow->play_method);
         }
+        list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao(self::LOTTERY_TYPE_AOZHOU5);
+        if($betRow->qihao != $nextQiHao){
+            throw_info("下注期号异常{$betRow->qihao} != $nextQiHao");
+        }
         $postData1 = [
             '__'=>'isAutoOdds',
             'gameId'=>601,
@@ -293,8 +297,10 @@ class AoZhou5BetService extends CommonBaseService
         $url = "https://url{$objectClass->line_number}.{$parsed_url['host']}";
 
         $result1 = OrderApi::push($url, $postData1);
+        if(!empty($result1['error'])){
+            throw_info($result1['error']??'推送盘口异常1', 30001);
+        }
 
-        list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao(self::LOTTERY_TYPE_AOZHOU5);
         $postData2 = [
             '__'=>'bettingSingle',
             'data' => Json::encode([
@@ -315,7 +321,7 @@ class AoZhou5BetService extends CommonBaseService
         if(!empty($result2['error'])){ # 错误码：2成功、9918 登录超时....
             $logArr['result'] = $result2;
             Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘20', $logArr);
-            throw_info($result2['error']??'推送盘口异常', 30001);
+            throw_info($result2['error']??'推送盘口异常2', 30002);
         }
         $objectClass->getUserInfo(); # 同步余额
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘30', ['result2'=>$result2]);
