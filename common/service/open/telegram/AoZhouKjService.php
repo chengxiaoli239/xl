@@ -17,7 +17,7 @@ class AoZhouKjService  extends BaseService
         $switch = \Yii::$app->params['AZ_MESSAGE_SWITCH']??0;
         if(!$switch) return false;
 
-        list($codeHz, $kjCode, $ds, $ft) = AoZhouKjService::getAoZhouKjData($qiHao);
+        list($codeHz, $kjCode, $ds, $ft, $qiHao) = AoZhouKjService::getAoZhouKjData($qiHao);
 
         $text = "============================\n";
         $text .= LotteryType::TYPE_OPTIONS[self::$lottery_type].'（前'.(AoZhou5Service::KJ_CODE_NUM).'位数番摊）'."\n\n".
@@ -87,7 +87,8 @@ class AoZhouKjService  extends BaseService
 
         $ds = ($codeHz%2==0) ? '双' : '单';
         $ft = ($codeHz%4)?:4;
+        $qiHao = $kjData['qihao'];
 
-        return [$codeHz, $kjCode, $ds, $ft];
+        return [$codeHz, $kjCode, $ds, $ft, $qiHao];
     }
 }
