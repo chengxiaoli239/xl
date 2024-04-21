@@ -125,7 +125,7 @@ class ActionService
      * 获取用户信息
      * @return bool
      */
-    public function getUserInfo(): bool
+    public function getUserInfo(): array
     {
         $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
         $cookie = explode('=', $this->tzSystemUsers->cookie)[1];
@@ -164,6 +164,6 @@ class ActionService
         $this->tzSystemUsers->updated_at = time();
         $this->tzSystemUsers->save();
 
-        return true;
+        return $userInfo?:[];
     }
 }

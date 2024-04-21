@@ -117,39 +117,8 @@ class Aozhou extends BaseKj {
             $where = ['AND', ['=', 'status',1], ['>', 'balance', 0],['=', 'tz_system_id', 19], ['!=', 'ssc_domain', '']];
             $TzSystemsUser = TzSystemsUsers::find()->where($where)->limit(1)->one();
 
-            $objectClass = ActionBaseService::getClass($TzSystemsUser->tz_system_id);
-            $objectClass->domain = $TzSystemsUser->ssc_domain;
-            $objectClass->tzSystemUsers = $TzSystemsUser;
-            $parsed_url = parse_url($objectClass->domain); # Array ( [scheme] => https [host] => ac3868.com )
-            $cookie = explode('=', $objectClass->tzSystemUsers->cookie)[1];
-            $params = [
-                #'__' => 'lotteryRecord', #'memberoddsdata',
-                '__' => 'memberoddsdata',
-                'gameId' => 601,
-                'pusId' => 8,
-                'tId' => 1,
-                'pId' => -1,
-                'rebate' => 'A',
-                'cbk' => $cookie,
-            ];
-            $host = $parsed_url['host'];
-            $headers = [
-                'User-Agent' => str_replace('User-Agent:', '', $objectClass->tzSystemUsers->user_agent),
-                'cookie' => $objectClass->tzSystemUsers->cookie,
-                'origin' => "https://url{$objectClass->line_number}.{$host}",
-                'referer' => "https://url{$objectClass->line_number}.{$host}/member/",
-                'sec-ch-ua' => '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-                'Origin' => "{$parsed_url['scheme']}://url{$objectClass->line_number}.{$host}",
-                'Referer' => "{$parsed_url['scheme']}://url{$objectClass->line_number}.{$host}/member/",
-                'sec-ch-ua-mobile' => '?0',
-                'sec-ch-ua-platform' => '"Windows"',
-                'sec-fetch-dest' => 'empty',
-                'sec-fetch-mode' => 'cors',
-                'sec-fetch-site' => 'same-origin',
-                'Content-Type' => 'application/x-www-form-urlencoded',
-            ];
-            $url = "https://url{$objectClass->line_number}.{$host}";
-            $lotteryInfo = UserApi::getLotteryRecord($url, $params, $headers);
+            list($code, $lotteryInfo, $msg) = (new ActionBaseService)->login($TzSystemsUser);
+            //p(['lotteryInfo'=>$lotteryInfo]);
             $siteData = $lotteryInfo['drawList'][0]??[];
             $kjData = [
                 'expect'=>$siteData['drawNumber'],

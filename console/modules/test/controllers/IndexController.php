@@ -59,13 +59,13 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $data = Aozhou::getSiteLucky5($type='json');p($data);
             (new AoZhouKjService())->operateSendKjData();p('dddd');
             $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%platform_robot}}'); p($r);
             $groups = PlatformGroup::getGroups($userId=21);p($groups);
             $model = PlatformRobot::findOne(['platform_robot_id'=>'6744049574']);
             $rst = PlatformRobotService::getUpdates($model); p($rst);# 添加之后立马获取群聊消息，记录群ID
             $r = OneNumYl::yl($lotteryType=8);p($r);
-            $data = Aozhou::getSiteLucky5($type='json');p($data);
             $tzSystemUser = TzSystemsUsers::findOne(68);
             #$r = (new ActionBaseService())->login($tzSystemUser);p($r);
             $r = (new ActionBaseService())->getUserInfo($tzSystemUser);p($r);

@@ -111,7 +111,10 @@ class BaseService{
                     $rst = Sx3dUserService::login($TzSystemsUser);
                     break;
                 case 19: # 澳洲五
-                    $rst = (new ActionBaseService())->login($TzSystemsUser);
+                    list($code, $data, $msg) = (new ActionBaseService())->login($TzSystemsUser);
+                    if(!$code){
+                        $rst = ['status'=>200, 'data'=>$data, 'msg'=>$msg];
+                    }
                     break;
             }
             if($rst['status'] != 200){

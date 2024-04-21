@@ -27,20 +27,21 @@ class ActionBaseService
         $objectClass->password = $tzSystemsUser->password;
         $objectClass->tzSystemUsers = $tzSystemsUser;
 
-        if($isAuto==2 OR !$objectClass->getUserInfo()){
+        $userInfo = $objectClass->getUserInfo();
+        if($isAuto==2 OR !$userInfo){
             $objectClass->login();
-            $objectClass->getUserInfo();
+            $userInfo = $objectClass->getUserInfo();
         }
 
-        return [0, '完成'];
+        return [0, $userInfo, '完成'];
     }
 
-    public function getUserInfo($tzSystemsUser): bool
+    public function getUserInfo($tzSystemsUser): array
     {
         $objectClass = self::getClass($tzSystemsUser->tz_system_id);
         $objectClass->domain = $tzSystemsUser->ssc_domain;
         $objectClass->tzSystemUsers = $tzSystemsUser;
 
-        return $objectClass->getUserInfo();
+        return $objectClass->getUserInfo()?:[];
     }
 }
