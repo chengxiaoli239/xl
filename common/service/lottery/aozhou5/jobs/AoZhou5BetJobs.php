@@ -59,14 +59,13 @@ class AoZhou5BetJobs extends CommonJob {
                 if($code>0){
                     $errContent .= $betRow->bet_desc.'：'.$msg."\n";
                     continue;
-                }else{
-                    $allMoneys += $betRow->bet_money; # 总投
-                    list($methodId, $methodName) = SscMethod::getMethod($betRow->codes);
-                    $replyMethodName = PlayMethodService::getReplyMethodName($methodName);
-                    $oneBetContent = "\n".$replyMethodName.'：'.str_replace([':',','],'', $betRow->codes).'各'.$betRow->single.'共'.$betRow->bet_money;
-
-                    //var_dump('id'.$method['codes'].'_'.$Bets->id);
                 }
+                $allMoneys += $betRow->bet_money; # 总投
+                list($methodId, $methodName) = SscMethod::getMethod($betRow->codes);
+                $replyMethodName = PlayMethodService::getReplyMethodName($methodName);
+                $oneBetContent = "\n".$replyMethodName.'：'.str_replace([':',','],'', $betRow->codes).'各'.$betRow->single.'共'.$betRow->bet_money;
+
+                //var_dump('id'.$method['codes'].'_'.$Bets->id);
                 $allCount += 1; # 总投
 
                 $betContent .= str_replace(';', ',', $oneBetContent);
