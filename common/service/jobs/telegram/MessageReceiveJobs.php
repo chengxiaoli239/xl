@@ -51,6 +51,11 @@ class MessageReceiveJobs extends CommonJob
         if(!$TzSystemUsers->status){
             throw_info('机器人已停止工作，请稍后', CommonBaseService::CODE_FOR_USER);
         }
+        # 消息时间限制
+        $message = $params['message'];
+        if((time()-30)>$message['date']){
+            throw_info("消息接收延迟忽略处理，请重新下单:\n".$message['text'], CommonBaseService::CODE_FOR_USER);
+        }
 
     }
 
