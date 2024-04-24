@@ -96,10 +96,10 @@ use yii\widgets\ActiveForm;
                 <?php //include(dirname(__FILE__).'/fenli_shu_form.php'); ?>
 
                 <div class="row">
-                    <div class="col-lg-6 col-xs-12">
+                    <div class="col-lg-6 col-xs-6">
                         <?= $form->field($model, 'hz')->checkboxList($hzArr)->label('投注类型(和值)') ?>
                     </div>
-                    <div class="col-lg-6 col-xs-12">
+                    <div class="col-lg-3 col-xs-6">
                         <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>
                     </div>
                     <div class="col-lg-3 col-xs-6">
