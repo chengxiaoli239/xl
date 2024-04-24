@@ -45,13 +45,11 @@ class AoZhouKjService  extends BaseService
             if(!$platformRobot['group_id']){
                 continue;
             }
-            $token = $platformRobot['token'];
-            $config = \Yii::$app->params['TELEGRAM'];
             $params = [
                 'business_id' => $qiHao,
                 'content' => $text,
                 'chat_id' => $platformRobot['group_id'],
-                'token' => $token,
+                'token' => $platformRobot['token'],
             ];
             push_queue(SendMessageJobs::class, $params); # 开奖结果消息发送 - 群
         }
