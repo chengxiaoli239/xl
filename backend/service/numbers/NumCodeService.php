@@ -1114,12 +1114,13 @@ class NumCodeService extends BaseService
         $CurrentKjDatas = NumCodeService::getKjData($current_kj_qihao, $lottery_type);
 
         $type_dd = ($type_field=='type_4dx') ? substr($CurrentKjDatas['type_4dx'], 0, 4) : $CurrentKjDatas['code_1_2_3_4'];
-        # 然后全大全小，全单全双才过滤双重，其它情况过滤对数
+        # 全大全小，全单全双才过滤双重，其它情况过滤对数
         if(in_array($type_dd, ['1111', '2222'])){
             $andWhere = ['=', 'n.type_2', 1];
         }else{
             $andWhere = ['=', 'n.type_log', 1];
         }
+        $andWhere = ['=', 'n.type_2', 1]; // # 调整：只过滤双重
 
         //$type_dd = '2222';
 
