@@ -29,12 +29,12 @@ class AgentService extends BaseService {
         # 盘口余额、今日盈亏、有效金额、本周下单金额、本周实际盈亏、上周下单金额、上周实际盈亏
         return [
             $TzSystemsUsers->balance?:0.00, # 盘口余额
-            0-self::getZoneProfits($startOfDay, $endOfDay), # 今日盈亏
+            self::getZoneProfits($startOfDay, $endOfDay), # 今日盈亏
             self::getZoneBetMoney($startOfDay, $endOfDay), # 有效金额，暂时计算今日，有待确认
             self::getZoneBetMoney($startOfWeek, $endOfWeek), # 本周下单金额
-            0-self::getZoneProfits($startOfWeek, $endOfWeek), # 本周实际盈亏
+            self::getZoneProfits($startOfWeek, $endOfWeek), # 本周实际盈亏
             self::getZoneBetMoney($startOfLastWeek, $endOfLastWeek), # 上周下单金额
-            0-self::getZoneProfits($startOfLastWeek, $endOfLastWeek), # 上周实际盈亏
+            self::getZoneProfits($startOfLastWeek, $endOfLastWeek), # 上周实际盈亏
         ];
     }
 

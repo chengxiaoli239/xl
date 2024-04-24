@@ -28,7 +28,9 @@ class Send
         Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复', ['platform_id'=>$this->platformRobot->platform_id, 'targetId'=>$targetId, 'replyTxts'=>$replyTxts]);
         list($replyTxt1, $replyTxt2) = $replyTxts; # 分别为：用户消息、管理员消息
         if($this->platformRobot->platform_id == Platform::TELEGRAM){
-            $messageData = ['targetId'=>$targetId, 'token'=>$this->platformRobot->token];
+            $robotId = $platformUser['robot_wechat'];
+            $platformRobot = PlatformRobot::find()->where(['platform_robot_id'=>$robotId])->limit(1)->one();
+            $messageData = ['targetId'=>$targetId, 'token'=>$platformRobot['token']];
             Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复01-用户', ['messageData'=>$messageData]);
             $replyUserTxt = '【内容】'.$replyTxt1;
             # 1、给用户发信息
@@ -36,7 +38,7 @@ class Send
             //todo 2、审核之后给用户和管理员同时发消息，目前只有用户收到，管理员未处理
             # 2、给管理员发信息
             $replyAdminTxt = '【内容】"'.$platformUser['nickName'].'" '.$replyTxt2;
-            $messageData = ['targetId'=>$this->robotAdmin['userName'], 'token'=>$this->platformRobot->token];
+            $messageData = ['targetId'=>$this->robotAdmin['userName'], 'token'=>$platformRobot['token']];
             Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复02-管理员', ['messageData'=>$messageData]);
             $messageService->reply($this->userId, $replyAdminTxt, $messageData);
         }else{
