@@ -8,4 +8,8 @@ trait WechatCacheKeyTrait
         return 'wechat:users:user_id_' . $user_id;
     }
 
+    public static function robotInfo($robotId=0): string
+    {
+        return 'wechat:robot_info:robot_id_' . $robotId;
+    }
 }

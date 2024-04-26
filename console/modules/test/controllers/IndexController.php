@@ -59,6 +59,21 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $mKey = 'llllllll';
+            #$result = \Yii::$app->redis->get($mKey);
+            #$exists = \Yii::$app->redis->exists($mKey);
+            $result = commonRedis()->get($mKey);
+            $exists = commonRedis()->exists($mKey);
+            print_r(['exists'=>$exists]);
+            if(empty($result)){
+                commonRedis()->setex($mKey, 10, ['num'=>333]);
+                //\Yii::$app->redis->expire($mKey, 10);
+                print_r('为空');
+            }else{
+                print_r(['不为空：', $result]);
+            }
+            p(['result'=>$result, 'date'=>date('Y-m-d H:i:s')], 0);
+            p('设置结束'.date('Y-m-d H:i:s'));
             $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}'); p($r);
             $data = Aozhou::getSiteLucky5($type='json');p($data);
             (new AoZhouKjService())->operateSendKjData();p('dddd');

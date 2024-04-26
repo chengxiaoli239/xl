@@ -3,6 +3,7 @@ namespace common\service\open\telegram;
 
 use backend\models\SscKjData;
 use backend\models\thirdD\BetsBackend;
+use backend\models\TzSystemsUsers;
 use backend\service\agent\AgentUsersBalanceService;
 use backend\service\agent\AgentUsersService;
 use common\exceptions\InfoException;
@@ -27,6 +28,8 @@ class MessageOperateService  extends BaseService
 {
     public $user_id;
     public $platformUser;
+    public $robotInfo;
+    public $tzSystemUsers;
 
     public $member_id;
 
@@ -49,6 +52,8 @@ class MessageOperateService  extends BaseService
     {
         $this->user_id = $userId;
         $this->platformUser = WechatUserService::getWechatUsers($userId)[$fromId];
+        $this->tzSystemUsers = TzSystemsUsers::findOne(['uid'=>$userId]);
+        $this->robotInfo = WechatUserService::getRobotInfo($this->platformUser['robot_wechat']);
         $this->member_id = $this->platformUser['member_id'];
         $this->lottery_type = LotteryType::AZ_LUCKY_5;
         self::validateWechatUser();
@@ -212,11 +217,14 @@ class MessageOperateService  extends BaseService
                     'fromNickName' => $this->platformUser['nickName'],
                     'token' => $token,
                 ];
+                $robotId = explode(':', $token)[0];
                 $Bets = new BetsBackend();
                 $setData = [
                     'user_id' => $this->user_id,
                     'wechat_user_id' => $this->platformUser['id'],
                     'order_id' => $betOrderId,
+                    'robot_id' => $robotId,
+                    'site_account' => $this->tzSystemUsers->account, # 盘口账号
                     'play_method' => $method['id'],
                     'codes' => (string)$method['codes'],
                     'bet_money' => $method['all_moneys'],

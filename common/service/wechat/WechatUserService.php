@@ -2,8 +2,8 @@
 
 namespace common\service\wechat;
 
-use backend\models\AgentUsersBalanceFlows;
 use common\models\eyun\RobotUser;
+use common\models\open\PlatformRobot;
 use common\models\wechat\WechatUser;
 use common\service\BaseService;
 use common\service\cache\CacheKeyService;
@@ -75,6 +75,26 @@ class WechatUserService extends BaseService
             #$sql = $dataQuery->createCommand()->getRawSql();p($sql);
             $data = $dataQuery->indexBy(['userName'])->asArray()->all();
             $m->set($mkey, $data, 600);
+        }
+
+        return $data;
+    }
+
+    /**
+     * 获取机器人信息
+     * @param int $robotId
+     * @param bool $useCache
+     * @return array|mixed|ActiveRecord[]
+     */
+    public static function getRobotInfo(int $robotId=0, bool $useCache=true){
+        $m = \Yii::$app->cache;
+        $mKey = CacheKeyService::robotInfo($robotId);
+        if(!$data = commonRedis()->get($mKey)){
+            $dataQuery = PlatformRobot::find()
+                ->where(['platform_robot_id'=>$robotId]);
+            #$sql = $dataQuery->createCommand()->getRawSql();p($sql);
+            $data = $dataQuery->asArray()->all();
+            $m->set($mKey, $data, 600);
         }
 
         return $data;

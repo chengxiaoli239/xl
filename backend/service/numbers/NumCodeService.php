@@ -26,8 +26,9 @@ class NumCodeService extends BaseService
      */
     public static function getKjData(string $qiHao='', int $lottery_type=DEFAULT_LOTTERY_TYPE)
     {
-        $mkey = CacheKeyService::lotteryKjInfo($lottery_type, $qiHao);
-        if(!$kjData = commonRedis()->get($mkey)){
+        $mKey = CacheKeyService::lotteryKjInfo($lottery_type, $qiHao);
+        $kjData = commonRedis()->get($mKey);
+        if(empty($kjData)){
             $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'qihao', $qiHao]];
             $select = ['code1', 'code2', 'code3', 'code4', 'code5', 'code_str', 'qihao', 'code_str',
                 'type_ds'=>'code_1_2_3_4', 'code_1_2_3_4',
@@ -35,14 +36,14 @@ class NumCodeService extends BaseService
                 'hz'=>'SUM(code1 + code2 + code3 + code4)',
                 'codes_hz'=>'codes_4nums_hz',
             ];
-            $historyKjDataQuery = SscKjData::find()->select($select)
-                ->where($historyWhere)->limit(1)->orderBy(['id'=>SORT_DESC]);
+            $historyKjDataQuery = SscKjData::find()->select($select)->where($historyWhere)->limit(1)->orderBy(['id'=>SORT_DESC]);
             $sql = $historyKjDataQuery->createCommand()->getRawSql();//p($sql);
             $kjData = $historyKjDataQuery->asArray()->one();
             Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据', ['lottery_type'=>$lottery_type, 'qiHao'=>$qiHao, 'kjData'=>$kjData]);
-            if(!empty($kjData['qihao'])){
-                commonRedis()->setex($mkey, 300, $kjData);
+            if(empty($kjData['qihao'])){
+                return []; # 开奖数据为空
             }
+            commonRedis()->setex($mKey, 120, $kjData);
         }
 
         return $kjData;
@@ -1110,7 +1111,7 @@ class NumCodeService extends BaseService
         $playway = $plan->playway;
         $lottery_type = $plan->lottery_type;
 
-        list($current_kj_qihao, $next_qihao) = QihaoService::getKjQiHao($lottery_type);
+        list($current_kj_qihao, $next_qiHao) = QihaoService::getKjQiHao($lottery_type);
         $CurrentKjDatas = NumCodeService::getKjData($current_kj_qihao, $lottery_type);
 
         $type_dd = ($type_field=='type_4dx') ? substr($CurrentKjDatas['type_4dx'], 0, 4) : $CurrentKjDatas['code_1_2_3_4'];
