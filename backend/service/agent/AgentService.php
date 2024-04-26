@@ -29,30 +29,32 @@ class AgentService extends BaseService {
         # 盘口余额、今日盈亏、有效金额、本周下单金额、本周实际盈亏、上周下单金额、上周实际盈亏
         return [
             $TzSystemsUsers->balance?:0.00, # 盘口余额
-            self::getZoneProfits($startOfDay, $endOfDay), # 今日盈亏
-            self::getZoneBetMoney($startOfDay, $endOfDay), # 有效金额，暂时计算今日，有待确认
-            self::getZoneBetMoney($startOfWeek, $endOfWeek), # 本周下单金额
-            self::getZoneProfits($startOfWeek, $endOfWeek), # 本周实际盈亏
-            self::getZoneBetMoney($startOfLastWeek, $endOfLastWeek), # 上周下单金额
-            self::getZoneProfits($startOfLastWeek, $endOfLastWeek), # 上周实际盈亏
+            self::getZoneProfits($TzSystemsUsers->account, $startOfDay, $endOfDay), # 今日盈亏
+            self::getZoneBetMoney($TzSystemsUsers->account, $startOfDay, $endOfDay), # 有效金额，暂时计算今日，有待确认
+            self::getZoneBetMoney($TzSystemsUsers->account, $startOfWeek, $endOfWeek), # 本周下单金额
+            self::getZoneProfits($TzSystemsUsers->account, $startOfWeek, $endOfWeek), # 本周实际盈亏
+            self::getZoneBetMoney($TzSystemsUsers->account, $startOfLastWeek, $endOfLastWeek), # 上周下单金额
+            self::getZoneProfits($TzSystemsUsers->account, $startOfLastWeek, $endOfLastWeek), # 上周实际盈亏
         ];
     }
 
     /**
      * 计算区间利润
+     * @param $account - 盘口账号
      * @param $startTime
      * @param $endTime
+     * @param float|int $plusTime 往前推后4个小时
      * @return false|float|string
      */
-    private static function getZoneProfits($startTime, $endTime)
+    private static function getZoneProfits($account, $startTime, $endTime, $plusTime=4*3600)
     {
         $profits = Bets::find()->select(['profitAndLoss'=>'SUM(profits)'])->where([
             'AND',
-            ['>=', 'created_at', $startTime],
-            ['<=', 'created_at', $endTime],
+            ['=', 'site_account', $account],
+            ['>=', 'created_at', $startTime+$plusTime],
+            ['<=', 'created_at', $endTime+$plusTime],
             ['=', 'push_status', BetsBackend::PUSH_STATUS_SUCCESS],
             ['IN', 'status', [BetsBackend::STATUS_SUCCESS, BetsBackend::STATUS_FAIL]],
-            ['<=', 'created_at', $endTime],
         ])->scalar();
 
         return $profits?:0.00;
@@ -60,16 +62,19 @@ class AgentService extends BaseService {
 
     /**
      * 有效金额
+     * @param $account - 盘口账号
      * @param $startTime
      * @param $endTime
+     * @param float|int $plusTime 往后推移4个小时
      * @return false|float|string
      */
-    public static function getZoneBetMoney($startTime, $endTime)
+    public static function getZoneBetMoney($account, $startTime, $endTime, $plusTime=4*3600)
     {
         $money = Bets::find()->select(['money'=>'SUM(bet_money)'])->where([
             'AND',
-            ['>=', 'created_at', $startTime],
-            ['<=', 'created_at', $endTime],
+            ['=', 'site_account', $account],
+            ['>=', 'created_at', $startTime+$plusTime],
+            ['<=', 'created_at', $endTime+$plusTime],
             ['!=', 'status', CommonBaseService::STATUS_LT_CANCEL],
             ['=', 'push_status', BetsBackend::PUSH_STATUS_SUCCESS],
         ])->scalar();
