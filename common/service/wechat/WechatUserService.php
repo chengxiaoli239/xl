@@ -70,7 +70,7 @@ class WechatUserService extends BaseService
         $mkey = self::getWechatUsersKey($userId);
         if(true OR !$useCache OR !$data = $m->get($mkey)){
             $dataQuery = WechatUser::find()
-                ->select(['id', 'user_id', 'userName', 'balance', 'agent_id'=>'user_id', 'member_id'=>'id', 'reply_type', 'is_need_confirm', 'nickName', 'status', 'smallHead'])
+                ->select(['id', 'user_id', 'robot_wechat', 'userName', 'balance', 'agent_id'=>'user_id', 'member_id'=>'id', 'reply_type', 'is_need_confirm', 'nickName', 'status', 'smallHead'])
                 ->where(['user_id'=>$userId]);
             #$sql = $dataQuery->createCommand()->getRawSql();p($sql);
             $data = $dataQuery->indexBy(['userName'])->asArray()->all();
