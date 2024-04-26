@@ -223,7 +223,7 @@ class MessageOperateService  extends BaseService
                     'user_id' => $this->user_id,
                     'wechat_user_id' => $this->platformUser['id'],
                     'order_id' => $betOrderId,
-                    'robot_id' => $robotId,
+                    'robot_id' => (int)$robotId,
                     'site_account' => $this->tzSystemUsers->account, # 盘口账号
                     'play_method' => $method['id'],
                     'codes' => (string)$method['codes'],
@@ -234,7 +234,7 @@ class MessageOperateService  extends BaseService
                     'lottery_type' => $lotteryType,
                     'lottery_name' => $lotteryName,
                     'bet_desc' => $text,
-                    'new_msg_id' => $messageId,
+                    'new_msg_id' => (string)$messageId,
                     'reply_type' => $this->platformUser['is_need_confirm']?0:$this->platformUser['reply_type'],
                     'is_need_confirm' => $this->platformUser['is_need_confirm'],
                     'reply_content' => Json::encode($replyContent)??'',
