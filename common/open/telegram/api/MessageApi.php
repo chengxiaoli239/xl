@@ -24,7 +24,7 @@ class MessageApi extends TelegramBase
         $object = self::createObject();
         $token = $queryParams['token'];
 
-        $path = '/bot'.$token.'/'.self::API_SET_WEB_HOOK;
+        $path = '/bot'.$token.self::API_SET_WEB_HOOK;
         $result = $object->post($path, $params, $headers);
 
         return $result;
