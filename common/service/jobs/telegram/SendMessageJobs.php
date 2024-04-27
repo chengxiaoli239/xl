@@ -43,14 +43,14 @@ class SendMessageJobs extends CommonJob {
                 'text' => $params['content'],
             ];
             $s1 = microtime(true);
-            $content = MessageApi::sendMessage(['token' => $params['token']], $headers, $data);
             /*
+            $content = MessageApi::sendMessage(['token' => $params['token']], $headers, $data);
+            */
             $request = new Request('POST', $config['API'].'/bot'.$params['token'].'/sendMessage', $headers, Json::encode($data));
             $response = $client->sendAsync($request)->wait();
 
             $body = $response->getBody();
             $content = Json::decode($body);
-            */
             $s2 = microtime(true);
             $c = ($s2-$s1).'s';
             Tool_Common::log('/tg_message/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params, 'config'=>$config, 'data'=>$content, 'c'=>$c]);
