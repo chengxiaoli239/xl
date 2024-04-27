@@ -45,7 +45,7 @@ class Send
             $robotId = $platformUser['robot_wechat'];
             $platformRobot = PlatformRobot::find()->where(['platform_robot_id'=>$robotId])->limit(1)->one();
             $messageToUserData = ['targetId'=>$targetId, 'token'=>$platformRobot['token']];
-            $replyUserTxt = '【内容】'.$replyTxt1;
+            $replyUserTxt = $replyTxt1;
             # 1、给用户发信息
             $messageService->reply($this->userId, $replyUserTxt, $messageToUserData);
             //todo 2、审核之后给用户和管理员同时发消息，目前只有用户收到，管理员未处理
