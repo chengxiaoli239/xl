@@ -8,7 +8,7 @@ use yii\base\InvalidConfigException;
 class MessageApi extends TelegramBase
 {
     # 用户信息接口
-    const API_SET_WEB_HOOK = '/sendMessage';
+    const API_SEND_MESSAGE = '/sendMessage';
 
 
     /**
@@ -24,7 +24,7 @@ class MessageApi extends TelegramBase
         $object = self::createObject();
         $token = $queryParams['token'];
 
-        $path = '/bot'.$token.self::API_SET_WEB_HOOK;
+        $path = '/bot'.$token.self::API_SEND_MESSAGE;
         $result = $object->post($path, $params, $headers);
 
         return $result;

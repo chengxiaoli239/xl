@@ -41,10 +41,9 @@ class SendMessageJobs extends CommonJob {
             $data = [
                 "chat_id" => $params['chat_id'],
                 'text' => $params['content'],
-                'token' => $params['token'],
             ];
             $s1 = microtime(true);
-            $content = MessageApi::sendMessage($data, $headers);
+            $content = MessageApi::sendMessage(['token' => $params['token']], $headers, $data);
             /*
             $request = new Request('POST', $config['API'].'/bot'.$params['token'].'/sendMessage', $headers, Json::encode($data));
             $response = $client->sendAsync($request)->wait();
