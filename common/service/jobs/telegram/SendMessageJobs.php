@@ -24,7 +24,7 @@ class SendMessageJobs extends CommonJob {
     {
         try {
             $date = date('Y-m-d H:i:s');
-            if($date<'2024-04-27:17:00:00'){
+            if($date<'2024-04-27:17:30:00'){
                 return '频次太高暂停发送';
             }
             $config = \Yii::$app->params['TELEGRAM'];
