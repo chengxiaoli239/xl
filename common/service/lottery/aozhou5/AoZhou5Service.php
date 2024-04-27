@@ -68,9 +68,8 @@ class AoZhou5Service extends CommonLotteryService
                     continue;
                 }
                 $replyData[$bet->wechat_user_id][$bet->qihao]['betIds'][] = $bet->id;
-                $replyData[$bet->wechat_user_id][$bet->qihao]['userId'][] = $bet->user_id;
-                $replyData[$bet->wechat_user_id][$bet->qihao]['reply_content'] = Json::decode($bet->reply_content);
                 $replyData[$bet->wechat_user_id][$bet->qihao]['result'][] = $result;
+                $replyData[$bet->wechat_user_id][$bet->qihao]['userId'] = $bet->user_id;
             }
             Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', LotteryType::getName($lotteryType).'开奖之后业务处理', ['lottery_type'=>$lotteryType, 'currentKjQiHao'=>$currentKjQiHao, 'count'=>count($bets), 'replyData'=>$replyData]);
 
@@ -79,7 +78,6 @@ class AoZhou5Service extends CommonLotteryService
                     list($codeHz, $kjCode, $ds, $ft) = AoZhouKjService::getAoZhouKjData($qiHao);
                     $text = "第".$qiHao."期\n\n".$kjCode.'总和'.$codeHz."(".$ds.",".$ft.")\n\n";
                     $userId = $value['userId'];
-                    $replyContent = $value['reply_content'];
 
                     $betRows = Bets::find()->where(['id'=>$value['betIds'],'qihao'=>$qiHao, 'status'=>1])->asArray()->all();
                     foreach ($betRows as $betRow){
