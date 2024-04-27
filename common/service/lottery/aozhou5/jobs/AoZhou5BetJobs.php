@@ -11,6 +11,7 @@ use common\service\jobs\CommonJob;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
 use common\service\jobs\telegram\MessageReceiveJobs;
 use common\service\lottery\aozhou5\AoZhou5BetService;
+use common\service\message\Send;
 use common\service\open\telegram\MessageOperateService;
 use common\service\thirdD\PlayMethodService;
 use common\service\wechat\WechatUserService;
@@ -85,7 +86,8 @@ class AoZhou5BetJobs extends CommonJob {
             # 即时回复
             $replyTxt = $betContent;
 
-            $messageService->reply($userId, $replyTxt, ['targetId'=>$replyContent['fromUser'], 'token'=>$replyContent['token']]); # 回复消息
+            (new Send($userId))->replyAfterAction($WechatUser, [$replyTxt, '下注描述：'.$WechatUser->nickName . $replyTxt], Send::ACTION_BET); # 发送消息
+            //$messageService->reply($userId, $replyTxt, ['targetId'=>$replyContent['fromUser'], 'token'=>$replyContent['token']]); # 回复消息
             push_queue_fast(UserDayStaticsJobs::class, [
                 'user_id'=>$userId,
                 'type'=>WechatUserService::TYPE_ORDER_BET,

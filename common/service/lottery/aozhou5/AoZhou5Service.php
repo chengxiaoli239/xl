@@ -13,6 +13,7 @@ use common\helpers\SscMethod;
 use common\service\CommonService;
 use common\service\jobs\telegram\SendMessageJobs;
 use common\service\lottery\CommonLotteryService;
+use common\service\message\Send;
 use common\service\open\telegram\AoZhouKjService;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\MethodMatchService;
@@ -89,6 +90,7 @@ class AoZhou5Service extends CommonLotteryService
                     }
                     $platformUser = WechatUser::find()->where(['id'=>$wechatUserId])->asArray()->one();
                     $text .= "\n余额：".$platformUser['balance'];
+                    /*
                     $sendData = [
                         'user_id' => $platformUser['user_id'],
                         'chat_id' => $replyContent['fromUser'], # 谁发就给谁回复，要先判断是否是群聊，判断条件：fromGroup 存在且有值
@@ -98,6 +100,8 @@ class AoZhou5Service extends CommonLotteryService
                     ];
                     //todo 开奖结果私发用户
                     push_queue(SendMessageJobs::class, $sendData); # 中奖结果消息发送
+                    */
+                    (new Send($userId))->replyAfterAction($platformUser, [$text, '开奖结果：'.$platformUser['nickName'] . $text], Send::ACTION_AWARD); # 发送消息
                 }
             }
         }catch (\Exception $e){

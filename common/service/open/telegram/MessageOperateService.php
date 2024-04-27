@@ -147,7 +147,7 @@ class MessageOperateService  extends BaseService
                 list($code, $data, $msg) = AgentUsersBalanceService::operateBalanceChange($text, $this->platformUser, $message);
                 Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '充值申请处理结果', ['code'=>$code, 'data'=>$data, 'msg'=>$msg]);
                 if($code==CommonBaseService::CODE_FOR_IGNORE && !empty($data)){
-                    (new Send($this->user_id))->replyAfterRecharge($this->platformUser, [$msg, $msg.'，申请ID:'.$data['apply_id']."\n".'，输入："'.$data['apply_id'].'通过" 或 "'.$data['apply_id'].'拒绝“']);
+                    (new Send($this->user_id))->replyAfterAction($this->platformUser, [$msg, $msg.'，申请ID:'.$data['apply_id']."\n".'，输入："'.$data['apply_id'].'通过" 或 "'.$data['apply_id'].'拒绝“'], Send::ACTION_BALANCE);
                     return [CommonBaseService::CODE_FOR_IGNORE, [], '异步处理'];
                 }
                 return [$code, $code, $msg];

@@ -119,7 +119,7 @@ class AgentUsersService extends BaseService {
                     $rst['balance_now'] = $WechatUser->balance;
                 }
                 //todo 1、上下分之后给用户和管理员同时发消息
-                (new Send($WechatUser->user_id))->replyAfterRecharge($WechatUser, [$operateDesc2, '后台操作：给['.$WechatUser->nickName.']'.$operateDesc2]);
+                (new Send($WechatUser->user_id))->replyAfterAction($WechatUser, [$operateDesc2, '后台操作：给['.$WechatUser->nickName.']'.$operateDesc2], Send::ACTION_BALANCE);
             }elseif ($act == 'act-user-edit'){
                 if(empty($post['name'])){
                     throw_info('用户名不能为空');
@@ -225,7 +225,7 @@ class AgentUsersService extends BaseService {
                 "\n【操作前】".floatval($before_balance).
                 "\n【盛鱼】".floatval($after_balance);
             $d = Json::decode($flows->message);
-            (new Send($user_id))->replyAfterRecharge($WechatUser, [$replyTxt, $replyTxt]); # 发送消息
+            (new Send($user_id))->replyAfterAction($WechatUser, [$replyTxt, '审核通过：'.$WechatUser->nickName . $replyTxt], Send::ACTION_BALANCE); # 发送消息
             push_queue_fast(UserDayStaticsJobs::class, ['user_id'=>$user_id, 'type'=>$balanceType, 'msg'=>'上下分后报表计算', 'wechat_user_id'=>$WechatUser->id]);
         }catch (\Exception $e){
             $transaction->rollBack();
