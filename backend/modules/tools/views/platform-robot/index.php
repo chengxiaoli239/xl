@@ -96,7 +96,7 @@ $this->registerJs($js);
             <?= \yii\widgets\Breadcrumbs::widget([
                 'links' => $this->params['breadcrumbs'] ?? [],
             ]) ?>
-            <?= Html::a('新建平台', 'javascript:void(0);', ['class'=>'btn btn-success', 'id'=>'create-btn',
+            <?= Html::a('新建机器人', 'javascript:void(0);', ['class'=>'btn btn-success', 'id'=>'create-btn',
                 'data-url' => Yii::$app->urlManager->createUrl(['tools/platform-robot/create']),
             ]) ?>
         </header>

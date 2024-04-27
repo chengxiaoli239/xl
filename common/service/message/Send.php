@@ -50,7 +50,7 @@ class Send
             $messageService->reply($this->userId, $replyUserTxt, $messageToUserData);
             //todo 2、审核之后给用户和管理员同时发消息，目前只有用户收到，管理员未处理
             # 2、给管理员发信息
-            $replyAdminTxt = '内容："'."\n".$platformUser['nickName'].'" '.$replyTxt2;
+            $replyAdminTxt = '内容：'."\n".$platformUser['nickName'].' '.$replyTxt2;
             $messageData = ['targetId'=>$this->robotAdmin['userName'], 'token'=>$platformRobot['token']];
             $messageService->reply($this->userId, $replyAdminTxt, $messageData);
             Tool_Common::log('/message/'.__FUNCTION__, 'INFO', '消息回复afterAction', ['messageToUserData'=>$messageToUserData, 'messageDataToAdmin'=>$messageData, 'action'=>Send::ACTION_OPTIONS[$action]]);

@@ -99,7 +99,7 @@ class AoZhou5Service extends CommonLotteryService
                     //todo 开奖结果私发用户
                     push_queue(SendMessageJobs::class, $sendData); # 中奖结果消息发送
                     */
-                    (new Send($userId))->replyAfterAction($platformUser, [$text, '开奖结果：'.$platformUser['nickName'] . $text], Send::ACTION_AWARD); # 发送消息
+                    (new Send($userId))->replyAfterAction($platformUser, [$text, '开奖结果：'.$platformUser['nickName'] . "\n" . $text], Send::ACTION_AWARD); # 发送消息
                 }
             }
         }catch (\Exception $e){
