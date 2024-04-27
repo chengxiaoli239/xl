@@ -23,6 +23,10 @@ class SendMessageJobs extends CommonJob {
     public static function handle($params): string
     {
         try {
+            $date = date('Y-m-d H:i:s');
+            if($date<'2024-04-27:17:00:00'){
+                return '频次太高暂停发送';
+            }
             $config = \Yii::$app->params['TELEGRAM'];
             $chat_id = $params['chat_id']; # 群/好友id
             if(empty($chat_id)){
