@@ -66,11 +66,20 @@ class UserController extends BaseController
     public function actionIndex()
     {
         $searchModel = new UserSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+
+        $user = \Yii::$app->user->identity;
+        $user_type = UserService::getUserType($user, $queryParams, 'Admin');
+        $userTypes = UserService::getAdminUserTypes($user, $act=1);
+
+        $queryParams['User']['user_type'] = $user_type;
+        $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'userTypes' => $userTypes,
+            'user_type' => $user_type,
         ]);
     }
 

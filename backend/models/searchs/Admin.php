@@ -18,7 +18,7 @@ class Admin extends AdminModel
     public function rules()
     {
         return [
-            [['id', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'status', 'user_type', 'created_at', 'updated_at'], 'integer'],
             [['username', 'auth_key', 'password_hash', 'password_reset_token', 'email', 'pay_time', 'desc'], 'safe'],
         ];
     }
@@ -61,6 +61,7 @@ class Admin extends AdminModel
         $query->andFilterWhere([
             'id' => $this->id,
             'pay_time' => $this->pay_time,
+            'user_type' => $this->user_type,
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
