@@ -120,6 +120,7 @@ class UserService extends BaseService {
                 $setData = array_merge($setData,[
                     'uid' => $uid,
                     'username' => $user->username,
+                    'user_type' => $user->user_type,
                     'ssc_domain' => $TzSystemsUsers->ssc_domain ? $TzSystemsUsers->ssc_domain : $TzSystems->ssc_domain,
                     'access_token' => $TzSystemsUsers->access_token ? $TzSystemsUsers->access_token : md5('tz_systemUsers_'.$user->username),
                     'tz_system_id' => $tz_system_id,

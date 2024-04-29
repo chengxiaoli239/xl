@@ -59,6 +59,8 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $text = '千23百34=1';
+            list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);p([$code, $data, $err_msg]);
             $mKey = 'llllllll';
             #$result = \Yii::$app->redis->get($mKey);
             #$exists = \Yii::$app->redis->exists($mKey);
