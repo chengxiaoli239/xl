@@ -21,6 +21,7 @@ use backend\service\TzService;
 use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
 use common\kj\cqssc\CqsscKcw;
+use common\service\cache\CacheKeyService;
 use common\service\CommonService;
 use common\service\jobs\kj_data\GrabKjDatasJob;
 use common\service\jobs\kj_data\PeiShuProfitsJob;
@@ -141,13 +142,25 @@ class KjDataGet
                 }catch (\Exception $e1){
                 }
                 if($lottery_type == LotteryType::AZ_LUCKY_5 && $status1 != LotteryBet::STATUS_DRAW){
-                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取-异常28', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'err_msg'=>'该时间点不可抓取', 'status1'=>$status1, 'status1Txt'=>LotteryBet::STATUS_OPTIONS[$status1].'_'.$status1]);
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取-异常28', [
+                        'lottery_type'=>$lottery_type,
+                        'typeGroupName'=>$lotteryData['typeGroupName'],
+                        'err_msg'=>'该时间点不可抓取',
+                        'status1'=>$status1,
+                        'status1Txt'=>LotteryBet::STATUS_OPTIONS[$status1].'_'.$status1,
+                    ]);
                     throw_info('该时间点不可抓取-'.LotteryType::TYPE_OPTIONS[$lottery_type]);
                 }
 
                 if(!$status && $status1 != LotteryBet::STATUS_DRAW) {
-                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取-异常1', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'err_msg'=>'该时间点不可抓取', 'status'=>$status, 'status1'=>$status1]);
-                    throw_info('该时间点不可抓取');
+                    $mKey = CacheKeyService::lotteryGrabInfo($lottery_type);
+                    $data = commonRedis()->get($mKey);
+                    if($status1 == LotteryBet::STATUS_START && empty($data)){ # 开盘时间点但是抓去号码时间超过5分钟则继续抓去
+                        Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取-异常0', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'err_msg'=>'该时间点开奖延迟补抓', 'status'=>$status, 'status1'=>$status1]);
+                    }else{
+                        Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取-异常1', ['lottery_type'=>$lottery_type, 'typeGroupName'=>$lotteryData['typeGroupName'], 'err_msg'=>'该时间点不可抓取', 'status'=>$status, 'status1'=>$status1]);
+                        throw_info('该时间点不可抓取');
+                    }
                 }
 
                 $params = ['lottery_type'=>$lottery_type, 'title'=>$lotteryData['title'], 'business_id'=>$lottery_type, 'is_grab_history'=>1];
@@ -483,7 +496,17 @@ class KjDataGet
         }
         Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖记录-插入', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'kjData'=>$kjData]);
 
-        return ['status'=>200, 'msg'=>'开奖数据写入成功', 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'insertData'=>$insertData, 'insertRst'=>$insertRst, 'id'=>$SscKjData->id];
+        $mKey = CacheKeyService::lotteryQiHaoInfo($lottery_type);
+        commonRedis()->setex($mKey, 300, $qihao.':'.$kjData);
+        return [
+            'status'=>200,
+            'msg'=>'开奖数据写入成功',
+            'lottery_type'=>$lottery_type,
+            'qihao'=>$qihao,
+            'insertData'=>$insertData,
+            'insertRst'=>$insertRst,
+            'id'=>$SscKjData->id,
+        ];
     }
 
     /**

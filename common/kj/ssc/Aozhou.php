@@ -170,13 +170,13 @@ class Aozhou extends BaseKj {
                     $body = $response->getBody()->getContents();
                     $content = Json::decode($body);
                     if(empty($content['expect'])){
-                        throw_info($content['message']??'查询异常');
+                        throw_info($content['message']??'查询异常o');
                     }
 
                     $kjData = $content;
                     Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', '开奖数据网盘抓取-正常', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'domain'=>$domain, 'kjData'=>$kjData]);
                 }catch (\Exception $e){
-                    Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type,'name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage()]);
+                    Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'ERR', '开奖数据网盘获取-异常', ['lottery_type'=>self::$lottery_type,'name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage(), 'content'=>$content]);
                 }
             }else{
                 Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', LotteryType::getName($lottery_type).'数据抓取-缓存', ['lottery_type'=>self::$lottery_type, LotteryType::getName($lottery_type), 'cq'=>$currentQiHao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);

@@ -23,6 +23,16 @@ trait LotteryCacheKeyTrait
     }
 
     /**
+     * 开奖信息缓存
+     * @param int $lottery_type
+     * @return string
+     */
+    public static function lotteryGrabInfo(int $lottery_type=DEFAULT_LOTTERY_TYPE): string
+    {
+        return 'lottery:grabInfo:current_'.$lottery_type;
+    }
+
+    /**
      * @param int $lottery_type
      * @param string $qiHao
      * @return string
