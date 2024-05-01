@@ -496,7 +496,7 @@ class KjDataGet
         }
         Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖记录-插入', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'kjData'=>$kjData]);
 
-        $mKey = CacheKeyService::lotteryQiHaoInfo($lottery_type);
+        $mKey = CacheKeyService::lotteryGrabInfo($lottery_type);
         commonRedis()->setex($mKey, 300, $qihao.':'.$kjData);
         return [
             'status'=>200,
