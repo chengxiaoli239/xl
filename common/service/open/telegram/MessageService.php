@@ -35,7 +35,7 @@ class MessageService  extends BaseService
             switch ($chat['type']){
                 case self::CHAT_TYPE_GROUP:
                     # 群消息
-                    list($platformUserId, $name, $info) = $this->saveGroupInfo($from, $chat, $userId, $token);
+                    list($platformUserId, $name, $info) = $this->saveGroupInfo($message, $userId, $token);
                     break;
                 case self::CHAT_TYPE_PRIVATE:
                     # 私聊
@@ -53,7 +53,7 @@ class MessageService  extends BaseService
             Tool_Common::log('/telegram/'.__FUNCTION__, 'ERR', '消息处理异常', ['params'=>$params, 'err_msg'=>$e->getMessage()]);
             return ['code'=>300, 'message'=>$e->getMessage()];
         }
-        Tool_Common::log('/telegram/'.__FUNCTION__, 'ERR', '消息处理', ['params'=>$params, 'platformUserId'=>$platformUserId, 'name'=>$name, 'info'=>$info->attributes]);
+        Tool_Common::log('/telegram/'.__FUNCTION__, 'INFO', '消息处理', ['params'=>$params, 'platformUserId'=>$platformUserId, 'name'=>$name, 'info'=>$info->attributes]);
 
         return [];
     }
@@ -135,8 +135,10 @@ class MessageService  extends BaseService
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public function saveGroupInfo(array $from=[], array $chat=[], $userId=0): array
+    public function saveGroupInfo(array $message, $userId=0): array
     {
+        $chat = $message['chat'];
+        $from = $message['from'];
         $platformUserId = $from['id'];
         $groupId = $chat['id']; # 群id
         $group = PlatformGroup::findOne(['group_id'=>$groupId]);
@@ -150,6 +152,9 @@ class MessageService  extends BaseService
                 'name' => $name,
                 'created_at' => $now_time,
             ];
+        }
+        if(!empty($message['migrate_to_chat_id']) && $groupId != $message['migrate_to_chat_id']){
+            $setData['group_id'] = $message['migrate_to_chat_id']; # 群id变更
         }
         $setData['updated_at'] = $now_time;
         $group->setAttributes($setData, false);
