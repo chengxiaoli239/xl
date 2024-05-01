@@ -154,7 +154,7 @@ class MessageService  extends BaseService
             ];
         }
         if(!empty($message['migrate_to_chat_id']) && $groupId != $message['migrate_to_chat_id']){
-            $setData['group_id'] = $message['migrate_to_chat_id']; # 群id变更
+            $setData['group_id'] = (string)$message['migrate_to_chat_id']; # 群id变更
         }
         $setData['updated_at'] = $now_time;
         $group->setAttributes($setData, false);
