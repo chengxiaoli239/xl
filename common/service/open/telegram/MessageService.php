@@ -69,17 +69,19 @@ class MessageService  extends BaseService
         $message = $params['message'];
         $chat = $message['chat'];
         $from = $message['from'];
+        $name = ($chat['type']==self::CHAT_TYPE_GROUP)?$chat['title']:($chat['first_name'].$chat['last_name']);
+        $name = \common\tools\Common::filterEmoji($name);
         $setData = [
             'user_id' => $userId,
             'from_id' => $from['id'],
             'chat_id' => $chat['id'],
-            'name' => ($chat['type']==self::CHAT_TYPE_GROUP)?$chat['title']:($chat['first_name'].$chat['last_name']),
+            'name' => $name,
             'type' => $chat['type'],
             'message_id' => (string)$message['message_id'],
             'update_id' => $params['update_id'],
             'updated_at' => $message['date'],
             'created_at' => $message['date'],
-            'text' => $message['text'],
+            'text' => $message['text']??'',
             'content' => Json::encode($params),
         ];
         $telegramMessage = new TelegramMessage();
@@ -111,9 +113,10 @@ class MessageService  extends BaseService
                 'created_at' => $nowTime,
             ];
         }
+        $nickName = \common\tools\Common::filterEmoji($chat['first_name'].$chat['last_name']);
         $setData = array_merge($setData, [
             'user_id' => $userId, # 本系统用户id
-            'nickName' => $chat['first_name'].$chat['last_name'],
+            'nickName' => $nickName,
             'robot_wechat' => $robotPlatformUserId,
             'updated_at' => $nowTime,
         ]);
@@ -138,12 +141,13 @@ class MessageService  extends BaseService
         $groupId = $chat['id']; # 群id
         $group = PlatformGroup::findOne(['group_id'=>$groupId]);
         $now_time = time();
+        $name = \common\tools\Common::filterEmoji($chat['title']);
         if(empty($group)){
             $group = new PlatformGroup();
             $setData = [
                 'user_id' => $userId, # 本系统用户id
                 'group_id' => (string)$groupId,
-                'name' => $chat['title'],
+                'name' => $name,
                 'created_at' => $now_time,
             ];
         }

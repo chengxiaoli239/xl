@@ -153,10 +153,9 @@ class MessageOperateService  extends BaseService
                 return [$code, $code, $msg];
             default:
                 $status = (new LotteryBet())->checkLotteryStatus($this->lottery_type);
-                Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '盘口状态检测', ['lottery_type'=>$this->lottery_type, 'status'=>$status, 'typeStatus'=>gettype($status), 'STATUS_START'=>LotteryBet::STATUS_START, 'typeStartStatus'=>gettype(LotteryBet::STATUS_START)]);
+                Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '盘口状态检测', ['lottery_type'=>$this->lottery_type, 'status'=>$status, 'statusTxt'=>LotteryBet::STATUS_OPTIONS[$status]]);
 
                 if($status != LotteryBet::STATUS_START){
-                    Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '盘口状态检测2', ['lottery_type'=>$this->lottery_type, 'status'=>$status, 'STATUS_START'=>LotteryBet::STATUS_START]);
                     throw_info('后台尚未开盘2', CommonBaseService::CODE_FOR_USER);
                 }
 

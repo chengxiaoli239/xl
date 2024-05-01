@@ -163,6 +163,7 @@ class TelegramBase extends OpenBase
             self::resetResult($result);
             // 记录请求日志
             $result = $result ? Json::encode($result) : '';
+            $result = \common\tools\Common::filterEmoji($result);
             $logData = [
                 'send_time' => (int)($now / 10000),
                 'api_method' => $apiMethod,
