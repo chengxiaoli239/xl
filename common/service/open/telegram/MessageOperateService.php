@@ -156,7 +156,8 @@ class MessageOperateService  extends BaseService
                 Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '盘口状态检测', ['lottery_type'=>$this->lottery_type, 'status'=>$status, 'STATUS_START'=>LotteryBet::STATUS_START]);
 
                 if($status != LotteryBet::STATUS_START){
-                    throw_info('后台尚未开盘', CommonBaseService::CODE_FOR_USER);
+                    Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '盘口状态检测2', ['lottery_type'=>$this->lottery_type, 'status'=>$status, 'STATUS_START'=>LotteryBet::STATUS_START]);
+                    throw_info('后台尚未开盘2', CommonBaseService::CODE_FOR_USER);
                 }
 
                 break;
