@@ -137,47 +137,55 @@ class MessageService  extends BaseService
      */
     public function saveGroupInfo(array $message, $userId=0): array
     {
-        $chat = $message['chat'];
-        $from = $message['from'];
-        $platformUserId = $from['id'];
-        $groupId = $chat['id']; # 群id
-        $group = PlatformGroup::findOne(['group_id'=>$groupId]);
-        $now_time = time();
-        $name = \common\tools\Common::filterEmoji($chat['title']);
-        if(empty($group)){
-            $group = new PlatformGroup();
-            $setData = [
-                'user_id' => $userId, # 本系统用户id
-                'group_id' => (string)$groupId,
-                'name' => $name,
-                'created_at' => $now_time,
-            ];
-        }
-        if(!empty($message['migrate_to_chat_id']) && $groupId != $message['migrate_to_chat_id']){
-            $setData['group_id'] = (string)$message['migrate_to_chat_id']; # 群id变更
-        }
-        $setData['updated_at'] = $now_time;
-        $group->setAttributes($setData, false);
-        if(!$group->save()){
-            throw_info(Json::encode($group->getErrors()));
-        }
+        try {
+            $transaction = \Yii::$app->db->beginTransaction();
+            $chat = $message['chat'];
+            $from = $message['from'];
+            $platformUserId = $from['id'];
+            $groupId = $chat['id']; # 群id
+            $group = PlatformGroup::findOne(['group_id'=>$groupId]);
+            $now_time = time();
+            $name = \common\tools\Common::filterEmoji($chat['title']);
+            if(empty($group)){
+                $group = new PlatformGroup();
+                $setData = [
+                    'user_id' => $userId, # 本系统用户id
+                    'group_id' => (string)$groupId,
+                    'name' => $name,
+                    'created_at' => $now_time,
+                ];
+            }
+            if(!empty($message['migrate_to_chat_id']) && $groupId != $message['migrate_to_chat_id']){
+                $setData['group_id'] = (string)$message['migrate_to_chat_id']; # 群id变更
+                PlatformRobot::updateAll(['group_id'=>(string)$message['migrate_to_chat_id']], ['group_id'=>$groupId]);
+            }
+            $setData['updated_at'] = $now_time;
+            $group->setAttributes($setData, false);
+            if(!$group->save()){
+                throw_info(Json::encode($group->getErrors()));
+            }
 
-        $setData = [];
-        $groupUser = PlatformGroupUser::findOne(['group_id'=>$groupId, 'platform_user_id'=>$platformUserId]);
-        if(empty($groupUser)){
-            $groupUser = new PlatformGroupUser();
-            $setData = [
-                'user_id' => $userId,
-                'group_id' => (string)$groupId,
-                'platform_user_id' => (string)$platformUserId,
-                'created_at' => $now_time,
-            ];
-        }
-        $setData['username'] = $from['first_name'];
-        $setData['updated_at'] = $now_time;
-        $groupUser->setAttributes($setData, false);
-        if(!$groupUser->save()){
-            throw_info(Json::encode($groupUser->getErrors()));
+            $setData = [];
+            $groupUser = PlatformGroupUser::findOne(['group_id'=>$groupId, 'platform_user_id'=>$platformUserId]);
+            if(empty($groupUser)){
+                $groupUser = new PlatformGroupUser();
+                $setData = [
+                    'user_id' => $userId,
+                    'group_id' => (string)$groupId,
+                    'platform_user_id' => (string)$platformUserId,
+                    'created_at' => $now_time,
+                ];
+            }
+            $setData['username'] = $from['first_name'];
+            $setData['updated_at'] = $now_time;
+            $groupUser->setAttributes($setData, false);
+            if(!$groupUser->save()){
+                throw_info(Json::encode($groupUser->getErrors()));
+            }
+            $transaction->commit();
+        }catch (\Exception $e){
+            $transaction->rollBack();
+            throw_info($e->getMessage());
         }
 
         return [$platformUserId, $group->name, $group];
