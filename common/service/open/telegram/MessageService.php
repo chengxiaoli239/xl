@@ -79,8 +79,8 @@ class MessageService  extends BaseService
             'type' => $chat['type'],
             'message_id' => (string)$message['message_id'],
             'update_id' => $params['update_id'],
-            'updated_at' => $message['date'],
-            'created_at' => $message['date'],
+            'updated_at' => $message['date']??time(),
+            'created_at' => $message['date']??time(),
             'text' => $message['text']??'null',
             'content' => Json::encode($params),
         ];
