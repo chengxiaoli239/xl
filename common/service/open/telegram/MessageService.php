@@ -81,7 +81,7 @@ class MessageService  extends BaseService
             'update_id' => $params['update_id'],
             'updated_at' => $message['date'],
             'created_at' => $message['date'],
-            'text' => $message['text']??'',
+            'text' => $message['text']??'null',
             'content' => Json::encode($params),
         ];
         $telegramMessage = new TelegramMessage();
