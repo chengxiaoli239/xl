@@ -59,6 +59,12 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            foreach ([8] as $lotteryType){
+                //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
+                $r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
+                $rst[$lotteryType] = $r;
+            }
+            p(['rst'=>$rst]);
             $text = '千23百34=1';
             list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);p([$code, $data, $err_msg]);
             $mKey = 'llllllll';
@@ -89,12 +95,6 @@ class IndexController extends Controller
             $data = AgentService::getCalcMoney($userId=21);p($data);
             $rst = AgentUsersService::userFlowsCheck(['id'=>16791, 'status'=>1], 21, '管理员消息回复处理');p($rst);
             $rst = [];
-            foreach ([8] as $lotteryType){
-                //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
-                $r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
-                $rst[$lotteryType] = $r;
-            }
-            p(['rst'=>$rst]);
             list($entertainedStatus, $grabStatus) = LotteryBet::isEntertained(LotteryType::LUCKY_5);p([$entertainedStatus, $grabStatus]);
             list($entertainedStatus, $grabStatus) = LotteryBet::isEntertained(LotteryType::AZ_LUCKY_5);p([$entertainedStatus, $grabStatus]);
             list($lotteryType, $lotteryName) = [LotteryType::AZ_LUCKY_5, LotteryType::TYPE_OPTIONS[LotteryType::AZ_LUCKY_5]];
