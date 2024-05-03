@@ -19,7 +19,7 @@ class AoZhouKjService  extends BaseService
 
         list($codeHz, $kjCode, $ds, $ft, $qiHao) = AoZhouKjService::getAoZhouKjData($qiHao);
 
-        $text = "============================\n";
+        $text = "=========================\n";
         $text .= LotteryType::TYPE_OPTIONS[self::$lottery_type].'（前'.(AoZhou5Service::KJ_CODE_NUM).'位数番摊）'."\n\n".
             "第 {$qiHao} 期\n".
             $kjCode."总和{$codeHz}(".$ds.",".$ft.")\n\n".
@@ -35,7 +35,7 @@ class AoZhouKjService  extends BaseService
                 $text .= "\n\n";
             }
         }
-        $text .= "\n============================";
+        $text .= "\n=========================";
         Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', '开奖后群消息', ['lottery_type'=>self::$lottery_type, 'qiHao'=>$qiHao, 'text'=>$text, 'beforeQiHao'=>((int)$qiHao)-135]);
         //p($text, 0);
 
