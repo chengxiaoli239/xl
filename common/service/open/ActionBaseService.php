@@ -40,7 +40,8 @@ class ActionBaseService
 
     public function getUserInfo($tzSystemsUser): array
     {
-        $objectClass = self::getClass($tzSystemsUser->tz_system_id);
+        $TzSystems = TzSystems::findOne($tzSystemsUser->tz_system_id);
+        $objectClass = self::getClass($TzSystems->system_type_id);
         $objectClass->domain = $tzSystemsUser->ssc_domain;
         $objectClass->tzSystemUsers = $tzSystemsUser;
 
