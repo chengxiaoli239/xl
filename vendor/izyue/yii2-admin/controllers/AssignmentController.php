@@ -113,7 +113,18 @@ class AssignmentController extends Controller
                         return $TzSystemUsers->desc."\n余额：".floatval($TzSystemUsers->balance);
                     },
                 ]
-            ]),
+            ],
+                $user->id==1?[
+                    [
+                        'attribute' => 'desc',
+                        'label' => '备注2',
+                        'format' => 'raw',
+                        'value' => function ($model) {
+                            return $model->desc;
+                        },
+                    ],
+                ]:[]
+            ),
         ]);
     }
 
