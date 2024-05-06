@@ -303,7 +303,7 @@ class AoZhou5BetService extends CommonBaseService
         $objectClass->tzSystemUsers = TzSystemsUsers::findOne($site['id']);
         $parsed_url = parse_url($site['ssc_domain']); # Array ( [scheme] => https [host] => ac3868.com )
         $url = "https://url{$objectClass->line_number}.{$parsed_url['host']}";
-        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推盘口下注', [
+        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推盘口下注01', [
             'url' => $url,
             'postData1' => $postData1,
             'nextQiHao' => $nextQiHao,
@@ -329,8 +329,17 @@ class AoZhou5BetService extends CommonBaseService
             'cbk' => explode('=', trim($site['cookie']))[1],
         ];
         $result2 = OrderApi::pushBettingSingle($url, $postData2);
-        $logArr = ['betRowId'=>$betRowId, 'user_id'=>$user_id, 'method_id'=>$method_id, 'methodData'=>$methodData, 'post_data1'=>$postData1, 'post_data2'=>$postData2, 'lottery_type'=>$lottery_type, 'result1'=>$result1, 'result2'=>$result2];
-        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', $logArr);
+        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', [
+            'betRowId'=>$betRowId,
+            'user_id'=>$user_id,
+            'method_id'=>$method_id,
+            'methodData'=>$methodData,
+            'post_data1'=>$postData1,
+            'post_data2'=>$postData2,
+            'lottery_type'=>$lottery_type,
+            'result1'=>$result1,
+            'result2'=>$result2,
+        ]);
 
         if(!empty($result2['error'])){ # 错误码：2成功、9918 登录超时....
             $logArr['result'] = $result2;
