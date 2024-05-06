@@ -1074,10 +1074,10 @@ class NumCodeService extends BaseService
         //p($beforeQuery->createCommand()->getRawSql());
         $currentKjCodes = $beforeQuery->limit(1)->asArray()->one(); # 最新一期
         //p($currentKjCodes, 0);
-        $line1Codes = NumService::getCodeLine1($currentKjCodes['code1']);
-        $line2Codes = NumService::getCodeLine1($currentKjCodes['code2']);
-        $line3Codes = NumService::getCodeLine1($currentKjCodes['code3']);
-        $line4Codes = NumService::getCodeLine1($currentKjCodes['code4']);
+        $line1Codes = NumService::getCodeLine2($currentKjCodes['code1']);
+        $line2Codes = NumService::getCodeLine2($currentKjCodes['code2']);
+        $line3Codes = NumService::getCodeLine2($currentKjCodes['code3']);
+        $line4Codes = NumService::getCodeLine2($currentKjCodes['code4']);
 
         $query = Num4Type::find()->select(['code'])
             ->where(['=', 'code_type', $playway+1])

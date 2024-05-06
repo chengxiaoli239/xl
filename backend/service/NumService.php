@@ -3429,6 +3429,27 @@ class NumService extends BaseService {
     }
 
     /**
+     * 0123路号码获取
+     * @param string $code
+     * @return string[]
+     */
+    public static function getCodeLine2($code=''): array
+    {
+        if($code==0){
+            #$lineCodes = NumService::CODES_0_LINE;
+            $lineCodes = ['0'];
+        }elseif (in_array($code, NumService::CODES_1_LINE)){
+            $lineCodes = NumService::CODES_1_LINE;
+        }elseif (in_array($code, NumService::CODES_2_LINE)){
+            $lineCodes = NumService::CODES_2_LINE;
+        }elseif (in_array($code, NumService::CODES_3_LINE)){
+            $lineCodes = NumService::CODES_3_LINE;
+        }
+
+        return $lineCodes;
+    }
+
+    /**
      * @desc 位置 -> str
      * @param $poses
      * @return array
