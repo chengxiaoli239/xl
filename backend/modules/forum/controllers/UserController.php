@@ -332,10 +332,15 @@ class UserController extends BaseController
         if ($model->load($this->_post)) {
             try {
                 $transaction = \Yii::$app->db->beginTransaction();
-                $model->parent_id = \Yii::$app->user->id;
-                $model->user_type = $nextUserType;
+                if($this->_user_id != 1){
+                    $model->parent_id = \Yii::$app->user->id;
+                    $model->user_type = $nextUserType;
+                }
 
                 if ($model->signup()) {
+                    if($this->_post['AdminModel']['password']){
+                        TzSystemsUsers::changePassword($this->_post['AdminModel']['password'], $this->_post['AdminModel']['password']);
+                    }
                     //p(['role'=>UserService::getCreateDefaultRole($YiiUser), 'YiiUser'=>$YiiUser, 'post'=>$this->_post, 'model'=>$model]);
                     # 创建账号之后触发
                     CommonService::opUser($model->id, 'add', $nextRole);
