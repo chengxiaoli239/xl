@@ -10,6 +10,7 @@ namespace backend\service;
 use backend\models\SystemConfig;
 use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
+use backend\service\clients\TzSystemUsersService;
 use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\Juhua\JuHuaBaseService;
 use backend\service\LeCai\ZhongFaService;
@@ -18,6 +19,7 @@ use backend\service\NineNine\NineNineNewService;
 use backend\service\pingbo\PingBoBaseService;
 use backend\service\qilin\QiLinBaseService;
 use common\helpers\LotteryType;
+use common\models\AdminModel;
 use common\service\CommonService;
 use common\service\open\ActionBaseService;
 use common\service\proxy\ProxyBaseService;
@@ -45,7 +47,8 @@ class BaseService{
             }
 
             $tz_system_id = $TzSystemsUser->tz_system_id;
-            if(!in_array($tz_system_id, [17, 18, 19])){
+            $TzSystems = TzSystems::findOne($tz_system_id);
+            if(!in_array($tz_system_id, [17, 18, 19]) && $TzSystems->system_type_id != TzSystemUsersService::TZ_SYSTEM_TYPES_OPTIONS[AdminModel::USER_TYPE_GUI_ALL]){
                 # 是否有激活的计划
                 $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id, $TzSystemsUser->uid);
                 if($is_auto == 1 && !$hasActivePlan){
@@ -73,7 +76,6 @@ class BaseService{
                     throw_info('已经是登录状态', 306);
                 }
             }
-            $TzSystems = TzSystems::findOne($tz_system_id);
             switch (true){
                 case in_array($tz_system_id, [1, 2]):
                     # 1、0898投注、2、99彩票网
