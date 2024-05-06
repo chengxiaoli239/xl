@@ -87,7 +87,7 @@ class AoZhou5BetService extends CommonBaseService
             Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推盘口', ['betRowId'=>$betRow->id, 'lottery_type'=>$lottery_type, 'method_id'=>$method_id]);
 
             self::$siteSystemInfo = CommonBaseService::getSystemBaseInfo($user_id, $lottery_type); # 盘口信息
-            self::$localToSiteMethodInfo = CommonBaseService::getLocalToSiteMethods($method_id, self::$siteSystemInfo['system_type_id'], $betRow->codes); #
+            self::$localToSiteMethodInfo = CommonBaseService::getLocalToSiteMethods($method_id, self::$siteSystemInfo['system_type_id'], $betRow->codes, $betRow->kj_num); #
             self::$platformUser = WechatUser::find()->where(['id'=>$betRow->wechat_user_id])->asArray()->limit(1)->one();
 
             Tool_Common::log('/betSite/'.__FUNCTION__, 'INFO', '盘口信息', [
