@@ -186,7 +186,7 @@ class TzSystemsController extends BaseController
                     $this->_post['TzSystems']['lottery_type'] = TzSystemUsersService::LOTTERY_TYPES_OPTIONS[$this->user_type];
                     $this->_post['TzSystems']['status'] = 1;
                 }
-                $this->_post['TzSystems']['type'] = current($this->_post['TzSystems']['type'])?:1;
+                $this->_post['TzSystems']['type'] = $this->_post['TzSystems']['type']?:1;
                 $this->_post['TzSystems']['tz_types'] = implode(',', $this->_post['TzSystems']['tz_types']);
                 $this->_post['TzSystems']['created_at'] = $nowTime;
                 $this->_post['TzSystems']['updated_at'] = $nowTime;
