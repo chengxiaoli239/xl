@@ -4,6 +4,8 @@ namespace common\service\thirdD;
 
 use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
+use backend\service\clients\TzSystemUsersService;
+use common\helpers\LotteryType;
 use common\models\thirdD\LocalToSiteMethod;
 use common\service\BaseService;
 use common\service\lottery\aozhou5\AoZhou5Service;
@@ -96,7 +98,7 @@ class CommonBaseService extends BaseService
     public static function getLocalToSiteMethods(int $method_id=0, int $system_type_id=15, $betCodes='', $kjNum=4): array
     {
         //p([$method_id, $system_type_id, $betCodes]);
-        if($system_type_id == 16){
+        if($system_type_id == LotteryType::TZ_SYSTEM_TYPE_ID_AZ){
             $flippedArray = array_flip($kjNum==5?MethodMapService::METHOD_TYPE_OPTIONS_5:MethodMapService::METHOD_TYPE_OPTIONS_4);
             if(!isset($flippedArray[$betCodes])){
                 throw_info('不存在的玩法:'.$betCodes);

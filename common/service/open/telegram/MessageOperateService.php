@@ -226,6 +226,7 @@ class MessageOperateService  extends BaseService
                     'order_id' => $betOrderId,
                     'robot_id' => (int)$robotId,
                     'site_account' => $this->tzSystemUsers->account, # 盘口账号
+                    'kj_num' => $this->tzSystemUsers->kj_num, # 开奖号码
                     'play_method' => $method['id'],
                     'codes' => (string)$method['codes'],
                     'bet_money' => $method['all_moneys'],
