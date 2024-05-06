@@ -22,6 +22,7 @@ use Yii;
  * @property string $profits 利润
  * @property string $qihao 期号
  * @property string $kj_codes 开奖号码
+ * @property int $kj_num 前x位为开奖号码
  * @property int $status 中奖状态：0:正常、1:中奖、2:未中奖、3已撤单
  * @property int $push_status 推送盘口状态0待推2成功3失败
  * @property string $push_desc 推送结果
@@ -58,7 +59,7 @@ class Bets extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['user_id', 'wechat_user_id', 'robot_id', 'order_id', 'play_method', 'count', 'status', 'push_status', 'cancel_status', 'is_need_confirm', 'reply_type', 'has_reply', 'is_simulate', 'lottery_type', 'is_profits_record', 'created_at', 'updated_at'], 'integer'],
+            [['user_id', 'wechat_user_id', 'robot_id', 'order_id', 'play_method', 'count', 'kj_num', 'status', 'push_status', 'cancel_status', 'is_need_confirm', 'reply_type', 'has_reply', 'is_simulate', 'lottery_type', 'is_profits_record', 'created_at', 'updated_at'], 'integer'],
             [['codes', 'bet_desc', 'created_at', 'updated_at'], 'required'],
             [['codes', 'push_desc', 'reply_content', 'bet_desc', 'api_code_datas'], 'string'],
             [['bet_money', 'bonus', 'single', 'ratio', 'profits'], 'number'],
@@ -90,6 +91,7 @@ class Bets extends \common\models\base\BaseModel
             'profits' => Yii::t('app', '利润'),
             'qihao' => Yii::t('app', '期号'),
             'kj_codes' => Yii::t('app', '开奖号码'),
+            'kj_num' => Yii::t('app', '前x位为开奖号码'),
             'status' => Yii::t('app', '中奖状态：0:正常、1:中奖、2:未中奖、3已撤单'),
             'push_status' => Yii::t('app', '推送盘口状态0待推2成功3失败'),
             'push_desc' => Yii::t('app', '推送结果'),

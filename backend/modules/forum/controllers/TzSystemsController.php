@@ -2,7 +2,9 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\service\clients\TzSystemUsersService;
 use backend\service\HN0898Service;
+use backend\service\UserService;
 use common\service\CommonService;
 use Yii;
 use backend\models\TzSystems;
@@ -38,7 +40,12 @@ class TzSystemsController extends BaseController
     public function actionIndex()
     {
         $searchModel = new TzSystemsSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+        $TzSystemTypeId = TzSystemUsersService::TZ_SYSTEM_TYPES_OPTIONS[$this->user_type]??0;
+        if(!empty($TzSystemTypeId)){
+            $queryParams['TzSystems']['system_type_id'] = $TzSystemTypeId;
+        }
+        $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -88,7 +95,7 @@ class TzSystemsController extends BaseController
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreateBak()
     {
         $model = new TzSystems();
         if(\Yii::$app->request->isPost){
@@ -134,6 +141,82 @@ class TzSystemsController extends BaseController
             'allTzTypes' => $allTzTypes,
             'model' => $model,
         ]);
+    }
+
+    public function actionUpdateSiteInfo($id)
+    {
+        $model = (new TzSystems())->findOne($id);
+
+        $post = $this->_post;
+        if (!empty($post)) {
+            $domain = trim($post['TzSystems']['ssc_domain'], '/');
+            if(strpos($domain, 'https://') === false){
+                $domain = 'https://'.$domain;
+            }
+            $post['TzSystems']['ssc_domain'] = $domain;
+            $model->load($post) && $model->save();
+
+            return $this->redirect(['site-index']);
+        }
+
+        return $this->renderAjax('update_site_info', [
+            'model' => $model,
+        ]);
+    }
+
+    public function actionCreate($id='')
+    {
+        if(!empty($id) OR $id=$this->_post['TzSystems']['id']){
+            $model = $this->findModel($id);
+        }else{
+            $model = new TzSystems();
+        }
+        $YiiUser = \Yii::$app->user->identity;
+        $userTypes = UserService::getAdminUserTypes(\Yii::$app->user->identity, $act=1);
+        $nowTime = time();
+        list($nextUserType, $nextRole) = UserService::getCreateDefaultRole($YiiUser, current($userTypes)['user_type']);
+        if ($model->load($this->_post)) {
+            try {
+                $transaction = \Yii::$app->db->beginTransaction();
+                if(empty($this->_post['TzSystems']['system_type_id'])){
+                    $TzSystemTypeId = TzSystemUsersService::TZ_SYSTEM_TYPES_OPTIONS[$this->user_type]??0;
+                    $this->_post['TzSystems']['system_type_id'] = $TzSystemTypeId;
+                    $this->_post['TzSystems']['lottery_type'] = TzSystemUsersService::LOTTERY_TYPES_OPTIONS[$this->user_type];
+                    $this->_post['TzSystems']['status'] = 1;
+                }
+                $this->_post['TzSystems']['type'] = current($this->_post['TzSystems']['type'])?:1;
+                $this->_post['TzSystems']['tz_types'] = implode(',', $this->_post['TzSystems']['tz_types']);
+                $this->_post['TzSystems']['created_at'] = $nowTime;
+                $this->_post['TzSystems']['updated_at'] = $nowTime;
+                $model->load($this->_post);
+
+                if (!$model->save()) {
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    $errMsg = $model->getErrors()?current(current($model->getErrors())):'';
+                    //throw_info($errMsg?:'处理异常'); // $model->getErrors()
+                    return ['status'=>301, 'msg'=>$errMsg];
+                }
+                TzSystemUsersService::getSites($this->user_type, 0);
+                $transaction->commit();
+            }catch (\Exception $e){
+                $transaction->rollBack();
+                die('<script>alert("'.$e->getMessage().'"); history.back();</script>');
+            }
+            //p('kkdk');
+            return $this->redirect(['/forum/tz-systems/index']);
+        }else{
+            $get = \Yii::$app->request->get();
+            if(!empty($get['id'])){
+                $model = $this->findModel($get['id']);
+            }
+        }
+
+        $allTzTypes = CommonService::getAllTzTypes();
+        return $this->renderAjax('create_tz_system', [
+            'model' => $model,
+            'allTzTypes' => $allTzTypes,
+        ]);
+
     }
 
     /**

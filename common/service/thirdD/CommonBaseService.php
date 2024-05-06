@@ -93,11 +93,11 @@ class CommonBaseService extends BaseService
      * @param int $method_id
      * @param int $system_type_id     * @return array
      */
-    public static function getLocalToSiteMethods(int $method_id=0, int $system_type_id=15, $betCodes=''): array
+    public static function getLocalToSiteMethods(int $method_id=0, int $system_type_id=15, $betCodes='', $kjNum=4): array
     {
         //p([$method_id, $system_type_id, $betCodes]);
         if($system_type_id == 16){
-            $flippedArray = array_flip(AoZhou5Service::KJ_CODE_NUM==5?MethodMapService::METHOD_TYPE_OPTIONS_5:MethodMapService::METHOD_TYPE_OPTIONS_4);
+            $flippedArray = array_flip($kjNum==5?MethodMapService::METHOD_TYPE_OPTIONS_5:MethodMapService::METHOD_TYPE_OPTIONS_4);
             if(!isset($flippedArray[$betCodes])){
                 throw_info('不存在的玩法:'.$betCodes);
             }

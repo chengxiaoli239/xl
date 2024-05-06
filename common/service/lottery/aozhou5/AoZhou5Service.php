@@ -140,7 +140,7 @@ class AoZhou5Service extends CommonLotteryService
             if(!$kjData = CommonService::getAwardNumberByQihao($qiHao, $lottery_type)){ // 3,4,5,6,7
                 throw_info(LotteryType::TYPE_OPTIONS[$lottery_type].$qiHao.'期未开奖!');
             }
-            $drawData = DrawLottery::getGuiDrawData($kjData, $codeNum=self::KJ_CODE_NUM); # 4个或者5个
+            $drawData = DrawLottery::getGuiDrawData($kjData, $bet->kj_num); # 4个或者5个
 
             $profitsData = self::calcProfits($codes, $drawData, $single, $bet->user_id);
             //p(['qihao'=>$qihao, 'kjData'=>$kjData, 'drawData'=>$drawData, 'codes'=>$codes, 'id'=>$bet->id, 'playmethod'=>$bet->play_method]);

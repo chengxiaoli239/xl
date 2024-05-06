@@ -6,14 +6,13 @@ use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\models\wechat\Bets;
 use backend\service\agent\AgentUsersBalanceService;
+use common\helpers\lottery\DrawLottery;
 use common\helpers\RequestHelper;
 use common\models\wechat\WechatUser;
 use common\open\aozhou5\api\OrderApi;
 use common\open\aozhou5\api\UserApi;
 use common\service\CommonService;
 use common\service\open\ActionBaseService;
-use common\service\open\aozhou5\ActionService;
-use common\service\open\telegram\MessageOperateService;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\jobs\SsxxBetJobs;
@@ -25,6 +24,15 @@ use yii\helpers\Json;
 
 class AoZhou5BetService extends CommonBaseService
 {
+    # 推送ID
+    const PUSH_ID_FIVE = 8;
+    const PUSH_ID_FOUR = 9;
+
+    const PUSH_ID_OPTIONS = [
+        DrawLottery::BET_FOUR_NUM => AoZhou5BetService::PUSH_ID_FOUR,
+        DrawLottery::BET_FIVE_NUM => AoZhou5BetService::PUSH_ID_FIVE,
+    ];
+
     # 盘口信息
     public static array $siteSystemInfo = [];
     # 本地对盘口 玩法ID
@@ -305,7 +313,7 @@ class AoZhou5BetService extends CommonBaseService
             '__'=>'bettingSingle',
             'data' => Json::encode([
                 'gameId'=>601,
-                'pusId' => 8,
+                'pusId' => self::PUSH_ID_OPTIONS[$objectClass->tzSystemUsers->kj_num],
                 'openingNum' => (int)$nextQiHao,
                 'rebate' => 'A',
                 'data' => [

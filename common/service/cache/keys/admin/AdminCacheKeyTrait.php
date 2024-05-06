@@ -12,4 +12,14 @@ trait AdminCacheKeyTrait
     {
         return 'admin:user_type:' . $user_type;
     }
+
+    /**
+     * 管理员管理的系统类型
+     * @param int $user_type
+     * @return string
+     */
+    public static function manageSites(int $user_type=1): string
+    {
+        return 'admin:manageSites:' . $user_type;
+    }
 }

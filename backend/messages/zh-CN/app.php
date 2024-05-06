@@ -5,6 +5,7 @@ return [
     'edit' => '编辑',
     'query' => '查询',
     'Save' => '保存',
+    'Delete' => '删除',
 
     'Admin Log' => '访问日志',
     'Create Follow Datas' => '添加计划',

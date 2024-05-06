@@ -7,17 +7,17 @@ use backend\models\TzSystems;
 use backend\models\TzSystemsAuth;
 use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
 use backend\models\TzSystemsUsers;
-use backend\service\baota\BaoTaService;
 use backend\service\BaseService;
 use backend\service\BetService;
+use backend\service\clients\TzSystemUsersService;
 use backend\service\PoxyIPService;
 use backend\service\UserService;
 use common\models\AdminModel;
 use common\service\CommonService;
+use common\tools\Util;
 use izyue\admin\models\searchs\Assignment as AssignmentSearch;
 use Yii;
 use backend\models\User;
-//use backend\models\searchs\User as UserSearch;
 use backend\models\searchs\Admin as UserSearch;
 use backend\controllers\BaseController;
 use yii\web\NotFoundHttpException;
@@ -71,9 +71,11 @@ class UserController extends BaseController
         $user = \Yii::$app->user->identity;
         $user_type = UserService::getUserType($user, $queryParams, 'Admin');
         $userTypes = UserService::getAdminUserTypes($user, $act=1);
+        //p([$userTypes, $user_type]);
 
-        $queryParams['User']['user_type'] = $user_type;
+        $queryParams['Admin']['user_type'] = $user_type;
         $dataProvider = $searchModel->search($queryParams);
+        //$dataProvider['query'] = $queryParams['query']->leftjoin(TzSystemsUsers::tableName().' as t', 't.uid=u.id')->select(['u.*', 't.status as t_status']);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -309,6 +311,94 @@ class UserController extends BaseController
         }
 
         return $result;
+    }
+
+    public function actionCreateUser($id='')
+    {
+        $id = $id?:($this->_post['AdminModel']['id']?:'');
+        if(empty($id) OR !$model = $this->findModel($id)){
+            $model = new $this->userClassName;
+            $model->setScenario('create');
+        }else{
+            $model->setScenario('update');
+        }
+        $YiiUser = \Yii::$app->user->identity;
+        $className = Util::class_basename($this->userClassName);
+        //p(['identity'=>\Yii::$app->user->identity, $this->userClassName, UserService::is3dAdmin(\Yii::$app->user->identity), \Yii::$app->request->post(), $className, 'user'=>$YiiUser]);
+        $userTypes = UserService::getAdminUserTypes(\Yii::$app->user->identity, $act=1);
+        list($nextUserType, $nextRole) = UserService::getCreateDefaultRole($YiiUser, current($userTypes)['user_type']);
+        $currentUserType = $YiiUser['user_type'];
+        $nowTime = time();
+        if ($model->load($this->_post)) {
+            try {
+                $transaction = \Yii::$app->db->beginTransaction();
+                $model->parent_id = \Yii::$app->user->id;
+                $model->user_type = $nextUserType;
+
+                if ($model->signup()) {
+                    //p(['role'=>UserService::getCreateDefaultRole($YiiUser), 'YiiUser'=>$YiiUser, 'post'=>$this->_post, 'model'=>$model]);
+                    # 创建账号之后触发
+                    CommonService::opUser($model->id, 'add', $nextRole);
+                    $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$model->id]);
+                    $setData = [];
+                    if(empty($TzSystemUsers)){
+                        $TzSystemUsers = new TzSystemsUsers();
+                        $setData = [
+                            'uid' => $model->id,
+                            'created_at' => $nowTime,
+                            'expire_time' => $nowTime + 3600,
+                        ];
+                    }
+                    $postData = current($this->_post);
+                    $TzSystems = TzSystems::findOne($postData['tz_system_id']);
+                    $setData = array_merge($setData, [
+                        'username' => $postData['username'],
+                        'user_type' => $nextUserType,
+                        'tz_system_id' => $postData['tz_system_id'],
+                        'is_auto_login' => $nextUserType==AdminModel::USER_TYPE_GUI?1:0,
+                        'sys_name' => $TzSystems->name,
+                        'ssc_domain' => $TzSystems->ssc_domain??'',
+                        'account' => $postData['site_account']?:'',
+                        'password' => $postData['site_password']?:'',
+                        'secure_code' => $postData['secure_code']?:'',
+                        'desc' => $postData['description']?:'',
+                        'user_agent' => 'User-Agent: '.$_SERVER['HTTP_USER_AGENT'],
+                        'updated_at' => $nowTime,
+                    ]);
+                    $TzSystemUsers->setAttributes($setData);
+                    //p([$TzSystemUsers->attributes, $postData]);
+                    $TzSystemUsers->save();
+                }else{
+                    \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                    $errMsg = $model->getErrors()?current(current($model->getErrors())):'';
+                    //throw_info($errMsg?:'处理异常'); // $model->getErrors()
+                    return ['status'=>301, 'msg'=>$errMsg];
+                }
+                $transaction->commit();
+            }catch (\Exception $e){
+                $transaction->rollBack();
+                die('<script>alert("'.$e->getMessage().'"); history.back();</script>');
+            }
+            //p('kkdk');
+            return $this->redirect(['/admin/assignment/index.html']);
+        }else{
+            $get = \Yii::$app->request->get();
+            if(!empty($get['id'])){
+                #$model = $this->findModel($get['id']);
+                $model = AdminModel::find()->alias('u')
+                    ->leftJoin(TzSystemsUsers::tableName().' t', 'u.id=t.uid')
+                    ->select(['u.*', 't.secure_code', 't.tz_system_id', 't.ssc_domain', 't.account as site_account', 't.password as site_password', 't.desc as description'])
+                    ->where(['=', 'u.id', $get['id']])
+                    ->limit(1)->one();
+            }
+        }
+
+        $sites = TzSystemUsersService::getSites($currentUserType);
+        return $this->renderAjax('create_user', [
+            'model' => $model,
+            'sites' => $sites
+        ]);
+
     }
 
     /**
@@ -561,7 +651,8 @@ class UserController extends BaseController
 
                 if ($user = $model->signup()) {
                     # 创建账号之后触发
-                    CommonService::opUser($user->id, 'add', UserService::getCreateDefaultRole($YiiUser));
+                    list($nextUserType, $nextRole) = UserService::getCreateDefaultRole($YiiUser);
+                    CommonService::opUser($user->id, 'add', $nextRole);
                     $flag = true;
                 }
                 if(!$flag){
@@ -617,7 +708,8 @@ class UserController extends BaseController
             if ($model->save()) {
                 //MenuHelper::invalidate();
                 $user = \Yii::$app->user->identity;
-                $rst = UserService::opUser($id, 'add', UserService::getCreateDefaultRole($user));
+                list($nextUserType, $nextRole) = UserService::getCreateDefaultRole($user);
+                $rst = UserService::opUser($id, 'add', $nextRole);
                 return $this->redirect(['index']);
             } else {
                 return $this->render('update', [
@@ -660,7 +752,7 @@ class UserController extends BaseController
     protected function findModel($id)
     {
         $admin_id = \Yii::$app->user->id;
-        $where = ['id'=>$admin_id];
+        $where = ['id'=>$id];
         if($admin_id != 1){
             $where = ['parent_id'=>$admin_id, 'id'=>$id];
         }

@@ -8,6 +8,7 @@
 
 namespace backend\service;
 use backend\models\SystemConfig;
+use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
 use backend\service\huiyuan\HuiYuanBaseService;
 use backend\service\Juhua\JuHuaBaseService;
@@ -72,45 +73,40 @@ class BaseService{
                     throw_info('已经是登录状态', 306);
                 }
             }
-            switch ($tz_system_id){
-                case 1:
-                case 2:
+            $TzSystems = TzSystems::findOne($tz_system_id);
+            switch (true){
+                case in_array($tz_system_id, [1, 2]):
                     # 1、0898投注、2、99彩票网
                     $rst = HN0898Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     break;
-                case 3:
-                case 7:
-                case 9:
-                case 10: # 3、重庆7时彩网
+                case in_array($tz_system_id, [3, 7, 9, 10]): # 3、重庆7时彩网
                     if($tz_system_id == 3){
                         $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     }else{
                         $rst = Lucky5Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     }
                     break;
-                case 4: # 4、7天彩票网
-                case 5: # 5、希腊网
+                case in_array($tz_system_id, [4, 5]):
                     break;
-                case 6: # 6、会员网
+                case $tz_system_id == 6:# 6、会员网
                     $rst = HuiYuanBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     break;
-                case 11: # 11、菊花网暂时没对接登录
+                case $tz_system_id == 11:# 11、菊花网暂时没对接登录
                     //$rst = JuHuaBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     break;
-                case 8: # 8、麒麟财务系统网
+                case $tz_system_id == 8: # 8、麒麟财务系统网
                     $rst = QiLinBaseService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     break;
-                case 13: # 9、冰岛
+                case in_array($tz_system_id, [9]): # 9、冰岛
                     $rst = \backend\service\BingDao\BingDaoService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     break;
-                case 16: # 宝岛众发
+                case $tz_system_id == 16: # 宝岛众发
                     $rst = ZhongFaService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     break;
-                case 17: # 排sx
-                case 18: # 福sx
+                case in_array($tz_system_id, [17, 18]):# 排sx 福sx
                     $rst = Sx3dUserService::login($TzSystemsUser);
                     break;
-                case 19: # 澳洲五
+                case $TzSystems->system_type_id == 16: # 澳洲五
                     list($code, $data, $msg) = (new ActionBaseService())->login($TzSystemsUser);
                     if(!$code){
                         $rst = ['status'=>200, 'data'=>$data, 'msg'=>$msg];

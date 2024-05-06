@@ -3,9 +3,10 @@ namespace common\service\open\telegram;
 
 use backend\models\open\PlatformRobot;
 use backend\models\SscKjData;
+use backend\models\TzSystemsUsers;
+use common\helpers\lottery\DrawLottery;
 use common\helpers\LotteryType;
 use common\service\jobs\telegram\SendMessageJobs;
-use common\service\lottery\aozhou5\AoZhou5Service;
 use common\tools\Tool_Common;
 
 class AoZhouKjService  extends BaseService
@@ -17,34 +18,42 @@ class AoZhouKjService  extends BaseService
         $switch = \Yii::$app->params['AZ_MESSAGE_SWITCH']??0;
         if(!$switch) return false;
 
-        list($codeHz, $kjCode, $ds, $ft, $qiHao) = AoZhouKjService::getAoZhouKjData($qiHao);
-
-        $text = "=========================\n";
-        $text .= LotteryType::TYPE_OPTIONS[self::$lottery_type].'（前'.(AoZhou5Service::KJ_CODE_NUM).'位数番摊）'."\n\n".
-            "第 {$qiHao} 期\n".
-            $kjCode."总和{$codeHz}(".$ds.",".$ft.")\n\n".
-            "以下是历史课程表\n\n";
         $historyKjDataQuery = SscKjData::find()->where(['lottery_type'=>self::$lottery_type])->andWhere(['>', 'qihao', (int)$qiHao-135]);
         //$sql = $historyKjDataQuery->createCommand()->getRawSql();p($sql);
         $historyKjData = $historyKjDataQuery->asArray()->all();
-        foreach ($historyKjData as $k=>$historyKjDatum){
-            $kk = $k + 1;
-            $heZhi = (AoZhou5Service::KJ_CODE_NUM==5)? $historyKjDatum['codes_hz']:$historyKjDatum['codes_4nums_hz'];
-            $text .= self::getFanTan((int)$heZhi).' ';
-            if($kk%15==0){
-                $text .= "\n\n";
+        $texts = [];
+        foreach ([DrawLottery::BET_FOUR_NUM, DrawLottery::BET_FIVE_NUM] as $kjNum){
+            list($codeHz, $kjCode, $ds, $ft, $qiHao) = AoZhouKjService::getAoZhouKjData($qiHao, $kjNum);
+
+            $text = "=========================\n";
+            $text .= LotteryType::TYPE_OPTIONS[self::$lottery_type].'（前'.($kjNum).'位数番摊）'."\n\n".
+                "第 {$qiHao} 期\n".
+                $kjCode."总和{$codeHz}(".$ds.",".$ft.")\n\n".
+                "以下是历史课程表\n\n";
+            foreach ($historyKjData as $k=>$historyKjDatum){
+                $kk = $k + 1;
+                $heZhi = ($kjNum==5)? $historyKjDatum['codes_hz']:$historyKjDatum['codes_4nums_hz'];
+                $text .= self::getFanTan((int)$heZhi).' ';
+                if($kk%15==0){
+                    $text .= "\n\n";
+                }
             }
+            $text .= "\n=========================";
+            Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', '开奖后群消息', ['lottery_type'=>self::$lottery_type, 'qiHao'=>$qiHao, 'text'=>$text, 'beforeQiHao'=>((int)$qiHao)-135]);
+            $texts[$kjNum] = $text;
         }
-        $text .= "\n=========================";
-        Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', '开奖后群消息', ['lottery_type'=>self::$lottery_type, 'qiHao'=>$qiHao, 'text'=>$text, 'beforeQiHao'=>((int)$qiHao)-135]);
         //p($text, 0);
 
-        $platformRobots = PlatformRobot::find()->where(['status'=>PlatformRobot::STATUS_ACTIVE])->asArray()->all();
+        $platformRobots = PlatformRobot::find()->alias('r')
+            ->select(['r.*', 't.kj_num'])
+            ->leftJoin(TzSystemsUsers::tableName().' as t', 'r.user_id=t.uid')
+            ->where(['r.status'=>PlatformRobot::STATUS_ACTIVE])->asArray()->all();
         //p($platformRobots);
         foreach ($platformRobots as $platformRobot){
             if(!$platformRobot['group_id']){
                 continue;
             }
+            $text = $texts[$platformRobot['kj_num']];
             $params = [
                 'business_id' => $qiHao,
                 'content' => $text,
@@ -67,7 +76,7 @@ class AoZhouKjService  extends BaseService
      * @param string $qiHao
      * @return array
      */
-    public static function getAoZhouKjData(string $qiHao=''): array
+    public static function getAoZhouKjData(string $qiHao='', $kjNum=5): array
     {
         if($qiHao){
             $kjData = SscKjData::find()->where(['lottery_type'=>self::$lottery_type, 'qihao'=>$qiHao])->asArray()->limit(1)->one();
@@ -75,7 +84,7 @@ class AoZhouKjService  extends BaseService
             $kjData = SscKjData::find()->where(['lottery_type'=>self::$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one();
         }
 
-        if(AoZhou5Service::KJ_CODE_NUM==5){
+        if($kjNum==5){
             $codeHz = $kjData['codes_hz'];
             $kjCode = $kjData['code_str'];
         }else{

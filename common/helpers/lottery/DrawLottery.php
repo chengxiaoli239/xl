@@ -3,6 +3,9 @@ namespace common\helpers\lottery;
 
 class DrawLottery
 {
+    const BET_FOUR_NUM = 4;
+    const BET_FIVE_NUM = 5;
+
     public static function getGuiDrawData($kjCode='', $codeNum=4): array
     {
         $codes = explode(',', $kjCode);

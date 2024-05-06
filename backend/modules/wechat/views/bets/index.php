@@ -90,7 +90,7 @@ $columns = array_merge(
                     $txt = $model->status==3? '<strong><font color="red">已撤单</font></strong>' :
                         (($model->status===0) ? '<strong><font color="green">待开奖</font></strong>' : $model->kj_codes);
                     if($model->lottery_type == LotteryType::AZ_LUCKY_5 && !empty($model->kj_codes)){
-                        list($kjCode, $heZhi, $gui, $ds) = DrawLottery::getGuiDrawData($model->kj_codes, $codeNum=AoZhou5Service::KJ_CODE_NUM); # 4个或者5个
+                        list($kjCode, $heZhi, $gui, $ds) = DrawLottery::getGuiDrawData($model->kj_codes, $model->kj_num); # 4个或者5个
                         $txt .= " 和".$heZhi.'('.$ds.','.$gui.')';
                     }
                     return $txt;

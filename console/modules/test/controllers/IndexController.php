@@ -59,6 +59,7 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user}}'); p($r);
             foreach ([8] as $lotteryType){
                 //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
                 $r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
@@ -82,7 +83,6 @@ class IndexController extends Controller
             }
             p(['result'=>$result, 'date'=>date('Y-m-d H:i:s')], 0);
             p('设置结束'.date('Y-m-d H:i:s'));
-            $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%tz_systems_users}}'); p($r);
             $data = Aozhou::getSiteLucky5($type='json');p($data);
             (new AoZhouKjService())->operateSendKjData();p('dddd');
             $groups = PlatformGroup::getGroups($userId=21);p($groups);

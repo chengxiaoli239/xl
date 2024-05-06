@@ -4,11 +4,15 @@ namespace backend\service\clients;
 use backend\models\BetErrorPlansTask;
 use backend\models\DataDealStatus;
 use backend\models\SscKjData;
+use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\service\BetService;
 use backend\service\Lucky5\Lucky5Service;
+use common\helpers\LotteryType;
 use common\kj\ssc\Lucky5;
+use common\models\AdminModel;
+use common\service\cache\CacheKeyService;
 use common\service\CommonService;
 use common\service\jobs\kj_data\GrabKjDatasJob;
 use common\tools\RedisLock;
@@ -19,6 +23,13 @@ class TzSystemUsersService extends ClientsBaseService{
     public static $module_key = 'backend\models\TzSystemsUsers';
     const PlAN_TYPE_LOCAL = 'local';
     const PlAN_TYPE_RE_LOCAL = 're_local';
+
+    const TZ_SYSTEM_TYPES_OPTIONS = [
+        AdminModel::USER_TYPE_GUI_ALL => 16
+    ];
+    const LOTTERY_TYPES_OPTIONS = [
+        AdminModel::USER_TYPE_GUI_ALL => LotteryType::AZ_LUCKY_5,
+    ];
 
     public static function getLists($post=[]){
         if(empty($post)){
@@ -615,5 +626,28 @@ class TzSystemUsersService extends ClientsBaseService{
         }
 
         return ['status'=>200, 'data'=>$datas];
+    }
+
+    /**
+     * 获取站点
+     * @param int $userType
+     * @param int $useCache
+     * @return array
+     */
+    public static function getSites(int $userType=0, int $useCache=1): array
+    {
+        $mKey = CacheKeyService::manageSites($userType);
+        $data = commonRedis()->get($mKey);
+        if(empty($data) OR !$useCache){
+            $TzSystemTypeId = TzSystemUsersService::TZ_SYSTEM_TYPES_OPTIONS[$userType]??0;
+            $TzSystemsQuery = TzSystems::find()->select(['id', 'name', 'ssc_domain', 'status', 'lottery_type', 'kj_num']);
+            if(!empty($TzSystemTypeId)){
+                $TzSystemsQuery->where(['system_type_id'=>$TzSystemTypeId]);
+            }
+            $data = $TzSystemsQuery->asArray()->all();
+            commonRedis()->setex($mKey, 1800, $data);
+        }
+
+        return $data;
     }
 }

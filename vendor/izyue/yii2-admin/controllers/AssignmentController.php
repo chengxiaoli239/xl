@@ -7,6 +7,7 @@ use backend\models\TzSystemsUsers;
 use backend\service\UserService;
 use backend\service\UserSysPlansService;
 use common\models\AdminModel;
+use common\tools\Tool_Common;
 use common\tools\Util;
 use izyue\admin\components\MenuHelper;
 use Yii;
@@ -70,8 +71,8 @@ class AssignmentController extends Controller
         $permissions = Yii::$app->authManager->getPermissionsByUser($user->id);
         $queryParams = Yii::$app->getRequest()->getQueryParams();
 
-        //p(['queryParams'=>$queryParams, 'user'=>$user, 'roles'=>$roles, 'permissions'=>$permissions]);
         $user_type = UserService::getUserType($user, $queryParams);
+        //p(['queryParams'=>$queryParams, 'user'=>$user, 'roles'=>$roles, 'permissions'=>$permissions, 'user_type'=>$user_type]);
         if ($this->searchClass === null) {
             $searchModel = new AssignmentSearch;
             $dataProvider = $searchModel->search($queryParams, $this->userClassName, $this->usernameField);
@@ -93,7 +94,25 @@ class AssignmentController extends Controller
             'userTypes' => $userTypes,
             'user_type' => $user_type,
             'usernameField' => $this->usernameField,
-            'extraColumns' => $this->extraColumns,
+            'extraColumns' => array_merge($this->extraColumns, [
+                [
+                    'attribute' => 'status',
+                    'label' => '状态',
+                    'format' => 'raw',
+                    'value' => function ($model) {
+                        $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$model->id]);
+                        return '<strong>'.($TzSystemUsers->status?'<font color="green">工作中</font>':'<font color="red">停止</font>').'</strong>';
+                    },
+                ],
+                [
+                    'attribute' => 'desc',
+                    'label' => '备注',
+                    'format' => 'raw',
+                    'value' => function ($model) {
+                        return $model->desc;
+                    },
+                ]
+            ]),
         ]);
     }
 
@@ -343,8 +362,33 @@ class AssignmentController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-        MenuHelper::invalidate();
+        $user = \Yii::$app->user;
+        $user_id = $user->id;
+        try {
+            $transaction = \Yii::$app->db->beginTransaction();
+            $model = $this->findModel($id);
+            if(empty($model) OR ($model->parent_id != $user_id && $user_id != 1)){
+                throw_info('非法操作');
+            }
+            if($user_id==1){
+                $where = ['id'=>$id];
+            }else{
+                $where = [
+                    'AND',
+                    ['=', 'parent_id', $user_id],
+                    ['=', 'id', $id],
+                ];
+            }
+            AdminModel::deleteRecord($where);
+            TzSystemsUsers::deleteRecord(['uid'=>$id]);
+            
+            $transaction->commit();
+        }catch (\Exception $e){
+            $transaction->rollBack();
+            Tool_Common::log('/admin/'.__FUNCTION__, 'ERR', '删除用户异常');
+        }
+        
+        //MenuHelper::invalidate();
 
         return $this->redirect(['index']);
     }

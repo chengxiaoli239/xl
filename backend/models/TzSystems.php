@@ -36,7 +36,7 @@ class TzSystems extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['system_type_id', 'status', 'lottery_type', 'type', 'is_auto_login', 'created_at', 'updated_at'], 'integer'],
+            [['system_type_id', 'kj_num', 'status', 'lottery_type', 'type', 'is_auto_login', 'created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
             [['name'], 'string', 'max' => 64],
             [['ssc_domain', 'tz_types'], 'string', 'max' => 255],

@@ -1,5 +1,6 @@
 <?php
 
+use yii\bootstrap\Modal;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
@@ -9,6 +10,102 @@ use yii\widgets\Pjax;
 
 $this->title = Yii::t('app', 'Users');
 $this->params['breadcrumbs'][] = $this->title;
+$user = \Yii::$app->user;
+$columns = array_merge(
+        $user->id!=1?[]:
+        [
+            ['class' => 'yii\grid\SerialColumn'],
+        ],
+        [
+            ['attribute' => 'username','label'=>'账号', # 'headerOptions'=>['width'=>'5%'],
+                'value' => function($model){
+                    return $model->username;
+                }
+            ],
+            ['attribute'=>'desc','label'=>'备注',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value'=>function($model){
+                    $TzSystemsUsers = \backend\models\TzSystemsUsers::findOne(['uid'=>$model->id]);
+                    return $TzSystemsUsers->desc.' 余额：'.floatval($TzSystemsUsers->balance);
+                }
+            ],
+            ['attribute' => 'status','label'=>'状态', # 'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value' => function($model) {
+                    if($model->status == 1){
+                        $txt = '<font color="red">已禁用</font>';
+                        $alt = '点击启用';
+                        $val = 10;
+                    }else{
+                        $txt = '<font color="green">已启用</font>';
+                        $val = 1;
+                        $alt = '点击禁用';
+                    }
+                    $url = "/forum/user/switch-status?id=".$model->id."&status=".$val; #
+                    return Html::a($txt, $url, ['title' => '开通系统权限','alt'=>$alt]);
+                }
+            ],
+        ],
+        $user->id!=1?[
+            [
+                'attribute' => 'desc', 'label'=>'信息',
+            ]
+        ]:
+        [
+            ['attribute' => 'id','label'=>'更新时间', # 'headerOptions'=>['width'=>'5%'],
+                'value' => function($model){
+                    return date('Y-m-d H:i:s', $model->updated_at);
+                }
+            ],
+            ['attribute' => 'id','label'=>'投注系统权限', # 'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value' => function($model) {
+                    $url = "/forum/user/open-systems?uid=".$model->id; #
+                    return Html::a('添加/编辑', $url, ['title' => '开通系统权限','alt'=>$model->id]);
+                }
+            ],
+            'email',
+            ['attribute'=>'desc',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value'=>function($model){
+                    $TzSystemsUsers = \backend\models\TzSystemsUsers::findOne(['uid'=>$model->id]);
+                    $options = [
+                        'class'=>'act-user-copy',
+                        'data-id'=>$model->id,
+                        'data-username'=>$model->username,
+                        'data-desc'=>$model->desc,
+                        'data-access_token'=>$TzSystemsUsers->access_token??'',
+                    ];
+                    return Html::a($model->desc, 'javascript:;', $options);
+                }
+            ],
+        ],
+        [
+            [
+                'label'=>'操作',
+                'format'=>'raw',
+                'value'=>function($model){
+                    return Html::a(Yii::t('app', 'edit'),  'javascript:void(0);', [
+                            'class'=>'btn btn-xs btn-success edit-btn',
+                            'style'=>'margin-bottom:15px;',
+                            'data-url' => Yii::$app->urlManager->createUrl(['forum/user/create-user', 'id' => $model->id]),
+                        ]).' '
+                        .Html::a('删除', ['delete', 'id'=>$model->id], ['class'=>'btn btn-xs btn-warning', 'style'=>'margin-bottom:15px;']);
+                }
+            ]
+        ]
+);
+$js=<<<'JS'
+    $('.edit-btn').click(function(){
+        var url = $(this).attr('data-url');
+        console.log(url);
+        $('#create-user-modal .modal-content').load(url, function() {
+            $('#create-user-modal').modal('show');
+        });
+    });
+JS;
+$this->registerJs($js);
+
 ?>
 <section class="user-index wrapper site-min-height">
     <!-- page start-->
@@ -24,93 +121,16 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                 </div-->
 
-    <?php //Pjax::begin(); ?>
+            <?php //Pjax::begin(); ?>
                 <?php include(dirname(__FILE__).'/index_tab.php'); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
-                    'filterModel' => $searchModel,
-                    'columns' => [
-                        ['class' => 'yii\grid\SerialColumn'],
-
-                        //'id',
-                        //'admin_id',
-                        //'username',
-                        ['attribute' => 'username','label'=>'账号', # 'headerOptions'=>['width'=>'5%'],
-                            'value' => function($model){
-                                return $model->username;
-                            }
-                        ],
-                        //'updated_at:datetime',
-                        ['attribute' => 'id','label'=>'更新时间', # 'headerOptions'=>['width'=>'5%'],
-                            'value' => function($model){
-                                return date('Y-m-d H:i:s', $model->updated_at);
-                            }
-                        ],
-                        ['attribute' => 'id','label'=>'投注系统权限', # 'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                $url = "/forum/user/open-systems?uid=".$model->id; #
-                                return Html::a('添加/编辑', $url, ['title' => '开通系统权限','alt'=>$model->id]);
-                            }
-                        ],
-                        'email',
-                        //'status',
-                        ['attribute' => 'status','label'=>'账号状态', # 'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                if($model->status == 1){
-                                    $txt = '<font color="red">已禁用</font>';
-                                    $alt = '点击启用';
-                                    $val = 10;
-                                }else{
-                                    $txt = '<font color="green">已启用</font>';
-                                    $val = 1;
-                                    $alt = '点击禁用';
-                                }
-                                $url = "/forum/user/switch-status?id=".$model->id."&status=".$val; #
-                                return Html::a($txt, $url, ['title' => '开通系统权限','alt'=>$alt]);
-                            }
-                        ],
-                        'pay_time',
-                        //'desc',
-                        ['attribute'=>'desc',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                $TzSystemsUsers = \backend\models\TzSystemsUsers::findOne(['uid'=>$model->id]);
-                                $options = [
-                                    'class'=>'act-user-copy',
-                                    'data-id'=>$model->id,
-                                    'data-username'=>$model->username,
-                                    'data-desc'=>$model->desc,
-                                    'data-access_token'=>$TzSystemsUsers->access_token??'',
-                                ];
-                                return Html::a($model->desc, 'javascript:;', $options);
-                            }
-                        ],
-                        /*
-                        ['attribute' => 'id','label'=>'投注方式', # 'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                $url = "/forum/user/open-tz-type?uid=".$model->id; # 立即下注
-                                return Html::a('添加', $url, ['title' => '开通系统权限','alt'=>$model->id]);
-                            }
-                        ],
-                        */
-                        //'balance',
-                        //'simulate_balance',
-                        //'email:email',
-                        //'tz_password',
-                        //'cookie',
-                        //'cookie2',
-                        //'created_at',
-                        //'updated_at',
-
-                        ['class' => 'yii\grid\ActionColumn'],
-                    ],
+                    //'filterModel' => $searchModel,
+                    'columns' => $columns
                 ]); ?>
-    <?php //Pjax::end(); ?>
+            <?php //Pjax::end(); ?>
             </div>
         </div>
     </section>
@@ -199,3 +219,12 @@ $(function () {
     });
 });
 </script>
+
+
+<!-- 模态框 -->
+<?php Modal::begin([
+    'id' => 'create-user-modal',
+    'size' => 'modal-lg',
+]); ?>
+<?php Modal::end(); ?>
+

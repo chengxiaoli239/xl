@@ -41,7 +41,7 @@ class Admin extends AdminModel
      */
     public function search($params)
     {
-        $query = AdminModel::find();
+        $query = AdminModel::find()->alias('u');
 
         // add conditions that should always apply here
 
@@ -59,20 +59,21 @@ class Admin extends AdminModel
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
-            'pay_time' => $this->pay_time,
-            'user_type' => $this->user_type,
-            'status' => $this->status,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'u.id' => $this->id,
+            'u.pay_time' => $this->pay_time,
+            'u.user_type' => $this->user_type,
+            'u.status' => $this->status,
+            'u.created_at' => $this->created_at,
+            'u.updated_at' => $this->updated_at,
         ]);
 
-        $query->andFilterWhere(['like', 'username', $this->username])
-            ->andFilterWhere(['like', 'auth_key', $this->auth_key])
-            ->andFilterWhere(['like', 'password_hash', $this->password_hash])
-            ->andFilterWhere(['like', 'password_reset_token', $this->password_reset_token])
-            ->andFilterWhere(['like', 'email', $this->email])
-            ->andFilterWhere(['like', 'desc', $this->desc]);
+        $query->andFilterWhere(['like', 'u.username', $this->username])
+            ->andFilterWhere(['like', 'u.auth_key', $this->auth_key])
+            ->andFilterWhere(['like', 'u.password_hash', $this->password_hash])
+            ->andFilterWhere(['like', 'u.password_reset_token', $this->password_reset_token])
+            ->andFilterWhere(['like', 'u.email', $this->email])
+            ->andFilterWhere(['like', 'u.desc', $this->desc]);
+        //$sql = $query->createCommand()->getRawSql();p($sql);
 
         return $dataProvider;
     }

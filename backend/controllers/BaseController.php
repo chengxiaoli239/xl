@@ -19,6 +19,7 @@ class BaseController extends Controller
     public $_account;
     public $_user_id;
     public $service;
+    public $user_type;
 
     /**
      * 参数存放
@@ -40,6 +41,7 @@ class BaseController extends Controller
         $User = AdminModel::findOne($this->_user_id);
         $userLoginAccessTokenDatas = UserService::getUserLoginInfo($this->_user_id);
         $session_id = Yii::$app->getSession()->id;
+        $this->user_type = $User->user_type;
         if(in_array($this->_user_id, \Yii::$app->params['SINGLE_LOGIN_UIDS']) && !empty($userLoginAccessTokenDatas)){
             if(!in_array($session_id, $userLoginAccessTokenDatas)){
                 Yii::$app->user->logout();

@@ -13,6 +13,7 @@ use Yii;
  * @property string $account 投注账号
  * @property string $balance 用户余额
  * @property string $simulate_balance
+ * @property int $user_type 用户角色类型
  * @property string $email
  * @property int $expire_time 账号到期时间
  * @property string $tz_password 网盘密码
@@ -40,7 +41,7 @@ class User extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['admin_id', 'expire_time', 'is_agent', 'status', 'created_at', 'updated_at'], 'integer'],
+            [['admin_id', 'user_type', 'expire_time', 'is_agent', 'status', 'created_at', 'updated_at'], 'integer'],
             [['balance', 'simulate_balance'], 'number'],
             [['email', 'created_at', 'updated_at'], 'required'],
             [['username', 'account', 'email'], 'string', 'max' => 255],
@@ -62,6 +63,7 @@ class User extends \common\models\base\BaseModel
             'account' => Yii::t('app', '投注账号'),
             'balance' => Yii::t('app', '用户余额'),
             'simulate_balance' => Yii::t('app', 'Simulate Balance'),
+            'user_type' => Yii::t('app', '角色类型'),
             'email' => Yii::t('app', 'Email'),
             'expire_time' => Yii::t('app', '账号到期时间'),
             'tz_password' => Yii::t('app', '网盘密码'),

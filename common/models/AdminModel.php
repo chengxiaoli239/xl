@@ -24,6 +24,13 @@ use yii\web\IdentityInterface;
  */
 class AdminModel extends BaseModel implements IdentityInterface
 {
+    public $ssc_domain; // 盘口域名
+    public $site_account; //盘口账号
+    public $site_password; // 盘口密码
+    public $secure_code; // 安全码
+    public $description; // 备注
+    public $tz_system_id; // 下注系统
+
     public $re_password='';
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
@@ -34,13 +41,16 @@ class AdminModel extends BaseModel implements IdentityInterface
     const USER_TYPE_3D = 3;
     const USER_TYPE_3D_CHILD = 4;
     const USER_TYPE_GUI = 5;
+    const USER_TYPE_GUI_ALL = 6;
+    # 用户角色
     const USER_TYPE_OPTIONS = [
         self::USER_TYPE_SUPER_ADMIN => '超级管理员',
         self::USER_TYPE_QX => '七星',
         self::USER_TYPE_3D_ADMIN => '3d总管',
         self::USER_TYPE_3D => '3d代理',
         self::USER_TYPE_3D_CHILD => '3d代理下级',
-        self::USER_TYPE_GUI => '龟',
+        self::USER_TYPE_GUI => '龟代理',
+        self::USER_TYPE_GUI_ALL => '龟总代',
     ];
 
     public $password;
@@ -63,9 +73,10 @@ class AdminModel extends BaseModel implements IdentityInterface
             ['username', 'required'],
             ['username', 'unique', 'targetClass' => '\common\models\AdminModel', 'message' => Yii::t('signup', 'This username has already been taken')],
             ['username', 'string', 'min' => 2, 'max' => 255],
+            ['user_type', 'integer'],
 
             ['email', 'filter', 'filter' => 'trim'],
-            ['email', 'required'],
+            //['email', 'required'],
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
             ['email', 'unique', 'targetClass' => '\common\models\AdminModel', 'message' => Yii::t('signup', 'This email address has already been taken')],

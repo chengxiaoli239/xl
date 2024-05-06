@@ -42,10 +42,10 @@ class UserService extends BaseService {
                 $AdminModel = AdminModel::findOne($admin_id);
                 $insertData = [
                     'admin_id'=>$admin_id,
-                    'email'=>$AdminModel->email,
+                    'email'=>$AdminModel->email?:$AdminModel->username.'@126.com',
                     'account'=>$AdminModel->username,
                     'username'=>$AdminModel->username,
-                    'user_type' => UserService::is3dAdmin(\Yii::$app->user->identity) ? AdminModel::USER_TYPE_3D :  AdminModel::USER_TYPE_QX,
+                    'user_type' => $AdminModel->user_type,
                     'created_at'=> $now_time,
                     'updated_at'=> $now_time,
                 ];
@@ -53,6 +53,7 @@ class UserService extends BaseService {
                 $rst = $User->save();
                 //p(['3d'=>UserService::is3dAdmin(\Yii::$app->user->identity), 'attr'=>$User->attributes]);
 
+                AuthAssignment::deleteRecord(['user_id'=>$admin_id, 'item_name'=>$role]);
                 $AuthAssignment = new AuthAssignment();
                 $insertData = [
                     'item_name' => $role,
@@ -603,6 +604,21 @@ class UserService extends BaseService {
     }
 
     /**
+     * 判断是否为龟盘总代
+     * @param $user
+     * @return bool
+     */
+    public static function isGuiProxyAll($user): bool
+    {
+        $is_proxy = false;
+        if(array_key_exists('龟盘总代', Yii::$app->authManager->getRolesByUser($user->id)) OR $user->user_type == AdminModel::USER_TYPE_GUI_ALL){
+            $is_proxy = true;
+        }
+
+        return $is_proxy;
+    }
+
+    /**
      * 获取管理员管理可以管理的user_types
      * @param $user
      * @return array
@@ -616,15 +632,17 @@ class UserService extends BaseService {
                 if($act==1 && $user_type==AdminModel::USER_TYPE_3D_ADMIN) continue; # 详细信息
                 $user_types[] = ['user_type'=>$user_type, 'name'=>$name];
             }
-        }else if(array_key_exists('3D总管', Yii::$app->authManager->getRolesByUser($user->id)) OR $user->user_type == AdminModel::USER_TYPE_3D_ADMIN){
-            $user_types[] = ['user_type'=>AdminModel::USER_TYPE_3D, 'name'=>AdminModel::USER_TYPE_OPTIONS[AdminModel::USER_TYPE_3D]];
+        }else if(array_key_exists('3D总管', Yii::$app->authManager->getRolesByUser($user->id)) OR $user->user_type == AdminModel::USER_TYPE_3D_ADMIN) {
+            $user_types[] = ['user_type' => AdminModel::USER_TYPE_3D, 'name' => AdminModel::USER_TYPE_OPTIONS[AdminModel::USER_TYPE_3D]];
+        }elseif($user->user_type == AdminModel::USER_TYPE_GUI_ALL){
+            $user_types[] = ['user_type' => AdminModel::USER_TYPE_GUI, 'name' => AdminModel::USER_TYPE_OPTIONS[AdminModel::USER_TYPE_GUI]];
         }
 
         return $user_types;
     }
 
     /**
-     * 获取当前user_type
+     * 获取当前管理下的user_type
      * @param $user
      * @param array $queryParams
      * @return int
@@ -643,6 +661,8 @@ class UserService extends BaseService {
             $user_type = AdminModel::USER_TYPE_3D;
         }else if(UserService::is3dProxy($user)){
             $user_type = AdminModel::USER_TYPE_3D_CHILD;
+        }else if(UserService::isGuiProxyAll($user)){
+            $user_type = AdminModel::USER_TYPE_GUI;
         }else{
             $user_type = 99;
         }
@@ -653,19 +673,30 @@ class UserService extends BaseService {
     /**
      * 获取当前创建账号默认的user_type
      * @param $user
+     * @param int $userType
+     * @return array
      */
-    public static function getCreateDefaultRole($user): string
+    public static function getCreateDefaultRole($user, $userType=0)
     {
-        if($user->id==1){
+        if(AdminModel::USER_TYPE_OPTIONS[$userType]){
+            $role = AdminModel::USER_TYPE_OPTIONS[$userType];
+        }else if($user->id==1){
             $role = '收费会员';
+            $userType = AdminModel::USER_TYPE_QX;
         }else if(UserService::is3dAdmin($user)){
             $role = '3D代理';
+            $userType = AdminModel::USER_TYPE_3D;
         }else if(UserService::is3dProxy($user)){
             $role = '3D代理下级';
+            $userType = AdminModel::USER_TYPE_3D_CHILD;
+        }else if(UserService::isGuiProxyAll($user)){
+            $role = '龟代理';
+            $userType = AdminModel::USER_TYPE_GUI;
         }else{
-            $role = '';
+            $role = '收费会员';
+            $userType = AdminModel::USER_TYPE_QX;
         }
 
-        return $role;
+        return [$userType, $role];
     }
 }

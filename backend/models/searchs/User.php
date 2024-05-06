@@ -18,7 +18,7 @@ class User extends UserModel
     public function rules()
     {
         return [
-            [['id', 'admin_id', 'status', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'admin_id', 'user_type', 'status', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['username', 'account', 'email', 'tz_password', 'cookie', 'cookie2'], 'safe'],
             [['balance', 'simulate_balance'], 'number'],
         ];
@@ -63,6 +63,7 @@ class User extends UserModel
         $query->andFilterWhere([
             'id' => $this->id,
             'admin_id' => $this->admin_id,
+            'user_type' => $this->user_type,
             'balance' => $this->balance,
             'simulate_balance' => $this->simulate_balance,
             'status' => $this->status,

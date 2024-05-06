@@ -29,6 +29,7 @@ use Yii;
  * @property string $ssc_domain 网盘地址
  * @property string $cookie 登陆cookie
  * @property string $user_agent 浏览器代理
+ * @property int $kj_num 前x位为开奖号码
  * @property string $cookie_wx_web 微信web登录cookie
  * @property string $access_token 授权Token凭证
  * @property int $follow_status 跟随开关
@@ -72,7 +73,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['uid', 'is_agent', 'tz_system_id', 'status', 'follow_status', 'is_auto_login', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'user_type', 'is_local_bet', 'proxy_type', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['uid', 'is_agent', 'tz_system_id', 'status', 'follow_status', 'is_auto_login', 'kj_num', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'user_type', 'is_local_bet', 'proxy_type', 'expire_time', 'created_at', 'updated_at'], 'integer'],
             [['balance', 'flow_wp_player_bs', 'flow_op_player_bs', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
             [['secure_code', 'cookie', 'cookie_wx_web'], 'string'],
             [['updated_at'], 'required'],
@@ -147,6 +148,7 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'ssc_domain' => Yii::t('app', '网盘地址'),
             'cookie' => Yii::t('app', '登陆cookie'),
             'user_agent' => Yii::t('app', '浏览器代理'),
+            'kj_num' => Yii::t('app', '前x位为开奖号码'),
             'cookie_wx_web' => Yii::t('app', '微信web登录cookie'),
             'access_token' => Yii::t('app', '授权Token凭证'),
             'tz_sort' => Yii::t('app', '投注排序:从小到大'),
