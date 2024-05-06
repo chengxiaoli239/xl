@@ -103,7 +103,11 @@ $columns = array_merge([
                     'style'=>'margin-bottom:15px;',
                     'data-url' => Yii::$app->urlManager->createUrl(['forum/tz-systems/create', 'id' => $model->id]),
                 ]).' '
-                .Html::a('删除', ['delete', 'id'=>$model->id], ['class'=>'btn btn-xs btn-warning', 'style'=>'margin-bottom:15px;']);
+                .Html::a(Yii::t('app', 'Delete'), ['delete', 'id'=>$model->id], [
+                    'class'=>'btn btn-xs btn-warning',
+                    'style'=>'margin-bottom:15px;',
+                    'onclick'=>"return confirm('确定删除 “".$model->name."”吗?');"
+                ]);
         }
     ]
 ]);

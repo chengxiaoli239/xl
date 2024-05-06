@@ -2,9 +2,11 @@
 
 namespace backend\modules\forum\controllers;
 
+use backend\models\TzSystemsUsers;
 use backend\service\clients\TzSystemUsersService;
 use backend\service\HN0898Service;
 use backend\service\UserService;
+use common\models\AdminModel;
 use common\service\CommonService;
 use Yii;
 use backend\models\TzSystems;
@@ -27,7 +29,7 @@ class TzSystemsController extends BaseController
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+                    'delete' => ['POST', 'GET'],
                 ],
             ],
         ];
@@ -228,7 +230,11 @@ class TzSystemsController extends BaseController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $TzSystemUsers = TzSystemsUsers::findOne(['tz_system_id'=>$id]);
+        if(!empty($TzSystemUsers)){
+            throw new NotFoundHttpException('有存在使用该系统的用户，请先删除');
+        }
+        TzSystems::deleteRecord(['id'=>$id]);
 
         return $this->redirect(['index']);
     }
