@@ -373,6 +373,7 @@ class UserController extends BaseController
                     $TzSystemUsers->setAttributes($setData);
                     //p([$TzSystemUsers->attributes, $postData]);
                     $TzSystemUsers->save();
+                    \common\service\thirdD\Odds3dService::addUserOdds($model->id, $TzSystems->system_type_id); # 3d 用户添加赔率
                 }else{
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                     $errMsg = $model->getErrors()?current(current($model->getErrors())):'';
