@@ -303,6 +303,12 @@ class AoZhou5BetService extends CommonBaseService
         $objectClass->tzSystemUsers = TzSystemsUsers::findOne($site['id']);
         $parsed_url = parse_url($site['ssc_domain']); # Array ( [scheme] => https [host] => ac3868.com )
         $url = "https://url{$objectClass->line_number}.{$parsed_url['host']}";
+        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推盘口下注', [
+            'url' => $url,
+            'postData1' => $postData1,
+            'nextQiHao' => $nextQiHao,
+            'system_type_id' => $site['system_type_id'],
+        ]);
 
         $result1 = OrderApi::push($url, $postData1);
         if(!empty($result1['error'])){
