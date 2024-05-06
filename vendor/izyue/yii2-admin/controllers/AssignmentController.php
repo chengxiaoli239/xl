@@ -110,7 +110,7 @@ class AssignmentController extends Controller
                     'format' => 'raw',
                     'value' => function ($model) {
                         $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$model->id]);
-                        return $TzSystemUsers->desc.'余额：'.$TzSystemUsers->balance;
+                        return $TzSystemUsers->desc."\n余额：".floatval($TzSystemUsers->balance);
                     },
                 ]
             ]),
