@@ -39,7 +39,9 @@ class PlatformRobotController extends BaseController
     public function actionIndex()
     {
         $searchModel = new PlatformRobotSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $queryParams = Yii::$app->request->queryParams;
+        $queryParams['PlatformRobot']['user_id'] = $this->_user_id;
+        $dataProvider = $searchModel->search($queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
