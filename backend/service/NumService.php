@@ -3419,7 +3419,8 @@ class NumService extends BaseService {
             $lineCodes = NumService::CODES_1_LINE;
         }elseif (in_array($code, NumService::CODES_2_LINE)){
             #$lineCodes = NumService::CODES_2_LINE;
-            $lineCodes = ['2', '5', '8'];
+            $lineCodes = NumService::CODES_0_LINE;
+            #$lineCodes = ['2', '5', '8'];
         }elseif (in_array($code, NumService::CODES_3_LINE)){
             $lineCodes = NumService::CODES_3_LINE;
         }

@@ -1983,10 +1983,10 @@ class NumCodeService extends BaseService
         list($current_kj_qihao, $next_qihao) = QihaoService::getKjQiHao($lottery_type);
         $historyKjData = NumCodeService::getKjData($current_kj_qihao, $lottery_type);
 
-        $p1 = ($historyKjData['code1']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code1']));
-        $p2 = ($historyKjData['code2']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code2']));
-        $p3 = ($historyKjData['code3']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code3']));
-        $p4 = ($historyKjData['code4']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code4']));
+        $p1 = implode('', NumService::getCodeLine1($historyKjData['code1']));
+        $p2 = implode('', NumService::getCodeLine1($historyKjData['code2']));
+        $p3 = implode('', NumService::getCodeLine1($historyKjData['code3']));
+        $p4 = implode('', NumService::getCodeLine1($historyKjData['code4']));
         //p([$p1, $p2, $p3, $p4]);
         $psData = [1=>$p1, 2=>$p2, 3=>$p3, 4=>$p4];
         foreach ($positions as $position){
@@ -2033,10 +2033,10 @@ class NumCodeService extends BaseService
         list($current_kj_qihao, $next_qihao) = QihaoService::getKjQiHao($lottery_type);
         $historyKjData = NumCodeService::getKjData($current_kj_qihao, $lottery_type);
 
-        $p1 = ($historyKjData['code1']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code1']));
-        $p2 = ($historyKjData['code2']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code2']));
-        $p3 = ($historyKjData['code3']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code3']));
-        $p4 = ($historyKjData['code4']==0)? '0' : implode('', NumService::getCodeLine1($historyKjData['code4']));
+        $p1 = implode('', NumService::getCodeLine1($historyKjData['code1']));
+        $p2 = implode('', NumService::getCodeLine1($historyKjData['code2']));
+        $p3 = implode('', NumService::getCodeLine1($historyKjData['code3']));
+        $p4 = implode('', NumService::getCodeLine1($historyKjData['code4']));
         //p([$line1Codes, $line2Codes , $line3Codes , $line4Codes , $p1, $p2, $p3, $p4]);
 
         $hzArr = array_merge((array)$hzArr, [
