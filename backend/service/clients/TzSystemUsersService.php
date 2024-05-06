@@ -25,7 +25,7 @@ class TzSystemUsersService extends ClientsBaseService{
     const PlAN_TYPE_RE_LOCAL = 're_local';
 
     const TZ_SYSTEM_TYPES_OPTIONS = [
-        AdminModel::USER_TYPE_GUI_ALL => 16
+        AdminModel::USER_TYPE_GUI_ALL => LotteryType::TZ_SYSTEM_TYPE_ID_AZ
     ];
     const LOTTERY_TYPES_OPTIONS = [
         AdminModel::USER_TYPE_GUI_ALL => LotteryType::AZ_LUCKY_5,

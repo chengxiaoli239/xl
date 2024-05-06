@@ -1,27 +1,28 @@
 <?php
 
 namespace common\service\open;
-use common\helpers\LotteryType;
+use backend\models\TzSystems;
 use common\service\open\aozhou5\ActionService;
 
 class ActionBaseService
 {
 
     /**
-     * @param $tzSystemId
+     * @param $systemTypeId
      * @return ActionService|false
      */
-    public static function getClass($tzSystemId)
+    public static function getClass($systemTypeId)
     {
         $classes = [
-            \common\helpers\LotteryType::TZ_SYSTEM_ID_AZ_LUCKY_5 => new \common\service\open\aozhou5\ActionService(), # 澳洲五系统
+            \common\helpers\LotteryType::TZ_SYSTEM_TYPE_ID_AZ => new \common\service\open\aozhou5\ActionService(), # 澳洲五系统
         ];
-        return $classes[$tzSystemId]??false;
+        return $classes[$systemTypeId]??false;
     }
 
     public function login($tzSystemsUser, $isAuto=1): array
     {
-        $objectClass = self::getClass($tzSystemsUser->tz_system_id);
+        $TzSystems = TzSystems::findOne($tzSystemsUser->tz_system_id);
+        $objectClass = self::getClass($TzSystems->system_type_id);
         $objectClass->domain = $tzSystemsUser->ssc_domain;
         $objectClass->account = $tzSystemsUser->account;
         $objectClass->password = $tzSystemsUser->password;

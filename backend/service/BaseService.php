@@ -119,7 +119,7 @@ class BaseService{
                 throw_info($rst['msg']);
             }
         }catch (\Exception $e){
-            Tool_Common::log('/login/'.__FUNCTION__, 'ERR', '自动登录异常', ['id'=>$id, 'err_msg'=>$e->getMessage(), 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account, 'username'=>$TzSystemsUser->username]);
+            Tool_Common::log('/login/'.__FUNCTION__, 'ERR', '自动登录异常', ['id'=>$id, 'err_msg'=>$e->getMessage(), 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account, 'username'=>$TzSystemsUser->username, 'file'=>$e->getFile().'_'.$e->getLine()]);
             $rst = ['status'=>301, 'msg'=>$e->getMessage()];
         }
 

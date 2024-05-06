@@ -26,7 +26,7 @@ class LotteryType
     # 0898系统
     const TZ_SYSTEM_ID_0898 = 2;
     # 澳洲五
-    const TZ_SYSTEM_ID_AZ_LUCKY_5 = 19;
+    const TZ_SYSTEM_TYPE_ID_AZ = 16;
 
     const LOTTERY_TIME_CONFIG = [
         self::LUCKY_5 => [4*60+30, 5*60+30, 5*60+50], # 封盘偏移时间:betsCloseOffset、开始抓取时间:grabOffset、开盘偏移时间:betsOpenOffset
