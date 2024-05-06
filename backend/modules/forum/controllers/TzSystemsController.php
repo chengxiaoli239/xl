@@ -194,7 +194,7 @@ class TzSystemsController extends BaseController
 
                 if (!$model->save()) {
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    $errMsg = $model->getErrors()?current(current($model->getErrors())):'';
+                    $errMsg = $model->getFirstErrors()?current($model->getFirstErrors()):'';
                     //throw_info($errMsg?:'处理异常'); // $model->getErrors()
                     return ['status'=>301, 'msg'=>$errMsg];
                 }
