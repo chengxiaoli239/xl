@@ -164,6 +164,6 @@ class ActionService
         $this->tzSystemUsers->updated_at = time();
         $this->tzSystemUsers->save();
 
-        return $userInfo?:[];
+        return ($userInfo && empty($userInfo['error']))? $userInfo:[];
     }
 }
