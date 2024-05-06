@@ -30,7 +30,7 @@ class ActionBaseService
         $objectClass->securityCode = $tzSystemsUser->secure_code;
 
         $userInfo = $objectClass->getUserInfo();
-        if($isAuto==2 OR !$userInfo){
+        if($isAuto==2 OR empty($tzSystemsUser->cookie) OR !$userInfo){
             $objectClass->login();
             $userInfo = $objectClass->getUserInfo();
         }
