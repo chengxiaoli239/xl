@@ -70,12 +70,13 @@ class AoZhou5Service extends CommonLotteryService
                 $replyData[$bet->wechat_user_id][$bet->qihao]['betIds'][] = $bet->id;
                 $replyData[$bet->wechat_user_id][$bet->qihao]['result'][] = $result;
                 $replyData[$bet->wechat_user_id][$bet->qihao]['userId'] = $bet->user_id;
+                $replyData[$bet->wechat_user_id][$bet->qihao]['kj_num'] = $bet->kj_num;
             }
             Tool_Common::log('/kj_aozhou5/'.__FUNCTION__, 'INFO', LotteryType::getName($lotteryType).'开奖之后业务处理', ['lottery_type'=>$lotteryType, 'currentKjQiHao'=>$currentKjQiHao, 'count'=>count($bets), 'replyData'=>$replyData]);
 
             foreach ($replyData as $wechatUserId=>$replyDatum){
                 foreach ($replyDatum as $qiHao=>$value){
-                    list($codeHz, $kjCode, $ds, $ft) = AoZhouKjService::getAoZhouKjData($qiHao);
+                    list($codeHz, $kjCode, $ds, $ft, $qiHao) = AoZhouKjService::getAoZhouKjData($qiHao, $value['kj_num']);
                     $text = "第".$qiHao."期\n\n".$kjCode.'总和'.$codeHz."(".$ds.",".$ft.")\n\n";
                     $userId = $value['userId'];
 
