@@ -105,6 +105,15 @@ class AssignmentController extends Controller
                     },
                 ],
                 [
+                    'attribute' => 'ssc_domain',
+                    'label' => '站点',
+                    'format' => 'raw',
+                    'value' => function ($model) {
+                        $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$model->id]);
+                        return $TzSystemUsers->ssc_domain.'['.$TzSystemUsers->kj_num.'位]';
+                    },
+                ],
+                [
                     'attribute' => 'desc',
                     'label' => '备注',
                     'format' => 'raw',
