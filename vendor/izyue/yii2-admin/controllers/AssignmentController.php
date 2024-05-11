@@ -110,7 +110,7 @@ class AssignmentController extends Controller
                     'format' => 'raw',
                     'value' => function ($model) {
                         $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$model->id]);
-                        return $TzSystemUsers->ssc_domain.'['.$TzSystemUsers->kj_num.'位]';
+                        return $TzSystemUsers->ssc_domain.' ['.$TzSystemUsers->kj_num.'位]';
                     },
                 ],
                 [

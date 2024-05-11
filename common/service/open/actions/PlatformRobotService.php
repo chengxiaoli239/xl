@@ -64,11 +64,12 @@ class PlatformRobotService
                             continue;
                         }
                         $chat = $r['chat'];
+                        $title = \common\tools\Common::filterEmoji($chat['title']);
                         $tmpData = [
                             'user_id' => $platformRobotModel->user_id,
                             'group_id' => (string)$chat['id'],
-                            'name' => $chat['title'],
-                            'nickName' => $chat['title'],
+                            'name' => $title,
+                            'nickName' => $title,
                             'updated_at' => time(),
                         ];
                         #$chatMember = $r['new_chat_member']['user']??$r['new_chat_member'];
