@@ -79,8 +79,9 @@ $this->registerJs($js);
                                         }
                                     ],
                                     ['attribute' => 'ssc_domain', 'label'=>'网盘', //'headerOptions' => ['width' => '170'],
+                                        'format'=>'raw',
                                         'value'=> function($model){
-                                            return  $model->ssc_domain;
+                                            return  $model->ssc_domain.' <strong><font color="green">['.$model->kj_num.'位]</font></strong>';
                                         },
                                     ],
                                     ['attribute' => 'secure_code', 'label'=>'安全码', //'headerOptions' => ['width' => '170'],

@@ -21,14 +21,20 @@ $this->title = '盘口修改:'.$model->sys_name;
         <?php $form = ActiveForm::begin(); ?>
         <div class="panel-body">
             <div class="row">
-                <div class="col-lg-4 col-xs-6">
+                <div class="col-lg-3 col-xs-6">
                     <?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?>
                 </div>
-                <div class="col-lg-4 col-xs-6">
+                <div class="col-lg-3 col-xs-6">
                     <?= $form->field($model, 'password')->textInput(['maxlength' => true]) ?>
                 </div>
-                <div class="col-lg-4 col-xs-6">
+                <div class="col-lg-3 col-xs-6">
                     <?= $form->field($model, 'secure_code')->textInput(['maxlength' => true]) ?>
+                </div>
+                <div class="col-lg-3 col-xs-6">
+                    <?= $form->field($model, 'kj_num')->dropDownList(
+                        [4=>'4位', 5=>'5位'],
+                        ['prompt' => '-选择-'] // Optional: Add a prompt message
+                    )->label('位数')?>
                 </div>
             </div>
 
@@ -45,7 +51,7 @@ $this->title = '盘口修改:'.$model->sys_name;
             </div>
 
             <div class="row">
-                <div class="col-lg-offset-6 col-lg-6">
+                <div class="col-lg-offset-6 col-lg-6 col-xs-offset-6">
                         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?>
                 </div>
             </div>
