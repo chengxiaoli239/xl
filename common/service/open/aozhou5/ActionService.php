@@ -157,9 +157,9 @@ class ActionService
         ];
         $url = "https://url{$this->line_number}.{$host}";
 
-        $mKey = CacheKeyService::userSiteInfo($this->tzSystemUsers->uid);
+        $mKey = CacheKeyService::userSiteInfo($this->tzSystemUsers->uid).'_'.$useCache;
         $userInfo = commonRedis()->get($mKey);
-        if($useCache && !empty($userInfo)){
+        if(!empty($userInfo)){
             return $userInfo;
         }
         $userInfo = UserApi::getUserInfo($url, $params, $headers);
@@ -168,7 +168,8 @@ class ActionService
             Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '获取用户信息-异常', ['username'=>$this->tzSystemUsers->username, 'account'=>$this->tzSystemUsers->account, 'balance'=>$userInfo['balance'], 'userInfo'=>$userInfo, 'headers'=>$headers, 'url'=>$url]);
             return [];
         }
-        commonRedis()->setex($mKey, 15, $userInfo);
+        $cacheTime = $useCache ? 15 : 3;
+        commonRedis()->setex($mKey, $cacheTime, $userInfo);
         $this->tzSystemUsers->balance = $userInfo['balance'];
         $this->tzSystemUsers->updated_at = time();
         $this->tzSystemUsers->save();
