@@ -62,6 +62,12 @@ $editing = isset($_GET['id']);
                 <div class="col-lg-4 col-xs-6">
                     <?= $form->field($model, 'secure_code')->label('安全码')->textInput(['maxlength' => true]) ?>
                 </div>
+                <div class="col-lg-4 col-xs-6">
+                    <?= $form->field($model, 'kj_num')->dropDownList(
+                        [4=>'4位', 5=>'5位'],
+                        ['prompt' => '-选择-'] // Optional: Add a prompt message
+                    )->label('位数')?>
+                </div>
                 <div class="col-lg-4 col-xs-12">
                     <?= $form->field($model, 'description')->label('备注')->textarea(['maxlength' => true]) ?>
                 </div>

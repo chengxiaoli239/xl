@@ -27,6 +27,7 @@ class AdminModel extends BaseModel implements IdentityInterface
     public $ssc_domain; // 盘口域名
     public $site_account; //盘口账号
     public $site_password; // 盘口密码
+    public $kj_num; // 开奖位数
     public $secure_code; // 安全码
     public $description; // 备注
     public $tz_system_id; // 下注系统

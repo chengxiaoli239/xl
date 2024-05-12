@@ -360,6 +360,7 @@ class UserController extends BaseController
                         'username' => $postData['username'],
                         'user_type' => $nextUserType,
                         'tz_system_id' => $postData['tz_system_id'],
+                        'kj_num' => $postData['kj_num'],
                         'is_auto_login' => $nextUserType==AdminModel::USER_TYPE_GUI?1:0,
                         'sys_name' => $TzSystems->name,
                         'ssc_domain' => $TzSystems->ssc_domain??'',
@@ -393,7 +394,7 @@ class UserController extends BaseController
                 #$model = $this->findModel($get['id']);
                 $model = AdminModel::find()->alias('u')
                     ->leftJoin(TzSystemsUsers::tableName().' t', 'u.id=t.uid')
-                    ->select(['u.*', 't.secure_code', 't.tz_system_id', 't.ssc_domain', 't.account as site_account', 't.password as site_password', 't.desc as description'])
+                    ->select(['u.*', 't.secure_code', 't.tz_system_id', 't.kj_num', 't.ssc_domain', 't.account as site_account', 't.password as site_password', 't.desc as description'])
                     ->where(['=', 'u.id', $get['id']])
                     ->limit(1)->one();
             }
