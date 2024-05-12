@@ -33,6 +33,16 @@ trait LotteryCacheKeyTrait
     }
 
     /**
+     * 开盘开关缓存
+     * @param int $lottery_type
+     * @return string
+     */
+    public static function lotteryOpenSwitch(int $lottery_type=DEFAULT_LOTTERY_TYPE): string
+    {
+        return 'lottery:openSwitch:lottery_type_'.$lottery_type;
+    }
+
+    /**
      * @param int $lottery_type
      * @param string $qiHao
      * @return string

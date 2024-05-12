@@ -369,6 +369,8 @@ class KjDataGet
                 push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>$lottery_type, 'lottery_name'=>$lottery_name, 'business_id'=>$qihao]);
                 # 2、群里发开奖信息
                 (new AoZhouKjService())->operateSendKjData($qihao);
+                $mKey = CacheKeyService::lotteryOpenSwitch($lottery_type);
+                commonRedis()->setex($mKey, 60, 1);
                 break;
             case $lottery_type == CommonBaseService::LOTTERY_TYPE_LUCKY5:
                 push_queue_fast(PushKjDataToOutSiteJob::class, ['lottery_type'=>$lottery_type, 'business_id'=>$lottery_type]);

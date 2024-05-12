@@ -11,6 +11,7 @@ use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
 use common\helpers\SscMethod;
 use common\models\wechat\WechatUser;
+use common\service\cache\CacheKeyService;
 use common\service\chat\Tool_Common;
 use common\service\helpers\ThirdD;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
@@ -155,7 +156,9 @@ class MessageOperateService  extends BaseService
                 $status = (new LotteryBet())->checkLotteryStatus($this->lottery_type);
                 Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '盘口状态检测', ['lottery_type'=>$this->lottery_type, 'status'=>$status, 'statusTxt'=>LotteryBet::STATUS_OPTIONS[$status]]);
 
-                if($status != LotteryBet::STATUS_START){
+                $mKey = CacheKeyService::lotteryOpenSwitch($this->lottery_type);
+                $switch = commonRedis()->get($mKey);
+                if($status != LotteryBet::STATUS_START && !$switch){
                     throw_info('后台尚未开盘', CommonBaseService::CODE_FOR_USER);
                 }
 
