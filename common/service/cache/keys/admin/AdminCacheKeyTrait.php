@@ -22,4 +22,14 @@ trait AdminCacheKeyTrait
     {
         return 'admin:manageSites:' . $user_type;
     }
+
+    /**
+     * 用信息
+     * @param int $userId
+     * @return string
+     */
+    public static function userSiteInfo(int $userId=0): string
+    {
+        return 'admin:site_info:' . $userId;
+    }
 }

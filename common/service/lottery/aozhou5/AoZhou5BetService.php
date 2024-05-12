@@ -347,7 +347,7 @@ class AoZhou5BetService extends CommonBaseService
             Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘20', $logArr);
             throw_info($result2['error']??'推送盘口异常2', 30002);
         }
-        $objectClass->getUserInfo(); # 同步余额
+        $objectClass->getUserInfo(1); # 同步余额
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘30', ['result2'=>$result2]);
 
         return true;

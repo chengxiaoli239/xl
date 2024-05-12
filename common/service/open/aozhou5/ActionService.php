@@ -3,6 +3,7 @@
 namespace common\service\open\aozhou5;
 
 use common\open\aozhou5\api\UserApi;
+use common\service\cache\CacheKeyService;
 use common\service\chat\Tool_Common;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -125,7 +126,7 @@ class ActionService
      * 获取用户信息
      * @return bool
      */
-    public function getUserInfo(): array
+    public function getUserInfo($useCache=0): array
     {
         $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
         $cookie = explode('=', $this->tzSystemUsers->cookie)[1];
@@ -155,12 +156,19 @@ class ActionService
             'Content-Type' => 'application/x-www-form-urlencoded',
         ];
         $url = "https://url{$this->line_number}.{$host}";
+
+        $mKey = CacheKeyService::userSiteInfo($this->tzSystemUsers->uid);
+        $userInfo = commonRedis()->get($mKey);
+        if($useCache && !empty($userInfo)){
+            return $userInfo;
+        }
         $userInfo = UserApi::getUserInfo($url, $params, $headers);
         Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '获取用户信息', ['username'=>$this->tzSystemUsers->username, 'account'=>$this->tzSystemUsers->account, 'balance'=>$userInfo['balance'], 'userInfo'=>$userInfo]);
         if(!isset($userInfo['balance'])){
             Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '获取用户信息-异常', ['username'=>$this->tzSystemUsers->username, 'account'=>$this->tzSystemUsers->account, 'balance'=>$userInfo['balance'], 'userInfo'=>$userInfo, 'headers'=>$headers, 'url'=>$url]);
             return [];
         }
+        commonRedis()->setex($mKey, 15, $userInfo);
         $this->tzSystemUsers->balance = $userInfo['balance'];
         $this->tzSystemUsers->updated_at = time();
         $this->tzSystemUsers->save();
