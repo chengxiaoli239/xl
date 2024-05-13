@@ -29,7 +29,9 @@ class ActionBaseService
         $objectClass->tzSystemUsers = $tzSystemsUser;
         $objectClass->securityCode = $tzSystemsUser->secure_code;
 
-        $userInfo = $objectClass->getUserInfo();
+        try {
+            $userInfo = $objectClass->getUserInfo();
+        }catch (\Exception $e){}
         if($isAuto==2 OR empty($tzSystemsUser->cookie) OR !$userInfo){
             $objectClass->login();
             $userInfo = $objectClass->getUserInfo();
