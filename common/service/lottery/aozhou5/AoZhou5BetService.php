@@ -310,6 +310,7 @@ class AoZhou5BetService extends CommonBaseService
         $url = "https://url{$objectClass->line_number}.{$parsed_url['host']}";
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推盘口下注01', [
             'url' => $url,
+            'headers' => $headers,
             'postData1' => $postData1,
             'nextQiHao' => $nextQiHao,
             'system_type_id' => $site['system_type_id'],
@@ -338,6 +339,7 @@ class AoZhou5BetService extends CommonBaseService
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', [
             'betRowId'=>$betRowId,
             'user_id'=>$user_id,
+            'headers' => $headers,
             'method_id'=>$method_id,
             'methodData'=>$methodData,
             'post_data1'=>$postData1,
