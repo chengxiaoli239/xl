@@ -60,7 +60,7 @@ class IndexController extends Controller
         $dateString = '20231114002';
         try {
             $tzSystemUser = TzSystemsUsers::findOne(75);
-            $userInfo = (new ActionBaseService())->login($tzSystemUser, $isAuto=2);p($userInfo);
+            $userInfo = (new ActionBaseService())->login($tzSystemUser, $isAuto=1);p($userInfo);
             $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user}}'); p($r);
             foreach ([8] as $lotteryType){
                 //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);

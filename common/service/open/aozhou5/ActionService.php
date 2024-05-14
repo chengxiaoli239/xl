@@ -21,7 +21,7 @@ class ActionService
     public string $userAgent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36';
     public string $securityCode='fa8888';
     public string $cfRay = '';
-    public int $line_number = 1; # 这里假设线路号是5
+    public int $line_number = 3; # 这里假设线路号是5
     public function setDomain()
     {
 
@@ -161,12 +161,11 @@ class ActionService
     public function getUserInfo($useCache=0): array
     {
         $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
-        #$cookie = explode('=', $this->tzSystemUsers->cookie)[1];
-        $cookie = $this->tzSystemUsers->cookie;
+        $cookie = explode('=', $this->tzSystemUsers->cookie)[1];
         $params = [
             '__' => 'memberoddsdata',
             'gameId' => 601,
-            'pusId' => 8,
+            'pusId' => 9,
             'tId' => 1,
             'pId' => -1,
             'rebate' => 'A',
@@ -189,7 +188,7 @@ class ActionService
             'Content-Type' => 'application/x-www-form-urlencoded',
         ];
         $url = "https://url{$this->line_number}.{$host}";
-
+        //p(['url'=>$url, 'params'=>$params, 'headers'=>$headers]);
 
         $mKey = CacheKeyService::userSiteInfo($this->tzSystemUsers->uid).'_'.$useCache;
         $userInfo = commonRedis()->get($mKey);
