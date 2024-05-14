@@ -59,6 +59,7 @@ class ActionService
     public function login()
     {
         $params = ['search'=>$this->securityCode];
+        $search = UserApi::searchLine($this->domain, $params);
         // 创建 CookieJar 来存储 cookie
         $cookieJar = new CookieJar();
         $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
