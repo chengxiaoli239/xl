@@ -289,6 +289,10 @@ class AoZhou5BetService extends CommonBaseService
         if($betRow->qihao != $nextQiHao){
             throw_info("下注期号异常{$betRow->qihao} != $nextQiHao");
         }
+        $TzSystemUsers = TzSystemsUsers::findOne($site['id']);
+        $headers = [
+            'Cookie' => $TzSystemUsers->cookie,
+        ];
         $postData1 = [
             '__'=>'isAutoOdds',
             'gameId'=>601,
@@ -297,12 +301,11 @@ class AoZhou5BetService extends CommonBaseService
                 [$methodData['site_method_id'], $Odds['odds'], (string)floatval($betRow->bet_money)], // 赔率待处理
             ],
             #'cbk' => '0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6',
-            #'cbk' => explode('=', trim($site['cookie']))[1],
-            'cbk' => trim($site['cookie']),
+            'cbk' => explode('=', trim($site['cookie']))[1],
         ];
         $objectClass = ActionBaseService::getClass($site['system_type_id']);
         $objectClass->domain = $site['ssc_domain'];
-        $objectClass->tzSystemUsers = TzSystemsUsers::findOne($site['id']);
+        $objectClass->tzSystemUsers = $TzSystemUsers;
         $parsed_url = parse_url($site['ssc_domain']); # Array ( [scheme] => https [host] => ac3868.com )
         $url = "https://url{$objectClass->line_number}.{$parsed_url['host']}";
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推盘口下注01', [
@@ -312,7 +315,7 @@ class AoZhou5BetService extends CommonBaseService
             'system_type_id' => $site['system_type_id'],
         ]);
 
-        $result1 = OrderApi::push($url, $postData1);
+        $result1 = OrderApi::push($url, $postData1, $headers);
         if(!empty($result1['error'])){
             throw_info($result1['error']??'推送盘口异常1', 30001);
         }
@@ -331,7 +334,7 @@ class AoZhou5BetService extends CommonBaseService
             #'cbk' => explode('=', trim($site['cookie']))[1],
             'cbk' => trim($site['cookie']),
         ];
-        $result2 = OrderApi::pushBettingSingle($url, $postData2);
+        $result2 = OrderApi::pushBettingSingle($url, $postData2, $headers);
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', [
             'betRowId'=>$betRowId,
             'user_id'=>$user_id,
