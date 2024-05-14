@@ -297,7 +297,8 @@ class AoZhou5BetService extends CommonBaseService
                 [$methodData['site_method_id'], $Odds['odds'], (string)floatval($betRow->bet_money)], // 赔率待处理
             ],
             #'cbk' => '0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6',
-            'cbk' => explode('=', trim($site['cookie']))[1],
+            #'cbk' => explode('=', trim($site['cookie']))[1],
+            'cbk' => trim($site['cookie']),
         ];
         $objectClass = ActionBaseService::getClass($site['system_type_id']);
         $objectClass->domain = $site['ssc_domain'];
@@ -327,7 +328,8 @@ class AoZhou5BetService extends CommonBaseService
                     [$methodData['site_method_id'], $Odds['odds'], (string)floatval($betRow->bet_money)], // 赔率待处理
                 ]
             ]),
-            'cbk' => explode('=', trim($site['cookie']))[1],
+            #'cbk' => explode('=', trim($site['cookie']))[1],
+            'cbk' => trim($site['cookie']),
         ];
         $result2 = OrderApi::pushBettingSingle($url, $postData2);
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', [

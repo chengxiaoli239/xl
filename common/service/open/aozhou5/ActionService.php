@@ -35,7 +35,7 @@ class ActionService
             'authority' => 'ac955.com',
         ];
         $result = PreLoginApi::pre1($this->domain, $params1);
-        p($result);
+        //p($result);
 
         $params = ['search'=>$this->securityCode];
         $searchHtml = UserApi::searchLine($this->domain, $params);
