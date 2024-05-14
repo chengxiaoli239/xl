@@ -2,9 +2,11 @@
 
 namespace common\service\open\aozhou5;
 
+use common\open\aozhou5\api\PreLoginApi;
 use common\open\aozhou5\api\UserApi;
 use common\service\cache\CacheKeyService;
 use common\service\chat\Tool_Common;
+use DOMDocument;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\RequestOptions;
@@ -18,16 +20,45 @@ class ActionService
     public object $tzSystemUsers;
     public string $userAgent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36';
     public string $securityCode='fa8888';
+    public string $cfRay = '';
     public int $line_number = 1; # 这里假设线路号是5
     public function setDomain()
     {
 
     }
+
+    public function preLogin()
+    {
+        $firstUrl = $this->domain;
+        $params1 = [
+            //'Accept-Encoding' => 'identity',
+            'authority' => 'ac955.com',
+        ];
+        $result = PreLoginApi::pre1($this->domain, $params1);
+        p($result);
+
+        $params = ['search'=>$this->securityCode];
+        $searchHtml = UserApi::searchLine($this->domain, $params);
+        $dom = new \DOMDocument();
+        $dom->loadHTML($searchHtml);
+        $links = $dom->getElementsByTagName('a');
+        $domain = explode('//', trim('/', $this->domain))[1];
+
+        $pattern = '/https:\/\/url(\d+)'.$domain.'\/member\//'; // 匹配 https://url(数字).c955.com/member/ 格式的网址
+        $matchedLinks = [];
+        foreach ($links as $link) {
+            $href = $link->getAttribute('href');
+            if (preg_match($pattern, $href, $matches)) {
+                $matchedLinks[] = $href;
+            }
+        }
+        var_dump($matchedLinks); // 输出匹配到的网址数组
+        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '搜索线路', ['domain'=>$this->domain, 'matchedLinks'=>$matchedLinks]);
+    }
+
     public function login()
     {
         $params = ['search'=>$this->securityCode];
-        $search = UserApi::searchLine($this->domain, $params);
-
         // 创建 CookieJar 来存储 cookie
         $cookieJar = new CookieJar();
         $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
@@ -129,7 +160,8 @@ class ActionService
     public function getUserInfo($useCache=0): array
     {
         $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
-        $cookie = explode('=', $this->tzSystemUsers->cookie)[1];
+        #$cookie = explode('=', $this->tzSystemUsers->cookie)[1];
+        $cookie = $this->tzSystemUsers->cookie;
         $params = [
             '__' => 'memberoddsdata',
             'gameId' => 601,
@@ -157,11 +189,20 @@ class ActionService
         ];
         $url = "https://url{$this->line_number}.{$host}";
 
+
         $mKey = CacheKeyService::userSiteInfo($this->tzSystemUsers->uid).'_'.$useCache;
         $userInfo = commonRedis()->get($mKey);
         if(!empty($userInfo)){
             return $userInfo;
         }
+
+        $mKey2 = CacheKeyService::userSiteInfo($this->tzSystemUsers->uid).'_'.$useCache.'_uni';
+        $num = commonRedis()->incr($mKey2);
+        if($num>1){
+            throw_info('段时间内禁止访问同一个接口');
+        }
+        commonRedis()->expire($mKey2, 2);
+
         $userInfo = UserApi::getUserInfo($url, $params, $headers);
         Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '获取用户信息', ['username'=>$this->tzSystemUsers->username, 'account'=>$this->tzSystemUsers->account, 'balance'=>$userInfo['balance'], 'userInfo'=>$userInfo]);
         if(!isset($userInfo['balance'])){

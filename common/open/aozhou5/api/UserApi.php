@@ -14,7 +14,6 @@ class UserApi extends Base
 
     // 下单订单
     const API_SEARCH_LINE = '/user-search-result.aspx';
-    const API_PRE_LOGIN = '/user-search-result.aspx';
     const API_USER_INFO = '/api/';
 
     /**
@@ -37,6 +36,7 @@ class UserApi extends Base
         ], $headers);
         $data[RequestOptions::QUERY] = $params;
         $data['verify'] = false;
+        $data['port'] = 38900;
         $result = $object->get(self::API_SEARCH_LINE, $data, $headers);
         //p([$domain, $params, $headers, $result]);
 

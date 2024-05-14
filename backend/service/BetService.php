@@ -12,6 +12,7 @@ use backend\models\BetErrorPlansTask;
 use backend\models\DataDealStatus;
 use backend\models\SscKjData;
 use backend\models\TzType;
+use backend\service\clients\AgentClientsService;
 use backend\service\clients\TzSystemUsersService;
 use backend\service\huiyuan\HuiYuanService5;
 use backend\models\LotteryType;
@@ -2037,6 +2038,12 @@ abstract class BetService extends BaseBetService {
 
                         list($code, $current_profits) = UserService::updateUserProfits($TzSystemsUsers);
                         if($code>0 OR !$TzSystemsUsers->is_auto_bet){
+                            continue;
+                        }
+                        try {
+                            AgentClientsService::checkProfits($TzSystemsUsers);
+                        }catch (\Exception $e){
+                            Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入真实计划任务-止盈止损', ['plan_id'=>$plan->id, 'user_id'=>$plan->uid]);
                             continue;
                         }
 

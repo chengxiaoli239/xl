@@ -2,6 +2,8 @@
 
 namespace common\service\open;
 use backend\models\TzSystems;
+use common\open\aozhou5\api\UserApi;
+use common\service\chat\Tool_Common;
 use common\service\open\aozhou5\ActionService;
 
 class ActionBaseService
@@ -32,7 +34,9 @@ class ActionBaseService
         try {
             $userInfo = $objectClass->getUserInfo();
         }catch (\Exception $e){}
-        if($isAuto==2 OR empty($tzSystemsUser->cookie) OR !$userInfo){
+
+        if($isAuto==2 OR empty($tzSystemsUser->cookie) OR empty($userInfo)){
+            //$objectClass->preLogin();
             $objectClass->login();
             $userInfo = $objectClass->getUserInfo();
         }
