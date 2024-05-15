@@ -2077,10 +2077,10 @@ class NumCodeService extends BaseService
         list($current_kj_qihao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
         if($type == NumCodeService::CODE_LR_TYPE_YL){
             $Ssc1numsYl1 = Ssc1numsYl::find()->where(['position'=>$positions[0]])->asArray()->orderBy(['today_current'=>SORT_ASC])->limit(2)->all();
-            $latelyCode1Other = array_column($Ssc1numsYl1, 'today_current');
+            $latelyCode1Other = array_column($Ssc1numsYl1, 'code');
 
             $Ssc1numsYl2 = Ssc1numsYl::find()->where(['position'=>$positions[1]])->asArray()->orderBy(['today_current'=>SORT_ASC])->limit(2)->all();
-            $latelyCode2Other = array_column($Ssc1numsYl2, 'today_current');
+            $latelyCode2Other = array_column($Ssc1numsYl2, 'code');
             //p(['Ssc1numsYl1'=>$Ssc1numsYl1, 'Ssc1numsYl2'=>$Ssc1numsYl2]);
         }else{
             $latelyCode1 = NumService::getPosLatelyCode($positions[0], $num=8, $lottery_type); # 最近8个热码
