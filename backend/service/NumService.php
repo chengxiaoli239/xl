@@ -278,6 +278,17 @@ class NumService extends BaseService {
         169=>'过滤34位置各1个冷码 ',
         170=>'过滤35位置各1个冷码 ',
         171=>'过滤45位置各1个冷码 ',
+
+        172=>'过滤12位置各1个最多遗漏 ',
+        173=>'过滤13位置各1个最多遗漏 ',
+        174=>'过滤14位置各1个最多遗漏 ',
+        175=>'过滤15位置各1个最多遗漏 ',
+        176=>'过滤23位置各1个最多遗漏 ',
+        177=>'过滤24位置各1个最多遗漏 ',
+        178=>'过滤25位置各1个最多遗漏 ',
+        179=>'过滤34位置各1个最多遗漏 ',
+        180=>'过滤35位置各1个最多遗漏 ',
+        181=>'过滤45位置各1个最多遗漏 ',
     ];
 
     const TYPE_POSITIONS = [
@@ -291,6 +302,18 @@ class NumService extends BaseService {
         169=>[3,4],
         170=>[3,5],
         171=>[4,5],
+    ];
+    const TYPE_LR_POSITIONS = [
+        172=>[1,2],
+        173=>[1,3],
+        174=>[1,4],
+        175=>[1,5],
+        176=>[2,3],
+        177=>[2,4],
+        178=>[2,5],
+        179=>[3,4],
+        180=>[3,5],
+        181=>[4,5],
     ];
 
     /**
@@ -3347,7 +3370,19 @@ class NumService extends BaseService {
                 case 169:
                 case 170:
                 case 171:
-                $codes = NumCodeService::getBeforeKjCodesDynamic124($plan, self::TYPE_POSITIONS[$filter_dynamic_type]);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic124($plan, self::TYPE_POSITIONS[$filter_dynamic_type]);
+                    break;
+                case 172:
+                case 173:
+                case 174:
+                case 175:
+                case 176:
+                case 177:
+                case 178:
+                case 179:
+                case 180:
+                case 181:
+                    $codes = NumCodeService::getBeforeKjCodesDynamic124($plan, self::TYPE_LR_POSITIONS[$filter_dynamic_type], $type=NumCodeService::CODE_LR_TYPE_YL);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);

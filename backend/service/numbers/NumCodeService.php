@@ -4,6 +4,7 @@ use backend\models\BettingRecords;
 use backend\models\DataDealStatus;
 use backend\models\Num4Type;
 use backend\models\SscKjData;
+use backend\models\statics\Ssc1numsYl;
 use backend\service\BaseService;
 use backend\service\HN0898Service;
 use backend\service\NumService;
@@ -18,6 +19,14 @@ use yii\helpers\Json;
 
 class NumCodeService extends BaseService
 {
+    const CODE_LR_TYPE_COLD = 1;
+    const CODE_LR_TYPE_HOT = 2;
+    const CODE_LR_TYPE_YL = 3;
+    const CODE_LR_TYPE_OPTIONS = [
+        self::CODE_LR_TYPE_COLD => '冷码',
+        self::CODE_LR_TYPE_HOT => '热码',
+        self::CODE_LR_TYPE_YL => '遗漏',
+    ];
     /**
      * 开奖数据
      * @param string $qiHao
@@ -2057,19 +2066,29 @@ class NumCodeService extends BaseService
      * 过滤类型号码 - # 过滤两个位置的冷码
      * @param object $plan
      * @param int[] $positions
+     * @param int $type 1冷码2遗漏
      * @return array
      */
-    public static function getBeforeKjCodesDynamic124(object $plan, array $positions=[1,2]): array
+    public static function getBeforeKjCodesDynamic124(object $plan, array $positions=[1,2], int $type=1): array
     {
         $playway = $plan->playway;
         $lottery_type = $plan->lottery_type;
 
         list($current_kj_qihao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
-        $filterCodes = [];
-        $latelyCode1 = NumService::getPosLatelyCode($positions[0], $num=8, $lottery_type); # 最近8个热码
-        $latelyCode1Other = array_values(array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode1));
-        $latelyCode2 = NumService::getPosLatelyCode($positions[1], $num=8, $lottery_type); # 最近8个热码
-        $latelyCode2Other = array_values(array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode2));
+        if($type == NumCodeService::CODE_LR_TYPE_YL){
+            $Ssc1numsYl1 = Ssc1numsYl::find()->where(['position'=>$positions[0]])->asArray()->orderBy(['today_current'=>SORT_ASC])->limit(2)->all();
+            $latelyCode1Other = array_column($Ssc1numsYl1, 'today_current');
+
+            $Ssc1numsYl2 = Ssc1numsYl::find()->where(['position'=>$positions[1]])->asArray()->orderBy(['today_current'=>SORT_ASC])->limit(2)->all();
+            $latelyCode2Other = array_column($Ssc1numsYl2, 'today_current');
+            //p(['Ssc1numsYl1'=>$Ssc1numsYl1, 'Ssc1numsYl2'=>$Ssc1numsYl2]);
+        }else{
+            $latelyCode1 = NumService::getPosLatelyCode($positions[0], $num=8, $lottery_type); # 最近8个热码
+            $latelyCode2 = NumService::getPosLatelyCode($positions[1], $num=8, $lottery_type); # 最近8个热码
+
+            $latelyCode1Other = array_values(array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode1));
+            $latelyCode2Other = array_values(array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode2));
+        }
 
         $filterCodes = [$latelyCode1Other[0], $latelyCode2Other[0], $latelyCode1Other[1], $latelyCode2Other[1]];
         $filterCodes = array_values(array_unique($filterCodes));
