@@ -2098,7 +2098,7 @@ class NumCodeService extends BaseService
         $andWhere = ['AND'];
         foreach ($positions as $position){
             $andWhere[] = ['NOT IN', 'code_'.$position, array_merge($filterCodes, ['X'])];
-            $andWhere[] = ['IN', 'code_'.$positions[0], NumService::$ALL_CODES];
+            $andWhere[] = ['IN', 'code_'.$position, NumService::$ALL_CODES];
         }
         //p([$positions, $andWhere]);
 
