@@ -2107,13 +2107,12 @@ class NumCodeService extends BaseService
         $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
             ->where($andWhere)
             ->andWhere(['=', 'code_type', $playway+1]);
-        //$sql = $query->createCommand()->getRawSql();p($sql);
+        $sql = $query->createCommand()->getRawSql();//p($sql);
         $NumTypes = $query->asArray()->all();
-        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤某两个位置各一个冷码', ['lottery_type'=>$lottery_type, 'qiHao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'filterCodes'=>$filterCodes]);
-        $filterCodes = ArrayHelper::getColumn($NumTypes, 'code');
         //p([$NumTypes, $playway]);
 
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤某两个位置各一个冷码', ['lottery_type'=>$lottery_type, 'qiHao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'filterCodes'=>$filterCodes, 'sql'=>$sql, 'count'=>count($codes)]);
 
         return $codes;
     }
