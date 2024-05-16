@@ -2109,7 +2109,7 @@ class NumCodeService extends BaseService
         $NumTypes = $query->asArray()->all();
         Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤某两个位置各一个冷码', ['lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'filterCodes'=>$filterCodes]);
         $filterCodes = ArrayHelper::getColumn($NumTypes, 'code');
-        p([$NumTypes, $playway]);
+        //p([$NumTypes, $playway]);
 
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
