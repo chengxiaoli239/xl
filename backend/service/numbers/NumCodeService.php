@@ -2098,7 +2098,9 @@ class NumCodeService extends BaseService
         $andWhere = ['AND'];
         foreach ($positions as $position){
             $andWhere[] = ['NOT IN', 'code_'.$position, array_merge($filterCodes, ['X'])];
-            $andWhere[] = ['IN', 'code_'.$position, NumService::$ALL_CODES];
+            if($position==5){
+                $playway = 4; # 五位code_type=5
+            }
         }
         //p([$positions, $andWhere]);
 
@@ -2107,7 +2109,7 @@ class NumCodeService extends BaseService
             ->andWhere(['=', 'code_type', $playway+1]);
         //$sql = $query->createCommand()->getRawSql();p($sql);
         $NumTypes = $query->asArray()->all();
-        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤某两个位置各一个冷码', ['lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'filterCodes'=>$filterCodes]);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤某两个位置各一个冷码', ['lottery_type'=>$lottery_type, 'qiHao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'filterCodes'=>$filterCodes]);
         $filterCodes = ArrayHelper::getColumn($NumTypes, 'code');
         //p([$NumTypes, $playway]);
 
