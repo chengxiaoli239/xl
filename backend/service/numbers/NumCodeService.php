@@ -2086,8 +2086,8 @@ class NumCodeService extends BaseService
             $latelyCode1 = NumService::getPosLatelyCode($positions[0], $num=8, $lottery_type); # 最近8个热码
             $latelyCode2 = NumService::getPosLatelyCode($positions[1], $num=8, $lottery_type); # 最近8个热码
 
-            $latelyCode1Other = array_values(array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode1));
-            $latelyCode2Other = array_values(array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode2));
+            $latelyCode1Other = array_values(array_diff(NumService::$ALL_CODES, $latelyCode1));
+            $latelyCode2Other = array_values(array_diff(NumService::$ALL_CODES, $latelyCode2));
         }
 
         $filterCodes = [$latelyCode1Other[0], $latelyCode2Other[0], $latelyCode1Other[1], $latelyCode2Other[1]];
@@ -2098,7 +2098,9 @@ class NumCodeService extends BaseService
         $andWhere = ['AND'];
         foreach ($positions as $position){
             $andWhere[] = ['NOT IN', 'code_'.$position, array_merge($filterCodes, ['X'])];
+            $andWhere[] = ['IN', 'code_'.$positions[0], NumService::$ALL_CODES];
         }
+        //p([$positions, $andWhere]);
 
         $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
             ->where($andWhere)
@@ -2107,7 +2109,7 @@ class NumCodeService extends BaseService
         $NumTypes = $query->asArray()->all();
         Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤某两个位置各一个冷码', ['lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'filterCodes'=>$filterCodes]);
         $filterCodes = ArrayHelper::getColumn($NumTypes, 'code');
-        #p(count($filterCodes));
+        p([$NumTypes, $playway]);
 
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
