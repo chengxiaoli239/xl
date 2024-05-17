@@ -376,6 +376,7 @@ class UserService extends BaseService {
             'ssc_domain' => $TzSystemsUsers->ssc_domain,
             'account' => $TzSystemsUsers->account,
             'password' => $TzSystemsUsers->password,
+            'secure_code' => $TzSystemsUsers->secure_code,
             'access_token' => $TzSystemsUsers->access_token,
             'status' => $TzSystemsUsers->status,
             'bet_status' => $TzSystemsUsers->is_auto_bet,

@@ -57,23 +57,4 @@ class UserSysPlansService extends ClientsBaseService{
         $m->delete($mkey);
     }
 
-    /**
-     * @desc 获取系统授权access_tokens
-     * @return array|mixed
-     */
-    public static function getAuthAccessTokens(){
-        $m = \Yii::$app->cache;
-        $mkey = 'user_getAuthAccessTokens';
-        if(!$access_tokens = $m->get($mkey)){
-            $ADMIN_ACCESS_TOKEN = BetService::getConfig('ADMIN_ACCESS_TOKEN'); # 管理员token
-            $TzSystemsUsers = TzSystemsUsers::find()->select(['access_token'])->where(['status'=>1])->asArray()->all();
-            $access_tokens = ArrayHelper::getColumn($TzSystemsUsers, 'access_token');
-
-            $access_tokens = array_merge($access_tokens, [$ADMIN_ACCESS_TOKEN]);
-            $m->set($mkey, $access_tokens, 600);
-        }
-
-        return $access_tokens;
-    }
-
 }
