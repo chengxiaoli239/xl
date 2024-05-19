@@ -52,10 +52,14 @@ class OrderApi extends Base
         //p([$domain, $params, $headers, $object]);
 
         $headers = array_merge([
-            'Accept' => 'application/json, text/javascript, */*; q=0.01',
-            'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'priority' => 'u=1, i',
+            'sec-ch-ua' => '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+            'sec-ch-ua-mobile' => '?0',
+            'sec-ch-ua-platform' => '"Windows"',
+            'sec-fetch-dest' => 'empty',
+            'sec-fetch-mode' => 'cors',
+            'sec-fetch-site' => 'same-origin',
             'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
-            "X-Requested-With"=> "XMLHttpRequest",
         ], $headers);
         $data[RequestOptions::FORM_PARAMS] = $params;
         $data['verify']  = false; // 禁用 SSL 验证，不推荐在生产环境中使用
