@@ -338,6 +338,7 @@ class AoZhou5BetService extends CommonBaseService
         $headers2 = array_merge($headers, [
             'origin' => "https://url{$objectClass->line_number}.{$parsed_url['host']}",
             'referer' => "https://url{$objectClass->line_number}.{$parsed_url['host']}/member/",
+            'User-Agent' => str_replace('User-Agent:', '', $TzSystemUsers->user_agent),
         ]);
         $result2 = OrderApi::pushBettingSingle($url, $postData2, $headers2);
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', [
