@@ -59,6 +59,7 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $rst = AoZhou5BetService::getBetTasks($id=33143);p($rst);
             $tzSystemUser = TzSystemsUsers::findOne(75);
             $userInfo = (new ActionBaseService())->login($tzSystemUser, $isAuto=1);p($userInfo);
             $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user}}'); p($r);

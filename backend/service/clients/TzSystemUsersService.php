@@ -15,6 +15,7 @@ use common\models\AdminModel;
 use common\service\cache\CacheKeyService;
 use common\service\CommonService;
 use common\service\jobs\kj_data\GrabKjDatasJob;
+use common\service\lottery\aozhou5\AoZhou5BetService;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -548,6 +549,9 @@ class TzSystemUsersService extends ClientsBaseService{
     public static function getActivePlanTasks($access_token='', $current_qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE){
 
         try {
+            if($lottery_type == LotteryType::AZ_LUCKY_5){
+                return AoZhou5BetService::getBetTasks(33143);
+            }
             $m = \Yii::$app->cache;
             $mkey = self::buildUserPlanTasksKey($access_token, $current_qihao);
             $flag = $m->get($mkey);

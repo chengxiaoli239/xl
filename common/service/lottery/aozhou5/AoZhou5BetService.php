@@ -407,4 +407,69 @@ class AoZhou5BetService extends CommonBaseService
         $dataStr = implode(',', $datas);
         return $dataStr;
     }
+
+    /**
+     * 获取下注任务
+     * @param $id
+     * @return array
+     * @throws \common\exceptions\InfoException
+     */
+    public static function getBetTasks($id=0): array
+    {
+        $betTasksQuery = BetsBackend::find();
+
+        if(!empty($id)){
+            $betTasksQuery->where(['id'=>$id]);
+        }else{
+            $betTasksQuery->where(['status'=>BetsBackend::STATUS_WAIT]);
+        }
+        $betTasks = $betTasksQuery->asArray()->all();
+        $data = [];
+        foreach ($betTasks as $betRow){
+            $Odds = Odds3dService::getOdds($betRow['user_id'], $betRow['play_method']); # 玩法赔率
+            if(!isset($Odds['odds'])){
+                throw_info('赔率获取异常user_id:'.$betRow['user_id'].'_play_method:'.$betRow['play_method']);
+            }
+
+            #$method_id = $betRow['play_method'];
+            #p([$method_id, $betRow]);
+            $siteSystemInfo = CommonBaseService::getSystemBaseInfo($betRow['user_id'], $betRow['lottery_type']); # 盘口信息
+            $methodData = CommonBaseService::getLocalToSiteMethods($betRow['play_method'], $siteSystemInfo['system_type_id'], $betRow['codes'], $betRow['kj_num']); #
+            $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$betRow['user_id']]);
+            $headers = [
+                'Cookie' => $TzSystemUsers->cookie,
+            ];
+            $cookie = explode('=', trim($TzSystemUsers->cookie))[1];
+            $postData1 = [
+                '__'=>'isAutoOdds',
+                'gameId'=>601,
+                'rebate' => 'A',
+                'data' => [
+                    [$methodData['site_method_id'], $Odds['odds'], (string)floatval($betRow['bet_money'])], // 赔率待处理
+                ],
+                'cbk' => $cookie,
+            ];
+            $postData2 = [
+                '__'=>'bettingSingle',
+                'data' => Json::encode([
+                    'gameId'=>601,
+                    'pusId' => self::PUSH_ID_OPTIONS[$betRow['kj_num']],
+                    'openingNum' => (int)$betRow['qihao'],
+                    'rebate' => 'A',
+                    'data' => [
+                        [$methodData['site_method_id'], $Odds['odds'], (string)floatval($betRow['bet_money'])], // 赔率待处理
+                    ]
+                ]),
+                'cbk' => $cookie,
+            ];
+
+            $data[] = [
+                'headers' => $headers,
+                'postData1' => $postData1,
+                'postData2' => $postData2,
+            ];
+        }
+
+        return ['status'=>200, 'data'=>$data, 'msg'=>'操作成功'];
+    }
 }
