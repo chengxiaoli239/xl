@@ -64,21 +64,39 @@ class OrderApi extends Base
         $options = [
             'form_params' => $params
         ];
-        $request = new Request('POST', $domain.self::API_CREATE_ORDER, $headers);
-        $response = $client->sendAsync($request, $options)->wait();
-        $content = $response->getBody()->getContents();
-        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '下注2次请求', ['url'=>$domain, 'options'=>$options, 'headers'=>$headers, 'result'=>$content]);
-        if (!empty($content)) {
-            if(is_json($content)){
-                $result = Json::decode($content);
-            }else{
-                $result = ['content'=>$content];
-            }
-        }else{
-            throw_info('异常', 30000);
-        }
+        try {
+            $request = new Request('POST', $domain.self::API_CREATE_ORDER, $headers);
+            $response = $client->sendAsync($request, $options)->wait();
+            $content = $response->getBody()->getContents();
 
-        return $result;
+            Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '下注2次请求', [
+                'url' => $domain,
+                'options' => $options,
+                'headers' => $headers,
+                'result' => $content,
+                'status_code' => $response->getStatusCode(),
+                'reason_phrase' => $response->getReasonPhrase(),
+                'response_headers' => $response->getHeaders()
+            ]);
+
+            if (!empty($content)) {
+                if (is_json($content)) {
+                    $result = Json::decode($content);
+                } else {
+                    $result = ['content' => $content];
+                }
+            } else {
+                throw_info('异常', 30000);
+            }
+
+            return $result;
+        } catch (\Exception $e) {
+            Tool_Common::log('/aozhou5/'.__FUNCTION__, 'ERROR', '请求失败', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
     }
 
     /**
