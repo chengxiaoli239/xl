@@ -204,7 +204,7 @@ class Base extends OpenBase
             $params['timeout'] = 10;
             $options = array_merge(['headers' => $headers], $params);
             #p([$method, $url, $options]);
-            $request = new Request('POST', $url, $headers);
+            $request = new Request($method, $url, $headers);
             $response = $client->sendAsync($request, $options)->wait();
             $content = $response->getBody()->getContents();
             $statusCode = $response->getStatusCode();  // 获取成功响应的状态码
@@ -220,7 +220,7 @@ class Base extends OpenBase
                 throw_info('异常', 30000);
             }
 
-            Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '接口v2请求', ['url'=>$url, 'req'=>$params, 'statusCode'=>$statusCode, 'result'=>$result]);
+            Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '接口v2请求', ['url'=>$url, 'options'=>$options, 'headers'=>$headers, 'req'=>$params, 'statusCode'=>$statusCode, 'result'=>$result]);
             $status = OutSiteRequestLog::REQUEST_STATUS_SUCCESS;
             return $result;
         } catch(\Exception $e) {
