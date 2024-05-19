@@ -64,7 +64,7 @@ class OrderApi extends Base
         $options = [
             'form_params' => $params
         ];
-        $request = new Request('POST', $domain, $headers);
+        $request = new Request('POST', $domain.self::API_CREATE_ORDER, $headers);
         $response = $client->sendAsync($request, $options)->wait();
         $content = $response->getBody()->getContents();
         if (!empty($content)) {
