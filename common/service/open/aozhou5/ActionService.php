@@ -21,7 +21,7 @@ class ActionService
     public string $userAgent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36';
     public string $securityCode='fa8888';
     public string $cfRay = '';
-    public int $line_number = 3; # 这里假设线路号是5
+    public int $line_number = 2; # 这里假设线路号是5
     public function setDomain()
     {
 
