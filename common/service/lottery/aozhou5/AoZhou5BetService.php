@@ -316,7 +316,8 @@ class AoZhou5BetService extends CommonBaseService
             'system_type_id' => $site['system_type_id'],
         ]);
 
-        $result1 = OrderApi::push($url, $postData1, $headers);
+        #$result1 = OrderApi::push($url, $postData1, $headers);
+        $result1 = OrderApi::pushA($url, $postData1, $headers);
         if(!empty($result1['error'])){
             throw_info($result1['error']??'推送盘口异常1', 30001);
         }
@@ -340,7 +341,8 @@ class AoZhou5BetService extends CommonBaseService
             'referer' => "https://url{$objectClass->line_number}.{$parsed_url['host']}/member/",
             'User-Agent' => str_replace('User-Agent:', '', $TzSystemUsers->user_agent),
         ]);
-        $result2 = OrderApi::pushBettingSingle($url, $postData2, $headers2);
+        #$result2 = OrderApi::pushBettingSingle($url, $postData2, $headers2);
+        $result2 = OrderApi::pushBettingSingleA($url, $postData2, $headers2);
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', [
             'betRowId'=>$betRowId,
             'user_id'=>$user_id,

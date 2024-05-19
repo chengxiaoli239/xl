@@ -44,6 +44,58 @@ class OrderApi extends Base
         return $result;
     }
 
+    /**
+     * 推单
+     * @param array $params 参数
+     * @return array
+     */
+    public static function pushA(string $domain, array $params, array $headers = []): array
+    {
+        $client = new Client();
+        $headers = [
+            'accept' => '*/*',
+            'accept-language' => 'zh-CN,zh;q=0.9',
+            'content-type' => 'application/x-www-form-urlencoded',
+            'cookie' => '16ac692ecbd02b1c=59181a35012b5ae1a9d113a53ba92cf00335b2d08c7f75778ab890bd8b49cd9bd150ed0bb1d71d7f825538ad53e69a11a6a86bb34ed6e944',
+            'origin' => 'https://url2.ac3868.com',
+            'priority' => 'u=1, i',
+            'referer' => 'https://url2.ac3868.com/member/',
+            'sec-ch-ua' => '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+            'sec-ch-ua-mobile' => '?0',
+            'sec-ch-ua-platform' => '"Windows"',
+            'sec-fetch-dest' => 'empty',
+            'sec-fetch-mode' => 'cors',
+            'sec-fetch-site' => 'same-origin',
+            'user-agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
+        ];
+        $options = [
+            'form_params' => $params,
+        ];
+        $request = new Request('POST', $domain.'/api/', $headers);
+        $response = $client->sendAsync($request, $options)->wait();
+        $content = $response->getBody()->getContents();
+        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '下注1次请求', [
+            'url' => $domain,
+            'options' => $options,
+            'headers' => $headers,
+            'result' => $content,
+            'status_code' => $response->getStatusCode(),
+            'reason_phrase' => $response->getReasonPhrase(),
+            'response_headers' => $response->getHeaders()
+        ]);
+
+        if (!empty($content)) {
+            if (is_json($content)) {
+                $result = Json::decode($content);
+            } else {
+                $result = ['content' => $content];
+            }
+        } else {
+            throw_info('异常', 30000);
+        }
+
+        return $result;
+    }
 
     public static function pushBettingSingle(string $domain, array $params, array $headers = []): array
     {
@@ -97,6 +149,55 @@ class OrderApi extends Base
             ]);
             throw $e;
         }
+    }
+
+    public static function pushBettingSingleA(string $domain, array $params, array $headers = []): array
+    {
+        $client = new Client();
+        $headers = [
+            'accept' => '*/*',
+            'accept-language' => 'zh-CN,zh;q=0.9',
+            'content-type' => 'application/x-www-form-urlencoded',
+            'cookie' => '16ac692ecbd02b1c=59181a35012b5ae1a9d113a53ba92cf00335b2d08c7f75778ab890bd8b49cd9bd150ed0bb1d71d7f825538ad53e69a11a6a86bb34ed6e944',
+            'origin' => 'https://url2.ac3868.com',
+            'priority' => 'u=1, i',
+            'referer' => 'https://url2.ac3868.com/member/',
+            'sec-ch-ua' => '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+            'sec-ch-ua-mobile' => '?0',
+            'sec-ch-ua-platform' => '"Windows"',
+            'sec-fetch-dest' => 'empty',
+            'sec-fetch-mode' => 'cors',
+            'sec-fetch-site' => 'same-origin',
+            'user-agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
+        ];
+        $options = [
+            'form_params' => $params,
+        ];
+        $request = new Request('POST', 'https://url2.ac3868.com/api/', $headers);
+        $response = $client->sendAsync($request, $options)->wait();
+        $content = $response->getBody()->getContents();
+
+        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '下注2次请求', [
+            'url' => $domain,
+            'options' => $options,
+            'headers' => $headers,
+            'result' => $content,
+            'status_code' => $response->getStatusCode(),
+            'reason_phrase' => $response->getReasonPhrase(),
+            'response_headers' => $response->getHeaders()
+        ]);
+
+        if (!empty($content)) {
+            if (is_json($content)) {
+                $result = Json::decode($content);
+            } else {
+                $result = ['content' => $content];
+            }
+        } else {
+            throw_info('异常', 30000);
+        }
+
+        return $result;
     }
 
     /**
