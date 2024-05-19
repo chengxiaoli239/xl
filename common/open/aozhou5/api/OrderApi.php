@@ -3,7 +3,11 @@ namespace common\open\aozhou5\api;
 
 use common\service\wechat\eyun\api\EventServiceTrait;
 use common\tools\Common;
+use common\tools\Tool_Common;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
+use yii\helpers\Json;
 
 
 class OrderApi extends Base
@@ -17,10 +21,10 @@ class OrderApi extends Base
 
     /**
      * 推单
-     * @param array $params    参数
+     * @param array $params 参数
      * @return array
      */
-    public static function push(string $domain, array $params, array $headers=[]): array
+    public static function push(string $domain, array $params, array $headers = []): array
     {
         $object = self::createObject();
         $object->apiUrl = $domain;
@@ -30,12 +34,49 @@ class OrderApi extends Base
             'Accept' => 'application/json, text/javascript, */*; q=0.01',
             'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
             'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
-            "X-Requested-With"=> "XMLHttpRequest",
+            "X-Requested-With" => "XMLHttpRequest",
         ], $headers);
         $data[RequestOptions::FORM_PARAMS] = $params;
-        $data['verify']  = false; // 禁用 SSL 验证，不推荐在生产环境中使用
+        $data['verify'] = false; // 禁用 SSL 验证，不推荐在生产环境中使用
         //p([self::API_CREATE_ORDER, $data, $headers]);
         $result = $object->post(self::API_CREATE_ORDER, $data, $headers);
+
+        return $result;
+    }
+
+
+    public static function pushBettingSingle(string $domain, array $params, array $headers = []): array
+    {
+        $client = new Client();
+        $headers = array_merge([
+            'accept' => '*/*',
+            'accept-language' => 'zh-CN,zh;q=0.9',
+            'content-type' => 'application/x-www-form-urlencoded',
+            'priority' => 'u=1, i',
+            'sec-ch-ua' => '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+            'sec-ch-ua-mobile' => '?0',
+            'sec-ch-ua-platform' => '"Windows"',
+            'sec-fetch-dest' => 'empty',
+            'sec-fetch-mode' => 'cors',
+            'sec-fetch-site' => 'same-origin',
+            'user-agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
+        ], $headers);
+        $options = [
+            'form_params' => $params
+        ];
+        $request = new Request('POST', $domain, $headers);
+        $response = $client->sendAsync($request, $options)->wait();
+        $content = $response->getBody()->getContents();
+        if (!empty($content)) {
+            if(is_json($content)){
+                $result = Json::decode($content);
+            }else{
+                $result = ['content'=>$content];
+            }
+        }else{
+            throw_info('异常', 30000);
+        }
+        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '下注2次请求', ['url'=>$domain, 'options'=>$options, 'headers'=>$headers, 'result'=>$result]);
 
         return $result;
     }
@@ -45,7 +86,7 @@ class OrderApi extends Base
      * @param array $params    参数
      * @return array
      */
-    public static function pushBettingSingle(string $domain, array $params, array $headers=[]): array
+    public static function pushBettingSingleBak(string $domain, array $params, array $headers=[]): array
     {
         $object = self::createObject();
         $object->apiUrl = $domain;

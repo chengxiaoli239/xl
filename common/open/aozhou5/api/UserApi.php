@@ -69,6 +69,31 @@ class UserApi extends Base
     }
 
     /**
+     * 用户信息
+     * @param string $domain
+     * @param array $params 参数
+     * @param array $headers
+     * @return array
+     */
+    public static function memberThreadMd(string $domain, array $params, array $headers=[]): array
+    {
+        $object = self::createObject();
+        $object->apiUrl = $domain;
+
+        $headers = array_merge([
+            'Accept' => 'application/json, text/javascript, */*; q=0.01',
+            'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
+            "X-Requested-With"=> "XMLHttpRequest",
+        ], $headers);
+        $data[RequestOptions::FORM_PARAMS] = $params;
+        $data['verify'] = false;
+        $result = $object->post(self::API_USER_INFO, $data, $headers);
+
+        return $result;
+    }
+
+    /**
      * 盘口开奖信息
      * @param string $domain
      * @param array $params 参数
@@ -92,4 +117,6 @@ class UserApi extends Base
 
         return $result;
     }
+
+
 }

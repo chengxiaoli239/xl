@@ -2,11 +2,11 @@
 
 namespace common\service\open\aozhou5;
 
+use common\exceptions\InfoException;
 use common\open\aozhou5\api\PreLoginApi;
 use common\open\aozhou5\api\UserApi;
 use common\service\cache\CacheKeyService;
 use common\service\chat\Tool_Common;
-use DOMDocument;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\RequestOptions;
@@ -156,7 +156,9 @@ class ActionService
 
     /**
      * 获取用户信息
-     * @return bool
+     * @param int $useCache
+     * @return array
+     * @throws InfoException
      */
     public function getUserInfo($useCache=0): array
     {
@@ -214,6 +216,52 @@ class ActionService
         $this->tzSystemUsers->balance = $userInfo['balance'];
         $this->tzSystemUsers->updated_at = time();
         $this->tzSystemUsers->save();
+
+        return ($userInfo && empty($userInfo['error']))? $userInfo:[];
+    }
+
+    /**
+     * 获取用户md - 貌似心跳，不确定
+     * @return array
+     */
+    public function memberThreadMd(): array
+    {
+        $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
+        $cookie = explode('=', $this->tzSystemUsers->cookie)[1];
+        $params = [
+            '__' => 'memberThreadmd',
+            'gameId' => 601,
+            'pusId' => 9,
+            'tId' => 1,
+            'pId' => -1,
+            'rebate' => 'A',
+            'cbk' => $cookie,
+        ];
+        $host = $parsed_url['host'];
+        $headers = [
+            'User-Agent' => str_replace('User-Agent:', '', $this->tzSystemUsers->user_agent),
+            'cookie' => $this->tzSystemUsers->cookie,
+            'origin' => "https://url{$this->line_number}.{$host}",
+            'referer' => "https://url{$this->line_number}.{$host}/member/",
+            'sec-ch-ua' => '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+            'Origin' => "{$parsed_url['scheme']}://url{$this->line_number}.{$host}",
+            'Referer' => "{$parsed_url['scheme']}://url{$this->line_number}.{$host}/member/",
+            'sec-ch-ua-mobile' => '?0',
+            'sec-ch-ua-platform' => '"Windows"',
+            'sec-fetch-dest' => 'empty',
+            'sec-fetch-mode' => 'cors',
+            'sec-fetch-site' => 'same-origin',
+            'Content-Type' => 'text/plain; charset=utf-8',
+        ];
+        $url = "https://url{$this->line_number}.{$host}";
+        //p(['url'=>$url, 'params'=>$params, 'headers'=>$headers]);
+
+        $userInfo = UserApi::memberThreadMd($url, $params, $headers);
+        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '获取用户md', ['username'=>$this->tzSystemUsers->username, 'account'=>$this->tzSystemUsers->account, 'balance'=>$userInfo['balance'], 'userInfo'=>$userInfo]);
+        if(!isset($userInfo['balance'])){
+            Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '获取用户信息-异常', ['username'=>$this->tzSystemUsers->username, 'account'=>$this->tzSystemUsers->account, 'balance'=>$userInfo['balance'], 'userInfo'=>$userInfo, 'headers'=>$headers, 'url'=>$url]);
+            return [];
+        }
 
         return ($userInfo && empty($userInfo['error']))? $userInfo:[];
     }

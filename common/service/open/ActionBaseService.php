@@ -40,6 +40,9 @@ class ActionBaseService
             $objectClass->login();
             $userInfo = $objectClass->getUserInfo();
         }
+        if(!empty($userInfo)){
+            $userInfo = $objectClass->memberThreadMd();
+        }
 
         return [0, $userInfo, '完成'];
     }
