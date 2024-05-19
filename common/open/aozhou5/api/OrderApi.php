@@ -67,6 +67,7 @@ class OrderApi extends Base
         $request = new Request('POST', $domain.self::API_CREATE_ORDER, $headers);
         $response = $client->sendAsync($request, $options)->wait();
         $content = $response->getBody()->getContents();
+        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '下注2次请求', ['url'=>$domain, 'options'=>$options, 'headers'=>$headers, 'result'=>$content]);
         if (!empty($content)) {
             if(is_json($content)){
                 $result = Json::decode($content);
@@ -76,7 +77,6 @@ class OrderApi extends Base
         }else{
             throw_info('异常', 30000);
         }
-        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '下注2次请求', ['url'=>$domain, 'options'=>$options, 'headers'=>$headers, 'result'=>$result]);
 
         return $result;
     }
