@@ -230,11 +230,7 @@ class ActionService
         $cookie = explode('=', $this->tzSystemUsers->cookie)[1];
         $params = [
             '__' => 'memberThreadmd',
-            'gameId' => 601,
-            'pusId' => 9,
-            'tId' => 1,
-            'pId' => -1,
-            'rebate' => 'A',
+            'newsId' => -1,
             'cbk' => $cookie,
         ];
         $host = $parsed_url['host'];
@@ -251,7 +247,7 @@ class ActionService
             'sec-fetch-dest' => 'empty',
             'sec-fetch-mode' => 'cors',
             'sec-fetch-site' => 'same-origin',
-            'Content-Type' => 'text/plain; charset=utf-8',
+            'Content-Type' => 'application/x-www-form-urlencoded',
         ];
         $url = "https://url{$this->line_number}.{$host}";
         //p(['url'=>$url, 'params'=>$params, 'headers'=>$headers]);
