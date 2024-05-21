@@ -291,7 +291,7 @@ class AoZhou5BetService extends CommonBaseService
         }
         $TzSystemUsers = TzSystemsUsers::findOne($site['id']);
         $headers = [
-            'Cookie' => $TzSystemUsers->cookie,
+            'cookie' => $TzSystemUsers->cookie,
         ];
         $postData1 = [
             '__'=>'isAutoOdds',
