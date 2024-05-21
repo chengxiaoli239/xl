@@ -342,6 +342,7 @@ class AoZhou5BetService extends CommonBaseService
             'User-Agent' => str_replace('User-Agent:', '', $TzSystemUsers->user_agent),
         ]);
         #$result2 = OrderApi::pushBettingSingle($url, $postData2, $headers2);
+        sleep(2);
         $result2 = OrderApi::pushBettingSingleA($url, $postData2, $headers2);
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', [
             'betRowId'=>$betRowId,
