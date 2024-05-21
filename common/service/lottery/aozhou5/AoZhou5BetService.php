@@ -29,8 +29,8 @@ class AoZhou5BetService extends CommonBaseService
     const PUSH_ID_FOUR = 9;
 
     const PUSH_ID_OPTIONS = [
-        #DrawLottery::BET_FOUR_NUM => AoZhou5BetService::PUSH_ID_FOUR,
-        DrawLottery::BET_FOUR_NUM => AoZhou5BetService::PUSH_ID_FIVE,
+        DrawLottery::BET_FOUR_NUM => AoZhou5BetService::PUSH_ID_FOUR,
+        #DrawLottery::BET_FOUR_NUM => AoZhou5BetService::PUSH_ID_FIVE,
         DrawLottery::BET_FIVE_NUM => AoZhou5BetService::PUSH_ID_FIVE,
     ];
 
