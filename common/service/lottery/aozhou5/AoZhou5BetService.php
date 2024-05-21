@@ -341,6 +341,14 @@ class AoZhou5BetService extends CommonBaseService
             'referer' => "https://url{$objectClass->line_number}.{$parsed_url['host']}/member/",
             'User-Agent' => str_replace('User-Agent:', '', $TzSystemUsers->user_agent),
         ]);
+        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', [
+            'betRowId'=>$betRowId,
+            'user_id'=>$user_id,
+            'headers' => $headers,
+            'method_id'=>$method_id,
+            'methodData'=>$methodData,
+            'post_data2'=>$postData2,
+        ]);
         #$result2 = OrderApi::pushBettingSingle($url, $postData2, $headers2);
         sleep(2);
         $result2 = OrderApi::pushBettingSingleA($url, $postData2, $headers2);
