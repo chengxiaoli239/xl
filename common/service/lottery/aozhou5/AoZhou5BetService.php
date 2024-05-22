@@ -98,7 +98,7 @@ class AoZhou5BetService extends CommonBaseService
             ]);
             $betCodes = $betRow->codes;
             //p(['method_id'=>$method_id, 'betCodes'=>$betCodes, 'siteSystemInfo'=>self::$siteSystemInfo, 'localToSiteMethodInfo'=>self::$localToSiteMethodInfo]);
-            $postRst = self::postBet($betRow, $betCodes);
+            $postRst = self::postBet($betRow, $betCodes); # 投盘口
 
             # 下单扣减
             AgentUsersBalanceService::updateBalance((string)$betRowId, $betRow->bet_money, $betRow->wechat_user_id, WechatUserService::TYPE_ORDER_BET);

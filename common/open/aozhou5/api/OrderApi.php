@@ -52,14 +52,14 @@ class OrderApi extends Base
     public static function pushA(string $domain, array $params, array $headers = []): array
     {
         $client = new Client();
-        $headers = [
+        $headers = array_merge([
             'accept' => '*/*',
             'accept-language' => 'zh-CN,zh;q=0.9',
             'content-type' => 'application/x-www-form-urlencoded',
-            'cookie' => '16ac692ecbd02b1c=59181a35012b5ae1a9d113a53ba92cf00335b2d08c7f75778ab890bd8b49cd9bd150ed0bb1d71d7f825538ad53e69a11a6a86bb34ed6e944',
-            'origin' => 'https://url2.ac3868.com',
+            //'cookie' => '16ac692ecbd02b1c=59181a35012b5ae1a9d113a53ba92cf00335b2d08c7f75778ab890bd8b49cd9bd150ed0bb1d71d7f825538ad53e69a11a6a86bb34ed6e944',
+            'origin' => $domain,
             'priority' => 'u=1, i',
-            'referer' => 'https://url2.ac3868.com/member/',
+            'referer' => $domain.'/member/',
             'sec-ch-ua' => '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
             'sec-ch-ua-mobile' => '?0',
             'sec-ch-ua-platform' => '"Windows"',
@@ -67,7 +67,7 @@ class OrderApi extends Base
             'sec-fetch-mode' => 'cors',
             'sec-fetch-site' => 'same-origin',
             'user-agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36'
-        ];
+        ], $headers);
         $options = [
             'form_params' => $params,
         ];
