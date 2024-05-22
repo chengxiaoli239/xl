@@ -68,8 +68,8 @@ class UserApi extends Base
         Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '获取用户信息', [
             'apiUrl' => $object->apiUrl,
             'headers' => $headers,
-            'postData'=>$params,
-            'result' => $result,
+            'postData' => $params,
+            'balance' => $result['balance'],
         ]);
 
         return $result;
