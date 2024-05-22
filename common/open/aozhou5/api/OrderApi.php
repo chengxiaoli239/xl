@@ -214,7 +214,7 @@ class OrderApi extends Base
         //p([$domain, $params, $headers, $object]);
 
         $headers = array_merge([
-            'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'Content-Type' => 'application/x-www-form-urlencoded',
             //'priority' => 'u=1, i',
             #'sec-ch-ua' => '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
             'sec-ch-ua' => '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
