@@ -98,7 +98,7 @@ class OrderApi extends Base
         return $result;
     }
 
-    public static function pushBettingSingle(string $domain, array $params, array $headers = []): array
+    public static function pushBettingSingleB(string $domain, array $params, array $headers = []): array
     {
         $client = new Client();
         $headers = array_merge([
@@ -207,7 +207,7 @@ class OrderApi extends Base
      * @param array $params    参数
      * @return array
      */
-    public static function pushBettingSingleBak(string $domain, array $params, array $headers=[]): array
+    public static function pushBettingSingle(string $domain, array $params, array $headers=[]): array
     {
         $object = self::createObject();
         $object->apiUrl = $domain;
@@ -225,10 +225,19 @@ class OrderApi extends Base
             'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
         ], $headers);
         $data[RequestOptions::FORM_PARAMS] = $params;
-        $data['verify']  = false; // 禁用 SSL 验证，不推荐在生产环境中使用
+        //$data['verify']  = false; // 禁用 SSL 验证，不推荐在生产环境中使用
+        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘确认1', [
+            'apiUrl' => $object->apiUrl,
+            'headers' => $headers,
+            'postData'=>$params,
+        ]);
         //p([self::API_CREATE_ORDER, $data, $headers]);
         $result = $object->post(self::API_CREATE_ORDER, $data, $headers);
-        
+        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘确认2', [
+            'headers' => $headers,
+            'result'=>$result,
+        ]);
+
         return $result;
     }
 

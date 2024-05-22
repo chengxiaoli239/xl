@@ -349,9 +349,9 @@ class AoZhou5BetService extends CommonBaseService
             'methodData'=>$methodData,
             'post_data2'=>$postData2,
         ]);
-        #$result2 = OrderApi::pushBettingSingle($url, $postData2, $headers2);
+        $result2 = OrderApi::pushBettingSingle($url, $postData2, $headers2);
         sleep(2);
-        $result2 = OrderApi::pushBettingSingleA($url, $postData2, $headers2);
+        #$result2 = OrderApi::pushBettingSingleA($url, $postData2, $headers2);
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', [
             'betRowId'=>$betRowId,
             'user_id'=>$user_id,
