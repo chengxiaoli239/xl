@@ -215,8 +215,9 @@ class OrderApi extends Base
 
         $headers = array_merge([
             'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
-            'priority' => 'u=1, i',
-            'sec-ch-ua' => '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+            //'priority' => 'u=1, i',
+            #'sec-ch-ua' => '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+            'sec-ch-ua' => '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
             'sec-ch-ua-mobile' => '?0',
             'sec-ch-ua-platform' => '"Windows"',
             'sec-fetch-dest' => 'empty',
@@ -226,16 +227,13 @@ class OrderApi extends Base
         ], $headers);
         $data[RequestOptions::FORM_PARAMS] = $params;
         //$data['verify']  = false; // 禁用 SSL 验证，不推荐在生产环境中使用
+        //p([self::API_CREATE_ORDER, $data, $headers]);
+        $result = $object->post(self::API_CREATE_ORDER, $data, $headers);
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘确认1', [
             'apiUrl' => $object->apiUrl,
             'headers' => $headers,
             'postData'=>$params,
-        ]);
-        //p([self::API_CREATE_ORDER, $data, $headers]);
-        $result = $object->post(self::API_CREATE_ORDER, $data, $headers);
-        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘确认2', [
-            'headers' => $headers,
-            'result'=>$result,
+            'result' => $result,
         ]);
 
         return $result;

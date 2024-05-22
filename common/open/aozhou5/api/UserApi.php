@@ -3,6 +3,7 @@ namespace common\open\aozhou5\api;
 
 use common\service\wechat\eyun\api\EventServiceTrait;
 use common\tools\Common;
+use common\tools\Tool_Common;
 use GuzzleHttp\RequestOptions;
 
 
@@ -64,6 +65,12 @@ class UserApi extends Base
         $data[RequestOptions::FORM_PARAMS] = $params;
         $data['verify'] = false;
         $result = $object->post(self::API_USER_INFO, $data, $headers);
+        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '获取用户信息', [
+            'apiUrl' => $object->apiUrl,
+            'headers' => $headers,
+            'postData'=>$params,
+            'result' => $result,
+        ]);
 
         return $result;
     }
