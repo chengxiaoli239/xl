@@ -52,6 +52,7 @@ class OrderApi extends Base
     public static function pushA(string $domain, array $params, array $headers = []): array
     {
         $client = new Client();
+        $apiUrl = $domain.'/api/';
         $headers = array_merge([
             'accept' => '*/*',
             'accept-language' => 'zh-CN,zh;q=0.9',
@@ -71,7 +72,7 @@ class OrderApi extends Base
         $options = [
             'form_params' => $params,
         ];
-        $request = new Request('POST', $domain.'/api/', $headers);
+        $request = new Request('POST', $apiUrl, $headers);
         $response = $client->sendAsync($request, $options)->wait();
         $content = $response->getBody()->getContents();
         Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '下注1次请求', [
@@ -173,12 +174,13 @@ class OrderApi extends Base
         $options = [
             'form_params' => $params,
         ];
-        $request = new Request('POST', $domain.'/api/', $headers);
+        $apiUrl = $domain.'/api/';
+        $request = new Request('POST', $apiUrl, $headers);
         $response = $client->sendAsync($request, $options)->wait();
         $content = $response->getBody()->getContents();
 
         Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '下注2次请求', [
-            'url' => $domain,
+            'apiUrl' => $apiUrl,
             'options' => $options,
             'headers' => $headers,
             'result' => $content,
