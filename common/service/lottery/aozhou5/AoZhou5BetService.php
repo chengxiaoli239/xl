@@ -339,7 +339,7 @@ class AoZhou5BetService extends CommonBaseService
         $headers2 = array_merge($headers, [
             'Origin' => "https://url{$objectClass->line_number}.{$parsed_url['host']}",
             'Referer' => "https://url{$objectClass->line_number}.{$parsed_url['host']}/member/",
-            'User-Agent' => str_replace('User-Agent:', '', $TzSystemUsers->user_agent),
+            'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemUsers->user_agent)),
         ]);
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', [
             'betRowId'=>$betRowId,
