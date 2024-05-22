@@ -65,7 +65,7 @@ class UserApi extends Base
         $data[RequestOptions::FORM_PARAMS] = $params;
         $data['verify'] = false;
         $result = $object->post(self::API_USER_INFO, $data, $headers);
-        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '获取用户信息', [
+        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '获取用户信息', [
             'apiUrl' => $object->apiUrl,
             'headers' => $headers,
             'postData'=>$params,
