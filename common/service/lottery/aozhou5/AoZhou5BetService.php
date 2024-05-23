@@ -20,6 +20,9 @@ use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\Odds3dService;
 use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
+use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\RequestOptions;
 use yii\helpers\Json;
 
 class AoZhou5BetService extends CommonBaseService
@@ -317,7 +320,6 @@ class AoZhou5BetService extends CommonBaseService
         ]);
 
         #$result1 = OrderApi::push($url, $postData1, $headers);
-        $result1 = OrderApi::pushA($url, $postData1, $headers);
         if(!empty($result1['error'])){
             throw_info($result1['error']??'推送盘口异常1', 30001);
         }
@@ -336,7 +338,7 @@ class AoZhou5BetService extends CommonBaseService
             #'cbk' => explode('=', trim($site['cookie']))[1],
             'cbk' => trim($site['cookie']),
         ];
-        $headers2 = array_merge($headers, [
+        $headers = array_merge($headers, [
             'Origin' => "https://url{$objectClass->line_number}.{$parsed_url['host']}",
             'Referer' => "https://url{$objectClass->line_number}.{$parsed_url['host']}/member/",
             'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemUsers->user_agent)),
@@ -349,9 +351,42 @@ class AoZhou5BetService extends CommonBaseService
             'methodData'=>$methodData,
             'post_data2'=>$postData2,
         ]);
-        $result2 = OrderApi::pushBettingSingle($url, $postData2, $headers2);
-        sleep(2);
         #$result2 = OrderApi::pushBettingSingleA($url, $postData2, $headers2);
+
+        $apiUrl = $url . '/api/';
+        // 创建 CookieJar 来存储 cookie
+        $cookieJar = new CookieJar();
+        // 创建 Guzzle 客户端
+        $client = new Client(['cookies' => $cookieJar]);
+        // 第一个请求的 URL
+        $firstUrl = $apiUrl;
+
+        // 发起第一个 GET 请求
+        $response1 = $client->request('POST', $firstUrl, [
+            RequestOptions::HEADERS => $headers,
+            RequestOptions::FORM_PARAMS => $postData1,
+        ]);
+        $body = $response1->getBody()->getContents();
+        $result1 = Json::decode($body);
+
+        // 获取响应头中的 Set-Cookie
+        $setCookie = $response1->getHeader('Set-Cookie');
+
+        // 提取需要的 Cookie
+        $cookie = reset($setCookie); // 获取第一个 Set-Cookie
+
+        sleep(2);
+        // 第二个请求的 URL
+        $apiUrl = $url . '/api/';
+        // 发起第二个 GET 请求
+        $response2 = $client->request('POST', $apiUrl, [
+            RequestOptions::HEADERS => $headers,
+            RequestOptions::FORM_PARAMS => $postData2,
+        ]);
+
+        // 获取响应内容
+        $body = $response2->getBody()->getContents();
+        $result2 = Json::decode($body);
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', [
             'betRowId'=>$betRowId,
             'user_id'=>$user_id,
@@ -364,7 +399,6 @@ class AoZhou5BetService extends CommonBaseService
             'result1'=>$result1,
             'result2'=>$result2,
         ]);
-
         if(!empty($result2['error'])){ # 错误码：2成功、9918 登录超时....
             $logArr['result'] = $result2;
             Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘20', $logArr);
