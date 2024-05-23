@@ -295,6 +295,7 @@ class AoZhou5BetService extends CommonBaseService
         $TzSystemUsers = TzSystemsUsers::findOne($site['id']);
         $headers = [
             'cookie' => $TzSystemUsers->cookie,
+            "User-Agent" =>"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36","X-Requested-With" => "XMLHttpRequest"
         ];
         $postData1 = [
             '__'=>'isAutoOdds',
@@ -341,7 +342,7 @@ class AoZhou5BetService extends CommonBaseService
         $headers = array_merge($headers, [
             'Origin' => "https://url{$objectClass->line_number}.{$parsed_url['host']}",
             'Referer' => "https://url{$objectClass->line_number}.{$parsed_url['host']}/member/",
-            'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemUsers->user_agent)),
+            //'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemUsers->user_agent)),
         ]);
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', [
             'betRowId'=>$betRowId,
@@ -390,6 +391,7 @@ class AoZhou5BetService extends CommonBaseService
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', [
             'betRowId'=>$betRowId,
             'user_id'=>$user_id,
+            'apiUrl'=>$apiUrl,
             'headers' => $headers,
             'method_id'=>$method_id,
             'methodData'=>$methodData,
