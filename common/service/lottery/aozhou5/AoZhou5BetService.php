@@ -490,6 +490,7 @@ class AoZhou5BetService extends CommonBaseService
             $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$betRow['user_id']]);
             $headers = [
                 'Cookie' => $TzSystemUsers->cookie,
+                'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemUsers->user_agent)),
             ];
             $cookie = explode('=', trim($TzSystemUsers->cookie))[1];
             $postData1 = [
