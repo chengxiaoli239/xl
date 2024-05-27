@@ -505,13 +505,13 @@ class AoZhou5BetService extends CommonBaseService
 
             $d = 'url'.ActionService::LINE_NUMBER.'.'.$ht[1];
             $headers = [
-                ':authority: '.$d,
-                ':method:POST',
-                ':path:/api/',
-                ':scheme:https',
+                ':authority' => $d,
+                ':method' => 'POST',
+                ':path' => '/api/',
+                ':scheme' => 'https',
                 'accept' => '*/*',
-                'Accept-Encoding:gzip, deflate, br, zstd',
-                'Accept-Language:zh-CN,zh;q=0.9',
+                'Accept-Encoding' => 'gzip, deflate, br, zstd',
+                'Accept-Language' => 'zh-CN,zh;q=0.9',
                 'Cookie' => $TzSystemUsers->cookie,
                 "Content-Type" => "application/x-www-form-urlencoded",
                 'Content-Length' => (string)strlen(http_build_query($postData1)),
