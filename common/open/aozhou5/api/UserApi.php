@@ -33,10 +33,11 @@ class UserApi extends Base
             'Accept' => 'application/json, text/javascript, */*; q=0.01',
             'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
             'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
-            "X-Requested-With"=> "XMLHttpRequest",
+            //"X-Requested-With"=> "XMLHttpRequest",
+            'Upgrade-Insecure-Requests' => 1,
         ], $headers);
         $data[RequestOptions::QUERY] = $params;
-        $data['verify'] = false;
+        #$data['verify'] = false;
         //$data['port'] = 38900;
         $result = $object->get(self::API_SEARCH_LINE, $data, $headers);
         //p([$domain, $params, $headers, $result]);

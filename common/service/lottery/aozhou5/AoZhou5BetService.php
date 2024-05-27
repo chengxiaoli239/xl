@@ -14,6 +14,7 @@ use common\open\aozhou5\api\OrderApi;
 use common\open\aozhou5\api\UserApi;
 use common\service\CommonService;
 use common\service\open\ActionBaseService;
+use common\service\open\aozhou5\ActionService;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\jobs\SsxxBetJobs;
@@ -490,11 +491,6 @@ class AoZhou5BetService extends CommonBaseService
             $siteSystemInfo = CommonBaseService::getSystemBaseInfo($betRow['user_id'], $betRow['lottery_type']); # 盘口信息
             $methodData = CommonBaseService::getLocalToSiteMethods($betRow['play_method'], $siteSystemInfo['system_type_id'], $betRow['codes'], $betRow['kj_num']); #
             $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$betRow['user_id']]);
-            $headers = [
-                'Cookie' => $TzSystemUsers->cookie,
-                "Content-Type" => "application/x-www-form-urlencoded",
-                'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemUsers->user_agent)),
-            ];
             $cookie = explode('=', trim($TzSystemUsers->cookie))[1];
             $postData1 = [
                 '__'=>'isAutoOdds',
@@ -505,6 +501,32 @@ class AoZhou5BetService extends CommonBaseService
                 ],
                 'cbk' => $cookie,
             ];
+            $ht = explode('//', $TzSystemUsers->ssc_domain);
+
+            $d = 'url'.ActionService::LINE_NUMBER.'.'.$ht[1];
+            $headers = [
+                ':authority: '.$d,
+                ':method:POST',
+                ':path:/api/',
+                ':scheme:https',
+                'accept' => '*/*',
+                'Accept-Encoding:gzip, deflate, br, zstd',
+                'Accept-Language:zh-CN,zh;q=0.9',
+                'Cookie' => $TzSystemUsers->cookie,
+                "Content-Type" => "application/x-www-form-urlencoded",
+                'Content-Length' => strlen(http_build_query($postData1)),
+                'origin' => 'https://'.$d,
+                'priority' => 'u=1, i',
+                'referer' => 'https://'.$d.'/member/',
+                'sec-ch-ua' => '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+                'sec-ch-ua-mobile' => '?0',
+                'sec-ch-ua-platform' => "Windows",
+                'sec-fetch-dest' => 'empty',
+                'sec-fetch-mode' => 'cors',
+                'sec-fetch-site' => 'same-origin',
+                'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemUsers->user_agent)),
+            ];
+
             if($id == AoZhou5BetService::TEST_BET_ID){
                 $betRow['qihao'] = DataDealStatus::find()->select('next_qihao')->where(['lottery_type'=>28])->limit(1)->orderBy(['id'=>SORT_DESC])->scalar();
             }
@@ -522,9 +544,14 @@ class AoZhou5BetService extends CommonBaseService
                 'cbk' => $cookie,
             ];
 
+            $headers2 = array_merge($headers, [
+                'Content-Length' => strlen(http_build_query($postData2)),
+            ]);
+
             $data[] = [
-                'headers' => $headers,
+                'headers1' => $headers,
                 'postData1' => $postData1,
+                'headers2' => $headers2,
                 'postData2' => $postData2,
             ];
         }

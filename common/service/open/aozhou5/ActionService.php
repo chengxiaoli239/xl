@@ -22,6 +22,7 @@ class ActionService
     public string $securityCode='fa8888';
     public string $cfRay = '';
     public int $line_number = 2; # 这里假设线路号是5
+    const LINE_NUMBER = 2;
     public function setDomain()
     {
 
@@ -97,13 +98,18 @@ class ActionService
             #'Cookie' => $cookie, // 使用从第一个响应中提取的 Cookie
         ];
 
+        // 发起第一个 GET 请求
+        $response1 = $client->request('GET', $firstUrl, [
+            'headers' => $headers,
+        ]);
+
         // 发起第二个 GET 请求
-        $response = $client->request('GET', $secondUrl, [
+        $response2 = $client->request('GET', $secondUrl, [
             'headers' => $headers,
         ]);
 
         // 获取响应内容
-        $body = $response->getBody()->getContents();
+        $body = $response2->getBody()->getContents();
         $code = $body;
 
         $params[RequestOptions::FORM_PARAMS] = [
@@ -125,7 +131,7 @@ class ActionService
             //'Host' => "url{$line_number}.{$host}",
             'Origin' => "{$parsed_url['scheme']}://url{$this->line_number}.{$host}",
             'Referer' => "{$parsed_url['scheme']}://url{$this->line_number}.{$host}/member/",
-            'Sec-Ch-Ua' => '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+            'Sec-Ch-Ua' => '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
             'Sec-Ch-Ua-Mobile' => '?0',
             'Sec-Ch-Ua-Platform' => '"Windows"',
             'Sec-Fetch-Dest' => 'empty',
@@ -134,13 +140,14 @@ class ActionService
             'User-Agent' => $this->userAgent,
         ];
         $params[RequestOptions::HEADERS] = $headers;
-        $params['verify'] = false;
+        //$params['verify'] = false;
         //p(['thirdUrl'=>$thirdUrl, 'params'=>$params]);
-        $response = $client->request('POST', $thirdUrl, $params);
-        $body = $response->getBody()->getContents();
+        # 发起第三个 POST 请求
+        $response3 = $client->request('POST', $thirdUrl, $params);
+        $body = $response3->getBody()->getContents();
 
         // 获取响应中设置的 Cookie start
-        $setCookieHeaders = $response->getHeader('Set-Cookie');
+        $setCookieHeaders = $response3->getHeader('Set-Cookie');
         $cookieStr = trim(explode(';', $setCookieHeaders[1])[0]);
         $this->tzSystemUsers->cookie = $cookieStr;
         $this->tzSystemUsers->updated_at = time();
@@ -149,7 +156,19 @@ class ActionService
         // 获取响应中设置的 Cookie end
 
         $result = Json::decode($body);
-        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'ERR', '登录结束', ['params'=>$params, 'code'=>$code, 'result'=>$result, 'cookieStr'=>$cookieStr]);
+
+        $cookie = explode('=', $this->tzSystemUsers->cookie)[1];
+        $params[RequestOptions::FORM_PARAMS] = [
+            '__' => 'memberInitialization',
+            'cbk' => $cookie,
+        ];
+        $requestBody = http_build_query($params[RequestOptions::FORM_PARAMS]);
+        $headers['Content-Length'] = strlen($requestBody);
+        $params[RequestOptions::HEADERS] = $headers;
+        $response4 = $client->request('POST', $thirdUrl, $params);
+        $body = $response4->getBody()->getContents();
+        $result4 = Json::decode($body);
+        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'ERR', '登录结束', ['params'=>$params, 'code'=>$code, 'result'=>$result, 'cookieStr'=>$cookieStr, 'result4'=>$result4]);
 
         return $result;
     }

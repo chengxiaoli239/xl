@@ -60,14 +60,14 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $tzSystemUser = TzSystemsUsers::findOne(68);
+            $userInfo = (new ActionBaseService())->login($tzSystemUser, $isAuto=1);p($userInfo);
             //$rst = BetService::pushTasksBetRst($plan_id=7953, $qihao=20240203238, ['bet_rst'=>1,'time_consume'=>2], $access_token='g5843e29ac8dd191e894c7dcea547792', $lottery_type=LotteryType::LUCKY_5); p($rst);
             $rst = BetService::pushTasksBetRst($plan_id=AoZhou5BetService::TEST_BET_ID, $qihao=51108412, ['bet_rst'=>1,'task_status'=>2,'time_consume'=>2], $access_token='g5843e29ac8dd191e894c7dcea547792', $lottery_type=LotteryType::AZ_LUCKY_5);
             p($rst);
             $betRow['qihao'] = DataDealStatus::find()->select('next_qihao')->where(['lottery_type'=>28])->limit(1)->orderBy(['id'=>SORT_DESC])->scalar();
             p($betRow['qihao']);
             $rst = AoZhou5BetService::getBetTasks($id=AoZhou5BetService::TEST_BET_ID);p($rst);
-            $tzSystemUser = TzSystemsUsers::findOne(75);
-            $userInfo = (new ActionBaseService())->login($tzSystemUser, $isAuto=1);p($userInfo);
             $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user}}'); p($r);
             foreach ([8] as $lotteryType){
                 //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
