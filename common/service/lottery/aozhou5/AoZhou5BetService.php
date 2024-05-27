@@ -545,7 +545,7 @@ class AoZhou5BetService extends CommonBaseService
             ];
 
             $headers2 = array_merge($headers, [
-                'Content-Length' => strlen(http_build_query($postData2)),
+                'Content-Length' => (string)strlen(http_build_query($postData2)),
             ]);
 
             $data[] = [
