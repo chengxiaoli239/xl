@@ -549,6 +549,8 @@ class AoZhou5BetService extends CommonBaseService
             ]);
 
             $data[] = [
+                'plan_id' => $betRow['id'],
+                'qihao' => $betRow['qihao'],
                 'headers1' => $headers,
                 'postData1' => $postData1,
                 'headers2' => $headers2,
