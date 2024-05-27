@@ -555,6 +555,7 @@ class AoZhou5BetService extends CommonBaseService
                 'postData1' => $postData1,
                 'headers2' => $headers2,
                 'postData2' => $postData2,
+                'slow_seconds' => 30,
             ];
         }
 
