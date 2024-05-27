@@ -11,6 +11,7 @@ namespace backend\service;
 use backend\models\BetErrorPlansTask;
 use backend\models\DataDealStatus;
 use backend\models\SscKjData;
+use backend\models\thirdD\BetsBackend;
 use backend\models\TzType;
 use backend\service\clients\AgentClientsService;
 use backend\service\clients\TzSystemUsersService;
@@ -63,6 +64,24 @@ abstract class BetService extends BaseBetService {
 
     protected function __construct() {
         parent::__construct();
+    }
+
+    /**
+     * 获取下注任务model
+     * @param int $lotteryType
+     * @return string BetsBackend::class|BetErrorPlansTask::class
+     * @throws \common\exceptions\InfoException
+     */
+    public static function getBetModel(int $lotteryType = DEFAULT_LOTTERY_TYPE): string
+    {
+        $lotteryTypes = [
+            \common\helpers\LotteryType::AZ_LUCKY_5 => BetsBackend::class,
+            \common\helpers\LotteryType::LUCKY_5 => BetErrorPlansTask::class
+        ];
+        if(!isset($lotteryTypes[$lotteryType])){
+            throw_info('未找到对应model');
+        }
+        return $lotteryTypes[$lotteryType];
     }
 
     /**
@@ -609,15 +628,20 @@ abstract class BetService extends BaseBetService {
                 throw_info('用户信息找不到');
             }
 
-            $where = ['uid'=>$TzSystemsUsers->uid, 'plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
-            $BetErrorPlansTask = BetErrorPlansTask::findOne($where);
-            if($BetErrorPlansTask->status == 2){
-                throw_info('已经下注成功无需修改');
+            #$BetErrorPlansTask = BetErrorPlansTask::findOne($where);
+            $class = self::getBetModel($lottery_type);
+            if($lottery_type == \common\helpers\LotteryType::LUCKY_5){
+                $where = ['uid'=>$TzSystemsUsers->uid, 'plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
+            }else{
+                $where = ['user_id'=>$TzSystemsUsers->uid, 'id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
             }
-            if(empty($BetErrorPlansTask)){
+            $model = $class::findOne($where);
+            if(empty($model)){
                 throw_info('任务记录找不到');
             }
+
             $task_status = $betRst['task_status'];
+            //p(['class'=>$class, 'model'=>$model]);
             $m = \Yii::$app->cache;
             $mkey = __FUNCTION__.'_'.$plan_id."_".$qihao;
             if($task_status == 3 && strpos($betRst['err_msg'], '短时间内重复提交') !== false){
@@ -628,11 +652,18 @@ abstract class BetService extends BaseBetService {
                     $task_status = 0;
                 }
             }
+            if($lottery_type == \common\helpers\LotteryType::LUCKY_5){
+                if($model->status == 2){
+                    throw_info('已经下注成功无需修改');
+                }
+                $model->status = $task_status;
+            }else{
+                $model->push_status = $task_status;
+            }
             $m->set($mkey, 1, 40);
 
-            $BetErrorPlansTask->status = $task_status;
-            $BetErrorPlansTask->post_desc = json_encode($betRst, 320);
-            $flag = $BetErrorPlansTask->save();
+            $model->post_desc = json_encode($betRst, 320);
+            $flag = $model->save();
         }catch (\Exception $e){
             return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
         }

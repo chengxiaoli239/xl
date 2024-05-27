@@ -2,6 +2,7 @@
 
 namespace common\service\lottery\aozhou5;
 
+use backend\models\DataDealStatus;
 use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\models\wechat\Bets;
@@ -30,6 +31,7 @@ class AoZhou5BetService extends CommonBaseService
     # 推送ID
     const PUSH_ID_FIVE = 8;
     const PUSH_ID_FOUR = 9;
+    const TEST_BET_ID = 33159;
 
     const PUSH_ID_OPTIONS = [
         DrawLottery::BET_FOUR_NUM => AoZhou5BetService::PUSH_ID_FOUR,
@@ -503,6 +505,9 @@ class AoZhou5BetService extends CommonBaseService
                 ],
                 'cbk' => $cookie,
             ];
+            if($id == AoZhou5BetService::TEST_BET_ID){
+                $betRow['qihao'] = DataDealStatus::find()->select('next_qihao')->where(['lottery_type'=>28])->limit(1)->orderBy(['id'=>SORT_DESC])->scalar();
+            }
             $postData2 = [
                 '__'=>'bettingSingle',
                 'data' => Json::encode([
