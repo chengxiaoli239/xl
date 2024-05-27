@@ -514,7 +514,7 @@ class AoZhou5BetService extends CommonBaseService
                 'Accept-Language:zh-CN,zh;q=0.9',
                 'Cookie' => $TzSystemUsers->cookie,
                 "Content-Type" => "application/x-www-form-urlencoded",
-                'Content-Length' => strlen(http_build_query($postData1)),
+                'Content-Length' => (string)strlen(http_build_query($postData1)),
                 'origin' => 'https://'.$d,
                 'priority' => 'u=1, i',
                 'referer' => 'https://'.$d.'/member/',
