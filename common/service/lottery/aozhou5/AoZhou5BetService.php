@@ -558,6 +558,7 @@ class AoZhou5BetService extends CommonBaseService
             if($betType == BetsBackend::BET_TYPE_SELENIUM){
                 $oneBetData = array_merge($oneBetData, [
                     'method' => $Odds['name'],
+                    'bet_money' => $betRow['bet_money'],
                     'code' => trim(str_replace(['角', '番'], '', $betRow['codes'])),
                 ]);
             }else{
