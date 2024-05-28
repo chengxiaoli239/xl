@@ -470,14 +470,14 @@ class AoZhou5BetService extends CommonBaseService
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public static function getBetTasks($id=0): array
+    public static function getBetTasks($currentQiHao='', $id=0): array
     {
         $betTasksQuery = BetsBackend::find();
 
         if(!empty($id)){
             $betTasksQuery->where(['id'=>$id, 'push_status'=>BetsBackend::PUSH_STATUS_WAIT]);
         }else{
-            $betTasksQuery->where(['status'=>BetsBackend::STATUS_WAIT]);
+            $betTasksQuery->where(['status'=>BetsBackend::STATUS_WAIT, 'qihao'=>$currentQiHao]);
         }
         $betTasks = $betTasksQuery->asArray()->all();
         $data = [];

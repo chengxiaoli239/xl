@@ -93,7 +93,8 @@ class CommonBaseService extends BaseService
     /**
      * 获取本地对盘口玩法ID映射关系
      * @param int $method_id
-     * @param int $system_type_id     * @return array
+     * @param int $system_type_id
+     * @return array
      */
     public static function getLocalToSiteMethods(int $method_id=0, int $system_type_id=15, $betCodes='', $kjNum=4): array
     {

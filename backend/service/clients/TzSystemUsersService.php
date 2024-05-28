@@ -550,7 +550,7 @@ class TzSystemUsersService extends ClientsBaseService{
 
         try {
             if($lottery_type == LotteryType::AZ_LUCKY_5){
-                return AoZhou5BetService::getBetTasks();
+                return AoZhou5BetService::getBetTasks($current_qihao);
             }
             $m = \Yii::$app->cache;
             $mkey = self::buildUserPlanTasksKey($access_token, $current_qihao);
