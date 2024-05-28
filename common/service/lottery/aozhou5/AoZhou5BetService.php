@@ -480,6 +480,7 @@ class AoZhou5BetService extends CommonBaseService
         }
         $betTasks = $betTasksQuery->asArray()->all();
         $data = [];
+        $betType = BetsBackend::BET_TYPE_SELENIUM; # 下注方式：1接口2模拟操作
         foreach ($betTasks as $betRow){
             $Odds = Odds3dService::getOdds($betRow['user_id'], $betRow['play_method']); # 玩法赔率
             if(!isset($Odds['odds'])){
@@ -548,16 +549,28 @@ class AoZhou5BetService extends CommonBaseService
                 'Content-Length' => (string)strlen(http_build_query($postData2)),
             ]);
 
-            $data[] = [
+            $oneBetData = [
                 'plan_id' => $betRow['id'],
                 'qihao' => $betRow['qihao'],
-                'headers1' => $headers,
-                'postData1' => $postData1,
-                'headers2' => $headers2,
-                'postData2' => $postData2,
+                'betType' => $betType, # 1接口2模拟操作
                 'slow_seconds' => 30,
-                'betType' => 2, # 1接口2模拟操作
             ];
+            if($betType == BetsBackend::BET_TYPE_SELENIUM){
+                $oneBetData = array_merge($oneBetData, [
+                    'method' => $Odds['name'],
+                    'code' => trim($betRow['codes']),
+                ]);
+            }else{
+                $oneBetData = array_merge($oneBetData, [
+                    'headers1' => $headers,
+                    'postData1' => $postData1,
+                    'headers2' => $headers2,
+                    'postData2' => $postData2,
+                ]);
+
+            }
+
+            $data[] = $oneBetData;
         }
 
         return ['status'=>200, 'data'=>$data, 'msg'=>'操作成功'];

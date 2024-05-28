@@ -70,4 +70,12 @@ class BetsBackend extends Bets
         self::NEED_CONFIRM_NO => '无需',
         self::NEED_CONFIRM_YES => '需',
     ];
+
+    const BET_TYPE_API = 1;
+    const BET_TYPE_SELENIUM = 2;
+    # 下注方式
+    const BET_TYPE_OPTIONS = [
+        self::BET_TYPE_API => 'api',
+        self::BET_TYPE_SELENIUM => 'selenium',
+    ];
 }
