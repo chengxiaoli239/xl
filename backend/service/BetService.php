@@ -29,6 +29,7 @@ use backend\service\NineNine\NineNineService6;
 use common\kj\cqssc\CqsscKcw;
 use common\service\cache\CacheKeyService;
 use common\service\jobs\kj_data\UserBetJob;
+use common\service\lottery\aozhou5\AoZhou5BetService;
 use common\service\proxy\ProxyBaseService;
 use common\service\ssc\QihaoService;
 use common\tools\RedisLock;
@@ -633,7 +634,11 @@ abstract class BetService extends BaseBetService {
             if($lottery_type == \common\helpers\LotteryType::LUCKY_5){
                 $where = ['uid'=>$TzSystemsUsers->uid, 'plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
             }else{
-                $where = ['user_id'=>$TzSystemsUsers->uid, 'id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
+                if($plan_id == AoZhou5BetService::TEST_BET_ID){
+                    $where = ['user_id'=>$TzSystemsUsers->uid, 'id'=>$plan_id, 'lottery_type'=>$lottery_type];
+                }else{
+                    $where = ['user_id'=>$TzSystemsUsers->uid, 'id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
+                }
             }
             $model = $class::findOne($where);
             if(empty($model)){
