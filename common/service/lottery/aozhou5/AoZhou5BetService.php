@@ -474,7 +474,7 @@ class AoZhou5BetService extends CommonBaseService
         $betTasksQuery = BetsBackend::find();
 
         if(!empty($id)){
-            $betTasksQuery->where(['id'=>$id]);
+            $betTasksQuery->where(['id'=>$id, 'push_status'=>BetsBackend::PUSH_STATUS_WAIT]);
         }else{
             $betTasksQuery->where(['status'=>BetsBackend::STATUS_WAIT]);
         }
