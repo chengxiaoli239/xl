@@ -289,6 +289,11 @@ class NumService extends BaseService {
         179=>'过滤34位置各1个最多遗漏 ',
         180=>'过滤35位置各1个最多遗漏 ',
         181=>'过滤45位置各1个最多遗漏 ',
+
+        182=>'过滤1234最近三大一小200组直码 ',
+        183=>'过滤1234最近一大三小200组直码 ',
+        184=>'过滤1234最近一单三双200组直码 ',
+        185=>'过滤1234最近三单一双200组直码 ',
     ];
 
     const TYPE_POSITIONS = [
@@ -3383,6 +3388,18 @@ class NumService extends BaseService {
                 case 180:
                 case 181:
                     $codes = NumCodeService::getBeforeKjCodesDynamic124($plan, self::TYPE_LR_POSITIONS[$filter_dynamic_type], $type=NumCodeService::CODE_LR_TYPE_YL);
+                    break;
+                case 182: # 过滤最近x组三大一小类型(四定)
+                    $codes = NumCodeService::getBeforeKjCodesDynamic42($plan, $type_field='type_dx', $type_val=2, $positions=[1,2,3,4], $filterNums=200); #
+                    break;
+                case 183: # 过滤最近x组一大三小类型(四定)
+                    $codes = NumCodeService::getBeforeKjCodesDynamic42($plan, $type_field='type_dx', $type_val=4, $positions=[1,2,3,4], $filterNums=200); #
+                    break;
+                case 184: # 过滤最近x组一单三双类型(四定)
+                    $codes = NumCodeService::getBeforeKjCodesDynamic42($plan, $type_field='type_4ds', $type_val=4, $positions=[1,2,3,4], $filterNums=200); #
+                    break;
+                case 185: # 过滤最近x组三单一双类型(四定)
+                    $codes = NumCodeService::getBeforeKjCodesDynamic42($plan, $type_field='type_4ds', $type_val=5, $positions=[1,2,3,4], $filterNums=200); #
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
