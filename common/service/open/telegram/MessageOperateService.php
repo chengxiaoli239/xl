@@ -6,6 +6,7 @@ use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\service\agent\AgentUsersBalanceService;
 use backend\service\agent\AgentUsersService;
+use backend\service\BetService;
 use common\exceptions\InfoException;
 use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
@@ -266,8 +267,11 @@ class MessageOperateService  extends BaseService
             }
         }
 
-        foreach ($pushSiteData as $pushData){
-            push_queue_open(AoZhou5BetJobs::class, $pushData);
+        $betType = BetService::getConfig('aozhou5_bet_type')??BetsBackend::BET_TYPE_API; # 下注方式：1接口2模拟操作
+        if($betType == BetsBackend::BET_TYPE_API){
+            foreach ($pushSiteData as $pushData){
+                push_queue_open(AoZhou5BetJobs::class, $pushData);
+            }
         }
         $data = [
             'type' => WechatUserService::TYPE_ORDER_BET,

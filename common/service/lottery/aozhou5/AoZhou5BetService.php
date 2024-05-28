@@ -7,6 +7,7 @@ use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\models\wechat\Bets;
 use backend\service\agent\AgentUsersBalanceService;
+use backend\service\BetService;
 use common\helpers\lottery\DrawLottery;
 use common\helpers\RequestHelper;
 use common\models\wechat\WechatUser;
@@ -480,7 +481,7 @@ class AoZhou5BetService extends CommonBaseService
         }
         $betTasks = $betTasksQuery->asArray()->all();
         $data = [];
-        $betType = BetsBackend::BET_TYPE_SELENIUM; # 下注方式：1接口2模拟操作
+        $betType = BetService::getConfig('aozhou5_bet_type')??BetsBackend::BET_TYPE_API; # 下注方式：1接口2模拟操作
         foreach ($betTasks as $betRow){
             $Odds = Odds3dService::getOdds($betRow['user_id'], $betRow['play_method']); # 玩法赔率
             if(!isset($Odds['odds'])){
