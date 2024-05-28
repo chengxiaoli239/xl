@@ -235,6 +235,7 @@ class MessageOperateService  extends BaseService
                     'bet_money' => $method['all_moneys'],
                     'single' => $method['single'],
                     'count' => $method['count'],
+                    'post_desc' => '',
                     'qihao' => $qiHao,
                     'lottery_type' => $lotteryType,
                     'lottery_name' => $lotteryName,
