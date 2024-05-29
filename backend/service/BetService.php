@@ -707,7 +707,7 @@ abstract class BetService extends BaseBetService {
 
             if($lottery_type == \common\helpers\LotteryType::AZ_LUCKY_5) {
                 # 澳洲五客户端下注结果通知
-                $pushData[] = ['orderId' => $orderId, 'business_id' => $model->order_id];
+                $pushData = ['orderId' => $orderId, 'business_id' => $model->order_id];
                 push_queue_open(AoZhou5BetJobs::class, $pushData);
             }
         }catch (\Exception $e){
