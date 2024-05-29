@@ -552,6 +552,7 @@ class AoZhou5BetService extends CommonBaseService
 
             $oneBetData = [
                 'plan_id' => $betRow['id'],
+                'order_id' => $betRow['order_id'],
                 'qihao' => $betRow['qihao'],
                 'betType' => $betType, # 1接口2模拟操作
                 'slow_seconds' => 30,
