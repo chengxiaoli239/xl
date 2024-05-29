@@ -274,6 +274,22 @@ class TzSystemUsersController extends Controller
 
         return $rst;
     }
+    /**
+     * @desc 游戏结果消息通知
+     * @return array|bool
+     */
+    public function actionPushTasksBetRstNotice(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+        if(empty($post['access_token'])){
+            return ['status'=>301, 'msg'=>'缺少access_token参数'];
+        }
+
+        $rst = BetService::pushTasksBetRstNotice($post['order_id'], $post['qihao'], $post['access_token'], $post['lottery_type']);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '游戏结果消息通知', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
+
+        return $rst;
+    }
 
     /**
      * @desc 错误日志记录
