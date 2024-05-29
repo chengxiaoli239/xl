@@ -118,6 +118,7 @@ class CodeTypeService extends BaseService {
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_POS_2 => [ ],  #  '百=',
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_POS_3 => [ ],  #  '十=',
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_POS_4 => [ ],  #  '个=',
+        \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_POS_5 => [ ],  #  '五=',
     ];
 
     /**
@@ -127,7 +128,7 @@ class CodeTypeService extends BaseService {
      */
     public static function oprateFixedPositionStrCondition($operateStr=''){
         $matchCondition = [];
-        preg_match_all('/[千|百|十|个]\=\d+/u', $operateStr, $matches);
+        preg_match_all('/[千|百|十|个|五]=\d+/u', $operateStr, $matches);
         if($m = $matches[0]){
             foreach ($m as $mt){
                 if(strpos($mt, CodeTypeService::KX_KW_2_FIXED_POS_1) !== false){

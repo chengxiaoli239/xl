@@ -60,6 +60,9 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $logData = Json::decode('{"log_member_quick_select_id":"24483351","member_id":"21821","account":"Ldl158158","nickname":"","fix_num":"50","bet_count":"49","bet_money":"2940","operation_content":"[五位二定]，定位置“[取]”：个=[2345678]，五=[2341678]","operation_datetime":"05-29 16:51:34","time_value":"2024/5/29 16:51:34","operation_ip":"36.1.*.*","ip_value":"36.1.146.170","operation_ip_extension":"36.1.146.170","is_package":"0","log_type":"102"}');
+            list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token='eb70910c92f134bd54a3837d978f055b');
+            p([$code, $qihao, $logData]);
             $tzSystemUser = TzSystemsUsers::findOne(68);
             $userInfo = (new ActionBaseService())->login($tzSystemUser, $isAuto=1);p($userInfo);
             //$rst = BetService::pushTasksBetRst($plan_id=7953, $qihao=20240203238, ['bet_rst'=>1,'time_consume'=>2], $access_token='g5843e29ac8dd191e894c7dcea547792', $lottery_type=LotteryType::LUCKY_5); p($rst);

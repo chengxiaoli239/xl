@@ -178,6 +178,7 @@ class AgentClientsService extends ClientsBaseService{
         $bet_single_op = $single; # 反买倍数默认等于正常下注倍数
 
         $bet_op_theory_counts = AgentClientsService::getOpBetCounts($data['code_type'], $logData['bet_count']);  # 理论反买组数
+        //p(['lll'.rand(), $data['tz_type'], $data['codes_hz']]);
         $bet_codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']));  # 正买号码
         $bet_counts = count(explode('@', $bet_codes));  # 实际正买组数
 
@@ -284,7 +285,7 @@ class AgentClientsService extends ClientsBaseService{
     public static function getPlaywayByBetLogs(&$bet_logs='', &$codes_hz=[]){
         $playway = 0;
 
-        $playwayTxtArr = ['一定位', '二定位', '三定位', '四定位'];
+        $playwayTxtArr = ['一定位', '二定位', '三定位', '四定位', '五位二定'];
         $strArr = [',', '，'];
         foreach ($playwayTxtArr as $txt){
             if(strpos($bet_logs, $txt) === false){
@@ -303,7 +304,7 @@ class AgentClientsService extends ClientsBaseService{
             }elseif (strpos($bet_logs, '一定位') !== false){
                 $playway = 4;
                 $tz_type = 18;
-            }elseif (strpos($bet_logs, '五定二位') !== false){
+            }elseif (strpos($bet_logs, '五位二定') !== false){
                 $playway = 1;
                 $tz_type = 31;
             }
@@ -397,6 +398,7 @@ class AgentClientsService extends ClientsBaseService{
                         case CodeTypeService::KX_KW_2_FIXED_POS_2: # 定位置：百
                         case CodeTypeService::KX_KW_2_FIXED_POS_3: # 定位置：十
                         case CodeTypeService::KX_KW_2_FIXED_POS_4: # 定位置：个
+                        case CodeTypeService::KX_KW_2_FIXED_POS_5: # 定位置：五
                         case CodeTypeService::KX_KW_2_FIXED_FILTER: # 定位置“除”
                         case CodeTypeService::KX_KW_2_FIXED_GET: # 定位置“取”
                             $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateFixedPositionStrCondition($operateStr));
