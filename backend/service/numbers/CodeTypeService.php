@@ -59,6 +59,7 @@ class CodeTypeService extends BaseService {
     const KX_KW_2_FIXED_POS_2 = '百=';
     const KX_KW_2_FIXED_POS_3 = '十=';
     const KX_KW_2_FIXED_POS_4 = '个=';
+    const KX_KW_2_FIXED_POS_5 = '五=';
 
     # 除取
     public static $keywordsWhere1 = [
@@ -125,26 +126,29 @@ class CodeTypeService extends BaseService {
      * @return array
      */
     public static function oprateFixedPositionStrCondition($operateStr=''){
-        $matcheCondition = [];
+        $matchCondition = [];
         preg_match_all('/[千|百|十|个]\=\d+/u', $operateStr, $matches);
         if($m = $matches[0]){
             foreach ($m as $mt){
                 if(strpos($mt, CodeTypeService::KX_KW_2_FIXED_POS_1) !== false){
-                    $matcheCondition['p1'] = str_replace(CodeTypeService::KX_KW_2_FIXED_POS_1, '', trim($mt));
+                    $matchCondition['p1'] = str_replace(CodeTypeService::KX_KW_2_FIXED_POS_1, '', trim($mt));
                 }
                 if(strpos($mt, CodeTypeService::KX_KW_2_FIXED_POS_2) !== false){
-                    $matcheCondition['p2'] = str_replace(CodeTypeService::KX_KW_2_FIXED_POS_2, '', trim($mt));
+                    $matchCondition['p2'] = str_replace(CodeTypeService::KX_KW_2_FIXED_POS_2, '', trim($mt));
                 }
                 if(strpos($mt, CodeTypeService::KX_KW_2_FIXED_POS_3) !== false){
-                    $matcheCondition['p3'] = str_replace(CodeTypeService::KX_KW_2_FIXED_POS_3, '', trim($mt));
+                    $matchCondition['p3'] = str_replace(CodeTypeService::KX_KW_2_FIXED_POS_3, '', trim($mt));
                 }
                 if(strpos($mt, CodeTypeService::KX_KW_2_FIXED_POS_4) !== false){
-                    $matcheCondition['p4'] = str_replace(CodeTypeService::KX_KW_2_FIXED_POS_4, '', trim($mt));
+                    $matchCondition['p4'] = str_replace(CodeTypeService::KX_KW_2_FIXED_POS_4, '', trim($mt));
+                }
+                if(strpos($mt, CodeTypeService::KX_KW_2_FIXED_POS_5) !== false){
+                    $matchCondition['p5'] = str_replace(CodeTypeService::KX_KW_2_FIXED_POS_5, '', trim($mt));
                 }
             }
         }
 
-        return $matcheCondition;
+        return $matchCondition;
     }
 
     /**

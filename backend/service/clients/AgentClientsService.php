@@ -303,6 +303,9 @@ class AgentClientsService extends ClientsBaseService{
             }elseif (strpos($bet_logs, '一定位') !== false){
                 $playway = 4;
                 $tz_type = 18;
+            }elseif (strpos($bet_logs, '五定二位') !== false){
+                $playway = 1;
+                $tz_type = 31;
             }
 
             if($playway>0){
