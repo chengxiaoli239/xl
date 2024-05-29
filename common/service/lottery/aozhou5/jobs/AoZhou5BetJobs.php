@@ -2,6 +2,7 @@
 namespace common\service\lottery\aozhou5\jobs;
 
 use backend\models\thirdD\BetsBackend;
+use backend\service\agent\AgentUsersBalanceService;
 use backend\service\BetService;
 use common\helpers\LotteryType;
 use common\helpers\SscMethod;
@@ -62,6 +63,9 @@ class AoZhou5BetJobs extends CommonJob {
                 if($betType == BetsBackend::BET_TYPE_SELENIUM){
                     # selenium模拟点击
                     $code = ($betRow->push_status==BetsBackend::PUSH_STATUS_CANNOT)?10004:0;
+                    if($code==0){
+                        AgentUsersBalanceService::updateBalance((string)$betRow['id'], $betRow->bet_money, $betRow->wechat_user_id, WechatUserService::TYPE_ORDER_BET);
+                    }
                 }else{
                     list($code, $data, $msg) = AoZhou5BetService::postToSite($betRow->id);
                 }
