@@ -555,7 +555,7 @@ class AoZhou5BetService extends CommonBaseService
                 'order_id' => $betRow['order_id'],
                 'qihao' => $betRow['qihao'],
                 'betType' => $betType, # 1接口2模拟操作
-                'slow_seconds' => 30,
+                'slow_seconds' => 1,
             ];
             if($betType == BetsBackend::BET_TYPE_SELENIUM){
                 $oneBetData = array_merge($oneBetData, [
