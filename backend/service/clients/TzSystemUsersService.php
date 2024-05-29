@@ -576,7 +576,7 @@ class TzSystemUsersService extends ClientsBaseService{
             if(empty($BetErrorPlansTasks)){
                 throw_info('没有下注任务');
             }
-            $datas = [];
+            $data = [];
             $_t = round(microtime(true) * 1000);
             foreach ($BetErrorPlansTasks as $row){
                 $plan_id = $row->plan_id;
@@ -611,8 +611,9 @@ class TzSystemUsersService extends ClientsBaseService{
                 ];
 
                 $slow_seconds = BetService::getConfig('BET_SLOW_SECONDS'); # 下注延迟秒数设置
-                $datas[] = [
+                $data[] = [
                     'task_id' => $row->id,
+                    'order_id' => $row->order_id,
                     'bet_url' => $bet_url,
                     'plan_type' => self::PlAN_TYPE_RE_LOCAL,
                     'plan_id' => $plan_id,
@@ -629,7 +630,7 @@ class TzSystemUsersService extends ClientsBaseService{
             return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
         }
 
-        return ['status'=>200, 'data'=>$datas];
+        return ['status'=>200, 'data'=>$data, 'msg'=>'操作成功'];
     }
 
     /**
