@@ -30,6 +30,7 @@ use common\kj\cqssc\CqsscKcw;
 use common\service\cache\CacheKeyService;
 use common\service\jobs\kj_data\UserBetJob;
 use common\service\lottery\aozhou5\AoZhou5BetService;
+use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
 use common\service\proxy\ProxyBaseService;
 use common\service\ssc\QihaoService;
 use common\tools\RedisLock;
@@ -669,6 +670,12 @@ abstract class BetService extends BaseBetService {
 
             $model->post_desc = json_encode($betRst, 320);
             $flag = $model->save();
+
+            if($lottery_type == \common\helpers\LotteryType::AZ_LUCKY_5) {
+                # 澳洲五客户端下注结果通知
+                $pushData[] = ['orderId' => $model->order_id, 'business_id' => $model->order_id];
+                push_queue_open(AoZhou5BetJobs::class, $pushData);
+            }
         }catch (\Exception $e){
             return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
         }

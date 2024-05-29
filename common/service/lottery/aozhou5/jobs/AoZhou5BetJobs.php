@@ -1,6 +1,8 @@
 <?php
 namespace common\service\lottery\aozhou5\jobs;
 
+use backend\models\thirdD\BetsBackend;
+use backend\service\BetService;
 use common\helpers\LotteryType;
 use common\helpers\SscMethod;
 use common\models\thirdD\Bets;
@@ -55,8 +57,14 @@ class AoZhou5BetJobs extends CommonJob {
             $allCount = 0;
             $errContent = '';
             $haveSuccess = 0;
+            $betType = BetService::getConfig('aozhou5_bet_type')??BetsBackend::BET_TYPE_API; # 下注方式：1接口2模拟操作
             foreach ($BetRows as $betRow){
-                list($code, $data, $msg) = AoZhou5BetService::postToSite($betRow->id);
+                if($betType == BetsBackend::BET_TYPE_SELENIUM){
+                    # selenium模拟点击
+                    $code = ($betRow->push_status==BetsBackend::PUSH_STATUS_CANNOT)?10004:0;
+                }else{
+                    list($code, $data, $msg) = AoZhou5BetService::postToSite($betRow->id);
+                }
                 if($code>0){
                     $errContent .= $betRow->codes.'/'.$betRow->single.'：'.$msg."\n";
                     continue;
