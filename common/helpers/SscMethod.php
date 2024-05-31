@@ -1,6 +1,7 @@
 <?php
 namespace common\helpers;
 
+use common\service\thirdD\CommonBaseService;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -65,10 +66,16 @@ class SscMethod
             default:
                 $d = explode('/', $text);
                 if(strlen($d[0]) == 1){
+                    if(!in_array($d[0], ['1', '2', '3', '4'])){
+                        throw_info('不存在的玩法，请确认', CommonBaseService::CODE_FOR_USER);
+                    }
                     $methodId = self::FT_ZHENG_ID;
                 }elseif($d[0] == '13' OR $d[0] == '24'){
                     $methodId = self::FT_DS_ID;
-                }elseif(strlen($d[0]) == 2){
+                }elseif(strlen($d[0]) == 2){ # 12、23、34、14 角
+                    if(!in_array($d[0], ['12', '23', '34', '14'])){
+                        throw_info('不存在的玩法,请确认', CommonBaseService::CODE_FOR_USER);
+                    }
                     $methodId = self::FT_JIAO_ID;
                 }
                 break;
