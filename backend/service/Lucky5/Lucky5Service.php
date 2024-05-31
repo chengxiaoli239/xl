@@ -7,6 +7,7 @@ namespace backend\service\Lucky5;
  * Time: 09:40
  */
 
+use backend\models\AgentUserBetLogs;
 use backend\models\BetErrorPlansTask;
 use backend\models\BettingRecords;
 use backend\models\SscKjData;
@@ -254,7 +255,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @desc 返回投注日
      * @return string
      */
-    public static function getBetLog($tz_type = 20){
+    public static function getBetLog($tz_type = 20, $plan_id=0){
+        $BetLog = AgentUserBetLogs::find()->where(['wp_record_id'=>$plan_id])->limit(1)->asArray()->one();
+        if(!empty($BetLog) && $BetLog['bet_logs']){
+            return $BetLog['bet_logs'];
+        }
+
         if(in_array($tz_type,[ 27, 30, 31, 33])) { # 二定
             $str = '[二定位]，定位置“[取]”：千=[1]，百=[34]';
         }elseif(in_array($tz_type,[ 29])){
@@ -1990,7 +1996,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $snInfo_snid = '';
         $rst = [];
         foreach ($codesArrs as $key=>$tmpcodesArr){
-            $bet_log = self::getBetLog($tz_type);
+            $bet_log = self::getBetLog($tz_type, $plan_id);
             if($playway == 4){ # 一字定
                 $url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ');//.'?'.http_build_query($post_data);
                 $post_data = [
