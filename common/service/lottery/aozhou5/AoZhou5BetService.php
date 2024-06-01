@@ -583,18 +583,20 @@ class AoZhou5BetService extends CommonBaseService
             $data[] = $oneBetData;
         }
 
-        # 异常消息提醒
-        $betTasksQuery = BetsBackend::find()->select(['order_id']);
-        $betTasksQuery->where(['user_id'=>$userId, 'push_status'=>BetsBackend::STATUS_WAIT]) # , 'qihao'=>$currentQiHao
-            ->andWhere(['>', 'created_at', time()-900])
-            ->andWhere(['<', 'created_at', time() - 60]); # 超过1分钟则失败提示
-        $orderIds = $betTasksQuery->asArray()->column();
-        BetsBackend::updateAll(['push_status'=>BetsBackend::PUSH_STATUS_CANNOT, 'post_desc'=>['msg'=>'异常，请重新下注']], ['order_id'=>$orderIds, 'push_status'=>BetsBackend::PUSH_STATUS_WAIT]);
-        foreach ($orderIds as $orderId){
-            # 澳洲五客户端下注结果通知
-            $pushData = ['orderId' => $orderId, 'business_id' => $orderId];
-            push_queue_open(AoZhou5BetJobs::class, $pushData);
-        }
+        try {
+            # 异常消息提醒
+            $betTasksQuery = BetsBackend::find()->select(['order_id']);
+            $betTasksQuery->where(['user_id'=>$userId, 'push_status'=>BetsBackend::STATUS_WAIT]) # , 'qihao'=>$currentQiHao
+                ->andWhere(['>', 'created_at', time()-900])
+                ->andWhere(['<', 'created_at', time() - 60]); # 超过1分钟则失败提示
+            $orderIds = $betTasksQuery->asArray()->column();
+            BetsBackend::updateAll(['push_status'=>BetsBackend::PUSH_STATUS_CANNOT, 'post_desc'=>['msg'=>'异常，请重新下注']], ['order_id'=>$orderIds, 'push_status'=>BetsBackend::PUSH_STATUS_WAIT]);
+            foreach ($orderIds as $orderId){
+                # 澳洲五客户端下注结果通知
+                $pushData = ['orderId' => $orderId, 'business_id' => $orderId];
+                push_queue_open(AoZhou5BetJobs::class, $pushData);
+            }
+        }catch (\Exception $e){}
 
         return ['status'=>200, 'data'=>$data, 'msg'=>'操作成功'];
     }
