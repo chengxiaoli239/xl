@@ -662,6 +662,7 @@ abstract class BetService extends BaseBetService {
                 }
                 $model->status = $task_status;
             }else{
+                $task_status = $betRst['task_status']??BetsBackend::PUSH_STATUS_FAIL;
                 $model->push_status = ($task_status==3) ? BetsBackend::PUSH_STATUS_CANNOT : $task_status;
             }
             $m->set($mkey, 1, 40);
