@@ -29,6 +29,7 @@ use common\service\cache\CacheKeyService;
 use common\service\CommonService;
 use common\service\helpers\ThirdD;
 use common\service\lottery\aozhou5\AoZhou5BetService;
+use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
 use common\service\lottery\LotteryTypeService;
 use common\service\open\ActionBaseService;
 use common\service\open\actions\PlatformRobotService;
@@ -60,6 +61,18 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $betTasksQuery = BetsBackend::find()->select(['order_id']);
+            $betTasksQuery->where(['user_id'=>21, 'push_status'=>BetsBackend::STATUS_WAIT])
+                ->andWhere(['=', 'order_id', '118692'])
+                ->andWhere(['<', 'created_at', time() - 60]); # 只1分钟内下注，超过则失败提示
+            $orderIds = $betTasksQuery->asArray()->column();
+            BetsBackend::updateAll(['push_status'=>BetsBackend::PUSH_STATUS_CANNOT, 'post_desc'=>['msg'=>'异常，请重新下注']], ['order_id'=>$orderIds, 'push_status'=>BetsBackend::PUSH_STATUS_WAIT]);
+            foreach ($orderIds as $orderId){
+                # 澳洲五客户端下注结果通知
+                $pushData = ['orderId' => $orderId, 'business_id' => $orderId];
+                push_queue_open(AoZhou5BetJobs::class, $pushData);
+            }
+            p($orderIds);
             $logData = Json::decode('{"log_member_quick_select_id":"24483351","member_id":"21821","account":"Ldl158158","nickname":"","fix_num":"50","bet_count":"49","bet_money":"2940","operation_content":"[五位二定]，定位置“[取]”：个=[2345678]，五=[2341678]","operation_datetime":"05-29 16:51:34","time_value":"2024/5/29 16:51:34","operation_ip":"36.1.*.*","ip_value":"36.1.146.170","operation_ip_extension":"36.1.146.170","is_package":"0","log_type":"102"}');
             list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token='eb70910c92f134bd54a3837d978f055b');
             p([$code, $qihao, $logData]);

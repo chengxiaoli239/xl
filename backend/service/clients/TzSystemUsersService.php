@@ -549,8 +549,12 @@ class TzSystemUsersService extends ClientsBaseService{
     public static function getActivePlanTasks($access_token='', $current_qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE){
 
         try {
+            list($code, $TzSystemsUsers) = TzSystemUsersService::validateAccount($access_token);
+            $uid = $TzSystemsUsers->uid;
+
             if($lottery_type == LotteryType::AZ_LUCKY_5){
-                return AoZhou5BetService::getBetTasks($current_qihao);
+                # 澳洲五
+                return AoZhou5BetService::getBetTasks($uid, $current_qihao);
             }
             $m = \Yii::$app->cache;
             $mkey = self::buildUserPlanTasksKey($access_token, $current_qihao);
@@ -558,13 +562,11 @@ class TzSystemUsersService extends ClientsBaseService{
             if($flag){
                 throw_info('没有任务yyy');
             }
+
             $HI = date('H:i:s');
             if('09:00:00'<$HI && $HI<'09:01:00'){
                 throw_info('早盘开始晚一分钟下注');
             }
-
-            list($code, $TzSystemsUsers) = TzSystemUsersService::validateAccount($access_token);
-            $uid = $TzSystemsUsers->uid;
 
             $where = TzSystemUsersService::getActivePlanTasksWhere($uid, $current_qihao, $lottery_type);
             $BetErrorPlansTasksQuery = BetErrorPlansTask::find()->where($where);

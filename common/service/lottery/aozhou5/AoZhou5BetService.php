@@ -9,11 +9,15 @@ use backend\models\wechat\Bets;
 use backend\service\agent\AgentUsersBalanceService;
 use backend\service\BetService;
 use common\helpers\lottery\DrawLottery;
+use common\helpers\LotteryType;
 use common\helpers\RequestHelper;
+use common\helpers\SscMethod;
 use common\models\wechat\WechatUser;
 use common\open\aozhou5\api\OrderApi;
 use common\open\aozhou5\api\UserApi;
 use common\service\CommonService;
+use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
+use common\service\message\Send;
 use common\service\open\ActionBaseService;
 use common\service\open\aozhou5\ActionService;
 use common\service\ssc\QihaoService;
@@ -21,6 +25,7 @@ use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\jobs\SsxxBetJobs;
 use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\Odds3dService;
+use common\service\thirdD\PlayMethodService;
 use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
 use GuzzleHttp\Client;
@@ -470,16 +475,17 @@ class AoZhou5BetService extends CommonBaseService
      * @return array
      * @throws \common\exceptions\InfoException
      */
-    public static function getBetTasks($currentQiHao='', $id=0): array
+    public static function getBetTasks($userId, $currentQiHao='', $id=0): array
     {
         $betTasksQuery = BetsBackend::find();
 
         if(!empty($id)){
             $betTasksQuery->where(['id'=>$id, 'push_status'=>BetsBackend::PUSH_STATUS_WAIT]);
         }else{
-            $betTasksQuery->where(['push_status'=>BetsBackend::STATUS_WAIT, 'qihao'=>$currentQiHao]);
+            $betTasksQuery->where(['user_id'=>$userId, 'push_status'=>BetsBackend::STATUS_WAIT, 'qihao'=>$currentQiHao])
+                ->andWhere(['>', 'create_time', time() - 60]); # 只1分钟内下注，超过则失败提示
         }
-        $betTasks = $betTasksQuery->asArray()->all();
+        $betTasks = $betTasksQuery->all();
         $data = [];
         $betType = BetService::getConfig('aozhou5_bet_type')??BetsBackend::BET_TYPE_API; # 下注方式：1接口2模拟操作
         foreach ($betTasks as $betRow){
@@ -575,6 +581,18 @@ class AoZhou5BetService extends CommonBaseService
             }
 
             $data[] = $oneBetData;
+        }
+
+        # 异常消息提醒
+        $betTasksQuery = BetsBackend::find()->select(['order_id']);
+        $betTasksQuery->where(['user_id'=>$userId, 'push_status'=>BetsBackend::STATUS_WAIT, 'qihao'=>$currentQiHao])
+                ->andWhere(['<', 'created_at', time() - 60]); # 只1分钟内下注，超过则失败提示
+        $orderIds = $betTasksQuery->asArray()->column();
+        BetsBackend::updateAll(['push_status'=>BetsBackend::PUSH_STATUS_CANNOT, 'post_desc'=>['msg'=>'异常，请重新下注']], ['order_id'=>$orderIds, 'push_status'=>BetsBackend::PUSH_STATUS_WAIT]);
+        foreach ($orderIds as $orderId){
+            # 澳洲五客户端下注结果通知
+            $pushData = ['orderId' => $orderId, 'business_id' => $orderId];
+            push_queue_open(AoZhou5BetJobs::class, $pushData);
         }
 
         return ['status'=>200, 'data'=>$data, 'msg'=>'操作成功'];

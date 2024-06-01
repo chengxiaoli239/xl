@@ -92,7 +92,7 @@ class AoZhou5BetJobs extends CommonJob {
             }
 
             if(!empty($errContent)){
-                $betContent .= "\n【失败】".$errContent;
+                $betContent .= "\n【失败】".$errContent.' 异常请重新确认';
             }
             $betContent .= ("\n【剩余】".$WechatUser->balance.'咪');
             # 即时回复
