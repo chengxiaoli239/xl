@@ -585,7 +585,7 @@ class AoZhou5BetService extends CommonBaseService
 
         # 异常消息提醒
         $betTasksQuery = BetsBackend::find()->select(['order_id']);
-        $betTasksQuery->where(['user_id'=>$userId, 'push_status'=>BetsBackend::STATUS_WAIT, 'qihao'=>$currentQiHao])
+        $betTasksQuery->where(['user_id'=>$userId, 'push_status'=>BetsBackend::STATUS_WAIT]) # , 'qihao'=>$currentQiHao
                 ->andWhere(['<', 'created_at', time() - 60]); # 超过1分钟则失败提示
         $orderIds = $betTasksQuery->asArray()->column();
         BetsBackend::updateAll(['push_status'=>BetsBackend::PUSH_STATUS_CANNOT, 'post_desc'=>['msg'=>'异常，请重新下注']], ['order_id'=>$orderIds, 'push_status'=>BetsBackend::PUSH_STATUS_WAIT]);
