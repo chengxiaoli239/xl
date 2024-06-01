@@ -483,7 +483,7 @@ class AoZhou5BetService extends CommonBaseService
             $betTasksQuery->where(['id'=>$id, 'push_status'=>BetsBackend::PUSH_STATUS_WAIT]);
         }else{
             $betTasksQuery->where(['user_id'=>$userId, 'push_status'=>BetsBackend::STATUS_WAIT, 'qihao'=>$currentQiHao])
-                ->andWhere(['>', 'create_time', time() - 60]); # 只1分钟内下注，超过则失败提示
+                ->andWhere(['>', 'created_at', time() - 60]); # 只1分钟内下注，超过则失败提示
         }
         $betTasks = $betTasksQuery->all();
         $data = [];
