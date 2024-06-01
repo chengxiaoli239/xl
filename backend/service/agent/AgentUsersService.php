@@ -355,8 +355,12 @@ class AgentUsersService extends BaseService {
         if(in_array($playway, [2, 3]) && $bet_single<0.1){
             $bet_single = 0.1;
         }
-        if(in_array($playway, [1]) && $bet_single<1){
-            $bet_single = 1;
+        if(in_array($playway, [1])){
+            if($bet_single<1){
+                $bet_single = 1;
+            }else{
+                $bet_single = (int)$bet_single;
+            }
         }
 
         return [0, $bet_single];
