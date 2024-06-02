@@ -359,10 +359,10 @@ class TzSystemUsersService extends ClientsBaseService{
             }
             $m->set($mkey, 1, 15);
 
+            $mcKey = 'mc_syncClientKjDatas_x0_'.$access_token.'_'.$lottery_type.'_'.$kjData['expect'];
+            $num = \Yii::$app->redis->incr($mcKey);
             $SscKjData = SscKjData::findOne(['qihao'=>$expect, 'lottery_type'=>$lottery_type]);
             if(!empty($SscKjData)){
-                $mcKey = 'mc_syncClientKjDatas_x0_'.$access_token.'_'.$lottery_type.'_'.$kjData['expect'];
-                $num = \Yii::$app->redis->incr($mcKey);
                 \Yii::$app->redis->expire($mcKey, 600);
                 $mcKey_0 = $mcKey.'_x0'; # 指导客户是否刷新网页缓存key
                 $data['num'] = $num;
