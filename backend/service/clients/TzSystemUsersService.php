@@ -339,7 +339,7 @@ class TzSystemUsersService extends ClientsBaseService{
     public static function syncClientKjDatas($kjData=[], $access_token='', $lottery_type=DEFAULT_LOTTERY_TYPE){
 
         try {
-            $data = ['refresh'=>0];
+            $data = ['refresh'=>0, 'num'=>0];
             $now_time = date('Y-m-d H:i:s');
             $expect = $kjData['expect'] = trim($kjData['expect']);
             $kjData['opencode'] = trim($kjData['opencode']);
