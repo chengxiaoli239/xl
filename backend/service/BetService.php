@@ -670,6 +670,15 @@ abstract class BetService extends BaseBetService {
                     'post_desc' => json_encode($betRst, 320),
                 ];
                 $flag = $class::updateAll($updateData, $where);
+
+                $mKey = CacheKeyService::lotteryBetPlanIdKey($TzSystemsUsers->account, $qihao, $plan_id);
+                $lock = commonRedis()->setnx($mKey, 1);
+                if($lock){
+                    commonRedis()->expire($mKey, 300);
+                    # 澳洲五客户端下注结果通知
+                    $pushData = ['orderId'=>$plan_id, 'business_id' => $model->order_id];
+                    push_queue_open(AoZhou5BetJobs::class, $pushData);
+                }
             }
             $m->set($mkey, 1, 40);
             Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新计划状态', ['flag'=>$flag, 'where'=>$where, 'betRst'=>$betRst, 'lottery_type'=>$lottery_type]);
@@ -706,8 +715,8 @@ abstract class BetService extends BaseBetService {
 
             if($lottery_type == \common\helpers\LotteryType::AZ_LUCKY_5) {
                 # 澳洲五客户端下注结果通知
-                $pushData = ['orderId' => $orderId, 'business_id' => $model->order_id];
-                push_queue_open(AoZhou5BetJobs::class, $pushData);
+                #$pushData = ['orderId' => $orderId, 'business_id' => $model->order_id];
+                #push_queue_open(AoZhou5BetJobs::class, $pushData);
             }
         }catch (\Exception $e){
             return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];

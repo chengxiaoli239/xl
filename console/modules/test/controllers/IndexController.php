@@ -61,6 +61,10 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $mKey = CacheKeyService::lotteryBetPlanIdKey('aa30301', $qihao='1234568', $plan_id=1234);
+            $lock = commonRedis()->setnx($mKey, 300);
+            $value = commonRedis()->get($mKey);
+            p([$lock, $value]);
             $betTasksQuery = BetsBackend::find()->select(['order_id']);
             $betTasksQuery->where(['user_id'=>21, 'push_status'=>BetsBackend::STATUS_WAIT])
                 ->andWhere(['=', 'order_id', '118692'])
