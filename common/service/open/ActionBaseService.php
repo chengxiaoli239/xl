@@ -56,4 +56,22 @@ class ActionBaseService
 
         return $objectClass->getUserInfo()?:[];
     }
+
+    /**
+     * 获取盘口报表信息
+     * @param $tzSystemsUser
+     * @return array
+     */
+    public function getSiteStaticsInfo($tzSystemsUser): array
+    {
+        $TzSystems = TzSystems::findOne($tzSystemsUser->tz_system_id);
+        $objectClass = self::getClass($TzSystems->system_type_id);
+        $objectClass->domain = $tzSystemsUser->ssc_domain;
+        $objectClass->tzSystemUsers = $tzSystemsUser;
+
+        $siteStatics = $objectClass->getSiteStatics()?:[];
+        if(!empty($siteStatics)){
+
+        }
+    }
 }

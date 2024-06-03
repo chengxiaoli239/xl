@@ -5,6 +5,7 @@ use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\models\wechat\Bets;
 use backend\service\BaseService;
+use common\service\open\ActionBaseService;
 use common\service\thirdD\CommonBaseService;
 use common\tools\Timer;
 
@@ -15,27 +16,64 @@ class AgentService extends BaseService {
      * @param $userId
      * @return array
      */
-    public static function getCalcMoney($userId): array
+    public static function getCalcMoney($userId, $isSiteInfo=1): array
     {
-        // 今日时间
-        list($startOfDay, $endOfDay) = Timer::todayTime();
-        // 本周时间，获取本周的第一天（星期一）的时间戳、 获取本周的最后一天（星期日）的时间戳, 加上一天的秒数，然后减去1秒，以获取当天的最后一秒
-        list($startOfWeek, $endOfWeek) = Timer::thisWeekTime();
-        // 上周时间
-        list($startOfLastWeek, $endOfLastWeek) = Timer::lastWeekTime();
-
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$userId]);
+        if($isSiteInfo){
+            $siteStaticsInfos = (new ActionBaseService)->getSiteStaticsInfo($TzSystemsUsers);
+            $thisWeekBetMoney = 0.00; # 本周下单金额
+            $thisWeekProfits = 0.00; # 本周实际盈亏
+            $lastWeekBetMoney = 0.00; # 上周下单金额
+            $lastWeekProfits = 0.00; # 上周实际盈亏
+            foreach ($siteStaticsInfos as $k=>$siteStaticsInfo){
+                list($date, $bs, $betMoney, $profits, $backWater, $realProfits) = $siteStaticsInfo;
+                if(($k+1) == count($siteStaticsInfos)){
+                    $todayProfits = $realProfits;
+                    $todayBetMoney = $betMoney;
+                }
+                if($k<=6){
+                    # 上周
+                    $lastWeekBetMoney += $betMoney;
+                    $thisWeekProfits += $realProfits;
+                }else{
+                    # 本周
+                    $thisWeekBetMoney += $betMoney;
+                    $lastWeekProfits += $realProfits;
+                }
+            }
+            $data = [
+                $TzSystemsUsers->balance?:0.00, # 盘口余额
+                $todayProfits, # 今日盈亏
+                $todayBetMoney, # 有效金额，暂时计算今日，有待确认
+                $thisWeekBetMoney, # 本周下单金额
+                $thisWeekProfits, # 本周实际盈亏
+                $lastWeekBetMoney, # 上周下单金额
+                $lastWeekProfits, # 上周实际盈亏
 
-        # 盘口余额、今日盈亏、有效金额、本周下单金额、本周实际盈亏、上周下单金额、上周实际盈亏
-        return [
-            $TzSystemsUsers->balance?:0.00, # 盘口余额
-            self::getZoneProfits($TzSystemsUsers->account, $startOfDay, $endOfDay), # 今日盈亏
-            self::getZoneBetMoney($TzSystemsUsers->account, $startOfDay, $endOfDay), # 有效金额，暂时计算今日，有待确认
-            self::getZoneBetMoney($TzSystemsUsers->account, $startOfWeek, $endOfWeek), # 本周下单金额
-            self::getZoneProfits($TzSystemsUsers->account, $startOfWeek, $endOfWeek), # 本周实际盈亏
-            self::getZoneBetMoney($TzSystemsUsers->account, $startOfLastWeek, $endOfLastWeek), # 上周下单金额
-            self::getZoneProfits($TzSystemsUsers->account, $startOfLastWeek, $endOfLastWeek), # 上周实际盈亏
-        ];
+            ];
+            #p(['siteStaticsInfos'=>$siteStaticsInfos]);
+        }else{
+            // 今日时间
+            list($startOfDay, $endOfDay) = Timer::todayTime();
+            // 本周时间，获取本周的第一天（星期一）的时间戳、 获取本周的最后一天（星期日）的时间戳, 加上一天的秒数，然后减去1秒，以获取当天的最后一秒
+            list($startOfWeek, $endOfWeek) = Timer::thisWeekTime();
+            // 上周时间
+            list($startOfLastWeek, $endOfLastWeek) = Timer::lastWeekTime();
+
+
+            # 盘口余额、今日盈亏、有效金额、本周下单金额、本周实际盈亏、上周下单金额、上周实际盈亏
+            $data = [
+                $TzSystemsUsers->balance?:0.00, # 盘口余额
+                self::getZoneProfits($TzSystemsUsers->account, $startOfDay, $endOfDay), # 今日盈亏
+                self::getZoneBetMoney($TzSystemsUsers->account, $startOfDay, $endOfDay), # 有效金额，暂时计算今日，有待确认
+                self::getZoneBetMoney($TzSystemsUsers->account, $startOfWeek, $endOfWeek), # 本周下单金额
+                self::getZoneProfits($TzSystemsUsers->account, $startOfWeek, $endOfWeek), # 本周实际盈亏
+                self::getZoneBetMoney($TzSystemsUsers->account, $startOfLastWeek, $endOfLastWeek), # 上周下单金额
+                self::getZoneProfits($TzSystemsUsers->account, $startOfLastWeek, $endOfLastWeek), # 上周实际盈亏
+            ];
+        }
+
+        return $data;
     }
 
     /**

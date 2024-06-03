@@ -271,7 +271,7 @@ class ActionService
         $url = "https://url{$this->line_number}.{$host}";
         //p(['url'=>$url, 'params'=>$params, 'headers'=>$headers]);
 
-        $userInfo = UserApi::memberThreadMd($url, $params, $headers);
+        $userInfo = UserApi::siteCommonApi($url, $params, $headers);
         Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '获取用户md', ['username'=>$this->tzSystemUsers->username, 'account'=>$this->tzSystemUsers->account, 'balance'=>$userInfo['balance'], 'userInfo'=>$userInfo]);
         if(!isset($userInfo['balance'])){
             Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '获取用户信息-异常', ['username'=>$this->tzSystemUsers->username, 'account'=>$this->tzSystemUsers->account, 'balance'=>$userInfo['balance'], 'userInfo'=>$userInfo, 'headers'=>$headers, 'url'=>$url]);
@@ -279,5 +279,27 @@ class ActionService
         }
 
         return ($userInfo && empty($userInfo['error']))? $userInfo:[];
+    }
+
+    /**
+     * 获取盘口报表信息
+     * @return array
+     */
+    public function getSiteStatics(): array
+    {
+        $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
+        $cookie = explode('=', $this->tzSystemUsers->cookie)[1];
+        $params = [
+            '__' => 'historicalReportDate',
+            'cbk' => $cookie,
+        ];
+        $host = $parsed_url['host'];
+        $url = "https://url{$this->line_number}.{$host}";
+        $headers = [
+            'cookie' => $this->tzSystemUsers->cookie,
+        ];
+        $staticsInfo = UserApi::siteCommonApi($url, $params, $headers);
+
+        return $staticsInfo;
     }
 }
