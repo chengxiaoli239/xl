@@ -610,7 +610,7 @@ class AoZhou5BetService extends CommonBaseService
             $data[] = $oneBetData;
         }
 
-        return ['bet_type'=>BetsBackend::BET_TYPE_API, 'data'=>$data];
+        return ['bet_type'=>BetsBackend::BET_TYPE_API, 'slow_seconds'=>0, 'data'=>$data];
     }
 
     /**
@@ -643,6 +643,6 @@ class AoZhou5BetService extends CommonBaseService
         }
         $data = array_values($postDataCodes);
 
-        return ['bet_type'=>BetsBackend::BET_TYPE_SELENIUM, 'data'=>$data];
+        return ['bet_type'=>BetsBackend::BET_TYPE_SELENIUM, 'slow_seconds'=>0, 'data'=>$data];
     }
 }
