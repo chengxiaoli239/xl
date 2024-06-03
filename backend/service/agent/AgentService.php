@@ -34,11 +34,11 @@ class AgentService extends BaseService {
                 if($k<=6){
                     # 上周
                     $lastWeekBetMoney += $betMoney;
-                    $thisWeekProfits += $realProfits;
+                    $lastWeekProfits += $realProfits;
                 }else{
                     # 本周
                     $thisWeekBetMoney += $betMoney;
-                    $lastWeekProfits += $realProfits;
+                    $thisWeekProfits += $realProfits;
                 }
             }
             $data = [
