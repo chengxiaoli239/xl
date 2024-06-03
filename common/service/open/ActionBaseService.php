@@ -69,9 +69,6 @@ class ActionBaseService
         $objectClass->domain = $tzSystemsUser->ssc_domain;
         $objectClass->tzSystemUsers = $tzSystemsUser;
 
-        $siteStatics = $objectClass->getSiteStatics()?:[];
-        if(!empty($siteStatics)){
-
-        }
+        return $objectClass->getSiteStatics()?:[];
     }
 }

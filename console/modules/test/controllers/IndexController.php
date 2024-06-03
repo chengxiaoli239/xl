@@ -61,6 +61,7 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $data = AgentService::getCalcMoney($userId=71);p($data);
             $mKey = CacheKeyService::lotteryBetPlanIdKey('aa30301', $qihao='1234568', $plan_id=1234);
             $lock = commonRedis()->setnx($mKey, 300);
             $value = commonRedis()->get($mKey);
@@ -121,7 +122,6 @@ class IndexController extends Controller
             $tzSystemUser = TzSystemsUsers::findOne(68);
             #$r = (new ActionBaseService())->login($tzSystemUser);p($r);
             $r = (new ActionBaseService())->getUserInfo($tzSystemUser);p($r);
-            $data = AgentService::getCalcMoney($userId=21);p($data);
             $rst = AgentUsersService::userFlowsCheck(['id'=>16791, 'status'=>1], 21, '管理员消息回复处理');p($rst);
             $rst = [];
             list($entertainedStatus, $grabStatus) = LotteryBet::isEntertained(LotteryType::LUCKY_5);p([$entertainedStatus, $grabStatus]);
