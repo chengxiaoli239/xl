@@ -25,13 +25,15 @@ class AgentService extends BaseService {
             $thisWeekProfits = 0.00; # 本周实际盈亏
             $lastWeekBetMoney = 0.00; # 上周下单金额
             $lastWeekProfits = 0.00; # 上周实际盈亏
+            list($startOfWeek, $endOfWeek) = Timer::thisWeekTime();
+            $startThisWeekDate = date('Y-m-d', $startOfWeek);
             foreach ($siteStaticsInfos as $k=>$siteStaticsInfo){
                 list($date, $bs, $betMoney, $profits, $backWater, $realProfits) = $siteStaticsInfo;
                 if(($k+1) == count($siteStaticsInfos)){
                     $todayProfits = $realProfits;
                     $todayBetMoney = $betMoney;
                 }
-                if($k<=6){
+                if($date<$startThisWeekDate){
                     # 上周
                     $lastWeekBetMoney += $betMoney;
                     $lastWeekProfits += $realProfits;
