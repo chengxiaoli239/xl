@@ -272,6 +272,8 @@ class MessageOperateService  extends BaseService
             foreach ($pushSiteData as $pushData){
                 push_queue_open(AoZhou5BetJobs::class, $pushData);
             }
+        }else{
+            # 后续直接
         }
         $data = [
             'type' => WechatUserService::TYPE_ORDER_BET,

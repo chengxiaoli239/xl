@@ -632,16 +632,16 @@ abstract class BetService extends BaseBetService {
             $class = self::getBetModel($lottery_type);
             if($lottery_type == \common\helpers\LotteryType::LUCKY_5){
                 $where = ['uid'=>$TzSystemsUsers->uid, 'plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
-            }else{
-                if($plan_id == AoZhou5BetService::TEST_BET_ID){
-                    $where = ['user_id'=>$TzSystemsUsers->uid, 'id'=>$plan_id, 'lottery_type'=>$lottery_type];
-                }else{
-                    $where = ['user_id'=>$TzSystemsUsers->uid, 'id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
+                $model = $class::findOne($where);
+                if(empty($model)){
+                    throw_info('任务记录找不到');
                 }
-            }
-            $model = $class::findOne($where);
-            if(empty($model)){
-                throw_info('任务记录找不到');
+            }else{
+                $where = ['user_id'=>$TzSystemsUsers->uid, 'order_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
+                $model = $class::findOne($where);
+                if(empty($model)){
+                    throw_info('任务记录找不到');
+                }
             }
 
             $task_status = $betRst['task_status'];
@@ -661,15 +661,18 @@ abstract class BetService extends BaseBetService {
                     throw_info('已经下注成功无需修改');
                 }
                 $model->status = $task_status;
+                $model->post_desc = json_encode($betRst, 320);
+                $flag = $model->save();
             }else{
                 $task_status = $betRst['task_status']??BetsBackend::PUSH_STATUS_FAIL;
-                $model->push_status = ($task_status==3) ? BetsBackend::PUSH_STATUS_CANNOT : $task_status;
+                $updateData = [
+                    'push_status' => ($task_status==3) ? BetsBackend::PUSH_STATUS_CANNOT : $task_status,
+                    'post_desc' => json_encode($betRst, 320),
+                ];
+                $flag = $class::updateAll($updateData, $where);
             }
             $m->set($mkey, 1, 40);
-
-            $model->post_desc = json_encode($betRst, 320);
-            $flag = $model->save();
-
+            Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新计划状态', ['flag'=>$flag, 'where'=>$where, 'betRst'=>$betRst, 'lottery_type'=>$lottery_type]);
         }catch (\Exception $e){
             return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
         }

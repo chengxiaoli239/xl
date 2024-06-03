@@ -483,105 +483,24 @@ class AoZhou5BetService extends CommonBaseService
             $betTasksQuery->where(['id'=>$id, 'push_status'=>BetsBackend::PUSH_STATUS_WAIT]);
         }else{
             $betTasksQuery->where(['user_id'=>$userId, 'push_status'=>BetsBackend::STATUS_WAIT, 'qihao'=>$currentQiHao])
-                ->andWhere(['>', 'created_at', time() - 60]); # 只1分钟内下注，超过则失败提示
+                ->andWhere(['>', 'created_at', time() - 60]); # 只取1分钟内下注，超过则失败提示
+            //$betTasksQuery->where(['order_id'=>[118837]]); # 测试
         }
-        $betTasks = $betTasksQuery->all();
-        $data = [];
+        $betTasks = $betTasksQuery->orderBy(['order_id'=>SORT_ASC])->all();
+        if(empty($betTasks)){
+            return ['status'=>300, 'data'=>[], 'msg'=>'无操作记录'];
+        }
+
         $betType = BetService::getConfig('aozhou5_bet_type')??BetsBackend::BET_TYPE_API; # 下注方式：1接口2模拟操作
-        foreach ($betTasks as $betRow){
-            $Odds = Odds3dService::getOdds($betRow['user_id'], $betRow['play_method']); # 玩法赔率
-            if(!isset($Odds['odds'])){
-                throw_info('赔率获取异常user_id:'.$betRow['user_id'].'_play_method:'.$betRow['play_method']);
-            }
+        $siteSystemInfo = CommonBaseService::getSystemBaseInfo($userId, LotteryType::AZ_LUCKY_5); # 盘口信息
+        $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$userId]);
 
-            #$method_id = $betRow['play_method'];
-            #p([$method_id, $betRow]);
-            $siteSystemInfo = CommonBaseService::getSystemBaseInfo($betRow['user_id'], $betRow['lottery_type']); # 盘口信息
-            $methodData = CommonBaseService::getLocalToSiteMethods($betRow['play_method'], $siteSystemInfo['system_type_id'], $betRow['codes'], $betRow['kj_num']); #
-            $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$betRow['user_id']]);
-            $cookie = explode('=', trim($TzSystemUsers->cookie))[1];
-            $postData1 = [
-                '__'=>'isAutoOdds',
-                'gameId'=>601,
-                'rebate' => 'A',
-                'data' => [
-                    [$methodData['site_method_id'], $Odds['odds'], (string)floatval($betRow['bet_money'])], // 赔率待处理
-                ],
-                'cbk' => $cookie,
-            ];
-            $ht = explode('//', $TzSystemUsers->ssc_domain);
-
-            $d = 'url'.ActionService::LINE_NUMBER.'.'.$ht[1];
-            $headers = [
-                ':authority' => $d,
-                ':method' => 'POST',
-                ':path' => '/api/',
-                ':scheme' => 'https',
-                'accept' => '*/*',
-                'Accept-Encoding' => 'gzip, deflate, br, zstd',
-                'Accept-Language' => 'zh-CN,zh;q=0.9',
-                'Cookie' => $TzSystemUsers->cookie,
-                "Content-Type" => "application/x-www-form-urlencoded",
-                'Content-Length' => (string)strlen(http_build_query($postData1)),
-                'origin' => 'https://'.$d,
-                'priority' => 'u=1, i',
-                'referer' => 'https://'.$d.'/member/',
-                'sec-ch-ua' => '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
-                'sec-ch-ua-mobile' => '?0',
-                'sec-ch-ua-platform' => "Windows",
-                'sec-fetch-dest' => 'empty',
-                'sec-fetch-mode' => 'cors',
-                'sec-fetch-site' => 'same-origin',
-                'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemUsers->user_agent)),
-            ];
-
-            if($id == AoZhou5BetService::TEST_BET_ID){
-                $betRow['qihao'] = DataDealStatus::find()->select('next_qihao')->where(['lottery_type'=>28])->limit(1)->orderBy(['id'=>SORT_DESC])->scalar();
-            }
-            $postData2 = [
-                '__'=>'bettingSingle',
-                'data' => Json::encode([
-                    'gameId'=>601,
-                    'pusId' => self::PUSH_ID_OPTIONS[$betRow['kj_num']],
-                    'openingNum' => (int)$betRow['qihao'],
-                    'rebate' => 'A',
-                    'data' => [
-                        [$methodData['site_method_id'], $Odds['odds'], (string)floatval($betRow['bet_money'])], // 赔率待处理
-                    ]
-                ]),
-                'cbk' => $cookie,
-            ];
-
-            $headers2 = array_merge($headers, [
-                'Content-Length' => (string)strlen(http_build_query($postData2)),
-            ]);
-
-            $oneBetData = [
-                'plan_id' => $betRow['id'],
-                'order_id' => $betRow['order_id'],
-                'qihao' => $betRow['qihao'],
-                'betType' => $betType, # 1接口2模拟操作
-                'slow_seconds' => 0,
-            ];
-            if($betType == BetsBackend::BET_TYPE_SELENIUM){
-                $oneBetData = array_merge($oneBetData, [
-                    'method' => $Odds['name'],
-                    'bet_money' => (int)$betRow['bet_money'],
-
-                    'code' => trim(str_replace(['角', '番'], '', $betRow['codes'])),
-                ]);
-            }else{
-                $oneBetData = array_merge($oneBetData, [
-                    'headers1' => $headers,
-                    'postData1' => $postData1,
-                    'headers2' => $headers2,
-                    'postData2' => $postData2,
-                ]);
-
-            }
-
-            $data[] = $oneBetData;
+        if($betType == BetsBackend::BET_TYPE_SELENIUM){
+            $data = self::getSeleniumBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
+        }else{
+            $data = self::getApiBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
         }
+        $data['slow_seconds'] = 0;
 
         try {
             # 异常消息提醒
@@ -599,5 +518,131 @@ class AoZhou5BetService extends CommonBaseService
         }catch (\Exception $e){}
 
         return ['status'=>200, 'data'=>$data, 'msg'=>'操作成功'];
+    }
+
+    /**
+     * api 下注数据组装
+     * @param $betTasks
+     * @param $TzSystemUsers
+     * @param $siteSystemInfo
+     * @return array
+     */
+    private static function getApiBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo): array
+    {
+        $ht = explode('//', $TzSystemUsers->ssc_domain);
+
+        $d = 'url'.ActionService::LINE_NUMBER.'.'.$ht[1];
+        $headers = [
+            ':authority' => $d,
+            ':method' => 'POST',
+            ':path' => '/api/',
+            ':scheme' => 'https',
+            'accept' => '*/*',
+            'Accept-Encoding' => 'gzip, deflate, br, zstd',
+            'Accept-Language' => 'zh-CN,zh;q=0.9',
+            'Cookie' => $TzSystemUsers->cookie,
+            "Content-Type" => "application/x-www-form-urlencoded",
+            'origin' => 'https://'.$d,
+            'priority' => 'u=1, i',
+            'referer' => 'https://'.$d.'/member/',
+            'sec-ch-ua' => '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
+            'sec-ch-ua-mobile' => '?0',
+            'sec-ch-ua-platform' => "Windows",
+            'sec-fetch-dest' => 'empty',
+            'sec-fetch-mode' => 'cors',
+            'sec-fetch-site' => 'same-origin',
+            'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemUsers->user_agent)),
+        ];
+
+        $postDataCodes = [];
+        foreach ($betTasks as $betRow){
+            $qiHao = $betRow['qihao'];
+            $Odds = Odds3dService::getOdds($TzSystemUsers->uid, $betRow['play_method']); # 玩法赔率
+            if(!isset($Odds['odds'])){
+                throw_info('赔率获取异常user_id:'.$betRow['user_id'].'_play_method:'.$betRow['play_method']);
+            }
+            $methodData = CommonBaseService::getLocalToSiteMethods($betRow['play_method'], $siteSystemInfo['system_type_id'], $betRow['codes'], $betRow['kj_num']); #
+            $postDataCodes[$betRow['order_id']][] = [$methodData['site_method_id'], $Odds['odds'], (string)floatval($betRow['bet_money'])];
+        }
+
+        foreach ($postDataCodes as $orderId=>$postData){
+            $cookie = explode('=', trim($TzSystemUsers->cookie))[1];
+            $postData1 = [
+                '__'=>'isAutoOdds',
+                'gameId'=>601,
+                'rebate' => 'A',
+                'data' => $postData['postCode'],
+                'cbk' => $cookie,
+            ];
+            $headers1 = array_merge($headers, [
+                'Content-Length' => (string)strlen(http_build_query($postData1)),
+            ]);
+
+            $postData2 = [
+                '__'=>'bettingSingle',
+                'data' => Json::encode([
+                    'gameId'=>601,
+                    'pusId' => self::PUSH_ID_OPTIONS[DrawLottery::BET_FOUR_NUM],
+                    'openingNum' => (int)$betRow['qihao'],
+                    'rebate' => 'A',
+                    'data' => $postData['postCode'],
+                ]),
+                'cbk' => $cookie,
+            ];
+
+            $headers2 = array_merge($headers, [
+                'Content-Length' => (string)strlen(http_build_query($postData2)),
+            ]);
+
+            $oneBetData = [
+                //'plan_id' => $betRow['id'],
+                'order_id' => $betRow['order_id'],
+                'qihao' => $qiHao,
+                'slow_seconds' => 0,
+            ];
+            $oneBetData = array_merge($oneBetData, [
+                'headers1' => $headers1,
+                'postData1' => $postData1,
+                'headers2' => $headers2,
+                'postData2' => $postData2,
+            ]);
+
+            $data[] = $oneBetData;
+        }
+
+        return ['bet_type'=>BetsBackend::BET_TYPE_API, 'data'=>$data];
+    }
+
+    /**
+     * selenium 下注数据组装
+     * @param $betTasks
+     * @param $TzSystemUsers
+     * @param $siteSystemInfo
+     * @return array
+     */
+    private static function getSeleniumBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo): array
+    {
+        $postDataCodes = [];
+        foreach ($betTasks as $betRow){
+            $Odds = Odds3dService::getOdds($TzSystemUsers->uid, $betRow['play_method']); # 玩法赔率
+            if(!isset($Odds['odds'])){
+                throw_info('赔率获取异常user_id:'.$betRow['user_id'].'_play_method:'.$betRow['play_method']);
+            }
+            $methodData = CommonBaseService::getLocalToSiteMethods($betRow['play_method'], $siteSystemInfo['system_type_id'], $betRow['codes'], $betRow['kj_num']); #
+            //$postDataCodes[$betRow['order_id']]['order_id'] = $betRow['order_id'];
+            $postDataCodes[$betRow['order_id']]['order_id'] = $betRow['order_id'];
+            $postDataCodes[$betRow['order_id']]['qihao'] = $betRow['qihao'];
+            $postDataCodes[$betRow['order_id']]['postCode'][] = [
+                'method' => $Odds['name'],
+                'code' => trim(str_replace(['角', '番'], '', $betRow['codes'])),
+                'bet_money' => (string)floatval($betRow['bet_money']),
+
+                'method_id' => $methodData['site_method_id'],
+                'odds' => $Odds['odds'],
+            ]; // 赔率待处理
+        }
+        $data = array_values($postDataCodes);
+
+        return ['bet_type'=>BetsBackend::BET_TYPE_SELENIUM, 'data'=>$data];
     }
 }
