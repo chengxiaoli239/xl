@@ -8,17 +8,18 @@ use common\tools\Tool_Common;
 class DatasClearService extends BaseService{
 
     /**
-     * @param array $params
      * @return array
      */
-    public static function deleteLatestRecords($params=[]){
-        self::clearBettingRecords($params);
+    public static function deleteLatestRecords(): array
+    {
+        self::clearBettingRecords();
         self::clearQueueJobRecords();
 
         return ['status'=>200, 'msg'=>'操作成功'];
     }
 
-    public static function clearBettingRecords($params=[]){
+    public static function clearBettingRecords(): bool
+    {
         #$lottery_types = UserSysPlansService::getMyLotteryTypes($uid=1);
         $db = \Yii::$app->db;
         $lottery_types = [['lottery_type'=>8], ['lottery_type'=>23], ['lottery_type'=>24]];

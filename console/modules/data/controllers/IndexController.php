@@ -320,11 +320,11 @@ class IndexController extends Controller
      * @desc 保留最近x天的记录，默认两天
      * @return array
      */
-    public function actionDelLatestRecords(): array
+    public function actionDeleteLatestRecords(): array
     {
         self::_init();
         $post = \Yii::$app->request->post();
-        $rst = DatasClearService::deleteLatestRecords($post);
+        $rst = DatasClearService::deleteLatestRecords();
 
         return $rst;
     }

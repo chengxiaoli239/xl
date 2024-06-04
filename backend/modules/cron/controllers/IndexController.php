@@ -203,24 +203,6 @@ class IndexController extends Controller
      * @desc 批量插入投注任务
      * @return array
      */
-    public function actionInsertPlansTask(){
-        self::_init();
-        $rst = ['status'=>200, 'msg'=>'操作成功'];
-        $post = \Yii::$app->request->post();
-
-        for ($i=0; $i<4; $i++){
-            $rst['data'] = BetService::insertPlansTask($post['lottery_types']);
-            //$rst['batch_simulate_data'] = BetService::batchSimulateBet($post['lottery_types']);
-            sleep(12);
-        }
-
-        return $rst;
-    }
-
-    /**
-     * @desc 批量插入投注任务
-     * @return array
-     */
     public function actionBatchSimulateBet(){
         self::_init();
         ini_set('memory_limit','1024M'); //升级为1024M内存
@@ -362,18 +344,6 @@ class IndexController extends Controller
         $uid = $post['uid'];
 
         $rst = WxService::syncCheckTask($uid);
-
-        return $rst;
-    }
-
-    /**
-     * @desc 保留最近x天的记录，默认两天
-     * @return array
-     */
-    public function actionDelLatestRecords(){
-        self::_init();
-        $post = \Yii::$app->request->post();
-        $rst = DatasClearService::deleteLatestRecords($post);
 
         return $rst;
     }
