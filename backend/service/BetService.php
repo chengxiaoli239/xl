@@ -689,42 +689,6 @@ abstract class BetService extends BaseBetService {
         return $flag;
     }
 
-    /**
-     * @desc 下注任务结果消息通知
-     * @param string $access_token
-     * @param string $qihao
-     * @return bool|array
-     */
-    public static function pushTasksBetRstNotice($orderId, $qihao='', $access_token='', $lottery_type=DEFAULT_LOTTERY_TYPE){
-        try {
-            $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
-            if(empty($TzSystemsUsers)){
-                throw_info('用户信息找不到');
-            }
-
-            $class = self::getBetModel($lottery_type);
-            if($lottery_type == \common\helpers\LotteryType::LUCKY_5){
-                $where = ['uid'=>$TzSystemsUsers->uid, 'id'=>$orderId, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
-            }else{
-                $where = ['user_id'=>$TzSystemsUsers->uid, 'order_id'=>$orderId, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
-            }
-            $model = $class::findOne($where);
-            if(empty($model)){
-                throw_info('任务记录找不到');
-            }
-
-            if($lottery_type == \common\helpers\LotteryType::AZ_LUCKY_5) {
-                # 澳洲五客户端下注结果通知
-                #$pushData = ['orderId' => $orderId, 'business_id' => $model->order_id];
-                #push_queue_open(AoZhou5BetJobs::class, $pushData);
-            }
-        }catch (\Exception $e){
-            return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
-        }
-
-        return ['status'=>200, 'data'=>['order_id'=>$orderId], 'msg'=>'操作成功'];
-    }
-
    /**
      * @desc 判断当前期是否可以自动化投注
      * @param int $lottery_type

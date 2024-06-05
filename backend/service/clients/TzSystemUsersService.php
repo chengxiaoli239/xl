@@ -184,33 +184,6 @@ class TzSystemUsersService extends ClientsBaseService{
 
     /**
      * @desc 获取用户激活的计划ids
-     * @param string $access_token
-     * @return mixed|string
-     */
-    public static function getActivePlanIds($access_token=''){
-
-        $m = \Yii::$app->cache;
-        $mkey = self::buildUserPlanidsKey($access_token);
-        $data = $m->get($mkey);
-
-        if(empty($data)){
-            //$TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
-            $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
-            $uid = $TzSystemsUsers->uid;
-
-            $where = ['AND', ['=', 'status', 1], ['OR', ['=', 'is_batch_simulate', 0], ['IS', 'is_batch_simulate', NULL]], ['=', 'uid', $uid]]; # is_batch_simulate:0正常1批量模拟历史记录
-            $plans = UserSysPlans::find()->where($where)->asArray()->all();
-            $data = ArrayHelper::getColumn($plans, 'id');
-
-            $m->set($mkey, $data, 60);
-        }
-
-        return ['status'=>200, 'data'=>$data];
-    }
-
-
-    /**
-     * @desc 获取用户激活的计划ids
      * @param int $lottery_type
      * @return mixed|string
      */
@@ -313,8 +286,8 @@ class TzSystemUsersService extends ClientsBaseService{
             if(!empty($TzSystemsUsers)){
                 $robot_id = Lucky5Service::getRobotIdByStr($err_msg, $TzSystemsUsers->ssc_domain);
                 $cookie = $TzSystemsUsers->cookie;
-                preg_match("/robot7=([^\r\n]*);Seven/i", $cookie, $matches);
-                $new_cookie = str_replace($matches, $robot_id.';Seven', $cookie);
+                preg_match("/robot7=([^\r\n]*)/i", $cookie, $matches);
+                $new_cookie = str_replace($matches, $robot_id, $cookie);
                 //p(['data'=>$data, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
                 $TzSystemsUsers->cookie = $new_cookie;
 

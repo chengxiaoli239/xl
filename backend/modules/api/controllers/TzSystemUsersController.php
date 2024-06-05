@@ -112,23 +112,6 @@ class TzSystemUsersController extends Controller
     }
 
     /**
-     * @desc 激活计划id
-     * @return array|bool
-     */
-    public function actionGetActivePlanIds(){
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        $post = \Yii::$app->request->post();
-        if(empty($post['access_token'])){
-            return ['status'=>301, 'msg'=>'缺少access_token参数'];
-        }
-
-        $rst = TzSystemUsersService::getActivePlanIds($post['access_token']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取cookies接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
-
-        return $rst;
-    }
-
-    /**
      * @desc 客户端同步开奖号码
      * @return array|bool
      */
@@ -285,11 +268,6 @@ class TzSystemUsersController extends Controller
             return ['status'=>301, 'msg'=>'缺少access_token参数'];
         }
         return ['status'=>200, 'msg'=>'操作成功'];
-
-        $rst = BetService::pushTasksBetRstNotice($post['order_id'], $post['qihao'], $post['access_token'], $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '游戏结果消息通知', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
-
-        return $rst;
     }
 
     /**
