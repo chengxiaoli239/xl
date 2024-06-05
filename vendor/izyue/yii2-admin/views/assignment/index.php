@@ -21,15 +21,7 @@ $extraColumns = array_merge($extraColumns, [
         'value' => function ($model) {
             return Yii::$app->formatter->asDatetime($model->updated_at);
         },
-    ],
-    #[
-    #    'attribute' => 'created_at',
-    #    'label' => '创建',
-    #    'format' => 'raw',
-    #    'value' => function ($model) {
-    #        return Yii::$app->formatter->asDatetime($model->created_at);
-    #    },
-    #],
+    ]
 ]);
 
 $columns = array_merge(
