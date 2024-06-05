@@ -325,7 +325,9 @@ class UserController extends BaseController
         $YiiUser = \Yii::$app->user->identity;
         $className = Util::class_basename($this->userClassName);
         //p(['identity'=>\Yii::$app->user->identity, $this->userClassName, UserService::is3dAdmin(\Yii::$app->user->identity), \Yii::$app->request->post(), $className, 'user'=>$YiiUser]);
-        $this->_post['AdminModel']['status'] = $this->_post['AdminModel']['status']??AdminModel::STATUS_ACTIVE;
+        if(\Yii::$app->request->isPost){
+            $this->_post['AdminModel']['status'] = $this->_post['AdminModel']['status']??AdminModel::STATUS_ACTIVE;
+        }
         $userTypes = UserService::getAdminUserTypes(\Yii::$app->user->identity, $act=1);
         list($nextUserType, $nextRole) = UserService::getCreateDefaultRole($YiiUser, current($userTypes)['user_type']);
         $currentUserType = $YiiUser['user_type'];
