@@ -282,18 +282,21 @@ class TzSystemUsersService extends ClientsBaseService{
     {
         try {
             $flag = 0;
-            $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+            $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token, $auto=2);
             if(!empty($TzSystemsUsers)){
                 $newRobotId = Lucky5Service::getRobotIdByStr($err_msg, $TzSystemsUsers->ssc_domain);
-                $cookie = $TzSystemsUsers->cookie;
+                $cookie = $TzSystemsUsers->cookie; // = "NOTICE_LOGIN_IN=1;Akamai_Cookie=2618296842.12917.0000;ASP.NET_SessionId=2mx1bexbdo11lcfqmk1sdg01;robot7=wsWwPi0DaRyd+HRecIWxlszt90SoVxbjMZpTHl02OQiiMHa51PPbYloMxcux3rNBv2Nih/Hns/tWa/c/YPGOQQ==";
                 preg_match("/robot7=([^\r\n]*)==/i", $cookie, $matches);
                 if(!empty($matches[1]) && $newRobotId){
                     $new_cookie = str_replace('robot7='.$matches[1].'==', $newRobotId, $cookie);
                 }elseif(strpos($cookie, 'robot7=') === false){
                     $new_cookie = str_replace(';;', ';', $cookie.';'.$newRobotId);
                 }
-                #p([$matches, $newRobotId, $err_msg, $cookie, $new_cookie, $newRobotId]);
-                //p(['data'=>$data, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
+
+                if(empty($new_cookie)){
+                    throw_info('匹配cookie为空不能更新');
+                }
+                //p(['matches'=>$matches, 'newRobotId'=>$newRobotId, 'err_msg'=>$err_msg, 'cookie'=>$cookie, 'new_cookie'=>$new_cookie, 'newRobotId'=>$newRobotId]);
                 $TzSystemsUsers->cookie = $new_cookie;
 
                 $TzSystemsUsers->updated_at = time();
