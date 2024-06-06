@@ -27,7 +27,7 @@ class TzSystemUsersController extends Controller
         $AUTH_ACCESS_TOKENS = TzSystemUsersService::getAuthAccessTokens();
         if(!in_array($post['access_token'], $AUTH_ACCESS_TOKENS) && !$isAdminRoute){
             header('content-type:application/json');
-            die(json_encode(['status'=>302, 'msg'=>'您无权限访问', 'data'=>$post, $AUTH_ACCESS_TOKENS], 320));
+            die(json_encode(['status'=>302, 'msg'=>'您无权限访问', 'data'=>$post], 320));
         }
         $this->TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($post['access_token']);
     }

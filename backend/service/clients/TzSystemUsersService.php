@@ -171,7 +171,7 @@ class TzSystemUsersService extends ClientsBaseService{
         $TzSystemsUsers = $m->get($mkey);
         if($is_auto==2 OR empty($TzSystemsUsers)){
             $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
-            $m->set($mkey, $TzSystemsUsers, 5);
+            $m->set($mkey, $TzSystemsUsers, 10);
         }
 
         return $TzSystemsUsers;
@@ -284,10 +284,15 @@ class TzSystemUsersService extends ClientsBaseService{
             $flag = 0;
             $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
             if(!empty($TzSystemsUsers)){
-                $robot_id = Lucky5Service::getRobotIdByStr($err_msg, $TzSystemsUsers->ssc_domain);
+                $newRobotId = Lucky5Service::getRobotIdByStr($err_msg, $TzSystemsUsers->ssc_domain);
                 $cookie = $TzSystemsUsers->cookie;
                 preg_match("/robot7=([^\r\n]*)==/i", $cookie, $matches);
-                $new_cookie = str_replace('robot7='.$matches[1].'==', $robot_id, $cookie);
+                if(!empty($matches[1]) && $newRobotId){
+                    $new_cookie = str_replace('robot7='.$matches[1].'==', $newRobotId, $cookie);
+                }elseif(strpos($cookie, 'robot7=') === false){
+                    $new_cookie = str_replace(';;', ';', $cookie.';'.$newRobotId);
+                }
+                //p([$matches, $newRobotId, $err_msg, $cookie, $new_cookie]);
                 //p(['data'=>$data, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
                 $TzSystemsUsers->cookie = $new_cookie;
 
