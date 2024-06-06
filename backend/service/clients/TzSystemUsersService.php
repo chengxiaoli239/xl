@@ -292,12 +292,13 @@ class TzSystemUsersService extends ClientsBaseService{
                 }elseif(strpos($cookie, 'robot7=') === false){
                     $new_cookie = str_replace(';;', ';', $cookie.';'.$newRobotId);
                 }
-                //p([$matches, $newRobotId, $err_msg, $cookie, $new_cookie]);
+                #p([$matches, $newRobotId, $err_msg, $cookie, $new_cookie, $newRobotId]);
                 //p(['data'=>$data, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
                 $TzSystemsUsers->cookie = $new_cookie;
 
                 $TzSystemsUsers->updated_at = time();
                 $flag = $TzSystemsUsers->save();
+                #p($TzSystemsUsers);
                 Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端余额同步', ['account'=>$TzSystemsUsers->username, 'access_token'=>$access_token]);
             }
         }catch (\Exception $e){
