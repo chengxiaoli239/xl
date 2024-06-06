@@ -1387,10 +1387,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $uid = max($TzSystemsUsers->uid, $uid);
         $data = self::httpGet($url, $headers, $uid, $time_out=15);
         if(is_string($data) && strpos($data, '您当前使用的浏览器不支持') !== false){
-            $roboot_id = Lucky5Service::getRobotIdByStr($data, $url);
+            $robot_id = Lucky5Service::getRobotIdByStr($data, $url);
             $cookie = $TzSystemsUsers->cookie;
             preg_match("/robot7=([^\r\n]*); Seven/i", $cookie, $matches);
-            $new_cookie = str_replace('robot7='.$matches[1], $roboot_id, $cookie);
+            $new_cookie = str_replace('robot7='.$matches[1], $robot_id, $cookie);
             //p(['data'=>$data, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
             $TzSystemsUsers->cookie = $new_cookie;
             $TzSystemsUsers->save();
@@ -1831,8 +1831,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if(is_string($data) && strpos($data, '您当前使用的浏览器不支持') !== false){
             $robot_id = Lucky5Service::getRobotIdByStr($data, $url);
             $cookie = $TzSystemsUsers->cookie;
-            preg_match("/robot7=([^\r\n]*);Seven/i", $cookie, $matches);
-            $new_cookie = str_replace($matches, $robot_id.';Seven', $cookie);
+            preg_match("/robot7=([^\r\n]*)==/i", $cookie, $matches);
+            $new_cookie = str_replace('robot7='.$matches[1].'==', $robot_id, $cookie);
             //p(['data'=>$data, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
             $TzSystemsUsers->cookie = $new_cookie;
             $TzSystemsUsers->save();
@@ -1859,15 +1859,15 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $Arrs = explode('.', $url);
         $domain = $Arrs[1];
         if(strpos($matches[1], $domain) !== false){
-            $roboot_id = trim(str_replace('; path=/; domain=.'.$domain.'.xyz','', $matches[1]));
-            Tool_Common::log('getSessionId', 'INFO', '获取session_id', ['url'=>$url, 'domain'=>$domain, 'roboot_id'=>$roboot_id, 'content'=>$content]);
+            $robot_id = trim(str_replace('; path=/; domain=.'.$domain.'.xyz','', $matches[1]));
+            Tool_Common::log('getSessionId', 'INFO', '获取session_id', ['url'=>$url, 'domain'=>$domain, 'robot_id'=>$robot_id, 'content'=>$content]);
         }
-        if(strpos($roboot_id, '您当前使用的浏览器不支持') !== false){
-            $tmp_roboot_id = explode('\';', $roboot_id);
-            if($tmp_roboot_id[0]) $roboot_id = $tmp_roboot_id[0];
+        if(strpos($robot_id, '您当前使用的浏览器不支持') !== false){
+            $tmp_roboot_id = explode('\';', $robot_id);
+            if($tmp_roboot_id[0]) $robot_id = $tmp_roboot_id[0];
         }
 
-        return $roboot_id;
+        return $robot_id;
     }
 
 

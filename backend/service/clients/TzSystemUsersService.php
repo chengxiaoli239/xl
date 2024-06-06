@@ -278,16 +278,16 @@ class TzSystemUsersService extends ClientsBaseService{
      * @param string $access_token
      * @param float $balance
      */
-    public static function updateClientRobotId($access_token='', $err_msg=''){
-
+    public static function updateClientRobotId($access_token='', $err_msg=''): array
+    {
         try {
             $flag = 0;
             $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
             if(!empty($TzSystemsUsers)){
                 $robot_id = Lucky5Service::getRobotIdByStr($err_msg, $TzSystemsUsers->ssc_domain);
                 $cookie = $TzSystemsUsers->cookie;
-                preg_match("/robot7=([^\r\n]*)/i", $cookie, $matches);
-                $new_cookie = str_replace($matches, $robot_id, $cookie);
+                preg_match("/robot7=([^\r\n]*)==/i", $cookie, $matches);
+                $new_cookie = str_replace('robot7='.$matches[1].'==', $robot_id, $cookie);
                 //p(['data'=>$data, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
                 $TzSystemsUsers->cookie = $new_cookie;
 
@@ -299,7 +299,7 @@ class TzSystemUsersService extends ClientsBaseService{
             return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
         }
 
-        return ['status'=>200, 'data'=>['flag'=>$flag], 'msg'=>'操作成功'];
+        return ['status'=>200, 'data'=>['flag'=>$flag, 'cookie'=>$cookie, 'new_cookie'=>$new_cookie], 'msg'=>'操作成功'];
     }
 
     /**
