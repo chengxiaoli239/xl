@@ -95,9 +95,13 @@ class TzSystemsUsers extends \common\models\base\BaseModel
      * @return bool
      * @throws \yii\base\Exception
      */
-    public static function changePassword(string $sys_password='', string $sys_repassword=''): bool
+    public static function changePassword(string $sys_password='', string $sys_repassword='', $userId=0): bool
     {
-        $id = YII::$app->user->id;
+        if(empty($userId)){
+            $id = YII::$app->user->id;
+        }else{
+            $id = $userId;
+        }
         $admin=  AdminModel::findIdentity($id);
         if(true OR Yii::$app->getSecurity()->validatePassword($sys_password, $admin->password_hash)){
             //p([$sys_password , $sys_repassword]);

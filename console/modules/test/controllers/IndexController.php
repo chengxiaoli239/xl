@@ -62,15 +62,16 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
-            $str = "<!DOCTYPE HTML><html><head><meta charset=utf-8><script id='robot7_session_id'>document.cookie='robot7=wsWwPi0DaRyd+HRecIWxlku8YGplzqL8Srj0E6dYdBCqWoz2w/iUuBaEJg2Z+EAqPjHP5+E+oPRWJ7urcCUf7w==; path=/; domain=.w5pq8382.xyz';if (document.cookie.indexOf('robot7')>-1){window.location.reload();} else {alert('您当前使用的浏览器不支持cookie，无法使用本系统，请检查浏览器设置！');}</script></head></html>";
-            $url = 'http://f1.w5pq8382.xyz';
+            $data = AgentService::getCalcMoney($userId=21);p($data);
+            $str = "<!DOCTYPE HTML><html><head><meta charset=utf-8><script id='robot7_session_id'>document.cookie='robot7=wsWwPi0DaRyd+HRecIWxljTBsWarVpS6duErdcXgtzhNl6mvoZXkEIe5XLuGTbunDeOIPvtRRtaoII+xW7b7Mw==; path=/; domain=.w5pq8382.xyz';if (document.cookie.indexOf('robot7')>-1){window.location.reload();} else {alert('您当前使用的浏览器不支持cookie，无法使用本系统，请检查浏览器设置！');}</script></head></html>";
+            $url = 'https://f4.w5pq8382.xyz';
             $robot_id = Lucky5Service::getRobotIdByStr($str, $url);
+            p($robot_id);
             $cookie = 'robot7=MoA5zLhlPojMmhKCY9qjqZdVB/A9D3wz2004riWrXEPQrwNKTsNTMVKDz0dn10ryqv7RdVWeEVwW2Ez3mBqLkQ==;ASP.NET_SessionId=cqzsyaoay3wg3s1bamjqsn43;Akamai_Cookie=2752514570.15221.0000;NOTICE_LOGIN_IN=1';
             preg_match("/robot7=([^\r\n]*)==/i", $cookie, $matches);
             $new_cookie = str_replace('robot7='.$matches[1].'==', $robot_id, $cookie);
             p(['str' => $str, 'robot_id' => $robot_id, 'old_cookie' => $cookie, 'matches' => $matches, 'new_cookie' => $new_cookie]);
 
-            $data = AgentService::getCalcMoney($userId=21);p($data);
             $mKey = CacheKeyService::lotteryBetPlanIdKey('aa30301', $qihao='1234568', $plan_id=1234);
             $lock = commonRedis()->setnx($mKey, 300);
             $value = commonRedis()->get($mKey);

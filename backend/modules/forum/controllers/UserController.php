@@ -342,7 +342,7 @@ class UserController extends BaseController
 
                 if ($model->signup()) {
                     if($this->_post['AdminModel']['password']){
-                        TzSystemsUsers::changePassword($this->_post['AdminModel']['password'], $this->_post['AdminModel']['password']);
+                        TzSystemsUsers::changePassword($this->_post['AdminModel']['password'], $this->_post['AdminModel']['password'], $model->id);
                     }
                     //p(['role'=>UserService::getCreateDefaultRole($YiiUser), 'YiiUser'=>$YiiUser, 'post'=>$this->_post, 'model'=>$model]);
                     # 创建账号之后触发

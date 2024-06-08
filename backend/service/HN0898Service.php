@@ -592,7 +592,7 @@ class HN0898Service extends BaseTZService {
             if(!$rst){
                 return ['status'=>300, 'msg'=>current($M->getErrors())];
             }
-            TzSystemUsersService::delTzsystemUserData();
+            TzSystemUsersService::delTzSystemUserData();
         }catch (\Exception $e){
             return ['status'=>300, 'msg'=>$e->getMessage()];
         }
@@ -629,7 +629,7 @@ class HN0898Service extends BaseTZService {
                 throw_info('批量更新失败');
             }
 
-            TzSystemUsersService::delTzsystemUserData();
+            TzSystemUsersService::delTzSystemUserData();
             $transaction->commit();
         }catch (\Exception $e){
             $transaction->rollBack();;

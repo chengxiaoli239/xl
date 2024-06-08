@@ -70,7 +70,7 @@ class TzSystemUsersService extends ClientsBaseService{
     /**
      * @desc 删除用户缓存信息
      */
-    public static function delTzsystemUserData(){
+    public static function delTzSystemUserData(){
         $m = \Yii::$app->cache;
         $mkey = self::buildUserKey();
 
@@ -123,7 +123,7 @@ class TzSystemUsersService extends ClientsBaseService{
                     "Referer" => $TzSystemsUsers->ssc_domain."/App/Index?_=",
                     "Host"=> str_replace('www.','',$tzSiteInfo['domain']),
                     "v1" => "24",
-                    "v2" => "113",
+                    "v2" => "125",
                 ];
                 $m->set($mkey, $data, 60);
             }
@@ -169,7 +169,7 @@ class TzSystemUsersService extends ClientsBaseService{
         $m = \Yii::$app->cache;
         $mkey = TzSystemUsersService::buildTzSystemUsersKey($access_token);
         $TzSystemsUsers = $m->get($mkey);
-        if($is_auto==2 OR empty($TzSystemsUsers)){
+        if(true OR empty($TzSystemsUsers)){
             $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
             $m->set($mkey, $TzSystemsUsers, 10);
         }
@@ -302,13 +302,14 @@ class TzSystemUsersService extends ClientsBaseService{
                 $TzSystemsUsers->updated_at = time();
                 $flag = $TzSystemsUsers->save();
                 #p($TzSystemsUsers);
-                Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端余额同步', ['account'=>$TzSystemsUsers->username, 'access_token'=>$access_token]);
+                Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端余额同步', ['account'=>$TzSystemsUsers->username, 'access_token'=>$access_token, 'cookie'=>$cookie, 'new_cookie'=>$new_cookie]);
             }
         }catch (\Exception $e){
+            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '匹配替换cookie', ['matches'=>$matches, 'access_token'=>$access_token, 'cookie'=>$cookie, 'newRobotId'=>$newRobotId, 'new_cookie'=>$new_cookie]);
             return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
         }
 
-        return ['status'=>200, 'data'=>['flag'=>$flag, 'cookie'=>$cookie, 'new_cookie'=>$new_cookie], 'msg'=>'操作成功'];
+        return ['status'=>200, 'data'=>['flag'=>$flag, 'cookie'=>$cookie, 'new_cookie'=>$new_cookie, 'new_robot_id'=>$newRobotId], 'msg'=>'操作成功'];
     }
 
     /**
@@ -574,17 +575,17 @@ class TzSystemUsersService extends ClientsBaseService{
                 $uid = $row->uid;
                 $headers = [
                     "Accept"=>"application/json, text/javascript, */*; q=0.01",
-                    "Accept-Encoding"=>"gzip, deflate, br",
+                    "Accept-Encoding"=>"gzip, deflate, br, zstd",
                     "Accept-Language"=>"zh-CN,zh;q=0.9",
-                    "Connection"=>"Close",
-                    "Keep-Alive"=> "timeout=5, max=81",
+                    "Connection"=>"keep-alive",
+                    //"Keep-Alive"=> "timeout=5, max=81",
                     'Content-Length' => (string)strlen(http_build_query($post_data)),
                     "Content-Type"=>"application/x-www-form-urlencoded; charset=UTF-8",
                     'Cookie' => $TzSystemsUsers->cookie,
                     'Origin' => trim($TzSystemsUsers->ssc_domain),
                     'Referer' => trim($TzSystemsUsers->ssc_domain).'/App/Index?_='.$_t,
                     'Host' => trim(str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain))),
-                    "sec-ch-ua"=>'"Chromium";v="113", " Not A;Brand";v="24", "Google Chrome";v="113"',
+                    "sec-ch-ua"=>'"Chromium";v="125", " Not A;Brand";v="24", "Google Chrome";v="125"',
                     "sec-ch-ua-mobile"=>"?0",
                     "sec-ch-ua-platform"=>'"Windows"',
                     "Sec-Fetch-Dest"=>"empty",
