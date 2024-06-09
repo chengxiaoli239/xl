@@ -392,6 +392,7 @@ class UserService extends BaseService {
         ];
         $mKey = CacheKeyService::getIsClientNeedLoginKey($TzSystemsUsers->uid);
         $rstData['is_need_login'] = (int)commonRedis()->get($mKey);
+        #$rstData['is_need_login'] = 1;
 
         $rst['data'] = $rstData;
 
