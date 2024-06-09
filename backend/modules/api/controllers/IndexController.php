@@ -191,6 +191,16 @@ class IndexController extends Controller
         return $rst;
     }
 
+    public function actionUpdateClientLoginFlag(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+
+        $rst = UserService::updateClientLoginFlag($post['access_token'], $post['flag']);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取用信息接口', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
+
+        return $rst;
+    }
+
     /**
      * @desc 更新用户状态
      * @param $id

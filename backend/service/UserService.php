@@ -21,6 +21,14 @@ use backend\models\UserFollowData;
 use  yii;
 
 class UserService extends BaseService {
+    const USER_CLIENT_LOGIN_NO = 0;
+    const USER_CLIENT_LOGIN_NEED = 1;
+    const USER_CLIENT_LOGIN_ING = 2;
+    const USER_CLIENT_LOGIN_OPTIONS = [
+        self::USER_CLIENT_LOGIN_NO => '无需登录',
+        self::USER_CLIENT_LOGIN_NEED => '需登录',
+        self::USER_CLIENT_LOGIN_ING => '正在登录',
+    ];
 
 
     /**
@@ -383,11 +391,26 @@ class UserService extends BaseService {
             'expire_time' => date('Y-m-d H:i:s', $TzSystemsUsers->expire_time),
         ];
         $mKey = CacheKeyService::getIsClientNeedLoginKey($TzSystemsUsers->uid);
-        $rstData['is_need_login'] = commonRedis()->get($mKey)?1:0;
+        $rstData['is_need_login'] = commonRedis()->get($mKey);
 
         $rst['data'] = $rstData;
 
         return $rst;
+    }
+
+    /***
+     * 更新客户端登录了标识
+     * @param $access_token
+     * @param $flag
+     * @return array
+     */
+    public static function updateClientLoginFlag($access_token, $flag=2): array
+    {
+        $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$access_token]);
+        $mKey = CacheKeyService::getIsClientNeedLoginKey($TzSystemsUsers->uid);
+        $rstData['is_need_login'] = commonRedis()->setex($mKey, 120, $flag);
+
+        return $rstData;
     }
 
     # 清空用户的登陆seesion数据
