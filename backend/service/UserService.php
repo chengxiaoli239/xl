@@ -359,6 +359,8 @@ class UserService extends BaseService {
             $msg = $TzSystemsUsers->getErrors();
             return ['status'=>304, 'msg'=>$msg];
         }
+        $mKey = CacheKeyService::getIsClientNeedLoginKey($TzSystemsUsers->uid);
+        commonRedis()->setex($mKey, 120, self::USER_CLIENT_LOGIN_NO); # 更新登录标识
         #$synRst = BetService::synBalance($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id);
 
         return ['status'=>200, 'msg'=>'操作成功', 'data'=>$r, /*'synRst'=>$synRst*/];
