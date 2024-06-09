@@ -391,7 +391,7 @@ class UserService extends BaseService {
             'expire_time' => date('Y-m-d H:i:s', $TzSystemsUsers->expire_time),
         ];
         $mKey = CacheKeyService::getIsClientNeedLoginKey($TzSystemsUsers->uid);
-        $rstData['is_need_login'] = commonRedis()->get($mKey);
+        $rstData['is_need_login'] = (int)commonRedis()->get($mKey);
 
         $rst['data'] = $rstData;
 
