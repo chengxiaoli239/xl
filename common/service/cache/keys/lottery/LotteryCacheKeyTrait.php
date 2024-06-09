@@ -79,13 +79,21 @@ trait LotteryCacheKeyTrait
     {
         return 'lottery:tz_type:type_name_'.$tz_type;
     }
+
     /**
+     * 客户端是否需要登录
      * @param int $lottery_type
      * @param string $qiHao
+     * @param string $status_key
      * @return string
      */
     public static function lotteryDealStatus(int $lottery_type=DEFAULT_LOTTERY_TYPE, string $qiHao='', $status_key=''): string
     {
         return 'lottery:getDataDealStatus_:info_'.$lottery_type.'_'.$qiHao.'_'.$status_key;
+    }
+
+    public static function getIsClientNeedLoginKey($userId=0): string
+    {
+        return 'lottery:need_login:user_'.$userId;
     }
 }

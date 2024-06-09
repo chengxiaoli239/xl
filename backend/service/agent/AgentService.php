@@ -5,6 +5,7 @@ use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\models\wechat\Bets;
 use backend\service\BaseService;
+use common\service\cache\CacheKeyService;
 use common\service\open\ActionBaseService;
 use common\service\thirdD\CommonBaseService;
 use common\tools\Timer;
@@ -21,6 +22,10 @@ class AgentService extends BaseService {
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$userId]);
         if($isSiteInfo){
             $siteStaticsInfos = (new ActionBaseService)->getSiteStaticsInfo($TzSystemsUsers);
+            if(!empty($siteStaticsInfos['error'])){
+                $mKey = CacheKeyService::getIsClientNeedLoginKey($TzSystemsUsers->uid);
+                commonRedis()->setex($mKey, 120, 1);
+            }
             $thisWeekBetMoney = 0.00; # 本周下单金额
             $thisWeekProfits = 0.00; # 本周实际盈亏
             $lastWeekBetMoney = 0.00; # 上周下单金额

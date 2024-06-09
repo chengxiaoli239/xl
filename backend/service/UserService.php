@@ -382,6 +382,8 @@ class UserService extends BaseService {
             'bet_status' => $TzSystemsUsers->is_auto_bet,
             'expire_time' => date('Y-m-d H:i:s', $TzSystemsUsers->expire_time),
         ];
+        $mKey = CacheKeyService::getIsClientNeedLoginKey($TzSystemsUsers->uid);
+        $rstData['is_need_login'] = commonRedis()->get($mKey)?1:0;
 
         $rst['data'] = $rstData;
 
