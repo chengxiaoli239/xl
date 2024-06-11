@@ -60,7 +60,7 @@ class AoZhou5BetJobs extends CommonJob {
             $errContent = '';
             $haveSuccess = 0;
             $TzSystemUsers = TzSystemsUsers::find()->where(['uid'=>$userId])->limit(1)->one();
-            $betType = MessageOperateService::getBetType($TzSystemUsers->username);
+            $betType = MessageOperateService::getBetType($TzSystemUsers);
             foreach ($BetRows as $betRow){
                 if($betType == BetsBackend::BET_TYPE_SELENIUM){
                     # selenium模拟点击

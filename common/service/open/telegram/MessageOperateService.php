@@ -267,7 +267,7 @@ class MessageOperateService  extends BaseService
             }
         }
 
-        $betType = MessageOperateService::getBetType($this->tzSystemUsers->username);
+        $betType = MessageOperateService::getBetType($this->tzSystemUsers);
         if($betType == BetsBackend::BET_TYPE_API){
             foreach ($pushSiteData as $pushData){
                 push_queue_open(AoZhou5BetJobs::class, $pushData);
@@ -351,10 +351,10 @@ class MessageOperateService  extends BaseService
      * @param $username
      * @return int
      */
-    public static function getBetType($username): int
+    public static function getBetType(object $TzSystemUser=null): int
     {
         $betType = BetService::getConfig('aozhou5_bet_type')?BetService::getConfig('aozhou5_bet_type'):BetsBackend::BET_TYPE_API; # 下注方式：1接口2模拟操作
-        if(in_array($username, ['aa30301', 'aa301'])){
+        if(!$TzSystemUser->is_local_bet OR in_array($TzSystemUser->username, ['aa30301'])){
             $betType = BetsBackend::BET_TYPE_API;
         }
 

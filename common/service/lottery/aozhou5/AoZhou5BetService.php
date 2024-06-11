@@ -494,7 +494,7 @@ class AoZhou5BetService extends CommonBaseService
         $siteSystemInfo = CommonBaseService::getSystemBaseInfo($userId, LotteryType::AZ_LUCKY_5); # 盘口信息
         $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$userId]);
 
-        $betType = MessageOperateService::getBetType($TzSystemUsers->username);
+        $betType = MessageOperateService::getBetType($TzSystemUsers);
         if($betType == BetsBackend::BET_TYPE_SELENIUM){
             $data = self::getSeleniumBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
         }else{
