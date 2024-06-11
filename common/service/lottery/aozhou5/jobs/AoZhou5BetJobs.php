@@ -2,6 +2,7 @@
 namespace common\service\lottery\aozhou5\jobs;
 
 use backend\models\thirdD\BetsBackend;
+use backend\models\TzSystemsUsers;
 use backend\service\agent\AgentUsersBalanceService;
 use backend\service\BetService;
 use common\helpers\LotteryType;
@@ -58,7 +59,8 @@ class AoZhou5BetJobs extends CommonJob {
             $allCount = 0;
             $errContent = '';
             $haveSuccess = 0;
-            $betType = BetService::getConfig('aozhou5_bet_type')??BetsBackend::BET_TYPE_API; # 下注方式：1接口2模拟操作
+            $TzSystemUsers = TzSystemsUsers::find()->where(['uid'=>$userId])->limit(1)->one();
+            $betType = MessageOperateService::getBetType($TzSystemUsers->username);
             foreach ($BetRows as $betRow){
                 if($betType == BetsBackend::BET_TYPE_SELENIUM){
                     # selenium模拟点击

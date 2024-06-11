@@ -20,6 +20,7 @@ use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
 use common\service\message\Send;
 use common\service\open\ActionBaseService;
 use common\service\open\aozhou5\ActionService;
+use common\service\open\telegram\MessageOperateService;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\jobs\SsxxBetJobs;
@@ -490,14 +491,18 @@ class AoZhou5BetService extends CommonBaseService
             return ['status'=>300, 'data'=>[], 'msg'=>'无操作记录'];
         }
 
-        $betType = BetService::getConfig('aozhou5_bet_type')??BetsBackend::BET_TYPE_API; # 下注方式：1接口2模拟操作
         $siteSystemInfo = CommonBaseService::getSystemBaseInfo($userId, LotteryType::AZ_LUCKY_5); # 盘口信息
         $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$userId]);
 
+        $betType = MessageOperateService::getBetType($TzSystemUsers->username);
         if($betType == BetsBackend::BET_TYPE_SELENIUM){
             $data = self::getSeleniumBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
         }else{
-            $data = self::getApiBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
+            if($TzSystemUsers->is_local_bet){
+                $data = self::getApiBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
+            }else{
+                $data = [];
+            }
         }
         $data['slow_seconds'] = 0;
 

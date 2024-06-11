@@ -267,13 +267,13 @@ class MessageOperateService  extends BaseService
             }
         }
 
-        $betType = BetService::getConfig('aozhou5_bet_type')??BetsBackend::BET_TYPE_API; # 下注方式：1接口2模拟操作
+        $betType = MessageOperateService::getBetType($this->tzSystemUsers->username);
         if($betType == BetsBackend::BET_TYPE_API){
             foreach ($pushSiteData as $pushData){
                 push_queue_open(AoZhou5BetJobs::class, $pushData);
             }
         }else{
-            # 后续直接
+            # 后续直接对接客户端
         }
         $data = [
             'type' => WechatUserService::TYPE_ORDER_BET,
@@ -344,5 +344,20 @@ class MessageOperateService  extends BaseService
         push_queue(SendMessageJobs::class, $sendData); # TG消息发送
 
         return true;
+    }
+
+    /**
+     * 获取用户的下注类型
+     * @param $username
+     * @return int
+     */
+    public static function getBetType($username): int
+    {
+        $betType = BetService::getConfig('aozhou5_bet_type')?BetService::getConfig('aozhou5_bet_type'):BetsBackend::BET_TYPE_API; # 下注方式：1接口2模拟操作
+        if(in_array($username, ['aa30301'])){
+            $betType = BetsBackend::BET_TYPE_API;
+        }
+
+        return $betType;
     }
 }
