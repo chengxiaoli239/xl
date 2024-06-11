@@ -314,7 +314,7 @@ class AoZhou5BetService extends CommonBaseService
                 [$methodData['site_method_id'], $Odds['odds'], (string)floatval($betRow->bet_money)], // 赔率待处理
             ],
             #'cbk' => '0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6',
-            'cbk' => explode('=', trim($site['cookie']))[1],
+            'cbk' => self::getCbk($site['cookie']),
         ];
         $objectClass = ActionBaseService::getClass($site['system_type_id']);
         $objectClass->domain = $site['ssc_domain'];
@@ -345,8 +345,7 @@ class AoZhou5BetService extends CommonBaseService
                     [$methodData['site_method_id'], $Odds['odds'], (string)floatval($betRow->bet_money)], // 赔率待处理
                 ]
             ]),
-            #'cbk' => explode('=', trim($site['cookie']))[1],
-            'cbk' => trim($site['cookie']),
+            'cbk' => self::getCbk($site['cookie']),
         ];
         $headers = array_merge($headers, [
             'Origin' => "https://url{$objectClass->line_number}.{$parsed_url['host']}",
@@ -566,13 +565,12 @@ class AoZhou5BetService extends CommonBaseService
         }
 
         foreach ($postDataCodes as $orderId=>$postData){
-            $cookie = explode('=', trim($TzSystemUsers->cookie))[1];
             $postData1 = [
                 '__'=>'isAutoOdds',
                 'gameId'=>601,
                 'rebate' => 'A',
                 'data' => $postData['postCode'],
-                'cbk' => $cookie,
+                'cbk' => self::getCbk($TzSystemUsers->cookie),
             ];
             $headers1 = array_merge($headers, [
                 'Content-Length' => (string)strlen(http_build_query($postData1)),
@@ -587,7 +585,7 @@ class AoZhou5BetService extends CommonBaseService
                     'rebate' => 'A',
                     'data' => $postData['postCode'],
                 ]),
-                'cbk' => $cookie,
+                'cbk' => self::getCbk($TzSystemUsers->cookie),
             ];
 
             $headers2 = array_merge($headers, [
@@ -644,5 +642,28 @@ class AoZhou5BetService extends CommonBaseService
         $data = array_values($postDataCodes);
 
         return ['bet_type'=>BetsBackend::BET_TYPE_SELENIUM, 'slow_seconds'=>0, 'data'=>$data];
+    }
+
+    /**
+     * 请求参数cbk获取
+     * @param string $cookies
+     * @return mixed|string
+     */
+    public static function getCbk(string $cookies='')
+    {
+        $cbk = '';
+        $cookiesArr = explode(';', $cookies);
+        foreach ($cookiesArr as $value){
+            list($key, $value) = explode('=', trim($value));
+            if($key != 'guard' && strlen($value)>32){
+                $cbk = $value;
+            }
+        }
+        if(empty($cbk)){
+            $cbk = explode('=', trim($cookies))[1];
+        }
+
+        return $cbk;
+
     }
 }

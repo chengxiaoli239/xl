@@ -7,6 +7,7 @@ use common\open\aozhou5\api\PreLoginApi;
 use common\open\aozhou5\api\UserApi;
 use common\service\cache\CacheKeyService;
 use common\service\chat\Tool_Common;
+use common\service\lottery\aozhou5\AoZhou5BetService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\RequestOptions;
@@ -157,10 +158,9 @@ class ActionService
 
         $result = Json::decode($body);
 
-        $cookie = explode('=', $this->tzSystemUsers->cookie)[1];
         $params[RequestOptions::FORM_PARAMS] = [
             '__' => 'memberInitialization',
-            'cbk' => $cookie,
+            'cbk' => AoZhou5BetService::getCbk($this->tzSystemUsers->cookie),
         ];
         $requestBody = http_build_query($params[RequestOptions::FORM_PARAMS]);
         $headers['Content-Length'] = strlen($requestBody);
@@ -182,7 +182,6 @@ class ActionService
     public function getUserInfo($useCache=0): array
     {
         $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
-        $cookie = explode('=', $this->tzSystemUsers->cookie)[1];
         $params = [
             '__' => 'memberoddsdata',
             'gameId' => 601,
@@ -190,7 +189,7 @@ class ActionService
             'tId' => 1,
             'pId' => -1,
             'rebate' => 'A',
-            'cbk' => $cookie,
+            'cbk' => AoZhou5BetService::getCbk($this->tzSystemUsers->cookie),
         ];
         $host = $parsed_url['host'];
         $headers = [
@@ -246,11 +245,10 @@ class ActionService
     public function memberThreadMd(): array
     {
         $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
-        $cookie = explode('=', $this->tzSystemUsers->cookie)[1];
         $params = [
             '__' => 'memberThreadmd',
             'newsId' => -1,
-            'cbk' => $cookie,
+            'cbk' => AoZhou5BetService::getCbk($this->tzSystemUsers->cookie),
         ];
         $host = $parsed_url['host'];
         $headers = [
@@ -288,10 +286,9 @@ class ActionService
     public function getSiteStatics(): array
     {
         $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
-        $cookie = explode('=', $this->tzSystemUsers->cookie)[1];
         $params = [
             '__' => 'historicalReportDate',
-            'cbk' => $cookie,
+            'cbk' => AoZhou5BetService::getCbk($this->tzSystemUsers->cookie),
         ];
         $host = $parsed_url['host'];
         $url = "https://url{$this->line_number}.{$host}";
