@@ -495,14 +495,14 @@ class AoZhou5BetService extends CommonBaseService
         $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$userId]);
 
         $betType = MessageOperateService::getBetType($TzSystemUsers);
-        if($betType == BetsBackend::BET_TYPE_SELENIUM){
-            $data = self::getSeleniumBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
-        }else{
-            if(!$TzSystemUsers->is_local_bet){
-                $data = self::getApiBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
+        if($TzSystemUsers->is_local_bet){
+            if($betType == BetsBackend::BET_TYPE_SELENIUM){
+                $data = self::getSeleniumBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
             }else{
-                $data = [];
+                $data = self::getApiBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
             }
+        }else{
+            $data = [];
         }
         if(!empty($data)){
             $data['slow_seconds'] = 0;
