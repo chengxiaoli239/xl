@@ -354,7 +354,7 @@ class MessageOperateService  extends BaseService
     public static function getBetType($username): int
     {
         $betType = BetService::getConfig('aozhou5_bet_type')?BetService::getConfig('aozhou5_bet_type'):BetsBackend::BET_TYPE_API; # 下注方式：1接口2模拟操作
-        if(in_array($username, ['aa30301'])){
+        if(in_array($username, ['aa30301', 'aa301'])){
             $betType = BetsBackend::BET_TYPE_API;
         }
 
