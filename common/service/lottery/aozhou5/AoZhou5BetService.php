@@ -504,7 +504,9 @@ class AoZhou5BetService extends CommonBaseService
                 $data = [];
             }
         }
-        $data['slow_seconds'] = 0;
+        if(!empty($data)){
+            $data['slow_seconds'] = 0;
+        }
 
         try {
             # 异常消息提醒
