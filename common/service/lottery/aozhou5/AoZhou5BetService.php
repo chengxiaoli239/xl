@@ -498,7 +498,7 @@ class AoZhou5BetService extends CommonBaseService
         if($betType == BetsBackend::BET_TYPE_SELENIUM){
             $data = self::getSeleniumBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
         }else{
-            if($TzSystemUsers->is_local_bet){
+            if(!$TzSystemUsers->is_local_bet){
                 $data = self::getApiBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
             }else{
                 $data = [];
@@ -539,10 +539,10 @@ class AoZhou5BetService extends CommonBaseService
 
         $d = 'url'.ActionService::LINE_NUMBER.'.'.$ht[1];
         $headers = [
-            ':authority' => $d,
-            ':method' => 'POST',
-            ':path' => '/api/',
-            ':scheme' => 'https',
+            #':authority' => $d,
+            #':method' => 'POST',
+            #':path' => '/api/',
+            #':scheme' => 'https',
             'accept' => '*/*',
             'Accept-Encoding' => 'gzip, deflate, br, zstd',
             'Accept-Language' => 'zh-CN,zh;q=0.9',
