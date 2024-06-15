@@ -18,10 +18,9 @@ use backend\service\Lucky5\Lucky5Service;
 use backend\service\NineNine\NineNineNewService;
 use backend\service\pingbo\PingBoBaseService;
 use backend\service\qilin\QiLinBaseService;
-use common\helpers\LotteryType;
 use common\models\AdminModel;
 use common\service\CommonService;
-use common\service\open\ActionBaseService;
+use common\service\open\aozhou5\ActionService;
 use common\service\proxy\ProxyBaseService;
 use common\service\thirdD\sx\Sx3dUserService;
 use common\tools\RedisLock;
@@ -34,10 +33,10 @@ class BaseService{
 
     /**
      * @desc 登陆中转
-     * @param $id TzSystemsUsers表id
+     * @param int $id - TzSystemsUsers表id
      * @return array|bool
      */
-    public static function login($id = '', $is_auto = 1){
+    public static function login(int $id = 0, $is_auto = 1){
         try {
             if(!$TzSystemsUser = TzSystemsUsers::findOne($id)){
                 throw_info('操作失败:找不到记录', 301);
@@ -109,7 +108,7 @@ class BaseService{
                     $rst = Sx3dUserService::login($TzSystemsUser);
                     break;
                 case $TzSystems->system_type_id == 16: # 澳洲五
-                    list($code, $data, $msg) = (new ActionBaseService())->login($TzSystemsUser);
+                    list($code, $data, $msg) = (new ActionService($TzSystemsUser))->login();
                     if(!$code){
                         $rst = ['status'=>200, 'data'=>$data, 'msg'=>$msg];
                     }

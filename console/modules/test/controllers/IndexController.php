@@ -34,6 +34,7 @@ use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
 use common\service\lottery\LotteryTypeService;
 use common\service\open\ActionBaseService;
 use common\service\open\actions\PlatformRobotService;
+use common\service\open\aozhou5\ActionService;
 use common\service\open\telegram\AoZhouKjService;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\match\MatchCodeService;
@@ -62,6 +63,11 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $tzSystemUser = TzSystemsUsers::findOne(75);
+            $userInfo = (new ActionService($tzSystemUser))->getUserData($isAuto=1);p($userInfo);
+            $logData = Json::decode('{"log_member_quick_select_id":"14169549","member_id":"9806","account":"Abc123bb","nickname":"","fix_num":"40","bet_count":"5017","bet_money":"1003.4","operation_content":"[四定位]，配数“[取]”：第2位：[01356]，第3位：[24789]，固定合分除值：第[2]位选中，第[3]位选中，第[4]位选中，内容：[2]；，不定合分值(两数合)：[01234]，不定合分值(三数合)：[012345]，合分值范围：[8-28]，包含“[取]”数：[43560]，三兄弟“[除]”操作，四兄弟“[除]”操作，对数“[除]”数：[16]，","operation_datetime":"06-13 14:37:44","time_value":"2024/6/13 14:37:44","operation_ip":"112.66.*.*","ip_value":"112.66.28.70","operation_ip_extension":"112.66.28.70","is_package":"0","log_type":"102"}');
+            list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token='eb70910c92f134bd54a3837d978f055b');
+            p([$code, $qihao, $logData]);
             $data = AgentService::getCalcMoney($userId=21);p($data);
             $str = "<!DOCTYPE HTML><html><head><meta charset=utf-8><script id='robot7_session_id'>document.cookie='robot7=wsWwPi0DaRyd+HRecIWxljTBsWarVpS6duErdcXgtzhNl6mvoZXkEIe5XLuGTbunDeOIPvtRRtaoII+xW7b7Mw==; path=/; domain=.w5pq8382.xyz';if (document.cookie.indexOf('robot7')>-1){window.location.reload();} else {alert('您当前使用的浏览器不支持cookie，无法使用本系统，请检查浏览器设置！');}</script></head></html>";
             $url = 'https://f4.w5pq8382.xyz';
@@ -88,11 +94,6 @@ class IndexController extends Controller
                 push_queue_open(AoZhou5BetJobs::class, $pushData);
             }
             p($orderIds);
-            $logData = Json::decode('{"log_member_quick_select_id":"24483351","member_id":"21821","account":"Ldl158158","nickname":"","fix_num":"50","bet_count":"49","bet_money":"2940","operation_content":"[五位二定]，定位置“[取]”：个=[2345678]，五=[2341678]","operation_datetime":"05-29 16:51:34","time_value":"2024/5/29 16:51:34","operation_ip":"36.1.*.*","ip_value":"36.1.146.170","operation_ip_extension":"36.1.146.170","is_package":"0","log_type":"102"}');
-            list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token='eb70910c92f134bd54a3837d978f055b');
-            p([$code, $qihao, $logData]);
-            $tzSystemUser = TzSystemsUsers::findOne(68);
-            $userInfo = (new ActionBaseService())->login($tzSystemUser, $isAuto=1);p($userInfo);
             //$rst = BetService::pushTasksBetRst($plan_id=7953, $qihao=20240203238, ['bet_rst'=>1,'time_consume'=>2], $access_token='g5843e29ac8dd191e894c7dcea547792', $lottery_type=LotteryType::LUCKY_5); p($rst);
             $rst = BetService::pushTasksBetRst($plan_id=AoZhou5BetService::TEST_BET_ID, $qihao=51108412, ['bet_rst'=>1,'task_status'=>2,'time_consume'=>2], $access_token='g5843e29ac8dd191e894c7dcea547792', $lottery_type=LotteryType::AZ_LUCKY_5);
             p($rst);

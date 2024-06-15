@@ -8,6 +8,22 @@ use common\service\open\aozhou5\ActionService;
 
 class ActionBaseService
 {
+    public object $tzSystemUsers;
+    public string $domain;
+    public string $account;
+    public string $password;
+    public string $objectClass;
+    public string $securityCode;
+    public function __construct($tzSystemsUsers=null)
+    {
+        $this->tzSystemUsers = $tzSystemsUsers;
+        $TzSystems = TzSystems::findOne($tzSystemsUsers->tz_system_id);
+        #$this->objectClass = self::getClass($TzSystems->system_type_id);
+        $this->domain = $tzSystemsUsers->ssc_domain;
+        $this->account = $tzSystemsUsers->account;
+        $this->password = $tzSystemsUsers->password;
+        $this->securityCode = $tzSystemsUsers->secure_code;
+    }
 
     /**
      * @param $systemTypeId
@@ -21,54 +37,14 @@ class ActionBaseService
         return $classes[$systemTypeId]??false;
     }
 
-    public function login($tzSystemsUser, $isAuto=1): array
+    public function login($isAuto=1): array
     {
-        $TzSystems = TzSystems::findOne($tzSystemsUser->tz_system_id);
-        $objectClass = self::getClass($TzSystems->system_type_id);
-        $objectClass->domain = $tzSystemsUser->ssc_domain;
-        $objectClass->account = $tzSystemsUser->account;
-        $objectClass->password = $tzSystemsUser->password;
-        $objectClass->tzSystemUsers = $tzSystemsUser;
-        $objectClass->securityCode = $tzSystemsUser->secure_code;
-
-        try {
-            $userInfo = $objectClass->getUserInfo();
-        }catch (\Exception $e){}
-
-        if($isAuto==2 OR empty($tzSystemsUser->cookie) OR empty($userInfo)){
-            //$objectClass->preLogin();
-            $objectClass->login();
-            $userInfo = $objectClass->getUserInfo();
-        }
-        if(!empty($userInfo)){
-            $userInfo = $objectClass->memberThreadMd();
-        }
-
-        return [0, $userInfo, '完成'];
+        return [];
     }
 
-    public function getUserInfo($tzSystemsUser): array
+    public function getUserInfo(): array
     {
-        $TzSystems = TzSystems::findOne($tzSystemsUser->tz_system_id);
-        $objectClass = self::getClass($TzSystems->system_type_id);
-        $objectClass->domain = $tzSystemsUser->ssc_domain;
-        $objectClass->tzSystemUsers = $tzSystemsUser;
-
-        return $objectClass->getUserInfo()?:[];
+        return $this->getUserInfo()?:[];
     }
 
-    /**
-     * 获取盘口报表信息
-     * @param $tzSystemsUser
-     * @return array
-     */
-    public function getSiteStaticsInfo($tzSystemsUser): array
-    {
-        $TzSystems = TzSystems::findOne($tzSystemsUser->tz_system_id);
-        $objectClass = self::getClass($TzSystems->system_type_id);
-        $objectClass->domain = $tzSystemsUser->ssc_domain;
-        $objectClass->tzSystemUsers = $tzSystemsUser;
-
-        return $objectClass->getSiteStatics()?:[];
-    }
 }

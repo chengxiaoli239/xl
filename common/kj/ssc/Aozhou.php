@@ -7,6 +7,7 @@ use common\helpers\LotteryType;
 use common\kj\BaseKj;
 use common\open\aozhou5\api\UserApi;
 use common\service\open\ActionBaseService;
+use common\service\open\aozhou5\ActionService;
 use common\service\ssc\QihaoService;
 use common\service\ssc\SscKjDataService;
 use common\tools\Tool_Common;
@@ -117,7 +118,7 @@ class Aozhou extends BaseKj {
             $where = ['AND', ['=', 'status',1], ['>', 'balance', 0],['=', 'tz_system_id', 19], ['!=', 'ssc_domain', '']];
             $TzSystemsUser = TzSystemsUsers::find()->where($where)->limit(1)->one();
 
-            list($code, $lotteryInfo, $msg) = (new ActionBaseService)->login($TzSystemsUser);
+            list($code, $lotteryInfo, $msg) = (new ActionService($TzSystemsUser))->getUserData();
             //p(['lotteryInfo'=>$lotteryInfo]);
             $siteData = $lotteryInfo['drawList'][0]??[];
             $kjData = [

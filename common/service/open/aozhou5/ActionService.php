@@ -2,173 +2,158 @@
 
 namespace common\service\open\aozhou5;
 
+use backend\models\TzSystems;
 use common\exceptions\InfoException;
 use common\open\aozhou5\api\PreLoginApi;
 use common\open\aozhou5\api\UserApi;
 use common\service\cache\CacheKeyService;
 use common\service\chat\Tool_Common;
 use common\service\lottery\aozhou5\AoZhou5BetService;
+use common\service\open\ActionBaseService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\RequestOptions;
 use yii\helpers\Json;
 
-class ActionService
+class ActionService extends ActionBaseService
 {
-    public string $domain;
-    public string $account;
-    public string $password;
-    public object $tzSystemUsers;
     public string $userAgent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36';
     public string $securityCode='fa8888';
-    public string $cfRay = '';
     public int $line_number = 2; # 这里假设线路号是5
     const LINE_NUMBER = 2;
-    public function setDomain()
-    {
 
+    public function __construct($tzSystemUsers)
+    {
+        parent::__construct($tzSystemUsers);
+        $this->line_number = self::getLineNumber();
     }
 
-    public function preLogin()
+    /**
+     * 获取用户数据
+     * @param int $isAuto
+     * @return array
+     * @throws InfoException
+     */
+    public function getUserData(int $isAuto=1): array
     {
-        $firstUrl = $this->domain;
-        $params1 = [
-            //'Accept-Encoding' => 'identity',
-            'authority' => 'ac955.com',
-        ];
-        $result = PreLoginApi::pre1($this->domain, $params1);
-        //p($result);
+        try {
+            $userInfo = $this->getUserInfo();
+        }catch (\Exception $e){}
 
-        $params = ['search'=>$this->securityCode];
-        $searchHtml = UserApi::searchLine($this->domain, $params);
-        $dom = new \DOMDocument();
-        $dom->loadHTML($searchHtml);
-        $links = $dom->getElementsByTagName('a');
-        $domain = explode('//', trim('/', $this->domain))[1];
+        if($isAuto==2 OR empty($tzSystemsUser->cookie) OR empty($userInfo)){
+            $this->login();
+            $userInfo = $this->getUserInfo();
+        }
 
-        $pattern = '/https:\/\/url(\d+)'.$domain.'\/member\//'; // 匹配 https://url(数字).c955.com/member/ 格式的网址
-        $matchedLinks = [];
-        foreach ($links as $link) {
-            $href = $link->getAttribute('href');
-            if (preg_match($pattern, $href, $matches)) {
-                $matchedLinks[] = $href;
+        return [0, $userInfo, '操作成功'];
+    }
+
+    public function login($isAuto=1): array
+    {
+        try {
+            //$params = ['search'=>$this->securityCode];
+            //$search = UserApi::searchLine($this->domain, $params);
+            // 创建 CookieJar 来存储 cookie
+            $cookieJar = new CookieJar();
+            $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
+            //p(['search'=>$search, 'parsed_url'=>$parsed_url]);
+
+            if ($parsed_url && isset($parsed_url['host'])) {
+                $host = $parsed_url['host'];
+                // 提取域名（例如：ac3868.com）
+                $domain = explode('.', $host)[1]; // 提取第二个部分，即域名
+
+                // 第一个请求的 URL
+                $firstUrl = "{$parsed_url['scheme']}://url{$this->line_number}.{$host}/member/#/";
+                // 第二个请求的 URL
+                $secondUrl = "{$parsed_url['scheme']}://url{$this->line_number}.{$host}/api/code";
+                // 第二个请求的 URL
+                $thirdUrl = "{$parsed_url['scheme']}://url{$this->line_number}.{$host}/api/";
+                //p([$firstUrl, $secondUrl, $thirdUrl]);
+            } else {
+                Tool_Common::log('/aozhou5/'.__FUNCTION__, 'ERR', '登录异常', ['domain'=>$this->domain, 'parsed_url'=>$parsed_url]);
+                return [];
             }
+
+            // 创建 Guzzle 客户端
+            $client = new Client(['cookies' => $cookieJar]);
+
+            $now_time = time();
+
+            // 设置请求头，包括 Cookie
+            $headers = [
+                'Accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'Accept-Encoding' => 'gzip, deflate, br, zstd',
+                'User-Agent' => $this->userAgent,
+                'Referer' => $firstUrl, // 使用第一个请求的 URL 作为 Referer
+            ];
+
+            // 发起第一个 GET 请求
+            #$response1 = $client->request('GET', $firstUrl, [
+            #    'headers' => $headers,
+            #]);
+            #p($response1);
+
+            $headers2 = [
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 '
+            ];
+            // 发起第二个 GET 请求
+            $response2 = $client->request('GET', $secondUrl, [
+                'headers' => $headers2,
+            ]);
+            // 获取响应内容
+            $body = $response2->getBody()->getContents();
+            $code = $body;
+
+            $params[RequestOptions::FORM_PARAMS] = [
+                '__' => 'memberLogin',
+                'userName' => $this->account,
+                'password' => $this->password,
+                'validateCode' => $code,
+                'host' => "url{$this->line_number}.{$host}"
+            ];
+            //$requestBody = http_build_query($params[RequestOptions::FORM_PARAMS]);
+            $params[RequestOptions::HEADERS] = $headers;
+            //$params['verify'] = false;
+            # 发起第三个 POST 请求
+            $response3 = $client->request('POST', $thirdUrl, $params);
+            $body = $response3->getBody()->getContents();
+            //p(['thirdUrl'=>$thirdUrl, 'params'=>$params, 'headers'=>$headers3, 'body'=>$body]);
+
+            // 获取响应中设置的 Cookie start
+            $setCookieHeaders = $response3->getHeader('Set-Cookie');
+            $cookieStr = trim(explode(';', $setCookieHeaders[1])[0]);
+            $this->tzSystemUsers->cookie = $cookieStr;
+            $this->tzSystemUsers->updated_at = time();
+            $this->tzSystemUsers->user_agent = 'User-Agent: '.$this->userAgent;
+            $this->tzSystemUsers->save();
+            // 获取响应中设置的 Cookie end
+
+            $result = Json::decode($body);
+
+            $params[RequestOptions::FORM_PARAMS] = [
+                '__' => 'memberInitialization',
+                'cbk' => AoZhou5BetService::getCbk($this->tzSystemUsers->cookie),
+            ];
+            $requestBody = http_build_query($params[RequestOptions::FORM_PARAMS]);
+            $headers['Content-Length'] = strlen($requestBody);
+            $params[RequestOptions::HEADERS] = $headers;
+            $response4 = $client->request('POST', $thirdUrl, $params);
+            $body = $response4->getBody()->getContents();
+            $result4 = Json::decode($body);
+            Tool_Common::log('/aozhou5/'.__FUNCTION__, 'ERR', '登录结束', ['params'=>$params, 'code'=>$code, 'result'=>$result, 'cookieStr'=>$cookieStr, 'result4'=>$result4]);
+        }catch (\Exception $e){
+            return [10001, $e->getMessage()];
         }
-        var_dump($matchedLinks); // 输出匹配到的网址数组
-        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '搜索线路', ['domain'=>$this->domain, 'matchedLinks'=>$matchedLinks]);
-    }
 
-    public function login()
-    {
-        $params = ['search'=>$this->securityCode];
-        $search = UserApi::searchLine($this->domain, $params);
-        // 创建 CookieJar 来存储 cookie
-        $cookieJar = new CookieJar();
-        $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
-        //p(['search'=>$search, 'parsed_url'=>$parsed_url]);
+        try {
+            $userInfo = $this->getUserInfo();
+        }catch (\Exception $e){}
 
-        if ($parsed_url && isset($parsed_url['host'])) {
-            $host = $parsed_url['host'];
-            // 提取域名（例如：ac3868.com）
-            $domain = explode('.', $host)[1]; // 提取第二个部分，即域名
-
-            // 第一个请求的 URL
-            $firstUrl = "{$parsed_url['scheme']}://url{$this->line_number}.{$host}/member/#/";
-            // 第二个请求的 URL
-            $secondUrl = "{$parsed_url['scheme']}://url{$this->line_number}.{$host}/api/code";
-            // 第二个请求的 URL
-            $thirdUrl = "{$parsed_url['scheme']}://url{$this->line_number}.{$host}/api/";
-            //p([$firstUrl, $secondUrl, $thirdUrl]);
-        } else {
-            Tool_Common::log('/aozhou5/'.__FUNCTION__, 'ERR', '登录异常', ['domain'=>$this->domain, 'parsed_url'=>$parsed_url]);
-            return false;
+        if($isAuto==2 OR empty($tzSystemsUser->cookie) OR empty($userInfo)){
+            $this->login();
+            $userInfo = $this->getUserInfo();
         }
-
-        // 创建 Guzzle 客户端
-        $client = new Client(['cookies' => $cookieJar]);
-
-        $now_time = time();
-        //LoginApi::login($params);
-
-        // 设置请求头，包括 Cookie
-        $headers = [
-            'Accept' => 'application/json, text/javascript, */*; q=0.01',
-            'Accept-Encoding' => 'gzip, deflate, br, zstd',
-            'User-Agent' => $this->userAgent,
-            'Referer' => $firstUrl, // 使用第一个请求的 URL 作为 Referer
-            #'Cookie' => $cookie, // 使用从第一个响应中提取的 Cookie
-        ];
-
-        // 发起第一个 GET 请求
-        $response1 = $client->request('GET', $firstUrl, [
-            'headers' => $headers,
-        ]);
-
-        // 发起第二个 GET 请求
-        $response2 = $client->request('GET', $secondUrl, [
-            'headers' => $headers,
-        ]);
-
-        // 获取响应内容
-        $body = $response2->getBody()->getContents();
-        $code = $body;
-
-        $params[RequestOptions::FORM_PARAMS] = [
-            '__' => 'memberLogin',
-            'userName' => $this->account,
-            'password' => $this->password,
-            'validateCode' => $code,
-            'host' => "url{$this->line_number}.{$host}"
-        ];
-        $requestBody = http_build_query($params[RequestOptions::FORM_PARAMS]);
-        $headers = [
-            'Accept' => '*/*',
-            'Accept-Encoding' => 'deflate',
-            'Accept-Language' => 'zh-CN,zh;q=0.9',
-            'Connection' => 'keep-alive',
-            'Content-Length' => strlen($requestBody),
-            'Content-Type' => 'application/x-www-form-urlencoded',
-            'Cookie' => 'code='.$code,
-            //'Host' => "url{$line_number}.{$host}",
-            'Origin' => "{$parsed_url['scheme']}://url{$this->line_number}.{$host}",
-            'Referer' => "{$parsed_url['scheme']}://url{$this->line_number}.{$host}/member/",
-            'Sec-Ch-Ua' => '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
-            'Sec-Ch-Ua-Mobile' => '?0',
-            'Sec-Ch-Ua-Platform' => '"Windows"',
-            'Sec-Fetch-Dest' => 'empty',
-            'Sec-Fetch-Mode' => 'cors',
-            'Sec-Fetch-Site' => 'same-origin',
-            'User-Agent' => $this->userAgent,
-        ];
-        $params[RequestOptions::HEADERS] = $headers;
-        //$params['verify'] = false;
-        //p(['thirdUrl'=>$thirdUrl, 'params'=>$params]);
-        # 发起第三个 POST 请求
-        $response3 = $client->request('POST', $thirdUrl, $params);
-        $body = $response3->getBody()->getContents();
-
-        // 获取响应中设置的 Cookie start
-        $setCookieHeaders = $response3->getHeader('Set-Cookie');
-        $cookieStr = trim(explode(';', $setCookieHeaders[1])[0]);
-        $this->tzSystemUsers->cookie = $cookieStr;
-        $this->tzSystemUsers->updated_at = time();
-        $this->tzSystemUsers->user_agent = 'User-Agent: '.$this->userAgent;
-        $this->tzSystemUsers->save();
-        // 获取响应中设置的 Cookie end
-
-        $result = Json::decode($body);
-
-        $params[RequestOptions::FORM_PARAMS] = [
-            '__' => 'memberInitialization',
-            'cbk' => AoZhou5BetService::getCbk($this->tzSystemUsers->cookie),
-        ];
-        $requestBody = http_build_query($params[RequestOptions::FORM_PARAMS]);
-        $headers['Content-Length'] = strlen($requestBody);
-        $params[RequestOptions::HEADERS] = $headers;
-        $response4 = $client->request('POST', $thirdUrl, $params);
-        $body = $response4->getBody()->getContents();
-        $result4 = Json::decode($body);
-        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'ERR', '登录结束', ['params'=>$params, 'code'=>$code, 'result'=>$result, 'cookieStr'=>$cookieStr, 'result4'=>$result4]);
 
         return $result;
     }
@@ -298,5 +283,24 @@ class ActionService
         $staticsInfo = UserApi::siteCommonApi($url, $params, $headers);
 
         return $staticsInfo;
+    }
+
+    /**
+     * 获取盘口报表信息
+     * @return array
+     */
+    public function getSiteStaticsInfo(): array
+    {
+        return $this->getSiteStatics()?:[];
+    }
+
+    public function getLineNumber()
+    {
+        $mKey = CacheKeyService::getLineNumber($this->tzSystemUsers->username);
+        if(in_array($this->tzSystemUsers->username, ['aa30301', 'aa301'])){
+            $lineNumber = commonRedis()->get($mKey);
+        }
+
+        return $lineNumber ? : $this->line_number;
     }
 }

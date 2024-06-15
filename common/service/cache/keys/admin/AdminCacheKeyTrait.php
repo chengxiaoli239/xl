@@ -32,4 +32,14 @@ trait AdminCacheKeyTrait
     {
         return 'admin:site_info:' . $userId;
     }
+
+    /**
+     * 获取线路
+     * @param $username
+     * @return string
+     */
+    public static function getLineNumber($username): string
+    {
+        return 'admin:line_number_'.$username;
+    }
 }

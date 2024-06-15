@@ -8,6 +8,7 @@ use common\models\AdminModel;
 use common\models\eyun\HistoryRobots;
 use common\open\telegram\api\WebHookApi;
 use common\service\open\ActionBaseService;
+use common\service\open\aozhou5\ActionService;
 use common\service\wechat\RobotUserService;
 use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
@@ -151,7 +152,7 @@ class RobotUserController extends BaseController
             $post['TzSystemsUsers']['ssc_domain'] = $domain;
             $model->load($post) && $model->save();
 
-            (new ActionBaseService())->login($model, $isAuto);
+            (new ActionService($model))->login($isAuto);
             return $this->redirect(['site-info']);
         }
 

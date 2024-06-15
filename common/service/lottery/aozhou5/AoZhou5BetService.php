@@ -317,11 +317,10 @@ class AoZhou5BetService extends CommonBaseService
             #'cbk' => '0a2016edb310cd7c3a6afae7ee88ed8077d9aa29853867b9b9e0e735eaf8bb470fcc5bc44796ce782116ccb2ab2631ae08fa23f414c7e6c6',
             'cbk' => self::getCbk($site['cookie']),
         ];
-        $objectClass = ActionBaseService::getClass($site['system_type_id']);
-        $objectClass->domain = $site['ssc_domain'];
-        $objectClass->tzSystemUsers = $TzSystemUsers;
+        $actService = new ActionService($TzSystemUsers);
+        $lineNumber = $actService->getLineNumber();
         $parsed_url = parse_url($site['ssc_domain']); # Array ( [scheme] => https [host] => ac3868.com )
-        $url = "https://url{$objectClass->line_number}.{$parsed_url['host']}";
+        $url = "https://url{$lineNumber}.{$parsed_url['host']}";
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推盘口下注01', [
             'url' => $url,
             'headers' => $headers,
@@ -339,7 +338,7 @@ class AoZhou5BetService extends CommonBaseService
             '__'=>'bettingSingle',
             'data' => Json::encode([
                 'gameId'=>601,
-                'pusId' => self::PUSH_ID_OPTIONS[$objectClass->tzSystemUsers->kj_num],
+                'pusId' => self::PUSH_ID_OPTIONS[$actService->tzSystemUsers->kj_num],
                 'openingNum' => (int)$nextQiHao,
                 'rebate' => 'A',
                 'data' => [
@@ -349,8 +348,8 @@ class AoZhou5BetService extends CommonBaseService
             'cbk' => self::getCbk($site['cookie']),
         ];
         $headers = array_merge($headers, [
-            'Origin' => "https://url{$objectClass->line_number}.{$parsed_url['host']}",
-            'Referer' => "https://url{$objectClass->line_number}.{$parsed_url['host']}/member/",
+            'Origin' => "https://url{$actService->line_number}.{$parsed_url['host']}",
+            'Referer' => "https://url{$actService->line_number}.{$parsed_url['host']}/member/",
             //'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemUsers->user_agent)),
         ]);
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘10', [
@@ -415,7 +414,7 @@ class AoZhou5BetService extends CommonBaseService
             Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘20', $logArr);
             throw_info($result2['error']??'推送盘口异常2', 30002);
         }
-        $objectClass->getUserInfo(1); # 同步余额
+        $actService->getUserData(); # 同步余额
         Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'INFO', '推网盘30', ['result2'=>$result2]);
 
         return true;

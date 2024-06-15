@@ -8,6 +8,7 @@ use backend\service\BaseService;
 use backend\service\UserService;
 use common\service\cache\CacheKeyService;
 use common\service\open\ActionBaseService;
+use common\service\open\aozhou5\ActionService;
 use common\service\thirdD\CommonBaseService;
 use common\tools\Timer;
 
@@ -22,7 +23,7 @@ class AgentService extends BaseService {
     {
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$userId]);
         if($isSiteInfo){
-            $siteStaticsInfos = (new ActionBaseService)->getSiteStaticsInfo($TzSystemsUsers);
+            $siteStaticsInfos = (new ActionService($TzSystemsUsers))->getSiteStaticsInfo();
             $mKey = CacheKeyService::getIsClientNeedLoginKey($TzSystemsUsers->uid);
             if(!empty($siteStaticsInfos['error'])){
                 commonRedis()->setex($mKey, 120, UserService::USER_CLIENT_LOGIN_NEED);
