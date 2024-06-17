@@ -81,10 +81,10 @@ class TzSystemUsersService extends ClientsBaseService{
      * @desc 获取系统授权access_tokens
      * @return array|mixed
      */
-    public static function getAuthAccessTokens(){
+    public static function getAuthAccessTokens($isAuto=1){
         $m = \Yii::$app->cache;
         $mkey = 'user_getAuthAccessTokens';
-        if(!$access_tokens = $m->get($mkey)){
+        if($isAuto==2 OR !$access_tokens = $m->get($mkey)){
             $ADMIN_ACCESS_TOKEN = BetService::getConfig('ADMIN_ACCESS_TOKEN'); # 管理员token
             $TzSystemsUsers = TzSystemsUsers::find()->select(['access_token'])->where(['status'=>1])->asArray()->all();
             $access_tokens = ArrayHelper::getColumn($TzSystemsUsers, 'access_token');

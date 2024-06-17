@@ -2108,7 +2108,8 @@ class SscDataService extends BaseService {
      * @desc 处理止盈止损计划
      * @return array
      */
-    public static function operateProfitsPlans($lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function operateProfitsPlans($lottery_type = DEFAULT_LOTTERY_TYPE): array
+    {
         $now_HI = date('H:i:s');
         if($lottery_type==8 && '04:05:00'<$now_HI && $now_HI<'09:00:00'){
             return ['status'=>300, 'msg'=>'非开盘时间不统计'];

@@ -12,6 +12,7 @@ use backend\models\TzSystems;
 use backend\models\TzSystemsAuth;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
+use backend\service\clients\TzSystemUsersService;
 use common\models\AdminModel;
 use common\models\AuthAssignment;
 use common\service\cache\CacheKeyService;
@@ -195,21 +196,20 @@ class UserService extends BaseService {
     /**
      * @description 更新用户表状态 tz_systems_users 表状态
      * @param $id
-     * @param $account
-     * @return array
+     * @param $status
+     * @return array|bool
      */
     public static function updateUserTzSystemStatus($id, $status)
     {
         if(!$id) return ['status'=>300, 'msg'=>'id为空'];
-        $m = \Yii::$app->cache;
-        $mkey = 'updateUserTzSystemStatus_'.$id.'_'.$status;
-        if($rst = $m->get($mkey)) return false;
+
+        TzSystemUsersService::getAuthAccessTokens(2);
 
         $TzSystemsUser = TzSystemsUsers::findOne($id);
         $TzSystemsUser->status = (int)$status;
         $TzSystemsUser->cookie = '';
         $TzSystemsUser->balance = '';
-        $TzSystemsUser->save();
+        $rst = $TzSystemsUser->save();
 
         return $rst;
     }

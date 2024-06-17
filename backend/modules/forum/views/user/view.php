@@ -111,7 +111,7 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                     }],
                                     ['attribute' => 'odds_2d', 'label'=>'赔率', //'headerOptions' => ['width' => '170'],
                                         'value'=> function($model){
-                                            return  '二定:'.$model->odds_2d .'、 '.'三定:'.$model->odds_3d .'、 '.'三定:'.$model->odds_4d;
+                                            return  '二定:'.$model->odds_2d .'、 '.'三定:'.$model->odds_3d .'、 '.'四定:'.$model->odds_4d;
                                         },
                                     ],
                                     ['attribute' => 'odds_3d', 'label'=>'盈利', //'headerOptions' => ['width' => '170'],

@@ -24,13 +24,23 @@ trait AdminCacheKeyTrait
     }
 
     /**
-     * 用信息
+     * 用户信息
      * @param int $userId
      * @return string
      */
     public static function userSiteInfo(int $userId=0): string
     {
         return 'admin:site_info:' . $userId;
+    }
+
+    /**
+     *  用户盘口信息key
+     * @param int $tzSystemUserId
+     * @return string
+     */
+    public static function userTzSystemUserStatus(int $tzSystemUserId=0): string
+    {
+        return 'admin:site_info:' . $tzSystemUserId;
     }
 
     /**
