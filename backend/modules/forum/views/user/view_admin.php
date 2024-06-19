@@ -1,5 +1,6 @@
 <?php
 
+use backend\models\thirdD\BetsBackend;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -136,17 +137,21 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'is_local_bet','label'=>'本地下', 'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                if($model->is_local_bet == 1){
-                                    $txt = '<font color="green">是</font>';
-                                    $alt = '点击禁用';
-                                    $val = 0;
-                                }else{
-                                    $txt = '<font color="red">否</font>';
-                                    $val = 1;
-                                    $alt = '点击启用';
+                                if($model->is_local_bet == BetsBackend::BET_TYPE_SERVER_API){
+                                    $txt = '<font color="green">'.BetsBackend::BET_TYPE_OPTIONS[BetsBackend::BET_TYPE_SERVER_API].'</font>';
+                                    $alt = '切换'.BetsBackend::BET_TYPE_OPTIONS[BetsBackend::BET_TYPE_LOCAL_API];
+                                    $val = BetsBackend::BET_TYPE_LOCAL_API;
+                                }elseif($model->is_local_bet == BetsBackend::BET_TYPE_LOCAL_API){
+                                    $txt = '<font color="green">'.BetsBackend::BET_TYPE_OPTIONS[BetsBackend::BET_TYPE_LOCAL_API].'</font>';
+                                    $alt = '切换'.BetsBackend::BET_TYPE_OPTIONS[BetsBackend::BET_TYPE_LOCAL_SELENIUM];
+                                    $val = BetsBackend::BET_TYPE_LOCAL_SELENIUM;
+                                }elseif($model->is_local_bet == BetsBackend::BET_TYPE_LOCAL_SELENIUM){
+                                    $txt = '<font color="green">'.BetsBackend::BET_TYPE_OPTIONS[BetsBackend::BET_TYPE_LOCAL_SELENIUM].'</font>';
+                                    $alt = '切换'.BetsBackend::BET_TYPE_OPTIONS[BetsBackend::BET_TYPE_SERVER_API];
+                                    $val = BetsBackend::BET_TYPE_SERVER_API;
                                 }
                                 $url = "/forum/user/switch-is-local-bet?id=".$model->id."&status=".$val; #
-                                return Html::a($txt, $url, ['title' => '开通使用代理IP','alt'=>$alt]);
+                                return Html::a($txt, $url, ['title' => $alt,'alt'=>$alt]);
                             }
                         ],
                         ['attribute' => 'follow_status','label'=>'自动跟', 'headerOptions'=>['width'=>'5%'],

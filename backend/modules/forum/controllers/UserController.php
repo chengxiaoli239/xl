@@ -536,10 +536,10 @@ class UserController extends BaseController
      * @param $status
      * @return \yii\web\Response
      */
-    public function actionSwitchIsLocalBet($id){
+    public function actionSwitchIsLocalBet($id, $status = 1){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if(\Yii::$app->user->id == 1){
-            $rst = HN0898Service::updateStatus($id, $model = '\backend\models\TzSystemsUsers', 'is_local_bet');
+            $rst = HN0898Service::updateStatus($id, $model = '\backend\models\TzSystemsUsers', 'is_local_bet', $status);
             PoxyIPService::delIsLocalBetKey();
         }
 

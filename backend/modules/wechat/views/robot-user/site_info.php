@@ -108,7 +108,7 @@ $this->registerJs($js);
                                     //'balance',
                                     [ 'attribute'=>'balance','label'=>'描述情况','format'=>'raw',
                                         'value'=>function($model){
-                                            list($balance, $todayPl, $todayBet, $weekBet, $weekPl, $lastWeekBet, $lastWeekPl) = AgentService::getCalcMoney($model->uid);
+                                            list($balance, $todayPl, $todayBet, $weekBet, $weekPl, $lastWeekBet, $lastWeekPl) = AgentService::getCalcMoney($model->uid, $siteInfo=0);
                                             return "余额：<span id='balance_".$model->id."'>".$model->balance."</span>、".'今日盈亏：'.$todayPl.'、有效金额：'.$todayBet;
                                         }
                                     ],

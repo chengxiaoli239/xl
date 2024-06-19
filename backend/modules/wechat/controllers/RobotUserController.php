@@ -152,7 +152,9 @@ class RobotUserController extends BaseController
             $post['TzSystemsUsers']['ssc_domain'] = $domain;
             $model->load($post) && $model->save();
 
-            (new ActionService($model))->login($isAuto);
+            if($model->is_auto_login){
+                (new ActionService($model))->login($isAuto);
+            }
             return $this->redirect(['site-info']);
         }
 

@@ -212,6 +212,7 @@ $columns = array_merge(
                 <?= Html::button("批量关闭", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchClose']) ?> &nbsp;
                 <?= Html::button("批量开启", ['class' => 'btn btn-success btn-xs', 'id' => 'batchOpen']) ?> &nbsp;
                 <?= Html::button("批量删除", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchDelete']) ?> &nbsp;
+                <?= Html::button("批量模拟", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchSimulate']) ?> &nbsp;
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
@@ -293,6 +294,13 @@ $columns = array_merge(
             }).get();
 
             batchUpdate('status', selectedIds, -2);
+        });
+        $('#batchSimulate').click(function () {
+            var selectedIds = $('input[name="selection[]"]:checked').map(function () {
+                return this.value;
+            }).get();
+
+            batchUpdate('is_test', selectedIds, 1);
         });
         function batchUpdate(field, ids, val) {
             console.log(field, ids, val)

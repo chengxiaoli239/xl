@@ -878,99 +878,6 @@ class Lucky5Service { # 重庆7时彩登陆体系
     }
 
     /**
-     * @decription 获取远程网页表单
-     * @param string $cookie
-     * @param string $vsid
-     * @return mixed
-     */
-    public static function getRemoteHtmlContent($uid = 1,$tz_system_id = 1, $vsid = '292p133GRw48'){
-        self::__init($uid, $tz_system_id);
-        //$User = User::findOne(['account'=>$account]);
-        $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
-        $headers = [
-            "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-            //"Accept-Encoding: gunzip,deflate, br", # gunzip 防止抓取页面内容返回乱码
-            "Upgrade-Insecure-Requests: 1",
-            "Origin:".self::$baseUrl,
-            'Host: '.str_replace('http://', '', str_replace('https:', 'http', self::$domain)),
-            //"Cookie:".$TzSystemUser->cookie.';vsid='.$vsid,
-            "Cookie:".$TzSystemUser->cookie,
-        ];
-        $url = HN0898Service::getTzSiteInfo($tz_system_id, 'INDEX');
-        $logArr = ['url'=>$url, 'headers'=>$headers, ];
-        $htmlData = RemoteHtmlService::getRemoteHtmlContent($url, $headers);
-        //p([$logArr,$htmlData]);
-
-        $htmlData = str_replace('/code2.aspx',self::$baseUrl.'/code2.aspx', $htmlData); // 验证码链接
-
-        return $htmlData;
-    }
-
-    /**
-     * @desc 获取订单号
-     * @param $sn 方案号
-     * @return mixed
-     */
-    public static function getSnidBySn($sn){
-        $m = \Yii::$app->cache;
-        $mkey = 'SNID_'.$sn;
-        if(!$snid = $m->get($mkey)){
-            //$url = HN0898Service::getUserUrlArr($user_id,'SSC_INDEX');
-            $url = HN0898Service::getTzSiteInfo(self::$tz_system_id,'SSC_INDEX');
-            $headers = [
-                'Cache-Control: max-age=0',
-                //'Upgrade-Insecure-Requests: 1',
-                "Host:".str_replace('www.','',self::$domain),
-                'Host: '.str_replace('http://', '', str_replace('https:', 'http', self::$domain)),
-                //"Accept-Encoding: gzip, deflate, br",
-                //"Accept-Encoding: gunzip, deflate, br", # gunzip 防止乱码
-                "Cookie:".self::$cookie,
-                'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
-            ];
-            //$headers = array_merge(self::$headers,$headers);
-
-            $content = RemoteHtmlService::getRemoteHtmlContent($url, $headers);
-            $preg = "/<td>".$sn."(.*?) snid=(.*?)\>点击撤单/ism"; // 这里是表达式，大神看看
-            preg_match_all($preg,$content,$matches);
-            $snid = $matches[2][0];
-            $logData = ['url'=>$url,'headers'=>$headers, 'snid'=>$snid,/* 'content'=>$content*/];
-            //p($logData);
-            Tool_Common::log('getSnidBySn','INFO','获取方案号', $logData);
-            $m->set($mkey, 6*3600);
-        }
-
-        return $snid;
-    }
-
-    /**
-     * @decription 获取登录表单
-     * @param $formData
-     * @return array
-     */
-    private static function getLoginForm($formData){
-        $form = $formData[0];
-        $filterField = ['__VIEWSTATE','__EVENTVALIDATION','__VIEWSTATEGENERATOR','ctl00$txtUser', 'ctl00$txtPwd', 'ctl00$txtcode'];
-        $inputs = [];
-        foreach ($form['inputs'] as $key=>$item){
-            $field = $item['name'];
-            if(!in_array($field, $filterField)) continue;
-            $value = $item['value'];
-
-            $inputs[$field] = $value;
-        }
-        $inputs['ctl00$btnlogin.x'] = rand(10,99);
-        $inputs['ctl00$btnlogin.y'] = rand(10,99);
-
-        return ['action'=>$form['action'],'inputs'=>$inputs];
-    }
-
-    public static function getZjByInterval(){
-        $times = 0;
-
-        return $times;
-    }
-
-    /**
      * @description 获取cookie并写表lt_tz_systems_users，场景：未登录情况下
      * @param $uid
      * @param $tz_system_id
@@ -1141,29 +1048,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
     /**
      * @desc 获取方案号
-     * @param $uid
-     * @param $tz_system_id
      * @return array
      */
-    public static function getSn($uid, $tz_system_id){
+    public static function getSn(){
+
         return ['sn'=>BetService::$true_bet_sn];
-        $rst = self::userInfo($uid, $tz_system_id);
-        $data = [];
-        if(!isset($rst['Status']) OR $rst['Status'] !=1) return $data;
-
-        //p($rst);
-        $data['sn'] = $rst['Data']['serial_no'];
-        $data['qihao'] = substr($rst['Data']['previous_period_no'], 2);
-        $tzDatas = $rst['Data']['Details'];
-        $snidStr = '';
-        foreach ($tzDatas as $tzData){
-            $snidStr .= $tzData['bet_id'].'|1,';
-        }
-        //$snidStr = trim('|1,', implode('|1,', $tzDatas));
-        $data['snid'] = trim($snidStr, ',');
-        Tool_Common::log('getSn','INFO','幸运五获取方案号', $data);
-
-        return $data;
     }
 
     /**
@@ -1483,7 +1372,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 $status = 2;
                 $tmpRst['status'] = $status; # 下注成功
                 //# 获取方案号，记录id, 用于撤单
-                $snInfo = self::getSn($row->uid, $row->tz_system_id);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
+                $snInfo = self::getSn();// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
                 Tool_Common::log('/repeatErrorBet/xxx', 'INFO', '幸运下注x2', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account,'Status'=>$tmpRst['Status'], 'snInfo'=>$snInfo, 'tmpRst'=>$tmpRst, 'codes'=>json_decode($row->codes)]);
                 if(isset($snInfo['snid'])) $snInfo['snid'] = substr($snInfo['snid'],0,20).'...';
                 $snid = '{'.$snInfo['sn'].'}|'.count(json_decode($row->codes)); # 多次下单需要分开，多次撤单

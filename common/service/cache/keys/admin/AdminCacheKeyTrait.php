@@ -44,6 +44,16 @@ trait AdminCacheKeyTrait
     }
 
     /**
+     *  用户更新余额key
+     * @param int $tzSystemUserId
+     * @return string
+     */
+    public static function updateBalanceKey(int $tzSystemUserId=0): string
+    {
+        return 'admin:user_info:update_balance_' . $tzSystemUserId;
+    }
+
+    /**
      * 获取线路
      * @param $username
      * @return string

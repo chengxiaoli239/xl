@@ -71,11 +71,13 @@ class BetsBackend extends Bets
         self::NEED_CONFIRM_YES => '需',
     ];
 
-    const BET_TYPE_API = 1;
-    const BET_TYPE_SELENIUM = 2;
+    const BET_TYPE_SERVER_API = 0;
+    const BET_TYPE_LOCAL_API = 1;
+    const BET_TYPE_LOCAL_SELENIUM = 2;
     # 下注方式
     const BET_TYPE_OPTIONS = [
-        self::BET_TYPE_API => 'api',
-        self::BET_TYPE_SELENIUM => 'selenium',
+        self::BET_TYPE_SERVER_API => 'A', #'服务器API下单',
+        self::BET_TYPE_LOCAL_API => 'L', # 本地API
+        self::BET_TYPE_LOCAL_SELENIUM => 'S', //'selenium',
     ];
 }

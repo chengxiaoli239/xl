@@ -2,10 +2,8 @@
 
 namespace common\service\open\aozhou5;
 
-use backend\models\TzSystems;
 use common\exceptions\InfoException;
-use common\open\aozhou5\api\PreLoginApi;
-use common\open\aozhou5\api\UserApi;
+use common\open\aozhou5\yiFanApi\UserApi;
 use common\service\cache\CacheKeyService;
 use common\service\chat\Tool_Common;
 use common\service\lottery\aozhou5\AoZhou5BetService;
@@ -15,12 +13,36 @@ use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\RequestOptions;
 use yii\helpers\Json;
 
-class ActionService extends ActionBaseService
+class ActionYIFanService extends ActionBaseService
 {
+    const GAME_INDEX_AZ5 = 16;
+    const GAME_INDEX_AZ5_NEW = 18;
+    const GAME_INDEX_OPTIONS = [
+        self::GAME_INDEX_AZ5 => '澳洲五',
+        self::GAME_INDEX_AZ5_NEW => '新澳洲五',
+    ];
+    const PLAY_TYPE_LIANG_MIAN = 8;
+    const PLAY_TYPE_DAN_MA = 9;
+    const PLAY_TYPE_1_BALL = 2;
+    const PLAY_TYPE_2_BALL = 3;
+    const PLAY_TYPE_3_BALL = 4;
+    const PLAY_TYPE_4_BALL = 5;
+    const PLAY_TYPE_5_BALL = 6;
+    const PLAY_TYPE_FAN_TAN = 10;
+    const PLAY_TYPE_OPTIONS = [
+        self::PLAY_TYPE_LIANG_MIAN => '两面盘',
+        self::PLAY_TYPE_DAN_MA => '单码1-5',
+        self::PLAY_TYPE_1_BALL => '第一球',
+        self::PLAY_TYPE_2_BALL => '第二球',
+        self::PLAY_TYPE_3_BALL => '第三球',
+        self::PLAY_TYPE_4_BALL => '第四球',
+        self::PLAY_TYPE_5_BALL => '第五球',
+        self::PLAY_TYPE_FAN_TAN => '番摊',
+    ];
+
     public string $userAgent='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36';
-    public string $securityCode='fa8888';
-    public int $line_number = 2; # 这里假设线路号是5
-    const LINE_NUMBER = 2;
+    public string $securityCode='686855';
+    public $line_number = 3;# 这里假设线路号是5
 
     public function __construct($tzSystemUsers)
     {
@@ -51,7 +73,6 @@ class ActionService extends ActionBaseService
     public function login($isAuto=1): array
     {
         try {
-            if(!$this->tzSystemUsers->is_auto_login) return [];
             //$params = ['search'=>$this->securityCode];
             //$search = UserApi::searchLine($this->domain, $params);
             // 创建 CookieJar 来存储 cookie
@@ -169,31 +190,21 @@ class ActionService extends ActionBaseService
     {
         $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
         $params = [
-            '__' => 'memberoddsdata',
-            'gameId' => 601,
-            'pusId' => 9,
-            'tId' => 1,
-            'pId' => -1,
-            'rebate' => 'A',
-            'cbk' => AoZhou5BetService::getCbk($this->tzSystemUsers->cookie),
+            '__' => 'memberGame',
+            'gIndex' => self::GAME_INDEX_AZ5,
+            'type' => 10,
+            'rebate' => 1,
+            '__CBK' => self::getCbk($this->tzSystemUsers->cookie),
         ];
         $host = $parsed_url['host'];
         $headers = [
-            'User-Agent' => str_replace('User-Agent:', '', $this->tzSystemUsers->user_agent),
             'cookie' => $this->tzSystemUsers->cookie,
-            'origin' => "https://url{$this->line_number}.{$host}",
-            'referer' => "https://url{$this->line_number}.{$host}/member/",
-            'sec-ch-ua' => '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-            'Origin' => "{$parsed_url['scheme']}://url{$this->line_number}.{$host}",
-            'Referer' => "{$parsed_url['scheme']}://url{$this->line_number}.{$host}/member/",
-            'sec-ch-ua-mobile' => '?0',
-            'sec-ch-ua-platform' => '"Windows"',
-            'sec-fetch-dest' => 'empty',
-            'sec-fetch-mode' => 'cors',
-            'sec-fetch-site' => 'same-origin',
+            'User-Agent' => str_replace('User-Agent:', '', $this->tzSystemUsers->user_agent),
             'Content-Type' => 'application/x-www-form-urlencoded',
+            'Cookie' => 'rebate=1',
+            'referer' => 'https://vip3.vvp138.com/Member/?__CBK=%20pemANRohcqGsrQsTGqjM767NtuRqFOSSzXc2fDlbGE=',
         ];
-        $url = "https://url{$this->line_number}.{$host}";
+        $url = "https://vip{$this->line_number}.{$host}";
         //p(['url'=>$url, 'params'=>$params, 'headers'=>$headers]);
 
         $mKey = CacheKeyService::userSiteInfo($this->tzSystemUsers->uid).'_'.$useCache;
@@ -201,13 +212,6 @@ class ActionService extends ActionBaseService
         if(!empty($userInfo)){
             return $userInfo;
         }
-
-        $mKey2 = CacheKeyService::userSiteInfo($this->tzSystemUsers->uid).'_'.$useCache.'_uni';
-        $num = commonRedis()->incr($mKey2);
-        if($num>1){
-            throw_info('段时间内禁止访问同一个接口');
-        }
-        commonRedis()->expire($mKey2, 2);
 
         $userInfo = UserApi::getUserInfo($url, $params, $headers);
         Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '获取用户信息', ['username'=>$this->tzSystemUsers->username, 'account'=>$this->tzSystemUsers->account, 'balance'=>$userInfo['balance'], 'params'=>$params, 'headers'=>$headers]);
@@ -217,50 +221,9 @@ class ActionService extends ActionBaseService
         }
         $cacheTime = $useCache ? 15 : 3;
         commonRedis()->setex($mKey, $cacheTime, $userInfo);
-        $this->tzSystemUsers->balance = $userInfo['balance'];
+        $this->tzSystemUsers->balance = $userInfo['kymoney'];
         $this->tzSystemUsers->updated_at = time();
         $this->tzSystemUsers->save();
-
-        return ($userInfo && empty($userInfo['error']))? $userInfo:[];
-    }
-
-    /**
-     * 获取用户md - 貌似心跳，不确定
-     * @return array
-     */
-    public function memberThreadMd(): array
-    {
-        $parsed_url = parse_url($this->domain); # Array ( [scheme] => https [host] => ac3868.com )
-        $params = [
-            '__' => 'memberThreadmd',
-            'newsId' => -1,
-            'cbk' => AoZhou5BetService::getCbk($this->tzSystemUsers->cookie),
-        ];
-        $host = $parsed_url['host'];
-        $headers = [
-            'User-Agent' => str_replace('User-Agent:', '', $this->tzSystemUsers->user_agent),
-            'cookie' => $this->tzSystemUsers->cookie,
-            'origin' => "https://url{$this->line_number}.{$host}",
-            'referer' => "https://url{$this->line_number}.{$host}/member/",
-            'sec-ch-ua' => '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-            'Origin' => "{$parsed_url['scheme']}://url{$this->line_number}.{$host}",
-            'Referer' => "{$parsed_url['scheme']}://url{$this->line_number}.{$host}/member/",
-            'sec-ch-ua-mobile' => '?0',
-            'sec-ch-ua-platform' => '"Windows"',
-            'sec-fetch-dest' => 'empty',
-            'sec-fetch-mode' => 'cors',
-            'sec-fetch-site' => 'same-origin',
-            'Content-Type' => 'application/x-www-form-urlencoded',
-        ];
-        $url = "https://url{$this->line_number}.{$host}";
-        //p(['url'=>$url, 'params'=>$params, 'headers'=>$headers]);
-
-        $userInfo = UserApi::siteCommonApi($url, $params, $headers);
-        Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '获取用户md', ['username'=>$this->tzSystemUsers->username, 'account'=>$this->tzSystemUsers->account, 'balance'=>$userInfo['balance'], 'userInfo'=>$userInfo]);
-        if(!isset($userInfo['balance'])){
-            Tool_Common::log('/aozhou5/'.__FUNCTION__, 'INFO', '获取用户信息-异常', ['username'=>$this->tzSystemUsers->username, 'account'=>$this->tzSystemUsers->account, 'balance'=>$userInfo['balance'], 'userInfo'=>$userInfo, 'headers'=>$headers, 'url'=>$url]);
-            return [];
-        }
 
         return ($userInfo && empty($userInfo['error']))? $userInfo:[];
     }
@@ -304,4 +267,27 @@ class ActionService extends ActionBaseService
 
         return $lineNumber ? : $this->line_number;
     }
+
+    /**
+     * 请求参数cbk获取
+     * @param string $cookies
+     * @return mixed|string
+     */
+    public static function getCbk(string $cookies='')
+    {
+        $cookiesArr = explode(';', $cookies);
+        foreach ($cookiesArr as $value){
+            list($key, $value) = explode('=', trim($value));
+            if(strlen($value)>32){
+                $cbk = $value;
+            }
+        }
+        if(empty($cbk)){
+            $cbk = explode('=', trim($cookies))[1];
+        }
+
+        return $cbk;
+
+    }
+
 }

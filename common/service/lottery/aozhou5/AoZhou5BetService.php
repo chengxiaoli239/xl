@@ -470,9 +470,10 @@ class AoZhou5BetService extends CommonBaseService
 
     /**
      * 获取下注任务
-     * @param $id
+     * @param $userId
+     * @param string $currentQiHao
+     * @param int $id
      * @return array
-     * @throws \common\exceptions\InfoException
      */
     public static function getBetTasks($userId, $currentQiHao='', $id=0): array
     {
@@ -483,7 +484,6 @@ class AoZhou5BetService extends CommonBaseService
         }else{
             $betTasksQuery->where(['user_id'=>$userId, 'push_status'=>BetsBackend::STATUS_WAIT, 'qihao'=>$currentQiHao])
                 ->andWhere(['>', 'created_at', time() - 60]); # 只取1分钟内下注，超过则失败提示
-            //$betTasksQuery->where(['order_id'=>[118837]]); # 测试
         }
         $betTasks = $betTasksQuery->orderBy(['order_id'=>SORT_ASC])->all();
         if(empty($betTasks)){
@@ -493,13 +493,10 @@ class AoZhou5BetService extends CommonBaseService
         $siteSystemInfo = CommonBaseService::getSystemBaseInfo($userId, LotteryType::AZ_LUCKY_5); # 盘口信息
         $TzSystemUsers = TzSystemsUsers::findOne(['uid'=>$userId]);
 
-        $betType = MessageOperateService::getBetType($TzSystemUsers);
-        if($TzSystemUsers->is_local_bet){
-            if($betType == BetsBackend::BET_TYPE_SELENIUM){
-                $data = self::getSeleniumBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
-            }else{
-                $data = self::getApiBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
-            }
+        if($TzSystemUsers->is_local_bet == BetsBackend::BET_TYPE_LOCAL_API) {
+            $data = self::getApiBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
+        }elseif ($TzSystemUsers->is_local_bet == BetsBackend::BET_TYPE_LOCAL_SELENIUM){
+            $data = self::getSeleniumBetTasks($betTasks, $TzSystemUsers, $siteSystemInfo);
         }else{
             $data = [];
         }
@@ -538,10 +535,6 @@ class AoZhou5BetService extends CommonBaseService
 
         $d = 'url'.ActionService::LINE_NUMBER.'.'.$ht[1];
         $headers = [
-            #':authority' => $d,
-            #':method' => 'POST',
-            #':path' => '/api/',
-            #':scheme' => 'https',
             'accept' => '*/*',
             'Accept-Encoding' => 'gzip, deflate, br, zstd',
             'Accept-Language' => 'zh-CN,zh;q=0.9',
@@ -551,11 +544,6 @@ class AoZhou5BetService extends CommonBaseService
             'priority' => 'u=1, i',
             'referer' => 'https://'.$d.'/member/',
             'sec-ch-ua' => '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"',
-            'sec-ch-ua-mobile' => '?0',
-            'sec-ch-ua-platform' => "Windows",
-            'sec-fetch-dest' => 'empty',
-            'sec-fetch-mode' => 'cors',
-            'sec-fetch-site' => 'same-origin',
             'User-Agent' => trim(str_replace('User-Agent:', '', $TzSystemUsers->user_agent)),
         ];
 
@@ -614,7 +602,7 @@ class AoZhou5BetService extends CommonBaseService
             $data[] = $oneBetData;
         }
 
-        return ['bet_type'=>BetsBackend::BET_TYPE_API, 'slow_seconds'=>0, 'data'=>$data];
+        return ['bet_type'=>BetsBackend::BET_TYPE_LOCAL_API, 'slow_seconds'=>0, 'data'=>$data];
     }
 
     /**
@@ -647,7 +635,7 @@ class AoZhou5BetService extends CommonBaseService
         }
         $data = array_values($postDataCodes);
 
-        return ['bet_type'=>BetsBackend::BET_TYPE_SELENIUM, 'slow_seconds'=>0, 'data'=>$data];
+        return ['bet_type'=>BetsBackend::BET_TYPE_LOCAL_SELENIUM, 'slow_seconds'=>0, 'data'=>$data];
     }
 
     /**

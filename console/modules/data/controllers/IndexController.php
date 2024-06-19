@@ -323,7 +323,6 @@ class IndexController extends Controller
     public function actionDeleteLatestRecords(): array
     {
         self::_init();
-        $post = \Yii::$app->request->post();
         $rst = DatasClearService::deleteLatestRecords();
 
         return $rst;

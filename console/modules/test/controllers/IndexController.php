@@ -35,6 +35,7 @@ use common\service\lottery\LotteryTypeService;
 use common\service\open\ActionBaseService;
 use common\service\open\actions\PlatformRobotService;
 use common\service\open\aozhou5\ActionService;
+use common\service\open\aozhou5\ActionYIFanService;
 use common\service\open\telegram\AoZhouKjService;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\match\MatchCodeService;
@@ -63,8 +64,8 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
-            $tzSystemUser = TzSystemsUsers::findOne(75);
-            $userInfo = (new ActionService($tzSystemUser))->getUserData($isAuto=1);p($userInfo);
+            $tzSystemUser = TzSystemsUsers::findOne(76);
+            $userInfo = (new ActionYIFanService($tzSystemUser))->getUserData($isAuto=1);p($userInfo);
             $logData = Json::decode('{"log_member_quick_select_id":"14169549","member_id":"9806","account":"Abc123bb","nickname":"","fix_num":"40","bet_count":"5017","bet_money":"1003.4","operation_content":"[四定位]，配数“[取]”：第2位：[01356]，第3位：[24789]，固定合分除值：第[2]位选中，第[3]位选中，第[4]位选中，内容：[2]；，不定合分值(两数合)：[01234]，不定合分值(三数合)：[012345]，合分值范围：[8-28]，包含“[取]”数：[43560]，三兄弟“[除]”操作，四兄弟“[除]”操作，对数“[除]”数：[16]，","operation_datetime":"06-13 14:37:44","time_value":"2024/6/13 14:37:44","operation_ip":"112.66.*.*","ip_value":"112.66.28.70","operation_ip_extension":"112.66.28.70","is_package":"0","log_type":"102"}');
             list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token='eb70910c92f134bd54a3837d978f055b');
             p([$code, $qihao, $logData]);
@@ -132,7 +133,6 @@ class IndexController extends Controller
             $r = OneNumYl::yl($lotteryType=8);p($r);
             $tzSystemUser = TzSystemsUsers::findOne(68);
             #$r = (new ActionBaseService())->login($tzSystemUser);p($r);
-            $r = (new ActionBaseService())->getUserInfo($tzSystemUser);p($r);
             $rst = AgentUsersService::userFlowsCheck(['id'=>16791, 'status'=>1], 21, '管理员消息回复处理');p($rst);
             $rst = [];
             list($entertainedStatus, $grabStatus) = LotteryBet::isEntertained(LotteryType::LUCKY_5);p([$entertainedStatus, $grabStatus]);

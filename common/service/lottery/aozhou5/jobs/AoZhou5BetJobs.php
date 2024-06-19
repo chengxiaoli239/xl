@@ -60,13 +60,15 @@ class AoZhou5BetJobs extends CommonJob {
             $errContent = '';
             $haveSuccess = 0;
             $TzSystemUsers = TzSystemsUsers::find()->where(['uid'=>$userId])->limit(1)->one();
-            $betType = MessageOperateService::getBetType($TzSystemUsers);
             foreach ($BetRows as $betRow){
-                if($betType == BetsBackend::BET_TYPE_SELENIUM){
-                    # selenium模拟点击
+                if(in_array($TzSystemUsers->is_local_bet, [BetsBackend::BET_TYPE_LOCAL_SELENIUM, BetsBackend::BET_TYPE_LOCAL_API])){
+                    # 本地selenium模拟点击、或本地电脑api
                     $code = ($betRow->push_status==BetsBackend::PUSH_STATUS_CANNOT)?10004:0;
                     if($code==0){
-                        AgentUsersBalanceService::updateBalance((string)$betRow['id'], $betRow->bet_money, $betRow->wechat_user_id, WechatUserService::TYPE_ORDER_BET);
+                        $mKey = CacheKeyService::updateBalanceKey($TzSystemUsers->id);
+                        if($isLock = commonRedis()->setnx($mKey, 1, 10)){
+                            AgentUsersBalanceService::updateBalance((string)$betRow['id'], $betRow->bet_money, $betRow->wechat_user_id, WechatUserService::TYPE_ORDER_BET);
+                        }
                     }
                 }else{
                     list($code, $data, $msg) = AoZhou5BetService::postToSite($betRow->id);
