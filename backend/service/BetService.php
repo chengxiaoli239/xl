@@ -1815,7 +1815,7 @@ abstract class BetService extends BaseBetService {
             case 8: # 幸运五星彩
                 $cacheTime = 6 * 60;
                 $min_qihao = substr($qihao, -3);
-                if(($min_qihao == '048') OR ('04:05:00'<$now_HI && $now_HI<'09:05:00')){
+                if(($min_qihao == '048') OR ('05:05:00'<$now_HI && $now_HI<'08:05:00')){
                     $cacheTime = 5 * 3600;
                 }
                 break;
@@ -2030,7 +2030,7 @@ abstract class BetService extends BaseBetService {
 
         foreach ($lottery_types as $lottery_type){
             $HI = date('H:i');
-            if($lottery_type == 8 && '03:59'<$HI && $HI<'09:00'){
+            if($lottery_type == 8 && '04:59'<$HI && $HI<'08:00'){
                 //return ['status'=>300, 'msg'=>'幸运五非开盘时间'];
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '批量插入任务100', ['lottery_type'=>$lottery_type, 'err_msg'=>'幸运五非开盘时间']);
                 continue;

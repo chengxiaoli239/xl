@@ -306,7 +306,7 @@ class KjDataGet
             }
         }elseif($lottery_type == 8){ # 幸运五星
             # 用户报表需求 24小时抓取开奖数据
-            if ('04:05' < $date_time && $date_time < '08:55') {
+            if ('05:05' < $date_time && $date_time < '07:55') {
                 #$flag = false; # 全天开奖，这里先去掉
                 $isCanGrab = false;
             }
