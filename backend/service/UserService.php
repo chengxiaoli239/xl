@@ -386,6 +386,7 @@ class UserService extends BaseService {
             'ssc_domain' => $TzSystemsUsers->ssc_domain,
             'account' => $TzSystemsUsers->account,
             'password' => $TzSystemsUsers->password,
+            'follow_status' => $TzSystemsUsers->follow_status,
             'secure_code' => $TzSystemsUsers->secure_code,
             'access_token' => $TzSystemsUsers->access_token,
             'status' => $TzSystemsUsers->status,
