@@ -729,7 +729,7 @@ abstract class BetService extends BaseBetService {
                 $status = false;
             }
         }elseif($lottery_type == 8){ # 幸运五星
-            if('04:00:00' < $time && $time < '09:00:00'){
+            if('05:00:00' < $time && $time < '08:00:00'){
                 $status = false;
             }
         }elseif($lottery_type == 9){

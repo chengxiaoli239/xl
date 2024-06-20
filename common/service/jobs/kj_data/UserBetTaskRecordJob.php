@@ -24,7 +24,7 @@ class UserBetTaskRecordJob extends CommonJob {
             return '非开盘时间段';
         }
         $HI = date('H:i');
-        if($lottery_type == 8 && '04:00'<$HI && $HI<'09:00'){
+        if($lottery_type == 8 && '05:00'<$HI && $HI<'08:00'){
             return '幸运五非开盘时间';
         }
 
