@@ -21,7 +21,7 @@ class McKeyService{
 
         $qihao = HN0898Service::getCurrentQihao($lottery_type);
         //$qihao = HN0898Service::getQihao($lottery_type);
-        $mkey = \Yii::$app->params['DATA_STATIC_KEY'].'_'.$lottery_type.'_'.$qihao.'_'.$key;
+        $mkey = \Yii::$app->params['DATA_STATIC_KEY'].'_0_'.$lottery_type.'_'.$qihao.'_'.$key;
 
         return $mkey;
     }
