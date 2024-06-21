@@ -337,7 +337,7 @@ class TzSystemUsersService extends ClientsBaseService{
             $mkey = 'syncClientKjDatas_x0_'.$lottery_type.'_'.$expect;
             Lucky5::setKjDataCache($lottery_type, $expect, $kjData);
 
-            if($flag = $m->get($mkey)){
+            if($m->get($mkey)){
                 throw_info('15秒短时间不处理');
             }
             $m->set($mkey, 1, 15);
@@ -365,7 +365,13 @@ class TzSystemUsersService extends ClientsBaseService{
                 }
             }
 
-            $params = ['lottery_type'=>$lottery_type, 'title'=>BetService::getLotteryName($lottery_type).'_网盘推送', 'is_grab_history'=>1, 'business_id'=>$expect];
+            $params = [
+                'lottery_type'=>$lottery_type,
+                'qihao'=>$expect,
+                'kj_data'=>$kjData,
+                'title'=>BetService::getLotteryName($lottery_type).'_网盘推送',
+                'business_id'=>$expect
+            ];
             push_queue(GrabKjDatasJob::class, $params);
         }catch (\Exception $e){
             return ['status'=>301, 'data'=>$data, 'msg'=>$e->getMessage()];

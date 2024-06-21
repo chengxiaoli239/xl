@@ -124,7 +124,7 @@ class KjDataGet
             try {
                 $lottery_type = (int)$lotteryData['lottery_type'];
                 $initLotteryKey = SystemService::getInitLotteryDataKey($lottery_type);
-                #KjDataGet::grabOneLotteryKjData($lottery_type);
+                #KjDataGet::insertOneLotteryKjData($lottery_type);
 
                 $exist_key = $initLotteryKey.$lottery_type;
                 $flag = $m->get($initLotteryKey);
@@ -185,7 +185,7 @@ class KjDataGet
      * @param int $lottery_type
      * @return array|null
      */
-    public static function grabOneLotteryKjData(int $lottery_type=DEFAULT_LOTTERY_TYPE): ?array
+    public static function insertOneLotteryKjData($qihao='', $kjData=[], int $lottery_type=DEFAULT_LOTTERY_TYPE): ?array
     {
         $RedisLock = new RedisLock();
         $KjConfigs = KjConfig::findAll(['enable'=>1, 'lottery_type'=>$lottery_type]);
@@ -200,8 +200,12 @@ class KjDataGet
                     throw_info('短时间内操作-暂不处理');
                 }
 
-                $url = trim($kjConfig->host).trim($kjConfig->path);
-                $data = CurlService::httpGet($url);
+                if($qihao && !empty($kjData)){
+                    $data = $kjData;
+                }else{
+                    $url = trim($kjConfig->host).trim($kjConfig->path);
+                    $data = CurlService::httpGet($url);
+                }
                 Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖任务获取', ['lottery_type'=>$lottery_type, 'url'=>$url, 'data'=>$data]);
                 if(isset($data['status']) && $data['status'] != 200){
                     throw_info($data['msg']??'开奖数据抓取异常');

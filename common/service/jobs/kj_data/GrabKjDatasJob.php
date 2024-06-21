@@ -17,9 +17,10 @@ class GrabKjDatasJob extends CommonJob {
 
     public static function handle($params){
         $lottery_type = $params['lottery_type'];
-        $is_grab_history = $params['is_grab_history'] ?? 0;
+        $qihao = $params['qihao']??'';
+        $kjData = $params['kj_data']??[];
         try {
-            $rst = KjDataGet::grabOneLotteryKjData($lottery_type, $is_grab_history);
+            $rst = KjDataGet::insertOneLotteryKjData($qihao, $kjData, $lottery_type);
         }catch (\Exception $e){
             return $e->getMessage();
         }

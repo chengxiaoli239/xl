@@ -88,7 +88,7 @@ class BaseKj extends BaseService {
 
     /**
      * @param $qihao string 格式：20190125-030
-     * @param $kjData  kjData:{"expect":20230326139,"opencode":"9,1,7,3,6","opentime":"2023-03-26 11:36:10"}
+     * @param $kjData - kjData:{"expect":20230326139,"opencode":"9,1,7,3,6","opentime":"2023-03-26 11:36:10"}
      * @return bool
      */
     public static function setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, string $qihao='', $kjData=[], $set_time=300): bool
