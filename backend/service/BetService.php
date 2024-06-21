@@ -1844,7 +1844,7 @@ abstract class BetService extends BaseBetService {
                 break;
         }
 
-        return $cacheTime ? $cacheTime : 1200;
+        return $cacheTime ?: 1200;
     }
 
     /**
