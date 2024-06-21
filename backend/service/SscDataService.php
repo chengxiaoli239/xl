@@ -39,6 +39,7 @@ use backend\service\statics\statics_base\DealDataService;
 use backend\service\statics\statics_qx\StaticsQxMissService;
 use common\service\cache\CacheKeyService;
 use common\service\CommonService;
+use common\service\lottery\LotteryTypeService;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\CommonBaseService;
 use common\tools\KjDataGet;
@@ -2111,7 +2112,10 @@ class SscDataService extends BaseService {
     public static function operateProfitsPlans($lottery_type = DEFAULT_LOTTERY_TYPE): array
     {
         $now_HI = date('H:i:s');
-        if($lottery_type==8 && '05:05:00'<$now_HI && $now_HI<'08:00:00'){
+        $lotteryTypeData = LotteryTypeService::getLotteryTypeData();
+        $openingTime = $lotteryTypeData[$lottery_type]['opening_time'];
+        $closingTime = $lotteryTypeData[$lottery_type]['closing_time'];
+        if($lottery_type==8 && $closingTime<$now_HI && $now_HI<$openingTime){
             return ['status'=>300, 'msg'=>'非开盘时间不统计'];
         }
         $RedisLock = new RedisLock();

@@ -31,6 +31,7 @@ use common\service\cache\CacheKeyService;
 use common\service\jobs\kj_data\UserBetJob;
 use common\service\lottery\aozhou5\AoZhou5BetService;
 use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
+use common\service\lottery\LotteryTypeService;
 use common\service\proxy\ProxyBaseService;
 use common\service\ssc\QihaoService;
 use common\tools\RedisLock;
@@ -703,6 +704,9 @@ abstract class BetService extends BaseBetService {
         $m = \Yii::$app->cache;
         $status = $m->get($pkey);
         Tool_Common::log('isCanBet', 'INFO', '是否下注缓存值', ['lottery_type'=>$lottery_type, 'uid'=>$uid, 'pKey'=>$pkey, 'status'=>$status]);
+        $lotteryTypeData = LotteryTypeService::getLotteryTypeData();
+        $openingTime = $lotteryTypeData[$lottery_type]['opening_time'];
+        $closingTime = $lotteryTypeData[$lottery_type]['closing_time'];
 
         $time = date('H:i:s');
         if($lottery_type == 5){
@@ -713,23 +717,12 @@ abstract class BetService extends BaseBetService {
                 //$rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
                 $status = false;
             }
-        }elseif($lottery_type == 7){
-            # 北京快乐8
-            if('00:00:00'<$time && $time<'09:00:00'){
-                $status = false;
-            }
-            /*
-            $tz_systems_users_id = SystemConfig::findOne(['key'=>'kuaile8_get_kj_user_id'])->value;
-            $TzSystemsUsers = TzSystemsUsers::findOne($tz_systems_users_id);
-            $qihaoInfo = KuaiLe8Service::getPreTz($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $lottery_type);
-            if($qihaoInfo['status'] != 200) $status = false;
-            */
         }elseif($lottery_type == 6){ # 新疆
             if(\Yii::$app->params['LOTTERY_TYPE_6_STOP_START_TIME'] < $time && $time < \Yii::$app->params['LOTTERY_TYPE_6_STOP_END_TIME']){
                 $status = false;
             }
         }elseif($lottery_type == 8){ # 幸运五星
-            if('05:00:00' < $time && $time < '08:00:00'){
+            if($closingTime < $time && $time < $openingTime){
                 $status = false;
             }
         }elseif($lottery_type == 9){
@@ -737,14 +730,14 @@ abstract class BetService extends BaseBetService {
             if('00:00:00'<$time && $time<'07:00:00'){
                 $status = false;
             }
-        }elseif(in_array($lottery_type, [16]) && '20:00:00'<$time && $time<'21:00:00'){
+        }elseif($lottery_type == 16 && '20:00:00'<$time && $time<'21:00:00'){
             $status = false;
         }elseif(in_array($lottery_type, [10, 11, 12, 13])){
             # 冰岛90s 3m 5m 10m
             if('03:00:00'<$time && $time<'08:00:00'){
                 $status = false;
             }
-        }elseif(in_array($lottery_type, [18])){
+        }elseif($lottery_type == 18){
             # 台湾快五
             if('02:00:00'<$time && $time<'07:00:00'){
                 $status = false;
@@ -1813,9 +1806,11 @@ abstract class BetService extends BaseBetService {
                 $cacheTime = 5 * 60;
                 break;
             case 8: # 幸运五星彩
+                $lotteryTypeData = LotteryTypeService::getLotteryTypeData();
+                $openingTime = $lotteryTypeData[$lottery_type]['opening_time'];
+                $closingTime = $lotteryTypeData[$lottery_type]['closing_time'];
                 $cacheTime = 6 * 60;
-                $min_qihao = substr($qihao, -3);
-                if(($min_qihao == '060') OR ('05:05:00'<$now_HI && $now_HI<'08:05:00')){
+                if($closingTime<$now_HI && $now_HI<$openingTime){
                     $cacheTime = 3 * 3600;
                 }
                 break;

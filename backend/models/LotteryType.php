@@ -18,6 +18,8 @@ use Yii;
  * @property string $title
  * @property string $shortName
  * @property string $info
+ * @property string $opening_time 开盘时间
+ * @property string $closing_time 封盘时间
  * @property string $onGetNoed 请求当前期号时后置事件函数
  * @property int $data_ftime 开奖时间频率(s)
  * @property int $defaultViewGroup 默认显示哪个玩法组
@@ -46,7 +48,7 @@ class LotteryType extends \common\models\base\BaseModel
         return [
             [['lottery_type', 'enable', 'grabDataStatus', 'isDelete', 'sort', 'data_ftime', 'defaultViewGroup', 'android', 'num', 'updated_at', 'created_at'], 'integer'],
             [['name', 'title', 'info', 'num'], 'required'],
-            [['update_time'], 'safe'],
+            [['opening_time', 'closing_time', 'update_time'], 'safe'],
             [['name'], 'string', 'max' => 32],
             [['codeList'], 'string', 'max' => 125],
             [['title', 'onGetNoed'], 'string', 'max' => 64],
@@ -65,7 +67,7 @@ class LotteryType extends \common\models\base\BaseModel
             'id' => Yii::t('app', 'ID'),
             'lottery_type' => Yii::t('app', '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc'),
             'enable' => Yii::t('app', 'Enable'),
-            'grabDataStatus' => Yii::t('app', '号码抓取'),
+            'grabDataStatus' => Yii::t('app', '抓取号码开关'),
             'isDelete' => Yii::t('app', 'Is Delete'),
             'sort' => Yii::t('app', 'Sort'),
             'name' => Yii::t('app', 'Name'),
@@ -73,6 +75,8 @@ class LotteryType extends \common\models\base\BaseModel
             'title' => Yii::t('app', 'Title'),
             'shortName' => Yii::t('app', 'Short Name'),
             'info' => Yii::t('app', 'Info'),
+            'opening_time' => Yii::t('app', '开盘时间'),
+            'closing_time' => Yii::t('app', '封盘时间'),
             'onGetNoed' => Yii::t('app', '请求当前期号时后置事件函数'),
             'data_ftime' => Yii::t('app', '开奖时间频率(s)'),
             'defaultViewGroup' => Yii::t('app', '默认显示哪个玩法组'),

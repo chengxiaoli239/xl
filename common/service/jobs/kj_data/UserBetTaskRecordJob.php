@@ -3,6 +3,7 @@ namespace common\service\jobs\kj_data;
 
 use backend\service\BetService;
 use common\service\jobs\CommonJob;
+use common\service\lottery\LotteryTypeService;
 use common\tools\KjDataGet;
 
 class UserBetTaskRecordJob extends CommonJob {
@@ -23,8 +24,11 @@ class UserBetTaskRecordJob extends CommonJob {
         if(!$isCanBet){
             return '非开盘时间段';
         }
-        $HI = date('H:i');
-        if($lottery_type == 8 && '05:00'<$HI && $HI<'08:00'){
+        $lotteryTypeData = LotteryTypeService::getLotteryTypeData();
+        $openingTime = $lotteryTypeData[$lottery_type]['opening_time'];
+        $closingTime = $lotteryTypeData[$lottery_type]['closing_time'];
+        $HI = date('H:i:s');
+        if($lottery_type == 8 && $closingTime<$HI && $HI<$openingTime){
             return '幸运五非开盘时间';
         }
 

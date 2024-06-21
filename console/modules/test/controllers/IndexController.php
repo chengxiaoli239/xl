@@ -64,6 +64,8 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $status = KjDataGet::isCanGrab($lottery_type=8); p($status);
+            $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%lottery_type}}'); p($r);
             $tzSystemUser = TzSystemsUsers::findOne(76);
             $userInfo = (new ActionYIFanService($tzSystemUser))->getUserData($isAuto=1);p($userInfo);
             $logData = Json::decode('{"log_member_quick_select_id":"14169549","member_id":"9806","account":"Abc123bb","nickname":"","fix_num":"40","bet_count":"5017","bet_money":"1003.4","operation_content":"[四定位]，配数“[取]”：第2位：[01356]，第3位：[24789]，固定合分除值：第[2]位选中，第[3]位选中，第[4]位选中，内容：[2]；，不定合分值(两数合)：[01234]，不定合分值(三数合)：[012345]，合分值范围：[8-28]，包含“[取]”数：[43560]，三兄弟“[除]”操作，四兄弟“[除]”操作，对数“[除]”数：[16]，","operation_datetime":"06-13 14:37:44","time_value":"2024/6/13 14:37:44","operation_ip":"112.66.*.*","ip_value":"112.66.28.70","operation_ip_extension":"112.66.28.70","is_package":"0","log_type":"102"}');
@@ -101,7 +103,6 @@ class IndexController extends Controller
             $betRow['qihao'] = DataDealStatus::find()->select('next_qihao')->where(['lottery_type'=>28])->limit(1)->orderBy(['id'=>SORT_DESC])->scalar();
             p($betRow['qihao']);
             $rst = AoZhou5BetService::getBetTasks($id=AoZhou5BetService::TEST_BET_ID);p($rst);
-            $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user}}'); p($r);
             foreach ([8] as $lotteryType){
                 //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
                 $r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);

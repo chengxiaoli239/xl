@@ -435,8 +435,6 @@ class IndexController extends Controller
         p($data);
         $data = Lucky5::getLotteryLucky($type = 'json', $test = 2);
         d($data);
-        $status = KjDataGet::isCanGrab($lottery_type=8);
-        p($status);
         $post = [
             'access_token' => '4b843e29ac8dd191e894c7dcea547815',
 

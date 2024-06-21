@@ -69,7 +69,7 @@ class DatasClearService extends BaseService{
 
                 try {
                     # 状态处理记录
-                    $optimize_sql = 'OPTIMIZE TABLE {{%bet_error_plans_task}}, {{%data_deal_status}}, {{%betting_records}}, {{%admin_log}}, {{%agent_user_bet_logs}}';
+                    $optimize_sql = 'OPTIMIZE TABLE {{%bet_error_plans_task}}, {{%data_deal_status}}, {{%betting_records}}, {{%queue_log}}, {{%admin_log}}, {{%agent_user_bet_logs}}';
                     $optimize = $db->createCommand($optimize_sql)->execute();
                 } catch (\Exception $e){}
 
