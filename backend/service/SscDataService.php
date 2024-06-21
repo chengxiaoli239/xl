@@ -2111,7 +2111,7 @@ class SscDataService extends BaseService {
     public static function operateProfitsPlans($lottery_type = DEFAULT_LOTTERY_TYPE): array
     {
         $now_HI = date('H:i:s');
-        if($lottery_type==8 && '04:05:00'<$now_HI && $now_HI<'09:00:00'){
+        if($lottery_type==8 && '05:05:00'<$now_HI && $now_HI<'08:00:00'){
             return ['status'=>300, 'msg'=>'非开盘时间不统计'];
         }
         $RedisLock = new RedisLock();
