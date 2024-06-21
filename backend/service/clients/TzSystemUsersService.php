@@ -374,6 +374,7 @@ class TzSystemUsersService extends ClientsBaseService{
             ];
             push_queue(GrabKjDatasJob::class, $params);
         }catch (\Exception $e){
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖数据同步异常', ['lottery_type'=>$lottery_type, 'kj_data'=>$kjData, 'err_msg'=>$e->getMessage()]);
             return ['status'=>301, 'data'=>$data, 'msg'=>$e->getMessage()];
         }
 
