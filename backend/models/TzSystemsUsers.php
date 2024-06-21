@@ -59,6 +59,16 @@ class TzSystemsUsers extends \common\models\base\BaseModel
 {
     public $sys_password;
     public $sys_repassword;
+    const BET_TYPE_LOCAL_API = 1;
+    const BET_TYPE_LOCAL_SELENIUM = 2;
+    const BET_TYPE_SERVER = 3;
+    # 下单模式选项
+    const BET_TYPE_OPTIONS = [
+        self::BET_TYPE_LOCAL_API => '本地api',
+        self::BET_TYPE_LOCAL_SELENIUM => '本地selenium点击',
+        self::BET_TYPE_SERVER => '服务器下单',
+    ];
+
     /**
      * @inheritdoc
      */

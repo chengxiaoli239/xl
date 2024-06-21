@@ -1815,8 +1815,8 @@ abstract class BetService extends BaseBetService {
             case 8: # 幸运五星彩
                 $cacheTime = 6 * 60;
                 $min_qihao = substr($qihao, -3);
-                if(($min_qihao == '048') OR ('05:05:00'<$now_HI && $now_HI<'08:05:00')){
-                    $cacheTime = 5 * 3600;
+                if(($min_qihao == '060') OR ('05:05:00'<$now_HI && $now_HI<'08:05:00')){
+                    $cacheTime = 3 * 3600;
                 }
                 break;
             case 9: # 台湾宾果

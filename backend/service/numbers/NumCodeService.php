@@ -2116,4 +2116,10 @@ class NumCodeService extends BaseService
 
         return $codes;
     }
+
+    public static function addBetDescRand($planId=0, $qiHao='', $desc='')
+    {
+        $mKey = CacheKeyService::getBetRandDescKey($planId, $qiHao);
+
+    }
 }

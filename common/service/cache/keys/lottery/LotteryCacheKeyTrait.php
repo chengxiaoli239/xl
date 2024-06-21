@@ -96,4 +96,14 @@ trait LotteryCacheKeyTrait
     {
         return 'lottery:need_login:user_'.$userId;
     }
+
+    /**
+     * 随机下注的描述
+     * @param int $planId
+     * @return string
+     */
+    public static function getBetRandDescKey(int $planId=0, $qiHao=''): string
+    {
+        return 'lottery:rand_bet_desc:plan_'.$planId.'_'.$qiHao;
+    }
 }
