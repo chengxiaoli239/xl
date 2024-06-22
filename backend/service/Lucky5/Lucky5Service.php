@@ -1977,7 +1977,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $post_desc = $plan->hz_Arr;
         $post_desc = ($post_desc && is_json($post_desc))?Json::decode($post_desc):[];
-        $post_desc['下注描述'] = NumCodeService::getRandBetDesc($plan->id, $qihao);
+        $pDesc = NumCodeService::getRandBetDesc($plan_id, $qihao);
+        if(!empty($pDesc)){
+            $post_desc['下注描述'] = $pDesc;
+        }
         $insertData = [
             'playway'=> $playway,  // 投注方式
             'tz_type'=> $tz_type,  // 投注类型

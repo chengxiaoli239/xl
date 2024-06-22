@@ -1919,7 +1919,10 @@ abstract class BetService extends BaseBetService {
             $count = count(explode('@', $codes));
         }
         $post_desc = ($post_desc && is_json($post_desc))?Json::decode($post_desc):[];
-        $post_desc['下注描述'] = NumCodeService::getRandBetDesc($UserSysPlans->id, $qihao);
+        $pDesc = NumCodeService::getRandBetDesc($UserSysPlans->id, $qihao);
+        if(!empty($pDesc)){
+            $post_desc['下注描述'] = $pDesc;
+        }
         $totalmoney = $count * $UserSysPlans->single;
         $insertData = [
             'playway'=> $UserSysPlans->playway,  // 投注方式
