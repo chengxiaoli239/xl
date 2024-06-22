@@ -2933,7 +2933,7 @@ class NumService extends BaseService {
                     $codes = NumCodeService::getBeforeKjCodesDynamic8($plan);
                     break;
                 case 9: # 随机9000组(四定)
-                    $codes = NumCodeService::getBeforeKjCodesDynamic9($playway);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic9($plan);
                     break;
                 case 10: # 过滤最近2880组(四定)，不够往前搜集 前四，与12 后4类似
                     $codes = NumCodeService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,2,3,4], $num=2880);
@@ -3012,7 +3012,7 @@ class NumService extends BaseService {
                     $codes = NumCodeService::getBeforeKjCodesDynamic31($plan, $positions=[2,3,4], $num=self::BEFORE_3X_QS);
                     break;
                 case 35: # 过滤期号一致历史号码全倒(四定)
-                    $codes = NumCodeService::getBeforeKjCodesDynamic35($plan, $lottery_type);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic35($plan);
                     break;
                 case 36: # 过滤1235期号尾号一致历史直码(四定)
                     $codes = NumCodeService::getBeforeKjCodesDynamic28($plan, $positions=[1,2,3,5]);
@@ -3544,10 +3544,6 @@ class NumService extends BaseService {
         if(isset($typeArr[$type])) return $typeArr[$type];
 
         return $typeArr;
-    }
-
-    public static function gendouble3Nums(){
-
     }
 
     /**

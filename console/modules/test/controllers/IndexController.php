@@ -64,6 +64,9 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $r = NumCodeService::addBetDescRand($planId=1000, $dateString, '十位除1234');
+            $members = NumCodeService::getRandBetDesc($planId, $dateString);
+            p([$r, $members]);
             $status = KjDataGet::isCanGrab($lottery_type=8); p($status);
             $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%lottery_type}}'); p($r);
             $tzSystemUser = TzSystemsUsers::findOne(76);
@@ -72,14 +75,6 @@ class IndexController extends Controller
             list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token='eb70910c92f134bd54a3837d978f055b');
             p([$code, $qihao, $logData]);
             $data = AgentService::getCalcMoney($userId=21);p($data);
-            $str = "<!DOCTYPE HTML><html><head><meta charset=utf-8><script id='robot7_session_id'>document.cookie='robot7=wsWwPi0DaRyd+HRecIWxljTBsWarVpS6duErdcXgtzhNl6mvoZXkEIe5XLuGTbunDeOIPvtRRtaoII+xW7b7Mw==; path=/; domain=.w5pq8382.xyz';if (document.cookie.indexOf('robot7')>-1){window.location.reload();} else {alert('您当前使用的浏览器不支持cookie，无法使用本系统，请检查浏览器设置！');}</script></head></html>";
-            $url = 'https://f4.w5pq8382.xyz';
-            $robot_id = Lucky5Service::getRobotIdByStr($str, $url);
-            p($robot_id);
-            $cookie = 'robot7=MoA5zLhlPojMmhKCY9qjqZdVB/A9D3wz2004riWrXEPQrwNKTsNTMVKDz0dn10ryqv7RdVWeEVwW2Ez3mBqLkQ==;ASP.NET_SessionId=cqzsyaoay3wg3s1bamjqsn43;Akamai_Cookie=2752514570.15221.0000;NOTICE_LOGIN_IN=1';
-            preg_match("/robot7=([^\r\n]*)==/i", $cookie, $matches);
-            $new_cookie = str_replace('robot7='.$matches[1].'==', $robot_id, $cookie);
-            p(['str' => $str, 'robot_id' => $robot_id, 'old_cookie' => $cookie, 'matches' => $matches, 'new_cookie' => $new_cookie]);
 
             $mKey = CacheKeyService::lotteryBetPlanIdKey('aa30301', $qihao='1234568', $plan_id=1234);
             $lock = commonRedis()->setnx($mKey, 300);
@@ -127,7 +122,6 @@ class IndexController extends Controller
             p(['result'=>$result, 'date'=>date('Y-m-d H:i:s')], 0);
             p('设置结束'.date('Y-m-d H:i:s'));
             $data = Aozhou::getSiteLucky5($type='json');p($data);
-            (new AoZhouKjService())->operateSendKjData();p('dddd');
             $groups = PlatformGroup::getGroups($userId=21);p($groups);
             $model = PlatformRobot::findOne(['platform_robot_id'=>'6744049574']);
             $rst = PlatformRobotService::getUpdates($model); p($rst);# 添加之后立马获取群聊消息，记录群ID
@@ -220,23 +214,6 @@ class IndexController extends Controller
             $text = '福一倍直二倍组 369';
             $text = '福二倍组一倍直 369';
             ##################### 直、组 #######################
-
-            ########### 组六、组三 #############
-            $text = '福一元组三二元组六 369'; # --
-            $text = '福组三一元组六二元 369'; # --
-            $text = '福1元组三2元组六 369';
-            $text = '福直1元组2元 369';
-
-            $text = '福1倍组三2倍组六 369';
-            $text = '福2倍组六1倍组三 369';
-            $text = '福一倍组三二倍组六 369'; # --
-            $text = '福二倍组六一倍组三 369'; # --
-
-            $text = '福一元组三二元组六 369'; # --
-            $text = '福组三一元组六二元 369'; # --
-            $text = '福一倍组三二倍组六 369'; # --
-            $text = '福二倍组六一倍组三 369'; # --
-            ########### 组六、组三 #############
 
             $text = '福 二码定百234个456 各10';
             $text = '单032.302=十五倍，';

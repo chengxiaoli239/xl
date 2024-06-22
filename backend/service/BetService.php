@@ -26,6 +26,7 @@ use backend\service\Lucky5\Lucky5Service;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NineNine\NineNineNewService;
 use backend\service\NineNine\NineNineService6;
+use backend\service\numbers\NumCodeService;
 use common\kj\cqssc\CqsscKcw;
 use common\service\cache\CacheKeyService;
 use common\service\jobs\kj_data\UserBetJob;
@@ -1917,6 +1918,8 @@ abstract class BetService extends BaseBetService {
         }else{
             $count = count(explode('@', $codes));
         }
+        $post_desc = ($post_desc && is_json($post_desc))?Json::decode($post_desc):[];
+        $post_desc['下注描述'] = NumCodeService::getRandBetDesc($UserSysPlans->id, $qihao);
         $totalmoney = $count * $UserSysPlans->single;
         $insertData = [
             'playway'=> $UserSysPlans->playway,  // 投注方式
@@ -1933,7 +1936,7 @@ abstract class BetService extends BaseBetService {
             'snid'=>$snid ? $snid : BetService::$test_true_snid,
             'order_type'=>$UserSysPlans->playway, # 单双三字定
             'is_simulate' => $is_test ? 1 : 0,  // 是否模拟投注
-            'post_desc' => $post_desc ?  : '',  // 下注描述
+            'post_desc' => Json::encode($post_desc),  // 下注描述
             'is_batch_simulate' => ($is_test==2) ? 1 : 0,  // 是否批量模拟
             'single' => floatval($UserSysPlans->single),  // 投注倍数
             'betting_money'=> round($totalmoney,2),  // 投注金额

@@ -46,7 +46,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                 </div-->
 
                 <?php include(dirname(__FILE__).'/index_tab.php'); ?>
-            <?php Pjax::begin(); ?>
+            <?php //Pjax::begin(); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([
@@ -188,7 +188,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         //['class' => 'yii\grid\ActionColumn','headerOptions' => ['width' => '5%'],'template'=>'{view}  {delete}'],
                     ],
                 ]); ?>
-    <?php Pjax::end(); ?>
+    <?php //Pjax::end(); ?>
             </div>
         </div>
     </section>
