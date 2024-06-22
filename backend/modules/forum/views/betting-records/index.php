@@ -230,7 +230,14 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
 
             $('#rst_code').text(JSON.stringify(bet_rst, null, ' '))
             //$('#push_content').text(JSON.stringify(content, null, ' '))
-            $('#push_content').text(content)
+            try {
+                var jsonObj = JSON.parse(content);
+                var formattedJson = JSON.stringify(jsonObj, null, 4); // 2 spaces for indentation
+                $('#push_content').html(formattedJson);
+            } catch (e) {
+                // Handle the case where content is not a valid JSON string
+                $('#push_content').text("Invalid JSON string");
+            }
 
             $('#exampleModal_msg').modal('show');
         });

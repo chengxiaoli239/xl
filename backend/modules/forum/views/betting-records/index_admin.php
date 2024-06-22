@@ -239,7 +239,16 @@ $this->params['breadcrumbs'][] = $this->title;
             content = $(this).attr('title');
 
             $('#rst_code').text(bet_rst)
-            $('#push_content').text(content)
+            //$('#push_content').text("<pre><code>"+content+"</code></pre>")
+            // 解析并格式化 JSON 字符串
+            try {
+                var jsonObj = JSON.parse(content);
+                var formattedJson = JSON.stringify(jsonObj, null, 4); // 2 spaces for indentation
+                $('#push_content').html("<pre><code>" + formattedJson + "</code></pre>");
+            } catch (e) {
+                // Handle the case where content is not a valid JSON string
+                $('#push_content').text("Invalid JSON string");
+            }
 
             $('#exampleModal_msg').modal('show');
         });
