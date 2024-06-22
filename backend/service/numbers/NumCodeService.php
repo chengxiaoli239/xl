@@ -2220,7 +2220,7 @@ class NumCodeService extends BaseService
         #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
-        $betDesc = "过滤{$pos}位最近{$cNum}个冷码:".implode('', $filterCode);
+        $betDesc = "{$pos}位过滤最近{$cNum}个冷码:".implode('', $filterCode);
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
