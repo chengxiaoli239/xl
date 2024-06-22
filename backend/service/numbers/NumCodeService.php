@@ -482,7 +482,7 @@ class NumCodeService extends BaseService
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
-        $betDesc = implode(',', $positions)."位过滤前{$num}期开过的号码";//.$filterCodesStr;
+        $betDesc = implode('', $positions)."位过滤前{$num}期开过的号码";//.$filterCodesStr;
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
@@ -2177,7 +2177,7 @@ class NumCodeService extends BaseService
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
         Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤某两个位置各一个冷码', ['lottery_type'=>$lottery_type, 'qiHao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'filterCodes'=>$filterCodes, 'sql'=>$sql, 'count'=>count($codes)]);
 
-        $betDesc = implode(',', $positions)."位置过滤冷码:".implode('', $filterCodes);
+        $betDesc = implode('', $positions)."位置过滤冷码:".implode('', $filterCodes);
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
