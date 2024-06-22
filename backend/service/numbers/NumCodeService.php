@@ -1970,31 +1970,41 @@ class NumCodeService extends BaseService
         $hzArr = Json::decode($plan->hz_Arr);
         # 随机内容添加："log_sel":1,"log_1":"05","fixed_pos_hefen_sel":2,"hefen_pos1":"1,2,3","hefen1":"012356789"
         //p($hzArr, 0);
+        $betDesc = '随机过滤';
         if($filter_type==1){
+            $log1 = ['05', '16', '27', '38', '49'][rand(0,4)];
+            $betDesc .= '对数：'.$log1;
             $hzArr = array_merge((array)$hzArr, [
                 'log_sel' => 1,
-                'log_1' => ['05', '16', '27', '38', '49'][rand(0,4)],
+                'log_1' => $log1,
                 'fixed_pos_hefen_sel' => 2,
             ]);
         }elseif ($filter_type==2){
+            $hefen1 = str_replace(rand(0, 9), '', '0123456789');
+            $betDesc .= '合分：'.$hefen1;
             $hzArr = array_merge((array)$hzArr, [
                 'fixed_pos_hefen_sel' => 2,
                 'hefen_pos1' => '1,2,3',
-                'hefen1' => str_replace(rand(0, 9), '', '0123456789'),
+                'hefen1' => $hefen1,
             ]);
         }else{
+            $log1 = ['05', '16', '27', '38', '49'][rand(0,4)];
+            $hefen1 = str_replace(rand(0, 9), '', '0123456789');
+            $betDesc .= '对数：'.$log1;
+            $betDesc .= '&合分：'.$hefen1;
             $hzArr = array_merge((array)$hzArr, [
                 'log_sel' => 1,
-                'log_1' => ['05', '16', '27', '38', '49'][rand(0,4)],
+                'log_1' => $log1,
                 'fixed_pos_hefen_sel' => 2,
                 'hefen_pos1' => '1,2,3',
-                'hefen1' => str_replace(rand(0, 9), '', '0123456789'),
+                'hefen1' => $hefen1,
             ]);
         }
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '随机对数或合分', ['plan_id'=>$plan->id, 'qihao'=>$current_kj_qihao, 'hzArr'=>$hzArr, 'filter_type'=>$filter_type]);
         # {"ps_sel":2,"ps_2":"34689","ps_3":"01257","log_sel":1,"log_1":"05","fixed_pos_hefen_sel":2,"hefen_pos1":"1,2,3","hefen1":"012356789","arise_in_sel":2,"arise_in":"02356","filters":{"playway":"3","start_qihao":"20231226281","lottery_type":"8"}}
         $codes = NumService::getCodesKuaiXuan($hzArr);
 
+        NumCodeService::addBetDescRand($plan->id, $next_qihao, $betDesc); # 添加动态计划下注描述
         #p(['count'=>count($codes), 'historyKjData'=>$historyKjData, 'codes'=>$codes]);
 
         return $codes;
