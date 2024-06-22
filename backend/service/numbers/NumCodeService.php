@@ -80,7 +80,6 @@ class NumCodeService extends BaseService
         $query = Num4Type::find()
             ->where(['OR', ['IN', 'code_1', $filterNum1], ['IN', 'code_2', $filterNum1], ['IN', 'code_3', $filterNum1], ['IN', 'code_4', $filterNum1]])
             ->andWhere(['=', 'code_type', $playway+1]);
-        $betDesc = '剔除上期号码,'.implode('', $filterNumKjCodes)."上{$cNum}个";
         if($cNum == 3) {
             # 上三个
             $whereFilterKjCodes = [
@@ -119,6 +118,7 @@ class NumCodeService extends BaseService
         #p(['kjCode'=>$NewCodes, 'count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
+        $betDesc = '剔除上期号码,'.implode('', $filterNumKjCodes)."上{$cNum}个";
         NumCodeService::addBetDescRand($plan->id, $nextQihao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
@@ -311,7 +311,7 @@ class NumCodeService extends BaseService
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
         //p(count($codes));
 
-        $betDesc = '过滤前200期开过的号码全转：'.$filterCodesStr;
+        $betDesc = '过滤前200期开过的号码全转';
         NumCodeService::addBetDescRand($plan->id, $next_qihao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
@@ -408,7 +408,7 @@ class NumCodeService extends BaseService
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
-        $betDesc = "过滤前200期开过2次以上号码的全转:".$filterCodesStr;
+        $betDesc = "过滤前200期开过2次以上号码的全转";
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
@@ -446,7 +446,7 @@ class NumCodeService extends BaseService
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
-        $betDesc = "过滤最近10000期重复2次以上的直码:".$filterCodesStr;
+        $betDesc = "过滤最近10000期重复2次以上的直码";//.$filterCodesStr;
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
@@ -482,7 +482,7 @@ class NumCodeService extends BaseService
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
-        $betDesc = implode(',', $positions)."位过滤前{$num}期开过的号码:".$filterCodesStr;
+        $betDesc = implode(',', $positions)."位过滤前{$num}期开过的号码";//.$filterCodesStr;
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
@@ -672,7 +672,7 @@ class NumCodeService extends BaseService
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
-        $betDesc = "过滤期号尾号一致历史直码：".$filterCodesStr;
+        $betDesc = "过滤期号尾号一致历史直码"; //.$filterCodesStr;
         NumCodeService::addBetDescRand($plan->id, $next_qihao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
@@ -753,9 +753,9 @@ class NumCodeService extends BaseService
     }
 
     /**
-     * 过滤类型号码 - 过滤positions一致的直码
+     * 过滤类型号码 - 过滤positions x期内一致的直码
      * @param object $plan
-     * @param int $lottery_type
+     * @param int[] $positions
      * @param int $num
      * @return array
      */
@@ -789,7 +789,7 @@ class NumCodeService extends BaseService
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
-        $betDesc = "过滤".implode('',$positions)."位一致的直码：".$filterCodesStr;
+        $betDesc = "过滤".implode('',$positions)."位{$num}期内一致的直码";//.$filterCodesStr;
         NumCodeService::addBetDescRand($plan->id, $next_qihao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
@@ -825,7 +825,7 @@ class NumCodeService extends BaseService
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
-        $betDesc = "过滤期号{$lastQihaoNum}一致历史号码全倒".$filterCodesStr;
+        $betDesc = "过滤期号{$lastQihaoNum}一致历史号码全倒";//.$filterCodesStr;
         NumCodeService::addBetDescRand($plan->id, $next_qihao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
@@ -874,7 +874,7 @@ class NumCodeService extends BaseService
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
-        $betDesc = implode('', $positions)."过滤大小类型一致近{$cNum}组".$filterCodesStr;
+        $betDesc = implode('', $positions)."过滤大小类型一致近{$cNum}组";//.$filterCodesStr;
         NumCodeService::addBetDescRand($plan->id, $next_qihao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
@@ -1693,8 +1693,8 @@ class NumCodeService extends BaseService
      * @param object $plan
      * @param string $type_field
      * @param int $type_val 当type_field=type_3b则type_val=1表示三兄弟，当type_field=type_4ds则type_val=0非四单四双1四单2四双3两单两双4一单三双5一双三单
-     * @param int $positions
-     * @param string $type  0不过滤1过滤对数2过滤双重，空则不过滤
+     * @param int $pos
+     * @param int $type_log
      * @return array
      */
     public static function getBeforeKjCodesDynamic114(object $plan, string $type_field='type_ds', int $type_val=1, $pos=1, $type_log=0){
@@ -2178,6 +2178,49 @@ class NumCodeService extends BaseService
         Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤某两个位置各一个冷码', ['lottery_type'=>$lottery_type, 'qiHao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'filterCodes'=>$filterCodes, 'sql'=>$sql, 'count'=>count($codes)]);
 
         $betDesc = implode(',', $positions)."位置过滤冷码:".implode('', $filterCodes);
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - # 过滤x位最近n个冷码
+     * @param object $plan
+     * @param int $pos
+     * @param $cNum - 冷吗个数
+     * @return array
+     */
+    public static function getBeforeKjCodesDynamic125(object $plan, $pos=1, $cNum=1){
+        $playway = $plan->playway;
+        $lottery_type = $plan->lottery_type;
+
+        list($current_kj_qihao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+
+        $num = 10 - $cNum;
+        $latelyCode = NumService::getPosLatelyCode($pos, $num, $lottery_type); # 最近9个热码
+        $filterCode = array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode); # cNum个冷码
+        #p([\backend\service\NumService::$ALL_CODES, $latelyCode,  $filterCodes]);
+
+        $pos_field = 'code_'.$pos;
+        $query = Num4Type::find()->alias('n')->select(['code', $pos_field, 'code_type'])
+            ->where(['IN', 'n.'.$pos_field, $filterCode])
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $NumTypes = $query->asArray()->all();
+        $sql = $query->createCommand()->getRawSql();//p($sql, 0);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤单双、大小+双重', ['pos'=>$pos, 'lottery_type'=>$lottery_type, 'qihao'=>$current_kj_qihao, 'plan_id'=>$plan->id, 'latelyCode'=>$latelyCode, 'filterCode'=>$filterCode, 'sql'=>$sql]);
+        $filterCodes = ArrayHelper::getColumn($NumTypes, 'code');
+        #p(count($filterCodes));
+
+        $query = Num4Type::find()->select(['code'])
+            ->where(['=', 'code_type', $playway+1])
+            ->andWhere(['NOT IN', 'code', $filterCodes]);
+        $sql = $query->createCommand()->getRawSql();//p($sql);
+        $NumTypes = $query->asArray()->all();
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤x位n个冷码', ['plan_id'=>$plan->id, 'current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'sql'=>$sql, 'count'=>count($NumTypes)]);
+        #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        $betDesc = "过滤{$pos}位最近{$cNum}个冷码:".implode('', $filterCode);
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;

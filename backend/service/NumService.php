@@ -294,6 +294,11 @@ class NumService extends BaseService {
         183=>'过滤1234最近一大三小200组直码 ',
         184=>'过滤1234最近一单三双200组直码 ',
         185=>'过滤1234最近三单一双200组直码 ',
+
+        186=>'过滤1位最近1个冷码 ',
+        187=>'过滤2位最近1个冷码 ',
+        188=>'过滤3位最近1个冷码 ',
+        189=>'过滤4位最近1个冷码 ',
     ];
 
     const TYPE_POSITIONS = [
@@ -3400,6 +3405,18 @@ class NumService extends BaseService {
                     break;
                 case 185: # 过滤最近x组三单一双类型(四定)
                     $codes = NumCodeService::getBeforeKjCodesDynamic42($plan, $type_field='type_4ds', $type_val=5, $positions=[1,2,3,4], $filterNums=200); #
+                    break;
+                case 186:
+                    $codes = NumCodeService::getBeforeKjCodesDynamic125($plan, $pos=1, $cNum=1);
+                    break;
+                case 187:
+                    $codes = NumCodeService::getBeforeKjCodesDynamic125($plan, $pos=2, $cNum=1);
+                    break;
+                case 188:
+                    $codes = NumCodeService::getBeforeKjCodesDynamic125($plan, $pos=3, $cNum=1);
+                    break;
+                case 189:
+                    $codes = NumCodeService::getBeforeKjCodesDynamic125($plan, $pos=4, $cNum=1);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);

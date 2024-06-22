@@ -21,6 +21,7 @@ use backend\service\BaseService;
 use backend\service\BetService;
 use backend\service\CurlService;
 use backend\service\HN0898Service;
+use backend\service\numbers\NumCodeService;
 use backend\service\NumService;
 use backend\service\plans\BetErrorPlansTaskService;
 use backend\service\SscDataService;
@@ -33,6 +34,7 @@ use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;
+use yii\helpers\Json;
 
 class Lucky5Service { # 重庆7时彩登陆体系
     public static $baseUrl =  '';
@@ -1785,16 +1787,6 @@ class Lucky5Service { # 重庆7时彩登陆体系
         return $rst;
     }
 
-    public static function queryBetInfo(){
-
-
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-
-        $lottery = self::getSiteLottery($lottery_type);
-        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/api/MemberDesk/GetTheLastThree?lottery='.$lottery;
-
-    }
-
     /**
      * @decription 新版投注，真实投注入口， 未完待续 2018.12.23
      *
@@ -1983,9 +1975,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $totalmoney = $count * $single;
         }
 
-        #$post_desc = $plan->hz_Arr;
-        #$post_desc = ($post_desc && is_json($post_desc))?Json::decode($post_desc):[];
-        #$post_desc['下注描述'] = NumCodeService::getRandBetDesc($plan->id, $qihao);
+        $post_desc = $plan->hz_Arr;
+        $post_desc = ($post_desc && is_json($post_desc))?Json::decode($post_desc):[];
+        $post_desc['下注描述'] = NumCodeService::getRandBetDesc($plan->id, $qihao);
         $insertData = [
             'playway'=> $playway,  // 投注方式
             'tz_type'=> $tz_type,  // 投注类型
@@ -1999,7 +1991,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             'tz_system_id' => self::$tz_system_id,  // 投注系统tz_systems_id
             'sn'=> trim($snInfo_sn, ';'),
             'snid'=> trim($snInfo_snid, ';'),
-            #'post_desc' = Json::encode($post_desc),
+            'post_desc' => Json::encode($post_desc),
             'order_type'=>3, # 单双三字定
             'is_simulate' => 0,  // 是否模拟投注
             'single' => $single,  // 投注倍数
