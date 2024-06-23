@@ -261,7 +261,13 @@ class MessageOperateService  extends BaseService
             $transaction->commit();;
         }catch (\Exception $e){
             $transaction->rollBack();
-            Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'ERR', '消息处理-异常', ['code'=>$e->getCode(), 'err_msg'=>$e->getMessage(), 'file'=>$e->getFile().'_'.$e->getLine()]);
+            Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'ERR', '消息处理-异常', [
+                'qiHao'=>$qiHao,
+                'currentKjQiHao'=>$currentKjQiHao,
+                'code'=>$e->getCode(),
+                'err_msg'=>$e->getMessage(),
+                'file'=>$e->getFile().'_'.$e->getLine(),
+            ]);
             if($e->getCode() == CommonBaseService::CODE_FOR_USER){
                 return [CommonBaseService::CODE_FOR_USER, [], $e->getMessage()];
             }
