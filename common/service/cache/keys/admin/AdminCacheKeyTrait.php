@@ -48,9 +48,9 @@ trait AdminCacheKeyTrait
      * @param int $tzSystemUserId
      * @return string
      */
-    public static function updateBalanceKey(int $tzSystemUserId=0): string
+    public static function updateBalanceKey(int $tzSystemUserId=0, $businessId=0): string
     {
-        return 'admin:user_info:update_balance_' . $tzSystemUserId;
+        return 'admin:user_info:update_balance_' . $tzSystemUserId.'_'.$businessId;
     }
 
     /**

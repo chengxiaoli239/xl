@@ -58,25 +58,21 @@ class AoZhou5BetJobs extends CommonJob {
             $allMoneys = 0.00;
             $allCount = 0;
             $errContent = '';
-            $haveSuccess = 0;
+            $haveSuccess = 1;
             $TzSystemUsers = TzSystemsUsers::find()->where(['uid'=>$userId])->limit(1)->one();
             foreach ($BetRows as $betRow){
                 if(in_array($TzSystemUsers->is_local_bet, [BetsBackend::BET_TYPE_LOCAL_SELENIUM, BetsBackend::BET_TYPE_LOCAL_API])){
                     $betRst = $params['betRst'];
                     # 本地selenium模拟点击、或本地电脑api
                     $code = ($betRow->push_status==BetsBackend::PUSH_STATUS_CANNOT)?10004:0;
-                    if($code==0){
-                        $mKey = CacheKeyService::updateBalanceKey($TzSystemUsers->id);
-                        if($isLock = commonRedis()->setnx($mKey, 1, 10)){
-                            AgentUsersBalanceService::updateBalance((string)$betRow['id'], $betRow->bet_money, $betRow->wechat_user_id, WechatUserService::TYPE_ORDER_BET);
-                        }
-                    }else{
+                    if($code>0){
                         $msg = $betRst['msg'];
                     }
                 }else{
                     list($code, $data, $msg) = AoZhou5BetService::postToSite($betRow->id);
                 }
                 if($code>0){
+                    $haveSuccess = 0;
                     $errContent .= $betRow->codes.'/'.$betRow->single.'：'.$msg."\n";
                     continue;
                 }
@@ -89,8 +85,19 @@ class AoZhou5BetJobs extends CommonJob {
                 $allCount += 1; # 总投
 
                 $betContent .= str_replace(';', ',', $oneBetContent);
-                $haveSuccess = 1;
             }
+
+            $mKey = CacheKeyService::updateBalanceKey($TzSystemUsers->id);
+            if($haveSuccess && commonRedis()->setnx($mKey, 1)){
+                try {
+                    $betMoney = BetsBackend::find()->where(['order_id'=>$params['orderId']])->sum('bet_money');
+                    AgentUsersBalanceService::updateBalance((string)$betRow['id'], $betMoney, $betRow->wechat_user_id, WechatUserService::TYPE_ORDER_BET);
+                }catch (\Exception $e){
+                    BetsBackend::updateAll(['push_status'=>BetsBackend::PUSH_STATUS_CANNOT], ['order_id'=>$params['orderId']]);
+                    Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'ERR', '下注成功，更新余额异常', ['params'=>$params, 'err_msg'=>$e->getMessage()]);
+                }
+            }
+
             $WechatUser = WechatUser::findOne($betRow->wechat_user_id);
 
             if($haveSuccess){
