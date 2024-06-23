@@ -621,7 +621,7 @@ abstract class BetService extends BaseBetService {
             if(empty($lottery_type)){
                 $lottery_type = DEFAULT_LOTTERY_TYPE;
             }
-            if(strpos($betRst['err_msg'], '您当前使用的浏览器不支持cookie') !== false){
+            if(strpos($betRst['msg'], '您当前使用的浏览器不支持cookie') !== false){
                 throw_info('下注失败，等待下注');
             }
 
@@ -678,7 +678,7 @@ abstract class BetService extends BaseBetService {
                 if($lock){
                     commonRedis()->expire($mKey, 300);
                     # 澳洲五客户端下注结果通知
-                    $pushData = ['orderId'=>$plan_id, 'business_id' => $model->order_id];
+                    $pushData = ['orderId'=>$plan_id, 'business_id' => $model->order_id, 'betRst'=>$betRst];
                     push_queue_open(AoZhou5BetJobs::class, $pushData);
                 }
             }
