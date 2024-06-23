@@ -27,7 +27,7 @@ class AoZhou5BetJobs extends CommonJob {
 
     public static function getName($params): string
     {
-        self::$name = '40-用户下注推送盘口';
+        self::$name = '40-用户下注推送盘口0';
         return self::$name;
     }
 
