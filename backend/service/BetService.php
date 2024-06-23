@@ -683,7 +683,7 @@ abstract class BetService extends BaseBetService {
                 }
             }
             $m->set($mkey, 1, 40);
-            Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新计划状态', ['flag'=>$flag, 'where'=>$where, 'betRst'=>$betRst, 'lottery_type'=>$lottery_type]);
+            Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新计划状态', ['flag'=>$flag, 'lock'=>$lock, 'where'=>$where, 'betRst'=>$betRst, 'lottery_type'=>$lottery_type]);
         }catch (\Exception $e){
             return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
         }
