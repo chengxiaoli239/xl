@@ -514,7 +514,7 @@ class AoZhou5BetService extends CommonBaseService
             BetsBackend::updateAll(['push_status'=>BetsBackend::PUSH_STATUS_CANNOT, 'post_desc'=>['msg'=>'异常，请重新下注']], ['order_id'=>$orderIds, 'push_status'=>BetsBackend::PUSH_STATUS_WAIT]);
             foreach ($orderIds as $orderId){
                 # 澳洲五客户端下注结果通知
-                $pushData = ['orderId' => $orderId, 'business_id' => $orderId];
+                $pushData = ['orderId' => $orderId, 'business_id' => $orderId, 'msg'=>'异常记录关闭'];
                 push_queue_open(AoZhou5BetJobs::class, $pushData);
             }
         }catch (\Exception $e){}

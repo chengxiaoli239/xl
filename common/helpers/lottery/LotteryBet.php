@@ -130,6 +130,7 @@ class LotteryBet
         $totalSeconds = $currentMinute * 60 + $currentSecond;
         $cycleStart = $totalSeconds - ($totalSeconds % (5 * 60)); // 当前周期(每小时为周期)开始的秒数
 
+        /*
         p([
             'currentHour'=>date('Y-m-d H:i:s', $currentMSeconds),
             'currentTime' => date('Y-m-d H:i:s', $now),
@@ -138,6 +139,7 @@ class LotteryBet
             '秒'=>$currentSecond,
             '求余秒数'=>$now%300
         ],0);
+        */
 
         if (!isset($this->schedule[$lotteryType])) {
             throw_info("彩种配置不存在");
