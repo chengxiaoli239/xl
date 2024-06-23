@@ -156,9 +156,6 @@ class IndexController extends Controller
             list($lastQihao, $lastIndexId, $lastId, $nextQihao) = SscDataService::getKjDataLastIndexId($lottery_type=8);
             p([$lastQihao, $lastIndexId, $lastId, $nextQihao]);
             //$rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 17); p($rst);// 更新和值遗漏
-            $r = push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>1, 'lottery_name'=>'七星彩', 'business_id'=>'2024016', 'ignore'=>1]);
-            $r = push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>17, 'lottery_name'=>'排列五', 'business_id'=>'2024038', 'ignore'=>1]);
-            p($r);
             # 测试回滚
             # 测试回滚2
             $rst['updateDs'] = SscDataService::updateDsData($lottery_type = 17);p($rst); // 每期开奖遗漏 -- 新开

@@ -60,7 +60,7 @@ class AoZhou5Service extends CommonLotteryService
             }
             $bets = Bets::find()
                 ->where(['status'=>BetsBackend::STATUS_WAIT, 'lottery_type'=>$lotteryType, 'push_status'=>BetsBackend::PUSH_STATUS_SUCCESS]) # , 'qihao'=>$currentKjQiHao
-                ->orderBy('id DESC')->limit(100)->all();
+                ->orderBy('id DESC')->limit(1000)->all();
             $replyData = [];
             foreach ($bets as $bet){
                 $result = self::opOneBettingRecord($bet->id, $bet);

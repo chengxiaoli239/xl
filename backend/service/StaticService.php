@@ -2716,7 +2716,7 @@ class StaticService extends BaseService {
         $rst = true;
 
         $qihao = HN0898Service::getCurrentQihao($lottery_type);
-        if($SscKjData = SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao])) {
+        if(SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao])) {
             $m = \Yii::$app->cache;
             $mkey = McKeyService::buildStaticMKey($key, $lottery_type);
 
