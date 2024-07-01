@@ -26,6 +26,7 @@ use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
 use common\kj\qxc\QxcTcw;
 use common\kj\ssc\Aozhou;
+use common\kj\ssc\Lucky5;
 use common\service\cache\CacheKeyService;
 use common\service\CommonService;
 use common\service\helpers\ThirdD;
