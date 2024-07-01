@@ -65,6 +65,13 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            foreach ([8] as $lotteryType){
+                //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
+                $r = (new LotteryBet())->checkLotteryStatus($lotteryType, '2024-07-01 12:06:31');//p($r);
+                $rst[$lotteryType] = $r;
+            }
+            p(['rst'=>$rst]);
+            $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);p($data);
             $r = NumCodeService::addBetDescRand($planId=1000, $dateString, '十位除1234');
             $members = NumCodeService::getRandBetDesc($planId, $dateString);
             p([$r, $members]);
@@ -99,12 +106,6 @@ class IndexController extends Controller
             $betRow['qihao'] = DataDealStatus::find()->select('next_qihao')->where(['lottery_type'=>28])->limit(1)->orderBy(['id'=>SORT_DESC])->scalar();
             p($betRow['qihao']);
             $rst = AoZhou5BetService::getBetTasks($id=AoZhou5BetService::TEST_BET_ID);p($rst);
-            foreach ([8] as $lotteryType){
-                //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
-                $r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
-                $rst[$lotteryType] = $r;
-            }
-            p(['rst'=>$rst]);
             $text = '千23百34=1';
             list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);p([$code, $data, $err_msg]);
             $mKey = 'llllllll';

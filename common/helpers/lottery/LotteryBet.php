@@ -14,10 +14,10 @@ class LotteryBet
         self::STATUS_START => '开盘',
         self::STATUS_CLOSE => '封盘',
     ];
-    public int $drawTime = 50;
+
     public array $schedule = [
         8 => [
-            'draw' => 0,       // 抓取开奖号码时间，例如每5分钟整
+            'draw' => 30,       // 抓取开奖号码开始时间，例如每5分钟整
             'closeOffset' => -30, // 封盘时间是第5分钟的前30秒，例如 4分30秒
             'open' => 65,  // 开盘时间是开奖后的50秒
         ],
