@@ -134,7 +134,7 @@ class Lucky5 extends BaseKj {
                 throw_info('非开奖抓取时间节点:'.date('Y-m-d H:i:s'));
             }
             $kjData = self::getCurrentKjData(self::$lottery_type, $current_qihao);
-            Tool_Common::log('/kj_dats/'.__FUNCTION__, 'INFO', '号码抓取-实讯网01', ['lottery_type'=>self::$lottery_type, 'current_qihao'=>$current_qihao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '号码抓取-实讯网01', ['lottery_type'=>self::$lottery_type, 'current_qihao'=>$current_qihao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
             if($is_auto==2 OR empty($kjData)) {
                 $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun-one');
 
