@@ -233,18 +233,6 @@ class IndexController extends Controller
         return ['status' => 200, 'data' => ['get' => $get, 'post' => $post], 'msg' => '操作成功'];
     }
 
-    public function actionTestLogin()
-    {
-        self::_init();
-        $post = \Yii::$app->request->post();
-        $id = $post['id'];
-        $rst = BaseService::login($id);
-        p($rst);
-        $TzSystemsUsers = TzSystemsUsers::findOne($id);
-
-        return array_merge($rst, ['TzSystemsUsers' => $TzSystemsUsers]);
-    }
-
     /**
      * @desc 测试投注
      */
@@ -497,8 +485,6 @@ class IndexController extends Controller
         p($rst);
         $rst = ProxyBaseService::preGetValidIp($proxy_type=1, $is_auto = 0);
         p($rst);
-        $rst = CrontabIndexService::autoLogin();
-        p($rst);
         $rst = SevenService::synBalance(17);
         p($rst);
         $params = [];
@@ -655,8 +641,6 @@ class IndexController extends Controller
         $data = NaSiDaKe::getLotteryNo($type='json', $is_auto=2, $lottery_type=25);p($data);
         $rst = OperatePlanService::opProfitsPlans12_13($lottery_type = 8);
         p($rst);# A出x次B出y次投B 计划处理
-        $r = BaseService::login($id = 10);
-        p($r);
         $rst = BaseService::synBalance($id = 10);
         p($rst); # 同步余额
         $ssl_uids = BaseService::getSslVersion1Uids();
@@ -689,8 +673,6 @@ class IndexController extends Controller
         $ip_addr = PoxyIPService::getCurrentValidProxyIp();
         p($ip_addr); # 获取当前可用的代理IP
         $rst = PoxyIPService::getRemoteProxyIp($type = 1);
-        p($rst);
-        $rst = BaseService::login($id = 10);
         p($rst);
         p($rst);
         $rst = BaoTaService::syncBaoTaCrontabs($id = 1);
@@ -818,8 +800,6 @@ class IndexController extends Controller
         p(['str' => $str, 'roboot_id' => $roboot_id, 'old_cookie' => $cookie, 'matches' => $matches, 'new_cookie' => $new_cookie]);
         p($roboot_id);
         p($_SERVER);
-        $rst = BaseService::login($id = 79, $is_auto = 2);
-        p($rst);
         $rst = StaticService::queryCodeTypeStatic($post);
         p($rst);
         $poxy_ip_data = '115.226.68.53:22598'; #
@@ -872,8 +852,6 @@ class IndexController extends Controller
         p($data);
         $data = JiaNaDa::getLottery($type = 'json', $is_auto = 2);
         p($data);
-        $rst = BingDaoService::login($uid = 12, $tz_system_id = 13);
-        p($rst);
         //PoxyIPService::delProxyUidsKey();
         $rst = PoxyIPService::getProxyUids();
         p($rst);
@@ -893,8 +871,6 @@ class IndexController extends Controller
 
         set_time_limit(0);
         $rst = JinYingService::getBalance('18', '15');
-        p($rst);
-        $rst = JinYingService::login('18', '15');
         p($rst);
         $rst['rst'] = BaseService::synBalance($tz_system_users_id = 66);
         p($rst);
@@ -933,8 +909,6 @@ class IndexController extends Controller
         $rst = NineNineNewService::synBalance($tz_system_users_id = 31);
         p($rst);
         d(false === '');
-        $rst = BingDaoService::login($uid = 20, $tz_system_id = 13);
-        p($rst);
         $kjData = BingDao::getLotteryOne('json', $l_type = 7);
         p($kjData);
         $rst = BingDaoService::synBalance($TzSystemsUser_id = 66);
@@ -973,15 +947,11 @@ class IndexController extends Controller
         p($rst);
         $rst[] = StaticService::opAllStaticProfits();
         p($rst);# 利润统计
-        $rst = \backend\service\pingbo\tennis\TennisService::login($uid = 18, $tz_system_id = 14);
-        p($rst);
         $rst = TennisSportsService::grabTennisSportsGame();
         p($rst);
         $rst = \backend\service\Mbs188\tennis\TennisService::getGames();
         p($rst);
         $rst = StaticService::staticCodeTypeProfitsDate($date = '2020-09-08', $lottery_type = 5);
-        p($rst);
-        $rst = NineNineNewService::login($uid = 18, $tz_system_id = 12);
         p($rst);
         $rst = NineNineNewService::getDifferentNums();
         p($rst);
@@ -1138,8 +1108,6 @@ class IndexController extends Controller
         $rst = LuckyBaseService::synBalance($tz_system_users_id = 29);
         p($rst);# 同步余额
 
-        $data = LuckyBaseService::login($uid = 18, $tz_system_id = 7);
-        p($data);
         $rst = bin2hex("Shanghai");
         p($rst);
         $rst = QiLinBaseService::synBalance(26);
@@ -1202,8 +1170,6 @@ class IndexController extends Controller
         p($rst);
 
         //$str = '{"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}'; //p(json_decode($str, true)); d(strpos($str, "\"Status\":1") !== false);
-        $rst = SevenService::login(19, 3);
-        p($rst);
 
         $rst = TzService::insertLuckyDataTime();
         p($rst);
@@ -1301,8 +1267,6 @@ class IndexController extends Controller
         //$str = 'a:1:{i:0;s:18:"海南省内包邮"}';
         p(serialize($arr));
         $rst = BaseDataService::insertStaticVal();
-        p($rst);
-        $rst = HuiYuanService5::login(3, 6);
         p($rst);
         $rst = HuiYuanService5::loginNew(18, 6);
         p($rst);

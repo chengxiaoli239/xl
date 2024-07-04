@@ -12,6 +12,7 @@ use backend\models\UserSysPlans;
 use backend\models\VBets;
 use backend\service\agent\AgentService;
 use backend\service\agent\AgentUsersService;
+use backend\service\BaseService;
 use backend\service\BetService;
 use backend\service\clients\AgentClientsService;
 use backend\service\HN0898Service;
@@ -24,6 +25,7 @@ use backend\service\statics\yl\OneNumYl;
 use backend\service\StaticService;
 use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
+use common\kj\BaseKj;
 use common\kj\qxc\QxcTcw;
 use common\kj\ssc\Aozhou;
 use common\kj\ssc\Lucky5;
@@ -65,6 +67,15 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $rst = BaseService::login($id=58); p($rst);
+            //$d = \common\kj\ssc\Thirdd::getCurrentKjData($lottery_type=8);p($d);
+
+            $r = BaseKj::setKjDataCache($lottery_type=8, $expect='240701001', $kjData=['except'=>'240701001', 'opentime'=>date('Y-m-d H:i:s'), 'opencode'=>'1,2,3,4,5']);
+            $mKey = CacheKeyService::lotteryOpenDataKey($lottery_type, $expect);
+            p($mKey);
+            $data = commonRedis()->get($mKey);
+            p(['r'=>$r, 'data'=>$data]);
+            $bet_log = Lucky5Service::getBetLog($tz_type=25, $plan_id=9178);p($bet_log);
             foreach ([8] as $lotteryType){
                 //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
                 $r = (new LotteryBet())->checkLotteryStatus($lotteryType, '2024-07-01 12:06:31');//p($r);

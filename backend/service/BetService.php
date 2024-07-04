@@ -267,12 +267,14 @@ abstract class BetService extends BaseBetService {
         $flag = self::isLogin($uid, $tz_system_id, $r=2);
         $end_time = microtime(true);
         Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注-登陆检测-1', ['uid'=>$uid, 'flag'=>$flag, 'consume_time'=>($end_time-$start_time).'s']);
+        /*
         if(!$flag && $TzSystemsUsers->is_auto_login){
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
             $loginRst = BaseService::login($TzSystemsUsers->id, $is_auto=2);
             Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '网盘开盘状态-4-2', ['uid'=>$uid, 'task_id'=>$task_id, 'loginRst'=>$loginRst]);
             return ['status'=>302, 'msg'=>'未登录'];
         }
+        */
 
         # 4、下注
         $lottery_types = UserSysPlansService::getMyLotteryTypes($uid);

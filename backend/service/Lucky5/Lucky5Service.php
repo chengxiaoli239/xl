@@ -25,8 +25,7 @@ use backend\service\numbers\NumCodeService;
 use backend\service\NumService;
 use backend\service\plans\BetErrorPlansTaskService;
 use backend\service\SscDataService;
-use backend\tools\Tools;
-use common\models\AdminModel;
+use common\helpers\LotteryType;
 use common\service\CaptchaCodeService;
 use common\service\proxy\ProxyBaseService;
 use common\tools\KjDataGet;
@@ -254,27 +253,199 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @desc 返回投注日
      * @return string
      */
-    public static function getBetLog($tz_type = 20, $plan_id=0){
+    public static function getBetLog($tz_type = 20, $plan_id=0, $hzArr=[]){
         $BetLog = AgentUserBetLogs::find()->where(['wp_record_id'=>$plan_id])->limit(1)->asArray()->one();
         if(!empty($BetLog) && $BetLog['bet_logs']){
             return $BetLog['bet_logs'];
         }
 
-        if(in_array($tz_type,[ 27, 30, 31, 33])) { # 二定
-            $str = '[二定位]，定位置“[取]”：千=[1]，百=[34]';
-        }elseif(in_array($tz_type,[ 29])){
-            $str = '[三定位]，定位置“[取]”：千=[0123456789]，百=[0123456789]，十=[0123456789]，固定合分取值：第[3]位选中，第[4]位选中，内容：[13579]；';
-        }elseif(in_array($tz_type,[36])){ # 二字现
-            $str = '[二字现]，不定合分值(两数合)：[0123456789]，包含“[取]”数：[0123456789]';
-        }elseif(in_array($tz_type,[17])){ # 三字现
-            $str = '[三字现]，不定合分值(两数合)：[0123456789]，包含“[取]”数：[0123456789]';
-        }elseif(in_array($tz_type,[37])){ # 四字现
-            $str = '[四字现]，不定合分值(两数合)：[0123456789]，包含“[取]”数：[0123456789]';
-        }else{ # 四定
-            $str = '[四定位]，合分值范围：[0-36]';
+        $UserSysPlans = UserSysPlans::findOne($plan_id);
+        if(!empty($UserSysPlans)){
+            $tz_type = $UserSysPlans->tz_type;
+            $hzArr = Json::decode($UserSysPlans->hz_Arr);
         }
 
-        return $str;
+        $randNum1 = rand(0, 9);
+        $p1 = str_replace($randNum1, '', '0123456789');
+        $randNum2 = rand(0, 9);
+        $p2 = str_replace($randNum2, '', '0123456789');
+        $randNum3 = rand(0, 9);
+        $p3 = str_replace($randNum3, '', '0123456789');
+
+        if(in_array($tz_type,[ 27, 30, 31, 33])) { # 二定
+            # 二定位，定位置“取”:干=0123459，百=0235678
+            $str = '[二定位]，定位置“[取]”：千=['.$p1.']，百=['.$p2.']';
+        }elseif($tz_type == 29){
+            $str = '[三定位]，定位置“[取]”：千=['.$p1.']，百=['.$p2.']，十=['.$p3.']，固定合分取值：第[3]位选中，第[4]位选中，内容：['.$p3.']；';
+        }elseif($tz_type == 36){ # 二字现
+            $str = '[二字现]，不定合分值(两数合)：['.$p1.']，包含“[取]”数：['.$p3.']';
+        }elseif($tz_type == 17){ # 三字现
+            $str = '[三字现]，不定合分值(两数合)：['.$p1.']，包含“[取]”数：['.$p2.']';
+        }elseif($tz_type == 37){ # 四字现
+            $str = '[四字现]，不定合分值(两数合)：['.$p1.']，包含“[取]”数：['.$p2.']';
+        }else{ # 四定
+            $str = '[四定位]，定位置“[取]”：千=['.$p1.']，百=['.$p2.']，十=['.$p3.']，合分值范围：[5-31]，三重“除”操作，四重“取”操作，双双重“取”操作';
+        }
+        if(empty($hzArr) OR in_array($tz_type, [19, 27, 34])){ # 导入方式
+            return $str;
+        }
+
+        if($tz_type == 31){
+            $desc = '五位二定';
+        }else{
+            $desc = LotteryType::LT_PLAY_WAY_OPTIONS[$UserSysPlans->playway]??'定位';
+        }
+        $desc .= '，';
+
+        # 定位除、取
+        if(!empty($hzArr['fixed_pos_sel'])){
+            $desc .= ($hzArr['fixed_pos_sel']==NumService::EXCLUDE)?'定位置“取”：':'定位置“除”：';
+            if(!empty($hzArr['p1'])){
+                $desc .= '千='.$hzArr['p1'].'，';
+            }
+            if(isset($hzArr['p2']) && $hzArr['p2'] !== ''){
+                $desc .= '百='.$hzArr['p2'].'，';
+            }
+            if(isset($hzArr['p3']) && $hzArr['p3'] !== ''){
+                $desc .= '十='.$hzArr['p3'].'，';
+            }
+            if(isset($hzArr['p4']) && $hzArr['p4'] !== ''){
+                $desc .= '个='.$hzArr['p4'].'，';
+            }
+            if(isset($hzArr['p5']) && $hzArr['p5'] !== ''){
+                $desc .= '五='.$hzArr['p5'].'，';
+            }
+        }
+
+        # 配数 除、取
+        if(isset($hzArr['ps_sel']) && $hzArr['ps_sel']){
+            $desc .= $hzArr['ps_sel']==NumService::PEI_SHU_OBTAIN ? ' 配数“取”:' : '配数“除”:';
+            if(isset($hzArr['ps_1']) && $hzArr['ps_1'] !== ''){
+                $desc .= '第1位：'.$hzArr['ps_1'].'，';
+            }
+            if(isset($hzArr['ps_2']) && $hzArr['ps_2'] !== ''){
+                $desc .= '第2位：'.$hzArr['ps_2'].'，';
+            }
+            if(isset($hzArr['ps_3']) && $hzArr['ps_3'] !== ''){
+                $desc .= '第3位：'.$hzArr['ps_3'].'，';
+            }
+            if(isset($hzArr['ps_4']) && $hzArr['ps_4'] !== ''){
+                $desc .= '第4位：'.$hzArr['ps_4'].'，';
+            }
+        }
+
+        # 定位合分，除取
+        if(!empty($hzArr['fixed_pos_hefen_sel'])){
+            $desc .= ($hzArr['fixed_pos_hefen_sel']==NumService::EXCLUDE)? '固定合分除值：' : '固定合分取值：';
+            foreach (['hefen_pos1', 'hefen_pos2', 'hefen_pos3', 'hefen_pos4'] as $kHf=>$hefen_pos){
+                $keyHf = $kHf + 1;
+                if (!empty($hzArr[$hefen_pos])){
+                    $hfPoss = explode(',', $hzArr[$hefen_pos]);
+                    foreach ($hfPoss as $hfPos){
+                        $desc .= "第{$hfPos}位选中，";
+                    }
+                    $desc .= '内容：'.$hzArr['hefen'.$keyHf].'；';
+                }
+            }
+        }
+
+        # 不定位合分:两数、三数
+        if(!empty($hzArr['no_fix_hefen_pos']) && isset($hzArr['no_fix_hefen'])){ # no_fix_hefen_pos=1:两数、no_fix_hefen_pos=2:三数
+            $desc .= ($hzArr['no_fix_hefen_pos'] == 2) ? ' 不定合分(三数合)：'.$hzArr['no_fix_hefen'] : '不定合分(两数合)：'.$hzArr['no_fix_hefen'];
+            $desc .= '，';
+        }
+
+        # 和值
+        if(!empty($hzArr['hz'])){
+            $desc .= '合分值范围：'.$hzArr['hz'][0].'-'.$hzArr['hz'][count($hzArr['hz'])-1].'，';
+        }
+        if(!empty($hzArr['arise_in_sel']) && !empty($hzArr['arise_in'])){
+            $desc .= ($hzArr['arise_in_sel']==NumService::EXCLUDE) ? '包含“除”数：' : '包含“取”数：';
+            $desc .= $hzArr['arise_in'].'，';
+        }
+
+        # {"get_types":["1","2"],"remove_types":["4","5"],"get_hzs":["7","8","10"],"remove_hzs":["12","13","14"],"get_arises":"123","remove_arises":"456"}
+        # 0.1、上奖取
+        if(isset($hzArr['arise']) OR isset($hzArr['get_arises'])){
+            if(isset($hzArr['get_arises'])) $hzArr['arise'] = $hzArr['get_arises'];
+            $desc .= "上奖“取”：".$hzArr['arise'].'，';
+        }
+        # 0.2、上奖除 - 新
+        if(!empty($hzArr['remove_arises'])){
+            $desc .= "上奖“取”：".$hzArr['remove_arises'].'，';
+        }
+
+        # 1、双重
+        if(isset($hzArr['type_2'])){
+            $desc .= ($hzArr['type_2'] == 1)? '双重“取”操作' : '双重“除”操作';
+            $desc .= '，';
+        }
+        # 2、三重
+        if(isset($hzArr['type_3'])){
+            $desc .= ($hzArr['type_3'] == 1)? '三重“取”操作' : '三重“除”操作';
+            $desc .= '，';
+        }
+        # 3、四重
+        if(isset($hzArr['type_4'])){
+            $desc .= ($hzArr['type_4'] == 1)? '四重“取”操作' : '四重“除”操作';
+            $desc .= '，';
+        }
+        # 4、双双重
+        if(isset($hzArr['type_22'])){
+            $desc .= ($hzArr['type_22'] == 1)? '双双重“取”操作' : '双双重“除”操作';
+            $desc .= '，';
+        }
+        # 5、两兄弟
+        if(isset($hzArr['type_2b'])){
+            $desc .= ($hzArr['type_2b'] == 1)? '二兄弟“取”操作' : '二兄弟“除”操作';
+            $desc .= '，';
+        }
+        # 6、三兄弟
+        if(isset($hzArr['type_3b'])){
+            $desc .= ($hzArr['type_3b'] == 1)? '三兄弟“取”操作' : '三兄弟“除”操作';
+            $desc .= '，';
+        }
+        # 7.1、四兄弟
+        if(isset($hzArr['type_4b'])){
+            $desc .= ($hzArr['type_4b'] == 1)? '四兄弟“取”操作' : '四兄弟“除”操作';
+            $desc .= '，';
+        }
+        # 7.2、对数
+        if(isset($hzArr['log_sel'])){
+            $desc .= ($hzArr['log_sel'] == 2)? '对数“取”数' : '对数“除”数';
+            $desc .= $hzArr['log_1'].'，';
+        }
+
+        # 筛选位置：单
+        if(!empty($hz_Arr['odd_sel']) && $hz_Arr['odd_pos']){
+            $desc .= $hz_Arr['odd_sel']==NumService::POS_ODD_OBTAIN ? '单数“取”数：' : '单数“除”数：';
+            foreach (explode(',', $hzArr['odd_pos']) as $pos){
+                $desc .= '第'.$hz_Arr['odd_pos'].'位，';
+            }
+        }
+        # 筛选位置：双
+        if(!empty($hz_Arr['even_sel']) && $hz_Arr['even_pos']){
+            $desc .= $hz_Arr['even_sel']==NumService::POS_ODD_OBTAIN ? '双数“取”数：' : '双数“除”数：';
+            foreach (explode(',', $hzArr['even_pos']) as $pos){
+                $desc .= '第'.$pos.'位，';
+            }
+        }
+        # 筛选位置：大
+        if(!empty($hz_Arr['big_sel']) && $hz_Arr['big_pos']){
+            $desc .= $hzArr['even_sel']==NumService::POS_ODD_OBTAIN ? '大“取”数：' : '小“除”数：';
+            foreach (explode(',', $hzArr['big_pos']) as $pos){
+                $desc .= '第'.$pos.'位，';
+            }
+        }
+        # 筛选位置：小
+        if(!empty($hz_Arr['small_sel']) && $hz_Arr['small_pos']){
+            $desc .= $hz_Arr['small_sel']==NumService::POS_ODD_OBTAIN ? '双数“取”数：' : '双数“除”数：';
+            foreach (explode(',', $hzArr['small_pos']) as $pos){
+                $desc .= '第'.$pos.'位，';
+            }
+        }
+
+        return trim($desc, '，');
     }
 
     /**
@@ -288,6 +459,63 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $json = '{"symbol":"X","isXian":0,"firstNumber":"13579","secondNumber":"","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":30,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[[[0,0,1,1],[1,3,5,7,9]]],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[],"symbolPositions":[0,0,0,0],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}';
         }else{
             $json = '{"symbol":"X","isXian":0,"firstNumber":"","secondNumber":"","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":40,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[30,35],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[0,0,0,0],"symbolPositions":[],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}';
+            $jsonArr = [
+                "symbol" => "X",
+                "isXian" => 0,
+                "firstNumber" => "",
+                "secondNumber" => "",
+                "thirdNumber" => "",
+                "fourthNumber" => "",
+                "fifthNumber" => "",
+                "numberType" => 40,
+                "positionType" => 0,
+                "positionFilter" => 0,
+                "remainFixedFilter" => 0,
+                "remainFixedNumbers" => [ ],
+                "remainMatchFilter" => 0,
+                "remainMatchNumbers" => [ ],
+                "remainValueRanges" => [
+                    30,
+                    35
+                ],
+                "transformNumbers" => [ ],
+                "upperNumbers" => [ ],
+                "exceptNumbers" => [ ],
+                "fixedPositions" => [
+                    0,
+                    0,
+                    0,
+                    0
+                ],
+                "symbolPositions" => [ ],
+                "containFilter" => 0,
+                "containNumbers" => [ ],
+                "multipleFilter" => 0,
+                "multipleNumbers" => [ ],
+                "repeatTwoWordsFilter" => -1,
+                "repeatThreeWordsFilter" => -1,
+                "repeatFourWordsFilter" => -1,
+                "repeatDoubleWordsFilter" => -1,
+                "twoBrotherFilter" => -1,
+                "threeBrotherFilter" => -1,
+                "fourBrotherFilter" => -1,
+                "logarithmNumberFilter" => -1,
+                "logarithmNumbers" => [],
+                "oddNumberFilter" => -1,
+                "oddNumberPositions" => [
+                    0,
+                    0,
+                    0,
+                    0
+                ],
+                "evenNumberFilter" => -1,
+                "evenNumberPositions" => [
+                    0,
+                    0,
+                    0,
+                    0
+                ]
+            ];
         }
 
         return $json;
@@ -993,7 +1221,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($curl, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
+        #curl_setopt($curl, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
+        curl_setopt($curl, CURLOPT_SSLVERSION, 1);
 
         $content = curl_exec($curl);
         preg_match_all("/Set-Cookie: (.*)/i", $content, $matches);

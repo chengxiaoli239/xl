@@ -100,10 +100,22 @@ trait LotteryCacheKeyTrait
     /**
      * 随机下注的描述
      * @param int $planId
+     * @param string $qiHao
      * @return string
      */
     public static function getBetRandDescKey(int $planId=0, $qiHao=''): string
     {
         return 'lottery:rand_bet_desc:plan_'.$planId.'_'.$qiHao;
+    }
+
+    /**
+     * 开奖数据缓存key
+     * @param $lottery_type
+     * @param $qiHao
+     * @return string
+     */
+    public static function lotteryOpenDataKey($lottery_type, $qiHao): string
+    {
+        return 'lottery:open_data:lt_'.$lottery_type.'_'.$qiHao;
     }
 }

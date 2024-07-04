@@ -56,7 +56,7 @@ class TzSystemsUsersController extends BaseController
         $id = $post['id'];
         $is_auto = $post['is_auto'];
         $rst = BaseService::login($id, $is_auto);
-        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '������½', ['id'=>$id, 'is_auto'=>$is_auto, 'rst'=>$rst]);
+        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '手工登录', ['id'=>$id, 'is_auto'=>$is_auto, 'rst'=>$rst]);
         if(empty($rst['username'])){
             $TzSystemsUsers = TzSystemsUsers::findOne($id);
             $rst['username'] = $TzSystemsUsers->username;

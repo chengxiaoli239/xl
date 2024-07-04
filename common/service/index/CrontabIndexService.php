@@ -11,8 +11,15 @@ class  CrontabIndexService{
     {
         $query = TzSystemsUsers::find()->alias('u')
             ->leftJoin('{{%tz_systems}} s', 'u.tz_system_id=s.id')
-            ->where(['AND',['=', 'u.status', 1], ['=', 'u.is_auto_login', 1], ['<>', 'u.ssc_domain', ''], ['=', 's.status', 1]]);
-        $sql = $query->createCommand()->getRawSql();
+            ->where([
+                'AND',
+                ['=', 'u.status', 1],
+                ['=', 'u.is_auto_login', 1],
+                ['<>', 'u.ssc_domain', ''],
+                ['=', 's.status', 1],
+                ['=', 'u.is_local_bet', 2],
+            ]);
+        //$sql = $query->createCommand()->getRawSql();p($sql);
         $TzSystemsUsers = $query->asArray()->all();
         if(empty($TzSystemsUsers)) return ['status'=>200, 'msg'=>'为空'];
 

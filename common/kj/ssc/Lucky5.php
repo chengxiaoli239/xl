@@ -6,6 +6,7 @@ use backend\models\TzSystemsUsers;
 use backend\service\BaseService;
 use backend\service\CurlService;
 use backend\service\Lucky5\LuckyBaseService;
+use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
 use common\kj\BaseKj;
 use common\service\CommonService;
@@ -130,6 +131,7 @@ class Lucky5 extends BaseKj {
         try {
             $is_remote = 0;
             $status = KjDataGet::isCanGrab(self::$lottery_type);
+            $checkStatus = (new LotteryBet())->checkLotteryStatus(self::$lottery_type); # 是否封盘, 封盘之时即是抓去之时
             if(empty($status)){
                 throw_info('非开奖抓取时间节点:'.date('Y-m-d H:i:s'));
             }
@@ -163,11 +165,11 @@ class Lucky5 extends BaseKj {
             if(empty($kjData['opencode'])){
                 throw_info('开奖号码不能为空');
             }
-            Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '号码抓取-实讯网02', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'is_remote'=>$is_remote]);
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '号码抓取-实讯网02', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'is_remote'=>$is_remote, 'checkStatus'=>$checkStatus]);
         }catch (\Exception $e){
             $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
 
-            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网03', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst, 'err_msg'=>$e->getMessage(), 'is_remote'=>$is_remote, 'current_proxy_addr'=>$current_proxy_addr]);
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网03', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst, 'err_msg'=>$e->getMessage(), 'is_remote'=>$is_remote, 'current_proxy_addr'=>$current_proxy_addr, 'checkStatus'=>$checkStatus]);
             if($e->getCode() != self::SUCCESS_CODE){
                 return false;
             }

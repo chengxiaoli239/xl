@@ -2576,17 +2576,17 @@ class NumService extends BaseService {
             if($hz_Arr['type_4s'] == 1) $filter1['type_4s'] = 1; else $filter0['type_4s'] = 0;
         }
         # 11.1、类型取 - 新  双重、三重、四重、双双重
-        if(isset($hz_Arr['get_types']) OR isset($hz_Arr['get_types'])){
-            if(isset($hz_Arr['get_types'])) $filter6['get_types'] = $hz_Arr['get_types'];// else $filter0['arise'] = 0;
+        if(isset($hz_Arr['get_types'])){
+            $filter6['get_types'] = $hz_Arr['get_types'];// else $filter0['arise'] = 0;
         }
         # 14.1、单双类型取
         if(!empty($hz_Arr['type_4ds'])){
-            if(isset($hz_Arr['type_4ds'])) $filter6['type_4ds'] = $hz_Arr['type_4ds'];
+            $filter6['type_4ds'] = $hz_Arr['type_4ds'];
         }
 
         # 11.2、类型除 - 新
-        if(isset($hz_Arr['remove_types']) OR isset($hz_Arr['remove_types'])){
-            if(isset($hz_Arr['remove_types'])) $filter7['remove_types'] = $hz_Arr['remove_types'];
+        if(isset($hz_Arr['remove_types'])){
+            $filter7['remove_types'] = $hz_Arr['remove_types'];
         }
         # 12.1、号码组1
         if(isset($hz_Arr['code1'])){

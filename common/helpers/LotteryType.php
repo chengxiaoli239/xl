@@ -28,6 +28,19 @@ class LotteryType
     # 澳洲五
     const TZ_SYSTEM_TYPE_ID_AZ = 16;
 
+    const LT_PLAY_WAY_1 = 4;
+    const LT_PLAY_WAY_2 = 1;
+    const LT_PLAY_WAY_3= 2;
+    const LT_PLAY_WAY_4 = 3;
+    const LT_PLAY_WAY_5= 5;
+    const LT_PLAY_WAY_OPTIONS = [
+        self::LT_PLAY_WAY_2 => '二定位',
+        self::LT_PLAY_WAY_3 => '三定位',
+        self::LT_PLAY_WAY_4 => '四定位',
+        self::LT_PLAY_WAY_1 => '一定位',
+        self::LT_PLAY_WAY_5 => '五定位',
+    ];
+
     const LOTTERY_TIME_CONFIG = [
         self::LUCKY_5 => [4*60+30, 5*60+30, 5*60+50], # 封盘偏移时间:betsCloseOffset、开始抓取时间:grabOffset、开盘偏移时间:betsOpenOffset
         self::AZ_LUCKY_5 => [3*60+30, 4*60, 4*60+20], # 封盘偏移时间:betsCloseOffset、开始抓取时间:grabOffset、开盘偏移时间:betsOpenOffset

@@ -4,6 +4,7 @@ use backend\models\KjConfig;
 use backend\service\HN0898Service;
 use common\exceptions\InfoException;
 use common\service\BaseService;
+use common\service\cache\CacheKeyService;
 use common\service\ssc\SscKjDataService;
 use common\tools\Tool_Common;
 use  yii;
@@ -76,14 +77,12 @@ class BaseKj extends BaseService {
      * @desc 获取当前开奖数据，如果有则返回
      */
     public static function getCurrentKjData($lotteryType = DEFAULT_LOTTERY_TYPE, &$currentQiHao=''){
-        $m = \Yii::$app->cache;
-
         $qiHao = HN0898Service::getCurrentQihao($lotteryType);
-        $mKey = self::buildKjDataKey($lotteryType, $qiHao);
+        $mKey = CacheKeyService::lotteryOpenDataKey($lotteryType, $qiHao);
 
         $currentQiHao = $qiHao;
 
-        return $m->get($mKey);
+        return commonRedis()->get($mKey);
     }
 
     /**
@@ -93,23 +92,14 @@ class BaseKj extends BaseService {
      */
     public static function setKjDataCache($lottery_type = DEFAULT_LOTTERY_TYPE, string $qihao='', $kjData=[], $set_time=300): bool
     {
-        $m = \Yii::$app->cache;
-
         $set_time = ($set_time OR $set_time<300) ? 300 : $set_time;
-        $mkey = self::buildKjDataKey($lottery_type, $qihao);
+        $mKey = CacheKeyService::lotteryOpenDataKey($lottery_type, $qihao);
         Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '设置开奖缓存', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'kjData'=>$kjData, 'set_time'=>$set_time]);
         if($kjData['opencode']){
-            $m->set($mkey, $kjData, $set_time);
+            commonRedis()->setex($mKey, $set_time, $kjData);
         }
 
         return true;
-    }
-
-    public static function buildKjDataKey($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao=''){
-
-        $mkey = 'KJ_DATA_QIHAO_KEY_'.$lottery_type.'_'.$qihao;
-
-        return $mkey;
     }
 
     public static function getOpenCodeLtKey($lottery_type=DEFAULT_LOTTERY_TYPE, $qihao=''): string

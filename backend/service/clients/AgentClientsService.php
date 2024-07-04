@@ -7,6 +7,7 @@ use backend\service\agent\AgentUsersService;
 use backend\service\BetService;
 use backend\service\HN0898Service;
 use backend\service\numbers\CodeTypeService;
+use common\helpers\LotteryType;
 use common\tools\Tool_Common;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
@@ -285,9 +286,8 @@ class AgentClientsService extends ClientsBaseService{
     public static function getPlaywayByBetLogs(&$bet_logs='', &$codes_hz=[]){
         $playway = 0;
 
-        $playwayTxtArr = ['一定位', '二定位', '三定位', '四定位', '五位二定'];
         $strArr = [',', '，'];
-        foreach ($playwayTxtArr as $txt){
+        foreach (LotteryType::LT_PLAY_WAY_OPTIONS as $tPlayWay=>$txt){
             if(strpos($bet_logs, $txt) === false){
                 continue;
             }
