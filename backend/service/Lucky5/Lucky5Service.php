@@ -299,7 +299,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         # 定位除、取
         if(!empty($hzArr['fixed_pos_sel'])){
-            $desc .= ($hzArr['fixed_pos_sel']==NumService::EXCLUDE)?'定位置“取”：':'定位置“除”：';
+            $desc .= ($hzArr['fixed_pos_sel']==NumService::EXCLUDE)?'定位置“除”：':'定位置“取”：';
             if(!empty($hzArr['p1'])){
                 $desc .= '千='.$hzArr['p1'].'，';
             }
