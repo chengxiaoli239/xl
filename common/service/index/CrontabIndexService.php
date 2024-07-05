@@ -1,6 +1,7 @@
 <?php
 namespace common\service\index;
 
+use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\service\BaseService;
 use common\service\chat\Tool_Common;
@@ -17,7 +18,7 @@ class  CrontabIndexService{
                 ['=', 'u.is_auto_login', 1],
                 ['<>', 'u.ssc_domain', ''],
                 ['=', 's.status', 1],
-                ['=', 'u.is_local_bet', 2],
+                ['=', 'u.is_local_bet', BetsBackend::BET_TYPE_SERVER_API],
             ]);
         //$sql = $query->createCommand()->getRawSql();p($sql);
         $TzSystemsUsers = $query->asArray()->all();

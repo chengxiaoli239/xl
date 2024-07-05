@@ -251,6 +251,7 @@ abstract class BetService extends BaseBetService {
             return ['status'=>301, 'msg'=>'账号过期提示'];
         }
 
+        /*
         # 2、下注任务检测
         $where = ['AND', ['=', 'uid', $uid], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
         $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(1)->one();
@@ -267,13 +268,6 @@ abstract class BetService extends BaseBetService {
         $flag = self::isLogin($uid, $tz_system_id, $r=2);
         $end_time = microtime(true);
         Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注-登陆检测-1', ['uid'=>$uid, 'flag'=>$flag, 'consume_time'=>($end_time-$start_time).'s']);
-        /*
-        if(!$flag && $TzSystemsUsers->is_auto_login){
-            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-            $loginRst = BaseService::login($TzSystemsUsers->id, $is_auto=2);
-            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '网盘开盘状态-4-2', ['uid'=>$uid, 'task_id'=>$task_id, 'loginRst'=>$loginRst]);
-            return ['status'=>302, 'msg'=>'未登录'];
-        }
         */
 
         # 4、下注
@@ -428,7 +422,7 @@ abstract class BetService extends BaseBetService {
         $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
             # status可重推的状态0:未推送1推送失败可重推，不可重推:3  is_local_bet:1客户本地0云服务器
-            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]];
+            $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]], ['=', 'is_local_bet', BetsBackend::BET_TYPE_SERVER_API]];
             if($uid){
                 $where = array_merge($where, [['=', 'uid', $uid]]);
             }
@@ -457,7 +451,7 @@ abstract class BetService extends BaseBetService {
                     $BetService = self::getBetObj($uid, $tz_system_id, $lottery_type);
                     if(false && $balance<$bet_money){
                         BetService::closeTask($task_id, $qihao, $activeQiHao, $account, $msg='余额不足，不可重推'); # 关闭计划
-                    }elseif($is_local_bet == 0 && $qihao == $activeQiHao){ # 0:云服务
+                    }elseif($qihao == $activeQiHao){ # 0:云服务
                         #$betKey = BetService::buildLotteryBetKey($activeQiHao, $plan_id, $bet_sort_key, $task_id);
                         #if($lock = $m->get($betKey)){
                         #    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-3', ['task_id'=>$task_id,'betKey'=>$betKey]);
@@ -496,7 +490,7 @@ abstract class BetService extends BaseBetService {
                         }
 
                         Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注成功-end', $logArr);
-                    }elseif(!empty($activeQiHao) && $qihao<$activeQiHao){ # 过期为下
+                    }elseif(!empty($activeQiHao) && $qihao<$activeQiHao){ # 过期不下
                         BetService::closeTask($task_id, $qihao, $activeQiHao, $account, $msg='未开盘或者已关盘[' . date('Y-m-d H:i:s') . ']'); # 关闭计划
                         $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = ['status' => 300, 'qihao'=>$qihao, 'activeQiHao'=>$activeQiHao, 'msg' => $msg];
                         Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-5', ['uid'=>$uid,'account'=>$account,'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
@@ -2127,9 +2121,6 @@ abstract class BetService extends BaseBetService {
                     }
                     $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>$e->getMessage()];
                 }
-            }
-            foreach ($user_ids as $uid=>$user_id_data){
-                push_queue(UserBetJob::class, $user_id_data);
             }
             $err_post_desc = Json::encode(['Status'=>0, 'msg'=>'过期未下单', 'time'=>date('Y-m-d H:i:s')]);
             BetErrorPlansTask::updateAll(['status'=>3, 'post_desc'=>$err_post_desc], 'created_at<'.(time()-300).' AND status=0');

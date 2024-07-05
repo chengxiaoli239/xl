@@ -241,7 +241,9 @@ class UserService extends BaseService {
 
     /**
      * @dssc 账号是否过期 描述
-     * @param string $tz_system_users_id
+     * @param string $user_id
+     * @param string $tz_system_id
+     * @param string $TzSystemsUsers
      * @return boolean
      */
     public static function accountIsExpire($user_id = '', $tz_system_id = '', &$TzSystemsUsers=''){
@@ -249,17 +251,15 @@ class UserService extends BaseService {
         if(!empty($tz_system_id)){
             $where['tz_system_id'] = $tz_system_id;
         }
-        $Model = TzSystemsUsers::findOne($where);
-        //$Model = TzSystemsUsers::findOne($tz_system_users_id);
-        if(!$Model) return false;
+        $TzSystemsUsers = TzSystemsUsers::findOne($where);
+        if(!$TzSystemsUsers) return false;
         $flag = false;
-        $TzSystemsUsers = $TzSystemsUsers;
-        if(!empty($Model->expire_time)){
-            if($Model->expire_time >= time()){
+        if(!empty($TzSystemsUsers->expire_time)){
+            if($TzSystemsUsers->expire_time >= time()){
                 $flag = true;
             }else{
-                $Model->desc = '账号过期，请及时续费';
-                $Model->save();
+                $TzSystemsUsers->desc = '账号过期，请及时续费';
+                $TzSystemsUsers->save();
             }
         }else{
             $flag = true;

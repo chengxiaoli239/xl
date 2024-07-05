@@ -131,7 +131,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @param $tz_system_user_id - 表lt_tz_systems_users.id
      * @return array
      */
-    public static function synBalance($tz_system_user_id, $is_auto=1){
+    public static function synBalance($tz_system_user_id, $is_auto=1): array
+    {
         $TzSystemsUsers = TzSystemsUsers::findOne($tz_system_user_id);
         $balance = self::getBalance($TzSystemsUsers->uid, $TzSystemsUsers->tz_system_id, $r=1, $is_auto);
         //d($balance);
@@ -143,7 +144,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         $TzSystemsUsers->balance = $balance;
         $TzSystemsUsers->updated_at = time();
-        if(!$rst = $TzSystemsUsers->save() OR $balance === false){
+        if(!$TzSystemsUsers->save() OR $balance === false){
             $msg = ['status'=>300, 'msg'=>'金额同步失败10~', 'balance'=>$balance,];
         }
 
@@ -1086,23 +1087,13 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @return mixed
      */
     public static function getBalance($uid, $tz_system_id, $r='', $is_auto=1){
+        $rst = self::userInfo($uid, $tz_system_id, $is_auto);
         self::__init($uid, $tz_system_id);
         $start_time = microtime(true);
-        $rst = self::userInfo($uid, $tz_system_id, $is_auto);
         $balance = false;
         if(isset($rst['Status']) && $rst['Status'] == 1){
             $balance = $rst['Data']['credit_balance'];
         }
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        if(isset($rst['status']) && $rst['status'] == 3004){
-            $TzSystemsUsers->desc = $rst['msg'];
-        }
-        $TzSystemsUsers->balance = $balance;
-        $TzSystemsUsers->save();
-        $end_time = microtime(true);
-        $time_consume = ($end_time-$start_time).'s';
-
-        Tool_Common::log('getBalance','INFO','幸运五星-用户余额-3', ['uid'=>$uid, 'r'=>$r, 'rst'=>$rst, 'balance'=>$balance, 'time_consume'=>$time_consume]);
 
         return $balance;
     }
@@ -1224,8 +1215,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
-        #curl_setopt($curl, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
-        curl_setopt($curl, CURLOPT_SSLVERSION, 1);
+        curl_setopt($curl, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
 
         $content = curl_exec($curl);
         preg_match_all("/Set-Cookie: (.*)/i", $content, $matches);
@@ -1460,11 +1450,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @return mixed|string
      */
     public static function userInfo($uid, $tz_system_id, $is_auto = 1){
-        return [];
         $m = \Yii::$app->cache;
         $mkey = 'get_userInfo_'.$uid.'_'.$tz_system_id.'_'.$is_auto;
-        //if($data = $m->get($mkey) && $is_auto==1) return $data;
-        //if($data = $m->get($mkey)) return $data;
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
         if($is_auto==1 && !empty($TzSystemsUsers->expire_time) && $TzSystemsUsers->expire_time<time()){
@@ -1488,16 +1475,16 @@ class Lucky5Service { # 重庆7时彩登陆体系
             "Accept: application/json, text/javascript, */*; q=0.01",
             "Accept-Encoding: gunzip, deflate, br",
             "Accept-Language: zh-CN,zh;q=0.9",
-            "Connection: keep-alive",
+            #"Connection: keep-alive",
             "Cookie: ".trim($TzSystemsUsers->cookie).' NOTICE_LOGIN_IN=1',
             //"Origin:".str_replace('www.','',self::$baseUrl),
             "Host:".str_replace('www.','',self::$domain),
             "Referer:".$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
-            'sec-ch-ua: " Not A; Brand";v="104", "Google Chrome";v="104", "Chromium";v="104"',
-            'sec-ch-ua-mobile: ?0',
-            'sec-ch-ua-platform: "Windows"',
-            'Sec-Fetch-Dest: empty',
-            'Sec-Fetch-Mode: cors',
+            #'sec-ch-ua: " Not A; Brand";v="104", "Google Chrome";v="104", "Chromium";v="104"',
+            #'sec-ch-ua-mobile: ?0',
+            #'sec-ch-ua-platform: "Windows"',
+            #'Sec-Fetch-Dest: empty',
+            #'Sec-Fetch-Mode: cors',
             'Sec-Fetch-Site: same-origin',
             $TzSystemsUsers->user_agent,
             "X-Requested-With: XMLHttpRequest",
@@ -1572,11 +1559,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
             'Host: '.str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
             'Origin: '.$TzSystemsUsers->ssc_domain,
             'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
-            'sec-ch-ua: " Not;A Brand";v="24", "Google Chrome";v="113", "Chromium";v="113"',
-            'sec-ch-ua-mobile: ?0',
-            'sec-ch-ua-platform: "Windows"',
-            'Sec-Fetch-Dest: empty',
-            'Sec-Fetch-Mode: cors',
+            #'sec-ch-ua: " Not;A Brand";v="24", "Google Chrome";v="113", "Chromium";v="113"',
+            #'sec-ch-ua-mobile: ?0',
+            #'sec-ch-ua-platform: "Windows"',
+            #'Sec-Fetch-Dest: empty',
+            #'Sec-Fetch-Mode: cors',
             'Sec-Fetch-Site: same-origin',
             'Upgrade-Insecure-Requests: 1',
             $TzSystemsUsers->user_agent,
@@ -1628,7 +1615,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 }
                 Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '幸运-下注节点-40', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst]);
             }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [302, 305, 307])){
-                $status = 3; # 不可再次下注：302余额不足305已关盘307网盘账号停押
+                $status = 4; # 不可再次下注：302余额不足305已关盘307网盘账号停押
                 Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '幸运-下注节点-41', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst]);
             }elseif($tmpRst['data'] == "Proxy Connect Error"){
                 $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key, $id);
@@ -2500,13 +2487,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @param $tz_system_id
      * @return bool
      */
-    public static function isLogin($uid, $tz_system_id){
-
+    public static function isLogin($uid, $tz_system_id): bool
+    {
         $balance = Lucky5Service::getBalance($uid,$tz_system_id, $r=2);
 
-        $flag = ($balance > 0 OR $balance === 0 OR $balance === '0') ? true : false;
-
-        return (boolean)$flag;
+        return $balance > 0 OR $balance === 0 OR $balance === '0';
     }
 
     /**

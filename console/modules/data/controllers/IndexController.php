@@ -2,12 +2,14 @@
 namespace console\modules\data\controllers;
 
 use backend\models\SystemConfig;
+use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\service\baota\BaoTaService;
 use backend\service\BaseService;
 use backend\service\datas\DatasClearService;
 use backend\service\SscDataService;
 use common\service\index\CrontabIndexService;
+use common\service\jobs\kj_data\UserBetJob;
 use common\service\proxy\ProxyBaseService;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\OperateLotteryService;
@@ -152,6 +154,7 @@ class IndexController extends Controller
     }
 
     /**
+     * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii data/index/bet-by-uid
      * @desc 多线程跑用户计划
      * @return mixed
      */
@@ -160,13 +163,20 @@ class IndexController extends Controller
         if(!$tzStatus) return ['status'=>300, 'msg'=>'投注开关未开启'];
         self::_init();
         set_time_limit(0);
-        $post = \Yii::$app->request->post();
-        $uid = $post['uid'];
         $for_times = 8;
         $sleep_time = rand(4, 8);
+        $where = [
+            'AND',
+            ['=', 'is_local_bet', BetsBackend::BET_TYPE_SERVER_API],
+            ['=', 'status', 1],
+            ['>=', 'expire_time',  time()]
+        ];
+        $userIds = TzSystemsUsers::find()->select(['uid'])->where($where)->asArray()->column();
         for($i=0; $i<$for_times; $i++){
+            foreach ($userIds as $userId){
+                push_queue(UserBetJob::class, ['user_id'=>$userId]);
+            }
             sleep($sleep_time);
-            $rst[$i]['rst'] = BetService::lotteryBet($uid);
             $rst[$i]['sleep_time'] = $sleep_time;
         }
 
