@@ -1512,6 +1512,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $desc = json_encode($data, 320);
         }
         $TzSystemsUsers->desc = $desc;
+        $TzSystemsUsers->balance = $data['Data']['credit_balance']??0;
         $TzSystemsUsers->save();
         //p($logArr);
         Tool_Common::log('userInfo','INFO','幸运五星-用户信息-2', $logArr);
