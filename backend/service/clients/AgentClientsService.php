@@ -179,12 +179,12 @@ class AgentClientsService extends ClientsBaseService{
         $bet_single_op = $single; # 反买倍数默认等于正常下注倍数
 
         $bet_op_theory_counts = AgentClientsService::getOpBetCounts($data['code_type'], $logData['bet_count']);  # 理论反买组数
-        //p(['lll'.rand(), $data['tz_type'], $data['codes_hz']]);
         $bet_codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']));  # 正买号码
         $bet_counts = count(explode('@', $bet_codes));  # 实际正买组数
 
         $bet_codes_op = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), $buy_type);  # 反买号码
         $bet_op_counts = count(explode('@', $bet_codes_op));  # 实际反买组数
+        //p(['lll'.rand(), $data['tz_type'], $data['codes_hz'], $bet_counts, $bet_op_counts]);
 
         if($data['code_type']==4 && $buy_type==0 && $bet_counts<1000){
             throw_info('反买:正买组数少于1000组，不反买，正买：'.$bet_counts.' 组 ', self::BET_WARING_CODE);
@@ -426,9 +426,12 @@ class AgentClientsService extends ClientsBaseService{
                             unset($dataArr[$k1]);
                             break;
                         case CodeTypeService::KX_KW_2_NOT_FIXED_HF_2NUM: # 不定合分值(两数合)
+                            $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateNotFixed2Condition($operateStr));
+                            unset($dataArr[$k1]);
+                            break;
                         case CodeTypeService::KX_KW_2_NOT_FIXED_HF_3NUM: # 不定合分值(三数合)
                             //var_dump('keyword2：'.$keyword2.'=='.$tmpStr);
-                            $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateNotFixed2_3Condition($operateStr));
+                            $keyword2Condition = array_merge($keyword2Condition, CodeTypeService::oprateNotFixed3Condition($operateStr));
                             unset($dataArr[$k1]);
                             break;
                         case CodeTypeService::KX_KW_2_FU_SHI_FILTER: # 复式“除”数

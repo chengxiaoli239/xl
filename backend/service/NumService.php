@@ -1217,74 +1217,87 @@ class NumService extends BaseService {
 
         # 不定位合分(1两数、2三数) - 三定
         //if($code_type == 3 && !empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){
-        if(!empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){ # no_fix_hefen:不定位合分值、no_fix_hefen_pos:1两数2三数
-
-            /**
-             * 1、处理合分值，例如：149转换成：
-             * 二定：1、11、4、14、9
-             * 三定：1、11、21、4、14、24、9、19、29
-             * 四定：1、11、21、31、4、14、24、9、19、29
-             */
-            $no_fix_lenHefen = strlen($codes_hz['no_fix_hefen']);
-            $codes_no_fix_hefen = [];
-            for ($i=0; $i<$no_fix_lenHefen;$i++){
-                if($codes_hz['no_fix_hefen_pos'] == 1){
-                    # 1、两数合分
-                    if($codes_hz['no_fix_hefen'][$i]<=8){
-                        $no_fix_hefenArr = [$codes_hz['no_fix_hefen'][$i], $codes_hz['no_fix_hefen'][$i] + 10];
-                    }else{
-                        $no_fix_hefenArr = [$codes_hz['no_fix_hefen'][$i]];
+        $newHefens = [];
+        if(!empty($codes_hz['no_fix_hefen2']) && $codes_hz['no_fix_hefen_pos_2'] == 1){
+            $newHefens[] = ['no_fix_hefen'=>$codes_hz['no_fix_hefen2'], 'no_fix_hefen_pos'=>$codes_hz['no_fix_hefen_pos_2']];
+        }
+        if(!empty($codes_hz['no_fix_hefen3']) && $codes_hz['no_fix_hefen_pos_3'] == 2){
+            $newHefens[] = ['no_fix_hefen'=>$codes_hz['no_fix_hefen3'], 'no_fix_hefen_pos'=>$codes_hz['no_fix_hefen_pos_3']];
+        }
+        if(!empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])) { # no_fix_hefen:不定位合分值、no_fix_hefen_pos:1两数2三数
+            $newHefens[] = ['no_fix_hefen'=>$codes_hz['no_fix_hefen'], 'no_fix_hefen_pos'=>$codes_hz['no_fix_hefen_pos']];
+        }
+        foreach ($newHefens as $newHefen){
+            $noFixHefen = $newHefen['no_fix_hefen'];
+            $noFixHefenPos = $newHefen['no_fix_hefen_pos'];
+            if(!empty($noFixHefen) && !empty($noFixHefenPos)){ # no_fix_hefen:不定位合分值、no_fix_hefen_pos:1两数2三数
+                /**
+                 * 1、处理合分值，例如：149转换成：
+                 * 二定：1、11、4、14、9
+                 * 三定：1、11、21、4、14、24、9、19、29
+                 * 四定：1、11、21、31、4、14、24、9、19、29
+                 */
+                $no_fix_lenHefen = strlen($noFixHefen);
+                $codes_no_fix_hefen = [];
+                for ($i=0; $i<$no_fix_lenHefen;$i++){
+                    if($noFixHefenPos == 1){
+                        # 1、两数合分
+                        if($noFixHefen[$i]<=8){
+                            $no_fix_hefenArr = [$noFixHefen[$i], $noFixHefen[$i] + 10];
+                        }else{
+                            $no_fix_hefenArr = [$noFixHefen[$i]];
+                        }
+                    }elseif($noFixHefenPos == 2){
+                        # 1、三数合分
+                        if($noFixHefen[$i]<=7){
+                            $no_fix_hefenArr = [$noFixHefen[$i], $noFixHefen[$i] + 10, $noFixHefen[$i] + 20];
+                        }else{
+                            $no_fix_hefenArr = [$noFixHefen[$i], $noFixHefen[$i] + 10];
+                        }
                     }
-                }elseif($codes_hz['no_fix_hefen_pos'] == 2){
-                    # 1、三数合分
-                    if($codes_hz['no_fix_hefen'][$i]<=7){
-                        $no_fix_hefenArr = [$codes_hz['no_fix_hefen'][$i], $codes_hz['no_fix_hefen'][$i] + 10, $codes_hz['no_fix_hefen'][$i] + 20];
-                    }else{
-                        $no_fix_hefenArr = [$codes_hz['no_fix_hefen'][$i], $codes_hz['no_fix_hefen'][$i] + 10];
-                    }
+                    $codes_no_fix_hefen = array_merge($codes_no_fix_hefen, $no_fix_hefenArr);
                 }
-                $codes_no_fix_hefen = array_merge($codes_no_fix_hefen, $no_fix_hefenArr);
-            }
-            //p($codes_no_fix_hefen);
+                //p($codes_no_fix_hefen);
 
-            /**
-             * 2、组合where条件
-             */
-            if($codes_hz['no_fix_hefen_pos'] == 1){ # 两数合分 ----------- 不定位合分
-                $tmp_no_fix_hefen = ['OR'];
-                $poss = [[1,2], [1,3], [1,4],[2,3],[2,4],[3,4]];
-                if(in_array($code_type, [2, 3])){ # 三定
-                    foreach ($poss as $pos){ # ['IN', SUM(code_1 + code2),[1,11,21]]
-                        $son_where = [
-                            ['AND',
-                                ['IN', '(`code_'.$pos[0].'` + `code_'.$pos[1].'`)', $codes_no_fix_hefen],
-                                ['<>', '`code_'.$pos[0].'`', 'X'],
-                                ['<>', '`code_'.$pos[1].'`', 'X']
-                            ]
-                        ];
-                        $tmp_no_fix_hefen = array_merge($tmp_no_fix_hefen, $son_where);
-                    }
-                }elseif($code_type == 2){ # 二定
-
-                }elseif($code_type == 4){ # 四定
-                    foreach ($poss as $pos){ # ['IN', SUM(code_1 + code2),[1,11,21]]
-                        $son_where = [ ['IN', '(`code_'.$pos[0].'` + `code_'.$pos[1].'`)', $codes_no_fix_hefen] ];
-                        $tmp_no_fix_hefen = array_merge($tmp_no_fix_hefen, $son_where);
-                    }
-                }
-            }elseif($codes_hz['no_fix_hefen_pos'] == 2){ # 三数合分 ----------- 不定位合分
-                if($code_type == 3) { # 三定
-                    $tmp_no_fix_hefen = ['IN', 'codes_hz', $codes_no_fix_hefen];
-                }elseif ($code_type == 4){ # 四定
+                /**
+                 * 2、组合where条件
+                 */
+                if($noFixHefenPos == 1){ # 两数合分 ----------- 不定位合分
                     $tmp_no_fix_hefen = ['OR'];
-                    $poss = [[1,2,3], [1,2,4], [1,3,4],[2,3,4]];
-                    foreach ($poss as $pos){ # ['IN', SUM(code_1 + code2),[1,11,21]]
-                        $son_where = [ ['IN', '(`code_'.$pos[0].'` + `code_'.$pos[1].'` + `code_'.$pos[2].'`)', $codes_no_fix_hefen] ];
-                        $tmp_no_fix_hefen = array_merge($tmp_no_fix_hefen, $son_where);
+                    $poss = [[1,2], [1,3], [1,4],[2,3],[2,4],[3,4]];
+                    if(in_array($code_type, [2, 3])){ # 三定
+                        foreach ($poss as $pos){ # ['IN', SUM(code_1 + code2),[1,11,21]]
+                            $son_where = [
+                                ['AND',
+                                    ['IN', '(`code_'.$pos[0].'` + `code_'.$pos[1].'`)', $codes_no_fix_hefen],
+                                    ['<>', '`code_'.$pos[0].'`', 'X'],
+                                    ['<>', '`code_'.$pos[1].'`', 'X']
+                                ]
+                            ];
+                            $tmp_no_fix_hefen = array_merge($tmp_no_fix_hefen, $son_where);
+                        }
+                    }elseif($code_type == 2){ # 二定
+
+                    }elseif($code_type == 4){ # 四定
+                        foreach ($poss as $pos){ # ['IN', SUM(code_1 + code2),[1,11,21]]
+                            $son_where = [ ['IN', '(`code_'.$pos[0].'` + `code_'.$pos[1].'`)', $codes_no_fix_hefen] ];
+                            $tmp_no_fix_hefen = array_merge($tmp_no_fix_hefen, $son_where);
+                        }
+                    }
+                }elseif($noFixHefenPos == 2){ # 三数合分 ----------- 不定位合分
+                    if($code_type == 3) { # 三定
+                        $tmp_no_fix_hefen = ['IN', 'codes_hz', $codes_no_fix_hefen];
+                    }elseif ($code_type == 4){ # 四定
+                        $tmp_no_fix_hefen = ['OR'];
+                        $poss = [[1,2,3], [1,2,4], [1,3,4],[2,3,4]];
+                        foreach ($poss as $pos){ # ['IN', SUM(code_1 + code2),[1,11,21]]
+                            $son_where = [ ['IN', '(`code_'.$pos[0].'` + `code_'.$pos[1].'` + `code_'.$pos[2].'`)', $codes_no_fix_hefen] ];
+                            $tmp_no_fix_hefen = array_merge($tmp_no_fix_hefen, $son_where);
+                        }
                     }
                 }
+                $where = array_merge($where, [$tmp_no_fix_hefen]);
             }
-            $where = array_merge($where, [$tmp_no_fix_hefen]);
         }
 
         # 合分 - 四定，例如：合分：147，转化成和值：1、11、21、31、4、14、14、34、7、17、27

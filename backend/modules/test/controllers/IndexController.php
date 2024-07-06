@@ -417,10 +417,7 @@ class IndexController extends Controller
         $str = 'fTtrNuJ2---sSYXaQFRUjChzqbBn7Od4SRDBvZp7hL4';
         p(base64_decode($str));
         p(['logData'=>$logData], 0);
-        list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token='00e9146df95b0dfb1b9557790acbbfc8');
         p($logData);
-        $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);
-        p($data);
         $data = Lucky5::getLotteryLucky($type = 'json', $test = 2);
         d($data);
         $post = [

@@ -103,8 +103,8 @@ class CodeTypeService extends BaseService {
         \backend\service\numbers\CodeTypeService::KX_KW_2_LOG_GET => ['log_sel'=>2], # '对数“取”',
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_HF_FILTER => ['fixed_pos_hefen_sel'=>1],  #  '固定合分除值',
         \backend\service\numbers\CodeTypeService::KX_KW_2_FIXED_HF_GET => ['fixed_pos_hefen_sel'=>2],  #  '固定合分取值',
-        \backend\service\numbers\CodeTypeService::KX_KW_2_NOT_FIXED_HF_2NUM => ['no_fix_hefen_pos'=>1],  # '不定合分值(两数合)',
-        \backend\service\numbers\CodeTypeService::KX_KW_2_NOT_FIXED_HF_3NUM => ['no_fix_hefen_pos'=>2],  # '不定合分值(三数合)',
+        \backend\service\numbers\CodeTypeService::KX_KW_2_NOT_FIXED_HF_2NUM => ['no_fix_hefen_pos_2'=>1],  # '不定合分值(两数合)',
+        \backend\service\numbers\CodeTypeService::KX_KW_2_NOT_FIXED_HF_3NUM => ['no_fix_hefen_pos_3'=>2],  # '不定合分值(三数合)',
         \backend\service\numbers\CodeTypeService::KX_KW_2_FU_SHI_FILTER => ['fushi_sel'=>1],  # '复式“除”数',
         \backend\service\numbers\CodeTypeService::KX_KW_2_FU_SHI_GET => ['fushi_sel'=>2],  # '复式“取”数',
         \backend\service\numbers\CodeTypeService::KX_KW_2_HF_ZHI_ZONE => [ ], # '合分值范围',
@@ -229,8 +229,19 @@ class CodeTypeService extends BaseService {
      * @param string $operateStr
      * @return array
      */
-    public static function oprateNotFixed2_3Condition($operateStr=''){
-        $matcheCondition = ['no_fix_hefen'=>trim($operateStr)];
+    public static function oprateNotFixed2Condition($operateStr=''){
+        $matcheCondition = ['no_fix_hefen2'=>trim($operateStr)];
+
+        return $matcheCondition;
+    }
+
+    /**
+     * 不定合分值(两数合)、不定合分值(三数合)
+     * @param string $operateStr
+     * @return array
+     */
+    public static function oprateNotFixed3Condition($operateStr=''){
+        $matcheCondition = ['no_fix_hefen3'=>trim($operateStr)];
 
         return $matcheCondition;
     }

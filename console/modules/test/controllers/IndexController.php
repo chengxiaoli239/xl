@@ -67,6 +67,9 @@ class IndexController extends Controller
     {
         $dateString = '20231114002';
         try {
+            $logData = Json::decode('{"log_member_quick_select_id":"14873805","member_id":"9806","account":"Abc123bb","nickname":"","fix_num":"40","bet_count":"4993","bet_money":"1997.2","operation_content":"[四定位]，配数“[取]”：第2位：[01356]，第3位：[24789]，固定合分除值：第[1]位选中，第[2]位选中，第[3]位选中，内容：[2]；，不定合分值(两数合)：[01234]，不定合分值(三数合)：[012345]，合分值范围：[8-28]，包含“[取]”数：[43560]，三兄弟“[除]”操作，四兄弟“[除]”操作，对数“[除]”数：[49]，","operation_datetime":"07-05 22:23:58","time_value":"2024/7/5 22:23:58","operation_ip":"112.66.*.*","ip_value":"112.66.17.177","operation_ip_extension":"112.66.17.177","is_package":"0","log_type":"102"}');
+            list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token='eb70910c92f134bd54a3837d978f055b');
+            p([$code, $qihao]);
             $rst = BaseService::login($id=58); p($rst);
             //$d = \common\kj\ssc\Thirdd::getCurrentKjData($lottery_type=8);p($d);
 
@@ -82,7 +85,6 @@ class IndexController extends Controller
                 $rst[$lotteryType] = $r;
             }
             p(['rst'=>$rst]);
-            $data = Lucky5::getLotteryShiXunOne($type='json', $is_auto=2);p($data);
             $r = NumCodeService::addBetDescRand($planId=1000, $dateString, '十位除1234');
             $members = NumCodeService::getRandBetDesc($planId, $dateString);
             p([$r, $members]);
