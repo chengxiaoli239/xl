@@ -153,6 +153,7 @@ class LotteryBet
         $closeEnd = date('Y-m-d H:i:s', $currentCycleStart + $lotterySchedule['open']); # 下注封盘结束时间
         $closeNextStart = date('Y-m-d H:i:s', $currentCycleStart + $lotterySchedule['closeOffset'] + 5*60); # 下注封盘开始时间
         $closeNextEnd = date('Y-m-d H:i:s', $currentCycleStart + $lotterySchedule['open'] + 5*60); # 下注封盘结束时间
+        /*
         p([
             'currentCycleStart' => date('Y-m-d H:i:s', $currentCycleStart),
             'currentTime'=>$currentTime,
@@ -162,6 +163,7 @@ class LotteryBet
             'closeNextStart'=>$closeNextStart,
             'closeNextEnd'=>$closeNextEnd,
         ], 0);
+        */
 
         $txt = $lotteryType.'_'.$currentTime;
         if(($closeStart<=$currentTime && $currentTime<=$closeEnd)) {
