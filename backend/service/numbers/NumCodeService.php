@@ -2260,7 +2260,8 @@ class NumCodeService extends BaseService
         $filterNums = [$filterNum, $filterNum+10, $filterNum+20, $filterNum+30];
         //p([$sumHz, $historyKjData, $hz, $hz[strlen($hz)-1], strlen($hz), $filterNum]);
 
-        $notWhere = ['NOT', ['IN', 'codes_hz', $filterNums]];
+        $otherHf = '(code_'.implode('+code_', $positions).')';
+        $notWhere = ['NOT', ['IN', $otherHf, $filterNums]]; # '(`code_1`+`code_2`+`code_3`+`code_4`)'
         $query = (new \yii\db\Query())
             ->select(['code', 'code_type'])
             ->from('lt_num4_type')
