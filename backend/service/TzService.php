@@ -63,31 +63,6 @@ class TzService extends BaseService {
     }
 
     /**
-     * @desc 投注计划 by plan_id
-     * @param $plan_id
-     * @return array
-     */
-    public static function tzByPlanId($plan_id){
-
-        $plan = UserSysPlans::findOne($plan_id);
-
-        # 0898体系投注号码，系统正买按照0898格式下单
-        $codes = BetService::getPlansAllCodesType1($plan->tz_type, 1, $plan->hz_Arr, $plan_id);
-
-        # 期号
-        $qihao = HN0898Service::getQihao($plan->lottery_type);
-
-        $rst = BetService::beforeBet($qihao, $plan->lottery_type, $plan->uid);
-        if($rst['status'] == 200){
-            # 0898体系最终投注
-            $HN0898Service = new HN0898Service();
-            $rst = $HN0898Service->betting($qihao, $plan->id, $codes);
-        }
-
-        return $rst;
-    }
-
-    /**
      * @desc 执行计划前判断
      * @param $qihao
      * @param int $lottery_type

@@ -299,6 +299,17 @@ class NumService extends BaseService {
         187=>'过滤2位最近1个冷码 ',
         188=>'过滤3位最近1个冷码 ',
         189=>'过滤4位最近1个冷码 ',
+
+        190=>'过滤123位合分(四定)',
+        191=>'过滤124位合分(四定)',
+        192=>'过滤125位合分(四定)',
+        193=>'过滤134位合分(四定)',
+        194=>'过滤135位合分(四定)',
+        195=>'过滤234位合分(四定)',
+        196=>'过滤235位合分(四定)',
+        197=>'过滤345位合分(四定)',
+
+        198=>'取上期4个码(不重复)必须上1个',
     ];
 
     const TYPE_POSITIONS = [
@@ -313,6 +324,7 @@ class NumService extends BaseService {
         170=>[3,5],
         171=>[4,5],
     ];
+    # 冷热码类型对应位置
     const TYPE_LR_POSITIONS = [
         172=>[1,2],
         173=>[1,3],
@@ -324,6 +336,17 @@ class NumService extends BaseService {
         179=>[3,4],
         180=>[3,5],
         181=>[4,5],
+    ];
+    # 合分类型对应位置
+    const TYPE_HF_POSITIONS = [
+        190=>[1,2,3],
+        191=>[1,2,4],
+        192=>[1,3,4],
+        193=>[1,3,5],
+        194=>[1,4,5],
+        195=>[2,3,4],
+        196=>[2,3,5],
+        197=>[3,4,5],
     ];
 
     /**
@@ -3430,6 +3453,19 @@ class NumService extends BaseService {
                     break;
                 case 189:
                     $codes = NumCodeService::getBeforeKjCodesDynamic125($plan, $pos=4, $cNum=1);
+                    break;
+                case 190:
+                case 191:
+                case 192:
+                case 193:
+                case 194:
+                case 195:
+                case 196:
+                case 197:
+                    $codes = NumCodeService::getBeforeKjCodesDynamic126($plan, self::TYPE_HF_POSITIONS[$filter_dynamic_type]);
+                    break;
+                case 198:
+                    $codes = NumCodeService::getBeforeKjCodesDynamic127($plan);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);

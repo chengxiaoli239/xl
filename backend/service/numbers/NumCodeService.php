@@ -2237,6 +2237,89 @@ class NumCodeService extends BaseService
     }
 
     /**
+     * 过滤类型号码 - # 过滤[千百十、千百个...]位号码合分(四定)
+     * @param object $plan
+     * @param int[] $positions
+     * @dateNums int 天数
+     * @return array
+     */
+    public static function getBeforeKjCodesDynamic126(object $plan, array $positions=[1, 2, 3]): array
+    {
+        $lottery_type = $plan->lottery_type;
+
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lottery_type);
+
+        $sumHz = [];
+        foreach ($positions as $position){
+            $sumHz[] = $historyKjData['code'.$position];
+        }
+        $hz = (string)array_sum($sumHz);
+        //p([$sumHz, $historyKjData, $hz, ((string)$hz)[0]]);
+
+        $filterNum = (int)$hz[0];
+        $filterNums = [$filterNum, $filterNum+10, $filterNum+20, $filterNum+30];
+
+        $notWhere = ['NOT', ['IN', 'codes_hz', $filterNums]];
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => 4])
+            ->andWhere($notWhere);
+        //$sql = $query->createCommand()->getRawSql();p($sql);
+
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - # 取上期号码4个码(不重复)必须上1个
+     * @param object $plan
+     * @dateNums int 天数
+     * @return array
+     */
+    public static function getBeforeKjCodesDynamic127(object $plan): array
+    {
+        $lottery_type = $plan->lottery_type;
+
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lottery_type);
+        $fourCodes = array_unique([$historyKjData['code1'], $historyKjData['code2'], $historyKjData['code3'], $historyKjData['code4']]);
+        if(count($fourCodes)<4){
+            $fourCodes[] = $historyKjData['code5'];
+            $fourCodes = array_unique($fourCodes);
+        }
+        if(count($fourCodes)<4){
+            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤x位n个冷码', ['plan_id'=>$plan->id, 'current_kj_qihao'=>$currentKjQiHao, 'lottery_type'=>$lottery_type, 'fourCodes'=>$fourCodes]);
+            throw_info('号码数量不足4个不下注');
+        }
+        //p([$historyKjData, $fourCodes]);
+
+        $notWhere = [
+            'OR',
+            ['IN', 'code_1', $fourCodes],
+            ['IN', 'code_2', $fourCodes],
+            ['IN', 'code_3', $fourCodes],
+            ['IN', 'code_4', $fourCodes],
+        ];
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => 4])
+            ->andWhere($notWhere);
+        //$sql = $query->createCommand()->getRawSql();p($sql);
+
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
+
+        return $codes;
+    }
+
+    /**
      * 添加计划动态过滤描述
      * @param $planId
      * @param $qiHao

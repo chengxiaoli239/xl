@@ -931,20 +931,6 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
-     * @desc 7时彩
-     * @param $playway
-     * @param $tz_type 投注类型:1大小单双三字定2大小三字定3单双三字定
-     * @param $buy_type
-     * @param $limit int 默认获取注数
-     * @return string
-     */
-    public static function getPlansAllCodesType2($tz_type = 1, $buy_type = 1, $codes_hz = '', $plan_id = ''){
-        $codes = self::getPlansAllCodesType1($tz_type, $buy_type, $codes_hz, $plan_id);
-
-        return $codes;
-    }
-
-    /**
      * @desc 是否批量投注，号码格式跟其它不一样
      * @param int $tz_type
      */

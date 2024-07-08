@@ -450,8 +450,6 @@ class IndexController extends Controller
         list($code, $data, $err_msg) = AgentClientsService::getKuaiYiDescByOperationLogs($text);
         $data['codes_hz'] = Json::decode('{"p1":"0123456789","p2":"0123456789","p3":"0123456789","fixed_sel_pos":"4","is_filter_dynamic":1,"filter_dynamic_types":["70"],"filters":[]}');
         $data['tz_type'] = 29;
-        $codes = BetService::getHzCodes($data['tz_type'], json_encode($data['codes_hz']), 0);
-        p(['text'=>$text, 'codes_hz'=>$data['codes_hz'], 'counts'=>count(explode('@', $codes)), /*'codes'=>$codes*/]);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>20]);
         list($code, $bet_single) = AgentUsersService::getFlowSingle($TzSystemsUsers, $single=0.5, $buy_type=0);
         p(['code'=>$code, 'bet_single'=>$bet_single]);
@@ -615,7 +613,6 @@ class IndexController extends Controller
         $plan = UserSysPlans::findOne(5119);
         $codes_hz_data = json_decode($plan->hz_Arr, true);
         //p($codes_hz_data, 0);
-        $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, json_encode($codes_hz_data), $plan->id);p($codes);
         $BetService = new NineNineNewService();
         $betRst = $BetService->repeatErrorBet($task_id=427940);
         p($betRst);
@@ -626,7 +623,6 @@ class IndexController extends Controller
         $plan = UserSysPlans::findOne(4827);
         $codes_hz = '{"area_all_qishus":"13","area_yl_qishus":"10","area_profits":"450","area_loss":"3600","arise_A_times":0,"arise_B_times":0,"filters":{"filter_type":"2","filter_nums":"","test_period_days":10,"playway":"1","filter_poses":"","start_qihao":"220411014","lottery_type":"23"},"filter_dates":[],"filter_qihaos":[],"singles_key":0,"areaBetStatus":0,"area_arise_qishus":0}';
         $codes_hz_data = json_decode($codes_hz);
-        $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, json_encode($codes_hz_data), $plan->id);p($codes);
 
         p(array_keys(DealDataService::$dealDataStatusFields));
         $r = DealDataService::insertLotteryDealDataStatus($lottery_type=17);p($r);
@@ -1346,8 +1342,6 @@ class IndexController extends Controller
         p($rst);
         $rst = NumService::getRecentlyCodes(5);
         p($rst);
-        $rst = UserSysPlansService::userSysPlanChange(2);
-        p($rst);
         $captchaCodeRst = Tools::getCaptchaCode(10, 5, '2x2tdrnawlpbli554jlsuf2c');
         p($captchaCodeRst); # 真实调用验证码接口，收费
         $rst = XlService::login(10, 5);
@@ -1376,8 +1370,6 @@ class IndexController extends Controller
         p($rst);
         $arr = [['reach_val' => 100, 'reduce_val' => 10], ['reach_val' => 300, 'reduce_val' => 50]];
         p(json_encode($arr));
-        $codes = BetService::getCodes(3, 20, 1, 0.1, 1, '35,36');
-        p($codes);
         $rst = BetService::userSysPlansTzNow(81, 3);
         p($rst);
         $rst = CqsscSevenDay::getLotteryNo();
@@ -1385,8 +1377,6 @@ class IndexController extends Controller
         $rst = StaticService::getSameCodes('1221', 1);
         p($rst);
         //p(base64_decode('1324%E5%85%A8%E5%80%92%E5%9B%9B%E5%AE%9A%E5%90%840.1'));
-        $rst = BetService::getPlansAllCodesType2(3, 4);
-        p($rst);
 
         p([base64_decode('OTA1Mjg2MTM1MzI3Ng=='), base64_decode('MjI5OTE2MTM0MTQ2MQ=='), base64_decode('MjA4ODY2MTM1MzI4Nw==')]);
         //$rst = HN0898Service::getTzList(3, 2);p($rst);
@@ -1400,8 +1390,6 @@ class IndexController extends Controller
         for ($i = 190329001; $i <= 190329019; $i++) {
             $rst[$i] = NumService::getRemoveCodes($i, 2000);
         }
-        p($rst);
-        $rst = BetService::getPlansAllCodesType1(3, 14);
         p($rst);
         $rst = StaticService::static4DdsLastTime();
         p($rst);
