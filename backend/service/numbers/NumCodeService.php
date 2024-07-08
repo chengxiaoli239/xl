@@ -2271,7 +2271,7 @@ class NumCodeService extends BaseService
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
         //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
-        $betDesc = "过滤[".implode('', $positions)."]位号码合分(四定)";
+        $betDesc = "过滤[".implode('', $positions)."]位号码:".implode(',', $sumHz)."合分".$filterNum."(四定)";
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
