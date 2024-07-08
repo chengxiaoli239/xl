@@ -2281,7 +2281,7 @@ class NumCodeService extends BaseService
      * @dateNums int 天数
      * @return array
      */
-    public static function getBeforeKjCodesDynamic127(object $plan): array
+    public static function getBeforeKjCodesDynamic127(object $plan, $cNum=1): array
     {
         $lottery_type = $plan->lottery_type;
 
@@ -2293,7 +2293,7 @@ class NumCodeService extends BaseService
             $fourCodes = array_unique($fourCodes);
         }
         if(count($fourCodes)<4){
-            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤x位n个冷码', ['plan_id'=>$plan->id, 'current_kj_qihao'=>$currentKjQiHao, 'lottery_type'=>$lottery_type, 'fourCodes'=>$fourCodes]);
+            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '取上期号码4个码上1个', ['plan_id'=>$plan->id, 'current_kj_qihao'=>$currentKjQiHao, 'lottery_type'=>$lottery_type, 'fourCodes'=>$fourCodes]);
             throw_info('号码数量不足4个不下注');
         }
         //p([$historyKjData, $fourCodes]);
@@ -2310,11 +2310,14 @@ class NumCodeService extends BaseService
             ->from('lt_num4_type')
             ->where(['code_type' => 4])
             ->andWhere($notWhere);
-        //$sql = $query->createCommand()->getRawSql();p($sql);
+        $sql = $query->createCommand()->getRawSql();//p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '取上期号码4个码上1个', ['plan_id'=>$plan->id, 'current_kj_qihao'=>$currentKjQiHao, 'lottery_type'=>$lottery_type, 'fourCodes'=>$fourCodes, 'sql'=>$sql]);
 
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
         //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
+        $betDesc = "取上期号码4个码(".implode('', $fourCodes).")上{$cNum}个";
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
     }
