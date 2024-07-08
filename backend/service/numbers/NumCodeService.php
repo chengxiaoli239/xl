@@ -2257,10 +2257,10 @@ class NumCodeService extends BaseService
         $hz = (string)array_sum($sumHz);
         //p([$sumHz, $historyKjData, $hz, ((string)$hz)[0]]);
 
-        $filterNum = (int)$hz[0];
+        $filterNum = (int)($hz[0]);
         $filterNums = [$filterNum, $filterNum+10, $filterNum+20, $filterNum+30];
 
-        $notWhere = ['NOT', ['IN', 'codes_hz', $filterNums]];
+        $notWhere = ['NOT', ['IN', 'codes_4nums_hz', $filterNums]];
         $query = (new \yii\db\Query())
             ->select(['code', 'code_type'])
             ->from('lt_num4_type')
