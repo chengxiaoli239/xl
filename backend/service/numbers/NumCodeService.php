@@ -2255,10 +2255,10 @@ class NumCodeService extends BaseService
             $sumHz[] = $historyKjData['code'.$position];
         }
         $hz = (string)array_sum($sumHz);
-        //p([$sumHz, $historyKjData, $hz, ((string)$hz)[0]]);
 
-        $filterNum = (int)($hz[0]);
+        $filterNum = (int)($hz[strlen($hz)-1]);
         $filterNums = [$filterNum, $filterNum+10, $filterNum+20, $filterNum+30];
+        //p([$sumHz, $historyKjData, $hz, $hz[strlen($hz)-1], strlen($hz), $filterNum]);
 
         $notWhere = ['NOT', ['IN', 'codes_hz', $filterNums]];
         $query = (new \yii\db\Query())
