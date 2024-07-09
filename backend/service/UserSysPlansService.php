@@ -393,8 +393,8 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['hefen_pos2']);
         # 15.2.2、合分值
-        if(isset($post['UserSysPlans']['hefen2']) && $post['UserSysPlans']['hefen2']){
-            $tmpFilter['hefen2'] = $post['UserSysPlans']['hefen2']; # 合分
+        if(isset($post['UserSysPlans']['hefen2']) && ($UserSysPlans['hefen2'] !== '' && ($UserSysPlans['hefen2'] OR $UserSysPlans['hefen2'] == 0))){
+            $tmpFilter['hefen2'] = trim($post['UserSysPlans']['hefen2']); # 合分
         }
         unset($post['UserSysPlans']['hefen2']);
         # 15.3.1、合分位置
@@ -403,8 +403,8 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['hefen_pos3']);
         # 15.3.2、合分值
-        if(isset($post['UserSysPlans']['hefen3']) && $post['UserSysPlans']['hefen3']){
-            $tmpFilter['hefen3'] = $post['UserSysPlans']['hefen3']; # 合分
+        if(isset($post['UserSysPlans']['hefen3']) && ($UserSysPlans['hefen3'] !== '' && ($UserSysPlans['hefen3'] OR $UserSysPlans['hefen3'] == 0))){
+            $tmpFilter['hefen3'] = trim($post['UserSysPlans']['hefen3']); # 合分
         }
         unset($post['UserSysPlans']['hefen3']);
         # 15.4.1、合分位置
