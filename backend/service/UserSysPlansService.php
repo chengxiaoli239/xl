@@ -413,8 +413,8 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['hefen_pos3']);
         # 15.4.2、合分值
-        if(isset($post['UserSysPlans']['hefen4']) && $post['UserSysPlans']['hefen4']){
-            $tmpFilter['hefen4'] = $post['UserSysPlans']['hefen4']; # 合分
+        if(isset($post['UserSysPlans']['hefen4']) && ($UserSysPlans['hefen4'] !== '' && ($UserSysPlans['hefen4'] OR $UserSysPlans['hefen4'] == 0))){
+            $tmpFilter['hefen4'] = trim($post['UserSysPlans']['hefen4']); # 合分
         }
         unset($post['UserSysPlans']['hefen4']);
         # 定位合分 -------  end  ----------
