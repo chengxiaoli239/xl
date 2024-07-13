@@ -2371,7 +2371,7 @@ class SscDataService extends BaseService {
                             $newKjCodes = explode(',', $newKjCodesStr);
                             $turn_key = $newKjCodes[$hzArr['change_turn_pos']-1];
                             Tool_Common::log('/plans/'.__FUNCTION__, 'INFO', '计划位置组', ['newKjCodes'=>$newKjCodes, 'turn_key'=>$turn_key, 'pos'=>$hzArr['change_turn_pos']-1]);
-                        }elseif(($hzArr['change_per']===0 OR ($hzArr['change_per'] == 1 && $hzArr['turn_key']>=$turn_key))) {
+                        }elseif($hzArr['turn_key']>=$turn_key) {
                             $turn_key = 0;#非轮换0，轮换:turn_key+1
                         }else{
                             $imports = ImportPlanCodes::find()->select(['uid', 'plan_id', 'plan_id_sort_key'])->where(['AND', ['=', 'plan_id', $UserSysPlan->id], ['!=', 'codes', '']])->asArray()->all();
@@ -2381,9 +2381,9 @@ class SscDataService extends BaseService {
                             $turn_key = $sortKeys[$next_key];
                         }
                         $hzArr['turn_key'] = $turn_key;
-                        $HI = date('H:i');
-                        if('03:59'<=$HI && $HI<'09:05'){
-                            $hzArr['turn_key'] = 0;
+                        $HI = date('H:i:s');
+                        if($closingTime<=$HI && $HI<$openingTime){
+                            $hzArr['turn_key'] = 0; # 开盘默认从0组开始
                         }
                     }
 

@@ -2576,9 +2576,13 @@ class NumService extends BaseService {
         if(isset($hz_Arr['type_4b'])){
             if($hz_Arr['type_4b'] == 1) $filter1['type_4b'] = 1; else $filter0['type_4b'] = 0;
         }
-        # 7.2、对数
+        # 7.2.1、对数
         if(isset($hz_Arr['type_log'])){
             if($hz_Arr['type_log'] == 1) $filter1['type_log'] = 1; else $filter0['type_log'] = 0;
+        }
+        # 7.2.2、双对数
+        if(isset($hz_Arr['type_2log'])){
+            if($hz_Arr['type_2log'] == 1) $filter1['type_2log'] = 1; else $filter0['type_2log'] = 0;
         }
         # 7.3、三现:双重+两兄
         if(isset($hz_Arr['type_3n_2b'])){
@@ -3585,6 +3589,7 @@ class NumService extends BaseService {
             'type_3n_2b'=>'三现[双重+两兄]',
             'type_4b'=>'四兄',
             'type_log'=>'对数',
+            'type_2log'=>'双对数',
             'type_4d'=>'四单',
             'type_4s'=>'四双',
             'arise'=>'上奖',

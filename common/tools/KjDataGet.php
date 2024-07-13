@@ -389,14 +389,13 @@ class KjDataGet
      * @desc ssc开奖data
      * @param $qihao 181120059
      * @param int $lottery_type 彩票类型1:1.5彩2:3分彩3:5分彩4:10分彩
-     * @param $kjDatas 2,4,5,8,9
+     * @param string $kjData
      * @param string $opentime 2022-04-03 21:00:00
      * @return array|bool
      */
     public static function insertKjData($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE, $kjData='', $opentime = ''){
         $kjDatas = str_replace(',', '', $kjData);
         if(!$qihao OR !$kjDatas) return false;
-        if(!$kjDatas) return false;
         $SscKjData = SscKjData::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
         if(!empty($SscKjData)){
             return ['status'=>301, 'msg'=>'开奖号码存在'];
@@ -443,8 +442,8 @@ class KjDataGet
             'code3'=>$kjDatasArr[2],
             'code4'=>$kjDatasArr[3],
             'code5'=>$kjDatasArr[4],
-            'code6'=>isset($kjDatasArr[5]) ? $kjDatasArr[5] : NULL,
-            'code7'=>isset($kjDatasArr[6]) ? $kjDatasArr[6] : NULL,
+            'code6'=> $kjDatasArr[5] ?? NULL,
+            'code7'=> $kjDatasArr[6] ?? NULL,
             'code_1_2'=>$kjDatasArr[0]+$kjDatasArr[1],
             'code_1_3'=>$kjDatasArr[0]+$kjDatasArr[2],
             'code_1_4'=>$kjDatasArr[0]+$kjDatasArr[3],
@@ -466,6 +465,8 @@ class KjDataGet
             'type_4ds' => CommonService::isCodeType4ds($codes), # 是否四单双：0非四单四双1四单2四双
             'type_3n_2b' => CommonService::isCodeType3n2b($codes), # 是否三现：双重+兄弟
             'type_zx_bz' => CommonService::isCodeTypeZxBz($codes), # 前三：组三、组六、豹子判读判断
+            'type_log' => CommonService::isCodeTypeLog($codes), # 是否对数
+            'type_2log' => CommonService::isCodeType2Log($codes), # 是否双对数
 
             # 大小类型
             'type_dx' => $type_dx, # 大小类型： \backend\service\NumService::$type_dx_datas
@@ -688,7 +689,7 @@ class KjDataGet
     /**
      * @desc 自动更新 万千百十个数据
      */
-    public static function updateNullCode( $times = 5000, $lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function updateNullCode($lottery_type = DEFAULT_LOTTERY_TYPE, $times=10000){
         /*
         $Num4Types = Num4Type::find()->where(['IS', 'type_dx', NULL])->orderBy('id DESC')->limit($times)->all();
         foreach ($Num4Types as $k=>$num4Type){
@@ -731,14 +732,13 @@ class KjDataGet
         }
         */
 
-        $msg = ['status'=>200, 'msg'=>'操作成功！'];
-        $kjDatasQuery = SscKjData::find()->where(['OR', ['IS', 'type_dx', NULL], ['=', 'type_dx_str', '']])->limit($times);
-        $sql = $kjDatasQuery->createCommand()->getRawSql();
-        $kjDatas = $kjDatasQuery->orderBy('id DESC')->all();
-        foreach ($kjDatas as $key=>$kjData){
+        $dataQuery = Num4Type::find()->where(['type_2log'=>0, 'code_type'=>4])->limit($times);
+        $sql = $dataQuery->createCommand()->getRawSql();
+        $data = $dataQuery->orderBy('id DESC');
+        foreach ($data->each(1000) as $kjDatum){
             //$kjDs = SscDataService::getCodesDS($kjData['code_str']);
-            $codes = $kjData['code1'].','.$kjData['code2'].','.$kjData['code3'].','.$kjData['code4'].','.$kjData['code5'];
-            list($type_dx, $type_4dx, $type_dx_str) = CommonService::getTypeDx($codes);
+            $codes = $kjDatum['code_1'].','.$kjDatum['code_2'].','.$kjDatum['code_3'].','.$kjDatum['code_4'];
+            $isType2Log = CommonService::isCodeType2Log($codes);
             #p(['lottery_type'=>$kjData['lottery_type'], 'codes'=>$codes, $type_dx, $type_4dx, $type_dx_str], 0);
             $updateData = [
                 //'code_4n_str' => $codes, # 四字定str
@@ -763,16 +763,16 @@ class KjDataGet
                 'type_22' => CommonService::isCodeType22($codes), # 是否双双重
                 'type_3b' => CommonService::isCodeType3b($codes), # 是否三兄弟
                 'type_22b' => CommonService::isCodeType22b($codes), # 是否双兄弟
-                */
-
                 'type_dx' => $type_dx, # 大小类型
                 'type_4dx' => $type_4dx, # 大小类型：1122  1小2大
                 'type_dx_str' => $type_dx_str, # 大小类型：2大2小
+                */
+                'type_2log' => $isType2Log
             ];
-            #p($updateData);
-            $kjData->setAttributes($updateData);
-            if(!$rst = $kjData->save()){
-                $msg = current($kjData->getErrors());
+            //p(['codes'=>$codes, 'updateData'=>$updateData], 0);
+            $kjDatum->setAttributes($updateData);
+            if(!$kjDatum->save()){
+                $msg = current($kjDatum->getErrors());
                 Tool_Common::log('updateNullCode', 'ERR', '更新空值', ['msg'=>$msg]);
                 $msg = ['status'=>300, 'msg'=>$msg];
             }

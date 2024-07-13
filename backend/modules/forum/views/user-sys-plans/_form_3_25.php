@@ -274,6 +274,20 @@ use yii\widgets\ActiveForm;
                         )->label('对数') ?>
                     </div>
                     <div class="col-lg-2 col-xs-4">
+                        <?= $form->field($model, 'type_2log')->checkBoxList(
+                            [0=>'除', 1=>'取'],
+                            ['item' => function ($index, $label, $name, $checked, $value) {
+                                $options = [
+                                    'class' => 'checkbox-item',
+                                    'label' => $label,
+                                    'value' => $value,
+                                    'checked' => $checked,
+                                ];
+                                return Html::checkbox($name, $checked, $options);
+                            }]
+                        )->label('双对数') ?>
+                    </div>
+                    <div class="col-lg-2 col-xs-4">
                         <?= $form->field($model, 'type_22b')->checkBoxList(
                             [0=>'除', 1=>'取'],
                             ['item' => function ($index, $label, $name, $checked, $value) {

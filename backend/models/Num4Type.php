@@ -26,6 +26,7 @@ use Yii;
  * @property int $type_4b 是否四兄弟
  * @property int $type_4ds 单双：0非四单四双1四单2四双
  * @property int $type_log 是否对数
+ * @property int $type_2log 是否双对数
  * @property int $type_3n_2b 三现:双重+兄弟
  * @property int $type_3d 三单
  * @property int $type_3s 三双
@@ -57,7 +58,7 @@ class Num4Type extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['type_2', 'type_22', 'type_3', 'type_4', 'type_22b', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_log', 'type_3n_2b', 'type_3d', 'type_3s', 'type_4d', 'type_4s', 'type_dx', 'codes_hz', 'code_type', 'created_at', 'updated_at'], 'integer'],
+            [['type_2', 'type_22', 'type_3', 'type_4', 'type_22b', 'type_2b', 'type_3b', 'type_4b', 'type_4ds', 'type_log', 'type_2log', 'type_3n_2b', 'type_3d', 'type_3s', 'type_4d', 'type_4s', 'type_dx', 'codes_hz', 'code_type', 'created_at', 'updated_at'], 'integer'],
             [['update_time'], 'safe'],
             [['code', 'code_n', 'code_str', 'type_ds', 'type_4dx', 'type_dx_str'], 'string', 'max' => 12],
             [['code_1', 'code_2', 'code_3', 'code_4', 'code_5'], 'string', 'max' => 1],
@@ -89,6 +90,7 @@ class Num4Type extends \common\models\base\BaseModel
             'type_4b' => '是否四兄弟',
             'type_4ds' => '单双：0非四单四双1四单2四双',
             'type_log' => '是否对数',
+            'type_2log' => '是否双对数',
             'type_3n_2b' => '三现:双重+兄弟',
             'type_3d' => '三单',
             'type_3s' => '三双',

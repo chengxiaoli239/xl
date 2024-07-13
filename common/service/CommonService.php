@@ -801,6 +801,26 @@ class  CommonService{
     }
 
     /**
+     * @desc 是否双对数
+     * @param string $codes 格式 1,2,3,8
+     * @return int
+     */
+    public static function isCodeType2Log(string $codes): int
+    {
+        $flag = 0;
+        $codesArr = explode(',', $codes);
+        $codesArr = array_unique($codesArr);
+        if(count($codesArr)==4){
+            sort($codesArr);
+            if(($codesArr[2]-$codesArr[0]==5) && ($codesArr[3]-$codesArr[1]==5)){
+                $flag = 1;
+            }
+        }
+
+        return $flag;
+    }
+
+    /**
      * @desc 是否 三现:双重+兄弟
      * @param string $codes 格式 1,2,3,4
      * @return int

@@ -457,8 +457,6 @@ class IndexController extends Controller
         $rst = self::getPermutations([1, 2, 3]);p($rst);
         $codes = BetService::getCodesByPlan($plan);
         p($codes);
-        $rst = KjDataGet::updateNullCode($num = 10000, $lottery_type = 5);
-        p($rst);
         list($type_dx, $type_4dx, $type_dx_str) = CommonService::getTypeDx('5,1,1,0,8');
         p([$type_dx, $type_4dx, $type_dx_str]);
         $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp(1, 2);
@@ -475,8 +473,6 @@ class IndexController extends Controller
         $rst = StaticService::static4dPerDateProfits($lottery_type = 8);
         p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
         $rst = Lucky5Service::login($uid = 12, $tz_system_id = 9);
-        p($rst);
-        $rst['operateProfitsPlans'] = SscDataService::operateProfitsPlans($lottery_type = 8);
         p($rst);
         $rst = ProxyBaseService::preGetValidIp($proxy_type=1, $is_auto = 0);
         p($rst);
@@ -727,8 +723,6 @@ class IndexController extends Controller
         p($data);
         $data = NaSiDaKe::getLotteryNo($type);
         p($data);
-        $rst = KjDataGet::updateNullCode();
-        p($rst);
         $rst = NineNineNewService::getSnidBySn($uid = 11, $tz_system_id = 12, $lottery_type = 1);
         p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 17);

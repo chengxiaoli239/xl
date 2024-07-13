@@ -242,6 +242,11 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['type_log'] = $UserSysPlans['type_log'][0];
         }
         unset($post['UserSysPlans']['type_log']);
+        # 14.1、双对数
+        if($UserSysPlans['type_2log'] && count($UserSysPlans['type_2log']) == 1){
+            $tmpFilter['type_2log'] = $UserSysPlans['type_2log'][0];
+        }
+        unset($post['UserSysPlans']['type_log']);
         # 15.1、单双类型:两双两单，四单，四双
         if(isset($UserSysPlans['type_4ds']) && $UserSysPlans['type_4ds']){
             $tmpFilter['type_4ds'] = $UserSysPlans['type_4ds'];
