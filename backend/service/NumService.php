@@ -1467,6 +1467,10 @@ class NumService extends BaseService {
             }
         }
 
+        # 双对数
+        if(isset($codes_hz['type_2log'])){
+            $where = array_merge($where, [['=', 'type_2log', $codes_hz['type_2log']]]);
+        }
 
         # 对数
         if(isset($codes_hz['type_log'])){
