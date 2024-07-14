@@ -810,9 +810,14 @@ class  CommonService{
         $flag = 0;
         $codesArr = explode(',', $codes);
         $codesArr = array_unique($codesArr);
+        sort($codesArr);
         if(count($codesArr)==4){
-            sort($codesArr);
             if(($codesArr[2]-$codesArr[0]==5) && ($codesArr[3]-$codesArr[1]==5)){
+                $flag = 1;
+            }
+        }
+        if(count($codesArr)==2){
+            if(($codesArr[1]-$codesArr[0])==5){
                 $flag = 1;
             }
         }
