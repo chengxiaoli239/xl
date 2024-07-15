@@ -306,6 +306,7 @@ class NumService extends BaseService {
         193=>'过滤234位合分(四定)',
 
         194=>'取上期4个码(不重复)必须上1个',
+        195=>'取上上期4个码(不重复)必须上1个',
     ];
 
     const TYPE_POSITIONS = [
@@ -3462,6 +3463,9 @@ class NumService extends BaseService {
                     break;
                 case 194:
                     $codes = NumCodeService::getBeforeKjCodesDynamic127($plan);
+                    break;
+                case 195:
+                    $codes = NumCodeService::getBeforeKjCodesDynamic127($plan, $qiHaoType=2);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);

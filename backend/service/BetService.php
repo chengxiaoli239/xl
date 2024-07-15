@@ -2226,7 +2226,7 @@ abstract class BetService extends BaseBetService {
                     $end_time1 = microtime(true);
                     Tool_Common::log('/datas/'.__FUNCTION__.'_step', 'INFO', '下注步骤1', ['plan_id'=>$plan_id, 'next_qihao'=>$next_qihao, 'cs_time'=>($end_time1-$start_time1).'s']);
                     //p([$current_qihao, $codes_hz_data]);
-                    $beforeQihao = KjDataGet::getBeforeQihaoByQihao($next_qihao, $lottery_type);
+                    $beforeQihao = KjDataGet::getBeforeQiHaoByQiHao($next_qihao, $lottery_type);
                     $before_record = BettingRecords::findOne(['qihao'=>(string)$beforeQihao, 'plan_id'=>$plan_id]);
                     if(!empty($before_record) && $before_record->status==0){
                         return BetService::opOneBettingRecordAndHandlePlanStatic($before_record->id, $plan_id, $beforeQihao, $rst);

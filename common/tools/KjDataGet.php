@@ -618,7 +618,7 @@ class KjDataGet
      * @param string $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分
      * @return bool|int|string
      */
-    public static function getBeforeQihaoByQihao($qihao = '180101001', $lottery_type = DEFAULT_LOTTERY_TYPE){
+    public static function getBeforeQiHaoByQiHao($qihao = '180101001', $lottery_type = DEFAULT_LOTTERY_TYPE){
         if($lottery_type == 'qxc'){
             # 未完
         }else{

@@ -2281,22 +2281,29 @@ class NumCodeService extends BaseService
     /**
      * 过滤类型号码 - # 取上期号码4个码(不重复)必须上1个
      * @param object $plan
-     * @dateNums int 天数
+     * @param int $qiHaoType 1上期2上上期
+     * @param int $cNum
      * @return array
      */
-    public static function getBeforeKjCodesDynamic127(object $plan, $cNum=1): array
+    public static function getBeforeKjCodesDynamic127(object $plan, $qiHaoType=1, $cNum=1): array
     {
         $lottery_type = $plan->lottery_type;
 
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+        if($qiHaoType == 2){
+            # 上上期
+            $currentKjQiHao = KjDataGet::getBeforeQiHaoByQiHao($currentKjQiHao, $lottery_type);
+        }
         $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lottery_type);
+
+        $qiHaoTypeDesc = ($qiHaoType==2) ? '取上上期' : '取上期';
         $fourCodes = array_unique([$historyKjData['code1'], $historyKjData['code2'], $historyKjData['code3'], $historyKjData['code4']]);
         if(count($fourCodes)<4){
             $fourCodes[] = $historyKjData['code5'];
             $fourCodes = array_unique($fourCodes);
         }
         if(count($fourCodes)<4){
-            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '取上期号码4个码上1个', ['plan_id'=>$plan->id, 'current_kj_qihao'=>$currentKjQiHao, 'lottery_type'=>$lottery_type, 'fourCodes'=>$fourCodes]);
+            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', $qiHaoTypeDesc.'号码4个码上1个', ['plan_id'=>$plan->id, 'current_kj_qihao'=>$currentKjQiHao, 'lottery_type'=>$lottery_type, 'fourCodes'=>$fourCodes]);
             throw_info('号码数量不足4个不下注');
         }
         //p([$historyKjData, $fourCodes]);
@@ -2319,7 +2326,7 @@ class NumCodeService extends BaseService
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
         //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
-        $betDesc = "取上期号码4个码(".implode('', $fourCodes).")上{$cNum}个";
+        $betDesc = $qiHaoTypeDesc."号码4个码(".implode('', $fourCodes).")上{$cNum}个";
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;

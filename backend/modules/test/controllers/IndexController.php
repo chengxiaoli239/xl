@@ -529,8 +529,6 @@ class IndexController extends Controller
         p($current_qihao);
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao = '20211215286', $lottery_type = 8);
         p($next_qihao);
-        $rst = KjDataGet::getBeforeQihaoByQihao('230120224', 23);
-        p($rst);
         $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 8);
         p($rst);
         $miss = SscDataService::staticPeiShuDate($lottery_type = 8);
@@ -1189,8 +1187,6 @@ class IndexController extends Controller
         p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr
         $rst = StaticService::allHzStaticProfitsPerdate($lottery_type = 6);
         p($rst);# 循环计算每天每个和值利润统计
-        $rst = KjDataGet::getBeforeQihaoByQihao('2019052501', 6);
-        p($rst);
         $rst = StaticService::staticAll2NumsYl();
         p($rst); # 统计所有二字现遗漏
         $rst = BetService::bet();
@@ -1349,8 +1345,6 @@ class IndexController extends Controller
         $rst = XlService::getQihaoInfo(10, 5);
         p($rst);
         $rst = HN0898Service::getQihao(2);
-        p($rst);
-        $rst = KjDataGet::getBeforeQihaoByQihao('191231960', 2);
         p($rst);
         $bettingRecords = BettingRecords::find()->alias('bet')->where(['bet.status' => 0])->distinct('qihao')->orderBy('bet.qihao ASC')->limit(20)->all();
         p($bettingRecords);
