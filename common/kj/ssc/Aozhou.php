@@ -117,6 +117,9 @@ class Aozhou extends BaseKj {
             //list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
             $where = ['AND', ['=', 'status',1], ['>', 'balance', 0],['=', 'tz_system_id', 19], ['!=', 'ssc_domain', '']];
             $TzSystemsUser = TzSystemsUsers::find()->where($where)->limit(1)->one();
+            if(empty($TzSystemsUser)){
+                throw_info('没有开启的用户');
+            }
 
             list($code, $lotteryInfo, $msg) = (new ActionService($TzSystemsUser))->getUserData();
             //p(['lotteryInfo'=>$lotteryInfo]);
