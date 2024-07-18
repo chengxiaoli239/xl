@@ -1186,7 +1186,7 @@ class NumCodeService extends BaseService
         list($current_kj_qihao, $next_qiHao) = QihaoService::getKjQiHao($lottery_type);
         $CurrentKjDatas = NumCodeService::getKjData($current_kj_qihao, $lottery_type);
 
-        $type_dd = ($type_field=='type_4dx') ? substr($CurrentKjDatas['type_4dx'], 0, 4) : $CurrentKjDatas['code_1_2_3_4'];
+        $type_dd = ($type_field=='type_4dx') ? substr($CurrentKjDatas['type_4dx'], 0, 4) : $CurrentKjDatas['type_ds'];
         # 全大全小，全单全双才过滤双重，其它情况过滤对数
         if(in_array($type_dd, ['1111', '2222'])){
             $andWhere = ['=', 'n.type_2', 1];

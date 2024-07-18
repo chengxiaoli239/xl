@@ -3164,7 +3164,7 @@ class NumService extends BaseService {
                 case 71: # 过滤同单双类型+双重
                     $codes = NumCodeService::getBeforeKjCodesDynamic64($plan, $type_field='type_ds', $positions=[1,2,3,4], $filterNums=500); #
                     break;
-                case 72: # 过滤同单双类型+双重
+                case 72: # 过滤同大小类型+双重
                     $codes = NumCodeService::getBeforeKjCodesDynamic64($plan, $type_field='type_4dx', $positions=[1,2,3,4], $filterNums=500); #
                     break;
                 case 73: # 过滤最近2345位50组全倒(四定)，不够往后搜集

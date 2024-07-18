@@ -65,6 +65,7 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $CurrentKjData = NumCodeService::getKjData($currentKjQiHao='20240718109', $lottery_type=8);p($CurrentKjData);
         $rst = KjDataGet::updateNullCode($lottery_type = 8); p($rst);
         $rst['operateProfitsPlans'] = SscDataService::operateProfitsPlans($lottery_type = 8);
         p($rst);
