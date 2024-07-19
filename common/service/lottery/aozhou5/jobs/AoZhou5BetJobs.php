@@ -87,15 +87,25 @@ class AoZhou5BetJobs extends CommonJob {
                 $betContent .= str_replace(';', ',', $oneBetContent);
             }
 
-            $mKey = CacheKeyService::updateBalanceKey($TzSystemUsers->id);
-            if($haveSuccess && commonRedis()->setnx($mKey, 1)){
-                try {
-                    $betMoney = BetsBackend::find()->where(['order_id'=>$params['orderId']])->sum('bet_money');
-                    AgentUsersBalanceService::updateBalance((string)$betRow['id'], $betMoney, $betRow->wechat_user_id, WechatUserService::TYPE_ORDER_BET);
-                }catch (\Exception $e){
-                    BetsBackend::updateAll(['push_status'=>BetsBackend::PUSH_STATUS_CANNOT], ['order_id'=>$params['orderId']]);
-                    Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'ERR', '下注成功，更新余额异常', ['params'=>$params, 'err_msg'=>$e->getMessage()]);
+            try {
+                $mKey = CacheKeyService::updateBalanceKey($TzSystemUsers->id);
+                $isLock = commonRedis()->setnx($mKey, 1);
+                if($haveSuccess && $isLock){
+                    try {
+                        $betMoney = BetsBackend::find()->where(['order_id'=>$params['orderId']])->sum('bet_money');
+                        AgentUsersBalanceService::updateBalance((string)$betRow['id'], $betMoney, $betRow->wechat_user_id, WechatUserService::TYPE_ORDER_BET);
+                    }catch (\Exception $e){
+                        BetsBackend::updateAll(['push_status'=>BetsBackend::PUSH_STATUS_CANNOT], ['order_id'=>$params['orderId']]);
+                        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'ERR', '下注成功，更新余额异常', ['params'=>$params, 'err_msg'=>$e->getMessage()]);
+                    }
+                    $updateBalanceDesc = '更新余额完成';
+                }else{
+                    $updateBalanceDesc = '更新余额失败haveSuccess:'.$haveSuccess.'或锁失败:'.$mKey;
+                    throw_info($updateBalanceDesc.'_'.$haveSuccess.'_'.$isLock);
                 }
+                commonRedis()->del($mKey);
+            }catch (\Exception $e){
+                commonRedis()->del($mKey);
             }
 
             $WechatUser = WechatUser::findOne($betRow->wechat_user_id);
@@ -120,7 +130,14 @@ class AoZhou5BetJobs extends CommonJob {
                 'msg'=>'下单/撤单之后计算',
                 'wechat_user_id'=>$WechatUser->id,
             ]);
-            Tool_Common::log('/bet_aozhou5/'.self::class_basename(__CLASS__), 'INFO', self::$name, ['params'=>$params, 'data'=>$data]);
+            Tool_Common::log('/bet_aozhou5/'.self::class_basename(__CLASS__), 'INFO', self::$name, [
+                'params'=>$params,
+                'haveSuccess'=>$haveSuccess,
+                'updateBalanceDesc'=>$updateBalanceDesc,
+                'is_local_bet'=>$TzSystemUsers->is_local_bet,
+                'data'=>$data,
+                'isLock'=>$isLock,
+            ]);
         }catch (\Exception $e){
             $err_msg = $e->getMessage();
             Tool_Common::log('/bet_aozhou5/'.self::class_basename(__CLASS__), 'ERR', self::$name, ['params'=>$params, 'err_msg'=>$err_msg]);
