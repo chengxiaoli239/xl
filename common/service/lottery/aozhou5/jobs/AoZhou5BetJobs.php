@@ -88,24 +88,27 @@ class AoZhou5BetJobs extends CommonJob {
             }
 
             try {
+                $transaction = \Yii::$app->db->beginTransaction();
                 $mKey = CacheKeyService::updateBalanceKey($TzSystemUsers->id);
-                $isLock = commonRedis()->setnx($mKey, 1);
+                $isLock = commonRedis()->setnx($mKey, 2);
                 if($haveSuccess && $isLock){
-                    try {
-                        $betMoney = BetsBackend::find()->where(['order_id'=>$params['orderId']])->sum('bet_money');
-                        AgentUsersBalanceService::updateBalance((string)$betRow['id'], $betMoney, $betRow->wechat_user_id, WechatUserService::TYPE_ORDER_BET);
-                    }catch (\Exception $e){
-                        BetsBackend::updateAll(['push_status'=>BetsBackend::PUSH_STATUS_CANNOT], ['order_id'=>$params['orderId']]);
-                        Tool_Common::log('/bet_aozhou5/'.__FUNCTION__, 'ERR', '下注成功，更新余额异常', ['params'=>$params, 'err_msg'=>$e->getMessage()]);
-                    }
+                    $betMoney = BetsBackend::find()->where(['order_id'=>$params['orderId']])->sum('bet_money');
+                    AgentUsersBalanceService::updateBalance((string)$betRow['id'], $betMoney, $betRow->wechat_user_id, WechatUserService::TYPE_ORDER_BET);
                     $updateBalanceDesc = '更新余额完成';
                 }else{
                     $updateBalanceDesc = '更新余额失败haveSuccess:'.$haveSuccess.'或锁失败:'.$mKey;
                     throw_info($updateBalanceDesc.'_'.$haveSuccess.'_'.$isLock);
                 }
+                $transaction->commit();
                 commonRedis()->del($mKey);
             }catch (\Exception $e){
+                $transaction->rollBack();
                 commonRedis()->del($mKey);
+                # 异常情况更新为推送失败，防止不扣款，但中了派奖的情况
+                BetsBackend::updateAll([
+                    'push_desc'=>$e->getMessage(),
+                    'push_status'=>BetsBackend::PUSH_STATUS_CANNOT
+                ], ['order_id'=>$params['orderId']]);
             }
 
             $WechatUser = WechatUser::findOne($betRow->wechat_user_id);
