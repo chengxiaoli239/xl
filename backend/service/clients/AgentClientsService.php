@@ -593,7 +593,18 @@ class AgentClientsService extends ClientsBaseService{
         return $opCounts;
     }
 
-    public static function getBuyTypeByUserAccount($uid='', $userAccount=''){
 
+    /**
+     * 同步报表日志
+     * @param $access_token
+     * @param $data
+     * @param $dataType
+     * @return array
+     */
+    public static function syncClientReportData($access_token, $data=[], $dataType='week'): array
+    {
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端报表日志', ['access_token'=>$access_token, 'data'=>$data, 'dataType'=>$dataType]);
+
+        return ['status'=>200, 'data'=>[], 'msg'=>'操作成功'];
     }
 }
