@@ -11,6 +11,7 @@ use common\service\open\ActionBaseService;
 use common\service\open\aozhou5\ActionService;
 use common\service\thirdD\CommonBaseService;
 use common\tools\Timer;
+use common\tools\Tool_Common;
 
 class AgentService extends BaseService {
 
@@ -40,6 +41,7 @@ class AgentService extends BaseService {
             list($startOfWeek, $endOfWeek) = Timer::thisWeekTime();
             $startThisWeekDate = date('Y-m-d', $startOfWeek);
             foreach ($siteStaticsInfos as $k=>$siteStaticsInfo){
+                Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '单日数据', ['siteStaticsInfo'=>$siteStaticsInfo]);
                 list($date, $bs, $betMoney, $profits, $backWater, $realProfits) = $siteStaticsInfo;
                 if(($k+1) == count($siteStaticsInfos)){
                     $todayProfits = $realProfits;
