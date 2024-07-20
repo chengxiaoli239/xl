@@ -608,7 +608,7 @@ class AgentClientsService extends ClientsBaseService{
     public static function syncClientReportData($access_token, array $data=[], string $dataType='week'): array
     {
         try {
-            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端报表日志', ['access_token'=>$access_token, 'data'=>$data, 'dataType'=>$dataType]);
+            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端报表日志', ['access_token'=>$access_token, 'data'=>$data, 'is_array'=>is_array($data), 'dataType'=>$dataType]);
             $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
             $userId = $TzSystemsUsers->uid;
             foreach ($data as &$datum){
