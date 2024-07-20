@@ -10,6 +10,6 @@ trait WechatCacheKeyTrait
 
     public static function robotInfo($robotId=0): string
     {
-        return 'wechat:robot_info:robot_id_' . $robotId;
+        return 'wechat:robot_info:robot_id_x0_' . $robotId;
     }
 }

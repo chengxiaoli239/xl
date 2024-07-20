@@ -29,6 +29,7 @@ use common\kj\BaseKj;
 use common\kj\qxc\QxcTcw;
 use common\kj\ssc\Aozhou;
 use common\kj\ssc\Lucky5;
+use common\models\wechat\WechatUser;
 use common\service\cache\CacheKeyService;
 use common\service\CommonService;
 use common\service\helpers\ThirdD;
@@ -40,6 +41,7 @@ use common\service\open\actions\PlatformRobotService;
 use common\service\open\aozhou5\ActionService;
 use common\service\open\aozhou5\ActionYIFanService;
 use common\service\open\telegram\AoZhouKjService;
+use common\service\open\telegram\MessageOperateService;
 use common\service\ssc\QihaoService;
 use common\service\thirdD\match\MatchCodeService;
 use common\service\thirdD\MethodMatchService;
@@ -65,6 +67,11 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $userId = 21;
+        $robotAdmin = WechatUser::find()->where(['user_id'=>$userId, 'is_admin'=>1])->asArray()->limit(1)->one();
+        $messageService = new MessageOperateService($userId, $robotAdmin['userName']);
+        p($messageService->robotInfo);
+        p($messageService);
         $CurrentKjData = NumCodeService::getKjData($currentKjQiHao='20240718109', $lottery_type=8);p($CurrentKjData);
         $rst = KjDataGet::updateNullCode($lottery_type = 8); p($rst);
         $rst['operateProfitsPlans'] = SscDataService::operateProfitsPlans($lottery_type = 8);

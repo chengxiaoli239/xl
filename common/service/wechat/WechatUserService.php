@@ -93,7 +93,7 @@ class WechatUserService extends BaseService
             $dataQuery = PlatformRobot::find()
                 ->where(['platform_robot_id'=>$robotId]);
             #$sql = $dataQuery->createCommand()->getRawSql();p($sql);
-            $data = $dataQuery->asArray()->all();
+            $data = $dataQuery->asArray()->one();
             $m->set($mKey, $data, 600);
         }
 
