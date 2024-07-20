@@ -635,7 +635,7 @@ class AgentClientsService extends ClientsBaseService{
             $messageService->reply($userId, $text, ['targetId'=>$adminUserName, 'token'=>$token]); # 回复管理员消息
             Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '报表日志处理', ['text'=>$text, 'user_id'=>$userId, 'targetId'=>$adminUserName, 'token'=>$token]);
         }catch (\Exception $e){
-            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '报表日志处理-异常', ['user_id'=>$userId, 'err_msg'=>$e->getMessage(), 'token'=>$token]);
+            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '报表日志处理-异常', ['user_id'=>$userId, 'file'=>$e->getFile().'_'.$e->getLine(), 'err_msg'=>$e->getMessage(), 'token'=>$token]);
         }
 
         return ['status'=>200, 'data'=>[], 'msg'=>'操作成功'];
