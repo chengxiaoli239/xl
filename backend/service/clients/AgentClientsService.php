@@ -621,7 +621,7 @@ class AgentClientsService extends ClientsBaseService{
                 $datum = [$date, (float)$bs, (float)$betMoney, (float)$profits, (float)$backWater, (float)$realProfits];
             }
             $mKeyStaticsInfoKey = CacheKeyService::getSiteReportDataKey($userId); # 客户端推送数据
-            commonRedis()->setex($mKeyStaticsInfoKey, 240, $data);
+            commonRedis()->setex($mKeyStaticsInfoKey, 360, $data);
 
             $robotAdmin = WechatUser::find()->where(['user_id'=>$userId, 'is_admin'=>1])->asArray()->limit(1)->one();
             $messageService = new MessageOperateService($TzSystemsUsers->uid, $robotAdmin['userName']);
