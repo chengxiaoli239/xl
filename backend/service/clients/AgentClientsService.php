@@ -612,8 +612,8 @@ class AgentClientsService extends ClientsBaseService{
             $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
             $userId = $TzSystemsUsers->uid;
             foreach ($data as &$datum){
-                //list($date, $bs, $betMoney, $profits, $backWater, $realProfits) = $datum;
-                $datum[0] = trim(explode(' ', $datum[0])[0]);
+                list($date, $bs, $betMoney, $profits, $backWater, $realProfits) = $datum;
+                $datum[0] = trim(explode(' ', $date)[0]);
             }
             $mKeyStaticsInfoKey = CacheKeyService::getSiteReportDataKey($userId); # 客户端推送数据
             commonRedis()->setex($mKeyStaticsInfoKey, 240, $data);
