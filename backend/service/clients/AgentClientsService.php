@@ -613,6 +613,7 @@ class AgentClientsService extends ClientsBaseService{
             $userId = $TzSystemsUsers->uid;
             foreach ($data as &$datum){
                 list($date, $bs, $betMoney, $profits, $backWater, $realProfits) = $datum;
+                Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端报表日志', ['datum'=>$datum, 'date'=>$date]);
                 $datum[0] = trim(explode(' ', $date)[0]);
             }
             $mKeyStaticsInfoKey = CacheKeyService::getSiteReportDataKey($userId); # 客户端推送数据
