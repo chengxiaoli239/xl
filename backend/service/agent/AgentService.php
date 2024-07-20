@@ -43,7 +43,7 @@ class AgentService extends BaseService {
             foreach ($siteStaticsInfos as $k=>$siteStaticsInfo){
                 Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '单日数据', ['siteStaticsInfo'=>$siteStaticsInfo]);
                 list($date, $bs, $betMoney, $profits, $backWater, $realProfits) = $siteStaticsInfo;
-                if(($k+1) == count($siteStaticsInfos)){
+                if(($k+1) == count($siteStaticsInfos) OR $date == date('Y-m-d')){
                     $todayProfits = $realProfits;
                     $todayBetMoney = $betMoney;
                 }
