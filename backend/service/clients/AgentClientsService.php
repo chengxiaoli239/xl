@@ -618,7 +618,7 @@ class AgentClientsService extends ClientsBaseService{
                 $date = trim(explode(' ', $date)[0]);
                 $backWater = is_numeric($backWater) ? (float)$backWater : 0;
                 $realProfits = is_numeric($realProfits) ? (float)$realProfits : 0;
-                $datum = [$date, (float)$bs, (float)$betMoney, (float)$profits, (float)$backWater, (float)$realProfits];
+                $datum = [$date, (float)$bs, (float)$betMoney, (float)$profits, (float)$backWater, (float)$profits];
             }
             $mKeyStaticsInfoKey = CacheKeyService::getSiteReportDataKey($userId); # 客户端推送数据
             commonRedis()->setex($mKeyStaticsInfoKey, 360, $data);
