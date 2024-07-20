@@ -623,6 +623,7 @@ class AgentClientsService extends ClientsBaseService{
             $mKeyStaticsInfoKey = CacheKeyService::getSiteReportDataKey($userId); # 客户端推送数据
             commonRedis()->setex($mKeyStaticsInfoKey, 360, $data);
 
+            /*
             $robotAdmin = WechatUser::find()->where(['user_id'=>$userId, 'is_admin'=>1])->asArray()->limit(1)->one();
             $messageService = new MessageOperateService($TzSystemsUsers->uid, $robotAdmin['userName']);
             list($balance, $todayPl, $todayBet, $weekBet, $weekPl, $lastWeekBet, $lastWeekPl) = AgentService::getCalcMoney($userId);
@@ -637,6 +638,7 @@ class AgentClientsService extends ClientsBaseService{
             $token = $messageService->robotInfo['token'];
             $messageService->reply($userId, $text, ['targetId'=>$adminUserName, 'token'=>$token]); # 回复管理员消息
             Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '报表日志处理', ['text'=>$text, 'user_id'=>$userId, 'targetId'=>$adminUserName, 'token'=>$token]);
+            */
         }catch (\Exception $e){
             Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '报表日志处理-异常', ['user_id'=>$userId, 'file'=>$e->getFile().'_'.$e->getLine(), 'err_msg'=>$e->getMessage(), 'token'=>$token]);
         }
