@@ -3,11 +3,15 @@ namespace backend\service\clients;
 
 use backend\models\AgentUserBetLogs;
 use backend\models\TzSystemsUsers;
+use backend\service\agent\AgentService;
 use backend\service\agent\AgentUsersService;
 use backend\service\BetService;
 use backend\service\HN0898Service;
 use backend\service\numbers\CodeTypeService;
 use common\helpers\LotteryType;
+use common\models\wechat\WechatUser;
+use common\service\cache\CacheKeyService;
+use common\service\open\telegram\MessageOperateService;
 use common\tools\Tool_Common;
 use yii\db\Exception;
 use yii\helpers\ArrayHelper;
@@ -597,13 +601,40 @@ class AgentClientsService extends ClientsBaseService{
     /**
      * 同步报表日志
      * @param $access_token
-     * @param $data
-     * @param $dataType
+     * @param array $data
+     * @param string $dataType
      * @return array
      */
-    public static function syncClientReportData($access_token, $data=[], $dataType='week'): array
+    public static function syncClientReportData($access_token, array $data=[], string $dataType='week'): array
     {
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端报表日志', ['access_token'=>$access_token, 'data'=>$data, 'dataType'=>$dataType]);
+        try {
+            Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端报表日志', ['access_token'=>$access_token, 'data'=>$data, 'dataType'=>$dataType]);
+            $TzSystemsUsers = TzSystemUsersService::getTzSystemsUsersByAccessToken($access_token);
+            $userId = $TzSystemsUsers->uid;
+            foreach ($data as &$datum){
+                //list($date, $bs, $betMoney, $profits, $backWater, $realProfits) = $datum;
+                $datum[0] = trim(explode(' ', $datum[0])[0]);
+            }
+            $mKeyStaticsInfoKey = CacheKeyService::getSiteReportDataKey($userId); # 客户端推送数据
+            commonRedis()->setex($mKeyStaticsInfoKey, 240, $data);
+
+            $robotAdmin = WechatUser::find()->where(['user_id'=>$userId, 'is_admin'=>1])->asArray()->limit(1)->one();
+            $messageService = new MessageOperateService($TzSystemsUsers->uid, $robotAdmin['userName']);
+            list($balance, $todayPl, $todayBet, $weekBet, $weekPl, $lastWeekBet, $lastWeekPl) = AgentService::getCalcMoney($userId);
+            $text = '盘口余额：'.$balance."\n"
+                .'今日盈亏：'.$todayPl."\n"
+                .'有效金额：'.$todayBet."\n"
+                .'本周下单金额：'.$weekBet."\n"
+                .'本周实际盈亏：'.$weekPl."\n"
+                .'上周下单金额：'.$lastWeekBet."\n"
+                .'上周实际盈亏：'.$lastWeekPl;
+            $adminUserName = $messageService->robotAdmin['userName'];
+            $token = $messageService->robotInfo['token'];
+            $messageService->reply($userId, $text, ['targetId'=>$adminUserName, 'token'=>$token]); # 回复管理员消息
+            Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '报表日志处理', ['text'=>$text, 'user_id'=>$userId, 'targetId'=>$adminUserName, 'token'=>$token]);
+        }catch (\Exception $e){
+            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '报表日志处理-异常', ['user_id'=>$userId, 'err_msg'=>$e->getMessage(), 'token'=>$token]);
+        }
 
         return ['status'=>200, 'data'=>[], 'msg'=>'操作成功'];
     }

@@ -92,9 +92,24 @@ trait LotteryCacheKeyTrait
         return 'lottery:getDataDealStatus_:info_'.$lottery_type.'_'.$qiHao.'_'.$status_key;
     }
 
+    /**
+     * 是否需要登录标识key
+     * @param $userId
+     * @return string
+     */
     public static function getIsClientNeedLoginKey($userId=0): string
     {
         return 'lottery:need_login:user_'.$userId;
+    }
+
+    /**
+     * 是否需要登录标识key
+     * @param $userId
+     * @return string
+     */
+    public static function getSiteReportDataKey($userId=0): string
+    {
+        return 'lottery:site_report:user_'.$userId;
     }
 
     /**

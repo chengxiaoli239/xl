@@ -123,7 +123,7 @@ class AgentClientsController extends Controller
             return ['status'=>302, 'msg'=>'数据不能为空'];
         }
 
-        $rst = AgentClientsService::syncClientReportData($post['data'], $post['access_token'], $post['data_type']);
+        $rst = AgentClientsService::syncClientReportData($post['access_token'], $post['data'], $post['data_type']);
         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '客户端报表数据日志同步', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;

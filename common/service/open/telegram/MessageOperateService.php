@@ -31,6 +31,7 @@ class MessageOperateService  extends BaseService
     public $user_id;
     public $platformUser;
     public $robotInfo;
+    public $robotAdmin;
     public $tzSystemUsers;
 
     public $member_id;
@@ -58,6 +59,7 @@ class MessageOperateService  extends BaseService
         $this->robotInfo = WechatUserService::getRobotInfo($this->platformUser['robot_wechat']);
         $this->member_id = $this->platformUser['member_id'];
         $this->lottery_type = LotteryType::AZ_LUCKY_5;
+        $this->robotAdmin = WechatUser::find()->where(['user_id'=>$userId, 'is_admin'=>1])->asArray()->limit(1)->one();
         self::validateWechatUser();
 
         parent::__construct();
