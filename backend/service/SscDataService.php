@@ -2059,7 +2059,7 @@ class SscDataService extends BaseService {
         }
         $profits = BettingRecords::find()->where($where)->sum('profits');
 
-        return $profits;
+        return $profits??0.00;
     }
 
     /**
@@ -2121,6 +2121,7 @@ class SscDataService extends BaseService {
         $RedisLock = new RedisLock();
 
         $start_time = microtime(true);
+        $nowTime = time();
         try {
             $logArr = [];
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划1', ['lottery_type'=>$lottery_type]);
@@ -2149,6 +2150,40 @@ class SscDataService extends BaseService {
                         }
                         \Yii::$app->redis->expire($Rkey, 120);
                         $profits = SscDataService::getPlanProfits($UserSysPlan);
+                        try {
+                            $transaction = \Yii::$app->db->beginTransaction();
+                            $planStaticProfits = PlanStaticProfits::find()->where(['plan_id'=>$UserSysPlan->id])->limit(1)->one();
+                            if(!empty($planStaticProfits)){
+                                if($planStaticProfits->current_qihao == $current_kj_qihao){
+                                    throw_info('已经统计过');
+                                }
+                            }else{
+                                $planStaticProfits = new PlanStaticProfits();
+                                $setPlanStaticProfitsData = [
+                                    'plan_id' => $UserSysPlan->id,
+                                    'current_qihao' => $current_kj_qihao,
+                                    'uid' => $UserSysPlan->uid,
+                                    'cut_profits' => 0.00,
+                                    'updated_at' => $nowTime,
+                                    'created_at' => $nowTime,
+                                ];
+                                $planStaticProfits->setAttributes($setPlanStaticProfitsData, false);
+                                $planStaticProfits->save();
+                            }
+                            $currentQiProfits = SscDataService::getPlanProfits($UserSysPlan, ['=', 'qihao', $current_kj_qihao]); # 计划本期利润
+                            PlanStaticProfits::updateAll([
+                                'cut_profits'=>(new Expression("`cut_profits`+".$currentQiProfits)),
+                                'current_qihao' => $current_kj_qihao,
+                                'uid' => $current_kj_qihao,
+                                'updated_at' => $nowTime,
+                                'created_at' => $nowTime,
+                            ], ['plan_id'=>$UserSysPlan->id]);
+
+                            $transaction->commit();
+                        }catch (\Exception $e){
+                            $transaction->rollBack();
+                            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '单个计划利润统计', ['plan_id'=>$UserSysPlan->id, 'err_msg'=>$e->getMessage()]);
+                        }
 
                         $maxQihao = BetService::$maxQihaoArr[$lottery_type];
                         $qihao = substr($current_kj_qihao,-3); # 最后三位

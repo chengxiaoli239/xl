@@ -561,7 +561,7 @@ class UserService extends BaseService {
                 }
             }
         }catch (\Exception $e){
-            Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '归零正常', ['user_id'=>$uid, 'username'=>$TzSystemsUsers->username, 'rst'=>$rst, 'r'=>$r]);
+            Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '归零异常', ['username'=>$TzSystemsUsers->username, 'err_msg'=>$e->getMessage()]);
         }
 
         return [$code, $current_profits, $TzSystemsUsers];

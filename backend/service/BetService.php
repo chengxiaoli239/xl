@@ -10,6 +10,7 @@ namespace backend\service;
 
 use backend\models\BetErrorPlansTask;
 use backend\models\DataDealStatus;
+use backend\models\PlanStaticProfits;
 use backend\models\SscKjData;
 use backend\models\thirdD\BetsBackend;
 use backend\models\TzType;
@@ -1037,6 +1038,7 @@ abstract class BetService extends BaseBetService {
 
         $rst['lottery_type'] = $UserSysPlans->lottery_type;
         $rst['flag'] = $rstFlag;
+        PlanStaticProfits::updateAll(['cut_profits'=>0.00], ['plan_id'=>$id, 'uid'=>$uid]); # 利润表归零
 
         return $rst;
     }

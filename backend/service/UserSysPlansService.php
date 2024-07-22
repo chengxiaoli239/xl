@@ -13,6 +13,7 @@ use backend\models\CodeTypesQuery;
 use backend\models\ImportPlanCodes;
 use backend\models\LotteryType;
 use backend\models\Num4Type;
+use backend\models\PlanStaticProfits;
 use backend\models\SscDsYl;
 use backend\models\SscKjData;
 use backend\models\SysPlansCodes;
@@ -1479,6 +1480,14 @@ class UserSysPlansService extends BaseService {
                 $sql2 = "DELETE FROM ".UserSysPlans::tableName()." WHERE id='{$plan_id}' AND uid='{$user_id}'";
             }
             $db->createCommand($sql2)->execute();
+
+            # 3、利润表
+            if($user_id==1){
+                $sql3 = "DELETE FROM ".PlanStaticProfits::tableName()." WHERE plan_id='{$plan_id}'";
+            }else{
+                $sql3 = "DELETE FROM ".PlanStaticProfits::tableName()." WHERE plan_id='{$plan_id}' AND uid='{$user_id}'";
+            }
+            $db->createCommand($sql3)->execute();
 
             $transaction->commit();
         }catch (\Exception $e){
