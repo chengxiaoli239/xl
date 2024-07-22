@@ -8,6 +8,7 @@
 <script type="text/javascript" src="/js/common.js?v={{STATIC_VERSION}}"></script>
 <?php
 
+use backend\models\PlanStaticProfits;
 use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\helpers\BaseStringHelper;
@@ -109,7 +110,8 @@ $columns = array_merge(
             'format'=>'raw',
             'value' => function($model) {
                 if(in_array($model->plan_type,[1, 3]) OR ($model->take_profits>0 OR $model->stop_loss)){
-                    $txt = '止盈:'.floatval($model->take_profits)." 止损:".floatval($model->stop_loss) .' 当前:<font color="'.(($model->current_profits>0)?'green':($model->current_profits<0?'red':'')).'">'.round($model->current_profits, 2).'</font>' ;
+                    $currentProfits = PlanStaticProfits::find()->select(['cut_profits'])->where(['plan_id'=>$model->id])->scalar()?:0.00;
+                    $txt = '止盈:'.floatval($model->take_profits)." 止损:".floatval($model->stop_loss) .' 当前:<font data-profits="'.$currentProfits.'" color="'.(($model->current_profits>0)?'green':($model->current_profits<0?'red':'')).'">'.round($model->current_profits, 2).'</font>' ;
                 }else{
                     $txt = '';
                 }
