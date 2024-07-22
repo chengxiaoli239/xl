@@ -2180,15 +2180,22 @@ class SscDataService extends BaseService {
                             ], ['plan_id'=>$UserSysPlan->id]);
 
                             $transaction->commit();
+                            $profits = PlanStaticProfits::find()->select(['cut_profits'])->where(['plan_id'=>$UserSysPlan->id])->scalar();
                         }catch (\Exception $e){
                             $transaction->rollBack();
-                            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '单个计划利润统计', ['plan_id'=>$UserSysPlan->id, 'err_msg'=>$e->getMessage()]);
+                            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '单个计划利润统计-异常', ['plan_id'=>$UserSysPlan->id, 'err_msg'=>$e->getMessage()]);
                         }
+                        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '单个计划利润统计', [
+                            'plan_id'=>$UserSysPlan->id,
+                            'profits'=>$profits,
+                            'qiHao'=>$current_kj_qihao,
+                            'currentQiProfits'=>$currentQiProfits,
+                        ]);
 
                         $maxQihao = BetService::$maxQihaoArr[$lottery_type];
                         $qihao = substr($current_kj_qihao,-3); # 最后三位
                         if(in_array($lottery_type, [8]) && $maxQihao == $qihao){
-                            $profits = 0.00; # 每天的盈利重新计算
+                            //$profits = 0.00; # 每天的盈利重新计算
                         }
 
                         //if(($UserSysPlan->take_profits!=0 && $UserSysPlan->stop_loss!=0) AND ($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits))){
