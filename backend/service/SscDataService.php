@@ -2174,7 +2174,7 @@ class SscDataService extends BaseService {
                             PlanStaticProfits::updateAll([
                                 'cut_profits'=>(new Expression("`cut_profits`+".$currentQiProfits)),
                                 'current_qihao' => $current_kj_qihao,
-                                'uid' => $current_kj_qihao,
+                                'uid' => $UserSysPlan->uid,
                                 'updated_at' => $nowTime,
                                 'created_at' => $nowTime,
                             ], ['plan_id'=>$UserSysPlan->id]);
