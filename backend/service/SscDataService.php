@@ -2188,11 +2188,11 @@ class SscDataService extends BaseService {
                             Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '单个计划利润统计-异常', ['plan_id'=>$UserSysPlan->id, 'err_msg'=>$e->getMessage()]);
                         }
                         Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '单个计划利润统计', [
-                            'plan_id'=>$UserSysPlan->id,
-                            'beforeProfits'=>$beforeProfits,
-                            'profits'=>$profits,
-                            'qiHao'=>$current_kj_qihao,
-                            'currentQiProfits'=>$currentQiProfits,
+                            'plan_id' => $UserSysPlan->id,
+                            'qiHao' => $current_kj_qihao,
+                            'beforeProfits' => $beforeProfits,
+                            'currentQiProfits' => $currentQiProfits,
+                            'afterProfits' => $profits,
                         ]);
 
                         $maxQihao = BetService::$maxQihaoArr[$lottery_type];
@@ -2204,6 +2204,15 @@ class SscDataService extends BaseService {
                         //if(($UserSysPlan->take_profits!=0 && $UserSysPlan->stop_loss!=0) AND ($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits))){
                         if($profits>=$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<=(0-$profits)){
                             $UserSysPlan->status = 0;
+                            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '止盈止损-计划关闭', [
+                                'plan_id' => $UserSysPlan->id,
+                                'qiHao' => $current_kj_qihao,
+                                'beforeProfits' => $beforeProfits,
+                                'currentQiProfits' => $currentQiProfits,
+                                'afterProfits' => $profits,
+                                'isTakeProfits' => $profits>=$UserSysPlan->take_profits,
+                                'isStopLoss' => $UserSysPlan->stop_loss<=(0-$profits),
+                            ]);
                         }
                         $hzArr = json_decode($UserSysPlan->hz_Arr, 320);
                         if(isset($hzArr['filters'])){
@@ -2216,7 +2225,15 @@ class SscDataService extends BaseService {
                         # 账号级别的盈利
                         \backend\service\SscDataService::updateUserProfits($UserSysPlan->uid);
 
-                        $logArr['plan_1_3_5'][$UserSysPlan->id] = ['saveFlag'=>$saveFlag, 'current_profits'=>$profits, 'take_profits'=>$UserSysPlan->take_profits, 'stop_loss'=>$UserSysPlan->stop_loss];
+                        $logArr['plan_1_3_5'][$UserSysPlan->id] = [
+                            'saveFlag'=>$saveFlag,
+                            'current_profits'=>$profits,
+                            'take_profits'=>$UserSysPlan->take_profits,
+                            'stop_loss'=>$UserSysPlan->stop_loss,
+                            'beforeProfits' => $beforeProfits,
+                            'currentQiProfits' => $currentQiProfits,
+                            'afterProfits' => $profits,
+                        ];
                     }catch (\Exception $e){
                         $logArr['plan_1_3_5'][$UserSysPlan->id] = ['err_msg'=>$e->getMessage()];
                     }
