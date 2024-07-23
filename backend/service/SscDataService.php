@@ -2157,7 +2157,9 @@ class SscDataService extends BaseService {
                                 if($planStaticProfits->current_qihao == $current_kj_qihao){
                                     throw_info('已经统计过');
                                 }
+                                $beforeProfits = $planStaticProfits->cut_profits;
                             }else{
+                                $beforeProfits = 0.00;
                                 $planStaticProfits = new PlanStaticProfits();
                                 $setPlanStaticProfitsData = [
                                     'plan_id' => $UserSysPlan->id,
@@ -2179,14 +2181,15 @@ class SscDataService extends BaseService {
                                 'created_at' => $nowTime,
                             ], ['plan_id'=>$UserSysPlan->id]);
 
-                            $transaction->commit();
                             $profits = PlanStaticProfits::find()->select(['cut_profits'])->where(['plan_id'=>$UserSysPlan->id])->scalar();
+                            $transaction->commit();
                         }catch (\Exception $e){
                             $transaction->rollBack();
                             Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '单个计划利润统计-异常', ['plan_id'=>$UserSysPlan->id, 'err_msg'=>$e->getMessage()]);
                         }
                         Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '单个计划利润统计', [
                             'plan_id'=>$UserSysPlan->id,
+                            'beforeProfits'=>$beforeProfits,
                             'profits'=>$profits,
                             'qiHao'=>$current_kj_qihao,
                             'currentQiProfits'=>$currentQiProfits,
