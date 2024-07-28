@@ -116,7 +116,7 @@ class NumService extends BaseService {
         22=>'过滤1235最近3200组(四定)',
         23=>'过滤1245最近3200组(四定)',
         24=>'过滤1345最近3200组(四定)',
-        25=>'过滤前100期开过号码的全转(四定)',
+        25=>'过滤前80期开过号码的全转(四定)',
         26=>'过滤前期同位置号码(四定6561组)',
         27=>'过滤前四1152组号码(四定)',
         28=>'过滤1234期号尾号一致3000组历史直码',
@@ -3024,7 +3024,7 @@ class NumService extends BaseService {
                     $codes = NumCodeService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,3,4,5], $num=3200);
                     break;
                 case 25: # 过滤前100期开过号码的全转
-                    $codes = NumCodeService::getBeforeKjCodesDynamic7($plan, $positions=[1,2,3,4], $num=100);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic7($plan, $positions=[1,2,3,4], $num=80);
                     break;
                 case 26: # 去除上期同位置 9 * 9 * 9 * 9 = 81 * 81 = 6561 组
                     $codes = NumCodeService::getBeforeKjCodesDynamic26($plan, $lottery_type);
