@@ -164,7 +164,7 @@ class NumService extends BaseService {
         70=>'取1234位置0123路同路最多两位',
         71=>'过滤1234位置同单双类型+双重', # |对数
         72=>'过滤1234位置同大小类型+双重', # |对数
-        73=>'过滤2345位50期开过号码全转(四定)',
+        73=>'过滤2345位80期开过号码全转(四定)',
 
         74=>'杀上期同位置号码+三兄(四定)',
         #75=>'杀同位置冷码+三兄(四定)',
@@ -3168,7 +3168,7 @@ class NumService extends BaseService {
                     $codes = NumCodeService::getBeforeKjCodesDynamic64($plan, $type_field='type_4dx', $positions=[1,2,3,4], $filterNums=500); #
                     break;
                 case 73: # 过滤最近2345位50组全倒(四定)，不够往后搜集
-                    $codes = NumCodeService::getBeforeKjCodesDynamic7($plan, $positions=[2,3,4,5], $num=50);
+                    $codes = NumCodeService::getBeforeKjCodesDynamic7($plan, $positions=[2,3,4,5], $num=80);
                     break;
                 case 74: # 杀上期同位置号码+三兄(四定)
                     $codes = NumCodeService::getBeforeKjCodesDynamic74($plan, $positions=[1,2,3,4]);
