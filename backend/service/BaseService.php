@@ -319,8 +319,8 @@ class BaseService{
      * @desc CURLOPT_SSLVERSION 为1的用户
      * @return false|string[]
      */
-    public static function getSslVersion1Uids(){
-        $uids = BetService::getConfig('CURLOPT_SSLVERSION_1_UIDS');
+    public static function getSslVersionUids(){
+        $uids = BetService::getConfig('CURLOPT_SSLVERSION_UIDS');
 
         return explode(',', $uids);
     }
@@ -331,9 +331,9 @@ class BaseService{
      * @return int
      */
     public static function getSslVersionByUid($uid=''){
-        $ssl_1_uids = BaseService::getSslVersion1Uids();
+        $ssl_uids = BaseService::getSslVersionUids();
 
-        $version = in_array($uid, $ssl_1_uids) ? 1 : 3;
+        $version = in_array($uid, $ssl_uids) ? 3 : 1;
         return $version;
     }
 

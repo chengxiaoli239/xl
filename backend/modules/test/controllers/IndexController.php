@@ -630,7 +630,7 @@ class IndexController extends Controller
         p($rst);# A出x次B出y次投B 计划处理
         $rst = BaseService::synBalance($id = 10);
         p($rst); # 同步余额
-        $ssl_uids = BaseService::getSslVersion1Uids();
+        $ssl_uids = BaseService::getSslVersionUids();
         p($ssl_uids);
         p(urldecode('https://m.kuajing0898.com/wechatlogin?access_token=54_Ta8VVjILPFM8kbloyNv2DQqMIowaly3_8iExGHW_YzMijrtSUFIl8iWzpNpsnE-8ZZzegMXxWmP-ubqH6sRMMg&openid=opAKq1LHH1lqc1eC8zZgh5nOPUZw&r_url=https%3A%2F%2Fmk.kuajing0898.com%2Fecpage%3Fcode%3Dea561700637319f5'));
 
