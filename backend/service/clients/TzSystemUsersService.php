@@ -560,7 +560,7 @@ class TzSystemUsersService extends ClientsBaseService{
             if($status != LotteryBet::STATUS_START && !$switch){
                 //throw_info('后台尚未开盘', CommonBaseService::CODE_FOR_USER);
             }
-            Tool_Common::log('/lotteryBet/'.__FUNCTION__, 'INFO', '获取下注任务', ['status'=>$status, 'switch'=>$switch]);
+            Tool_Common::log('/lotteryBet/'.__FUNCTION__, 'INFO', '获取下注任务', ['username'=>$TzSystemsUsers->username, 'status'=>$status, 'switch'=>$switch]);
 
             $HI = date('H:i:s');
             if('09:00:00'<$HI && $HI<'09:01:00'){
@@ -626,7 +626,7 @@ class TzSystemUsersService extends ClientsBaseService{
             }
             $m->set($mkey, 1, 3);
         }catch (\Exception $e){
-            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-异常', ['uid' => $uid, 'msg'=>$e->getMessage()]);
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-异常', ['username'=>$TzSystemsUsers->username, 'uid' => $uid, 'msg'=>$e->getMessage()]);
             return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
         }
 
