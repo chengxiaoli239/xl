@@ -9,6 +9,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\service\BetService;
 use backend\service\Lucky5\Lucky5Service;
+use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
 use common\kj\ssc\Lucky5;
 use common\models\AdminModel;
@@ -16,6 +17,7 @@ use common\service\cache\CacheKeyService;
 use common\service\CommonService;
 use common\service\jobs\kj_data\GrabKjDatasJob;
 use common\service\lottery\aozhou5\AoZhou5BetService;
+use common\service\thirdD\CommonBaseService;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
@@ -552,6 +554,13 @@ class TzSystemUsersService extends ClientsBaseService{
             if($flag){
                 throw_info('没有任务yyy');
             }
+            $status = (new LotteryBet())->checkLotteryStatus($lottery_type);
+            $mKey = CacheKeyService::lotteryOpenSwitch($lottery_type);
+            $switch = commonRedis()->get($mKey);
+            if($status != LotteryBet::STATUS_START && !$switch){
+                #throw_info('后台尚未开盘', CommonBaseService::CODE_FOR_USER);
+            }
+            Tool_Common::log('/lotteryBet/'.__FUNCTION__, 'INFO', '获取下注任务', ['status'=>$status, 'switch'=>$switch]);
 
             $HI = date('H:i:s');
             if('09:00:00'<$HI && $HI<'09:01:00'){
