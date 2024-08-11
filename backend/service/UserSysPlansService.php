@@ -71,17 +71,17 @@ class UserSysPlansService extends BaseService {
         unset($post['UserSysPlans']['p1']);
         # 11、第2位
         if(isset($UserSysPlans['p2']) && $UserSysPlans['p2'] !== ''){
-            $tmpFilter['p2'] = (string)trim($UserSysPlans['p2']);
+            $tmpFilter['p2'] = trim($UserSysPlans['p2']);
         }
         unset($post['UserSysPlans']['p2']);
         # 12、第3位
         if(isset($UserSysPlans['p3']) && $UserSysPlans['p3'] !== ''){
-            $tmpFilter['p3'] = (string)trim($UserSysPlans['p3']);
+            $tmpFilter['p3'] = trim($UserSysPlans['p3']);
         }
         unset($post['UserSysPlans']['p3']);
         # 13、第4位
         if(isset($UserSysPlans['p4']) && $UserSysPlans['p4'] !== ''){
-            $tmpFilter['p4'] = (string)trim($UserSysPlans['p4']);
+            $tmpFilter['p4'] = trim($UserSysPlans['p4']);
         }
         unset($post['UserSysPlans']['p4']);
         # 14、第5位
@@ -89,6 +89,9 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['p5'] = trim($UserSysPlans['p5']);
         }
         unset($post['UserSysPlans']['p5']);
+        if(empty($post['UserSysPlans']['fixed_pos_sel']) && (!empty($UserSysPlans['p1']) OR !empty($UserSysPlans['p2']) OR !empty($UserSysPlans['p3']) OR !empty($UserSysPlans['p4']) OR !empty($UserSysPlans['p5']))){
+            $tmpFilter['fixed_pos_sel'] = NumService::OBTAIN;
+        }
 
         # 定位置：千、百、十、个
         if($UserSysPlans['fixed_pos_sel'] && count($UserSysPlans['fixed_pos_sel']) == 1){

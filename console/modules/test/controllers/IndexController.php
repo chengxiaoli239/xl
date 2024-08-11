@@ -67,6 +67,7 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $bet_log = Lucky5Service::getBetLog($tz_type=25, $plan_id=	9621);p($bet_log);
         $userId = 21;
         $robotAdmin = WechatUser::find()->where(['user_id'=>$userId, 'is_admin'=>1])->asArray()->limit(1)->one();
         $messageService = new MessageOperateService($userId, $robotAdmin['userName']);
@@ -91,7 +92,6 @@ class IndexController extends Controller
             p($mKey);
             $data = commonRedis()->get($mKey);
             p(['r'=>$r, 'data'=>$data]);
-            $bet_log = Lucky5Service::getBetLog($tz_type=25, $plan_id=9178);p($bet_log);
             foreach ([8] as $lotteryType){
                 //$r = (new LotteryBet())->checkLotteryStatus($lotteryType);//p($r);
                 $r = (new LotteryBet())->checkLotteryStatus($lotteryType, '2024-07-01 12:06:31');//p($r);
