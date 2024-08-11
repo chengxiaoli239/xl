@@ -556,11 +556,11 @@ class TzSystemUsersService extends ClientsBaseService{
             }
             $status = (new LotteryBet())->checkLotteryStatus($lottery_type);
             $mKey = CacheKeyService::lotteryOpenSwitch($lottery_type);
-            //$switch = commonRedis()->get($mKey);
+            $switch = commonRedis()->get($mKey);
             if($status != LotteryBet::STATUS_START){
                 //throw_info('后台尚未开盘', CommonBaseService::CODE_FOR_USER);
             }
-            Tool_Common::log('/lotteryBet/'.__FUNCTION__, 'INFO', '获取下注任务', ['username'=>$TzSystemsUsers->username, 'status'=>$status,/* 'switch'=>$switch*/]);
+            Tool_Common::log('/lotteryBet/'.__FUNCTION__, 'INFO', '获取下注任务', ['username'=>$TzSystemsUsers->username, 'status'=>$status, 'switch'=>$switch]);
 
             $HI = date('H:i:s');
             if('09:00:00'<$HI && $HI<'09:01:00'){
