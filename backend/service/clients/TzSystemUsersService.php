@@ -630,7 +630,7 @@ class TzSystemUsersService extends ClientsBaseService{
             return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
         }
 
-        return ['status'=>200, 'data'=>$data, 'msg'=>'操作成功'];
+        return ['status'=>200, 'data'=>$data??[], 'msg'=>'操作成功'];
     }
 
     /**
