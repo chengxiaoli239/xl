@@ -571,7 +571,7 @@ class TzSystemUsersService extends ClientsBaseService{
 
             $where = TzSystemUsersService::getActivePlanTasksWhere($uid, $current_qihao, $lottery_type);
             $BetErrorPlansTasksQuery = BetErrorPlansTask::find()->where($where);
-            $BetErrorPlansTasks = $BetErrorPlansTasksQuery->orderBy(['id'=>SORT_DESC])->limit(8)->all();
+            $BetErrorPlansTasks = $BetErrorPlansTasksQuery->orderBy(['id'=>SORT_DESC])->limit(20)->all();
             $sql = $BetErrorPlansTasksQuery->createCommand()->getRawSql();
 
             $log = ['uid'=>$uid, 'current_qihao'=>$current_qihao, 'count'=>count($BetErrorPlansTasks),'sql'=>$sql];
