@@ -311,7 +311,7 @@ class NumCodeService extends BaseService
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
         //p(count($codes));
 
-        $betDesc = '过滤前200期开过的号码全转';
+        $betDesc = '过滤前'.$num.'期开过的号码全转';
         NumCodeService::addBetDescRand($plan->id, $next_qihao, $betDesc); # 添加动态计划下注描述
 
         return $codes;

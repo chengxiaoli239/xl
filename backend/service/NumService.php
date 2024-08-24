@@ -307,6 +307,8 @@ class NumService extends BaseService {
 
         194=>'取上期4个码(不重复)必须上1个',
         195=>'取上上期4个码(不重复)必须上1个',
+        196=>'过滤前400期开过号码的全转',
+        197=>'过滤前500期开过号码的全转',
     ];
 
     const TYPE_POSITIONS = [
@@ -3023,7 +3025,7 @@ class NumService extends BaseService {
                 case 24: # 过滤1,3,4,5最近3200组(四定)，不够往后搜集
                     $codes = NumCodeService::getBeforeKjCodesDynamic14($plan, $lottery_type, $positions=[1,3,4,5], $num=3200);
                     break;
-                case 25: # 过滤前100期开过号码的全转
+                case 25: # 过滤前80期开过号码的全转
                     $codes = NumCodeService::getBeforeKjCodesDynamic7($plan, $positions=[1,2,3,4], $num=80);
                     break;
                 case 26: # 去除上期同位置 9 * 9 * 9 * 9 = 81 * 81 = 6561 组
@@ -3466,6 +3468,12 @@ class NumService extends BaseService {
                     break;
                 case 195:
                     $codes = NumCodeService::getBeforeKjCodesDynamic127($plan, $qiHaoType=2);
+                    break;
+                case 196: # 过滤前400期开过号码的全转
+                    $codes = NumCodeService::getBeforeKjCodesDynamic7($plan, $positions=[1,2,3,4], $num=400);
+                    break;
+                case 197: # 过滤前500期开过号码的全转
+                    $codes = NumCodeService::getBeforeKjCodesDynamic7($plan, $positions=[1,2,3,4], $num=500);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
