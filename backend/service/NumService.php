@@ -309,6 +309,8 @@ class NumService extends BaseService {
         195=>'取上上期4个码(不重复)必须上1个',
         196=>'过滤前400期开过号码的全转',
         197=>'过滤前500期开过号码的全转',
+        198=>'取前四最近9990组(四定)',
+        199=>'取后四最近9990组(四定)',
     ];
 
     const TYPE_POSITIONS = [
@@ -3474,6 +3476,12 @@ class NumService extends BaseService {
                     break;
                 case 197: # 过滤前500期开过号码的全转
                     $codes = NumCodeService::getBeforeKjCodesDynamic7($plan, $positions=[1,2,3,4], $num=500);
+                    break;
+                case 198: # 取前四最近999组号码
+                    $codes = NumCodeService::getBeforeKjCodesDynamic17($plan, $lottery_type, 9990);
+                    break;
+                case 199: # 取后四最近9990组号码
+                    $codes = NumCodeService::getBeforeKjCodesDynamic18($plan, $lottery_type, 9990);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
