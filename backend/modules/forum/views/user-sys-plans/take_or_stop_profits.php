@@ -12,8 +12,10 @@
 </div>
 
 <!--提示框-start-->
-<div class="modal fade" id="exampleModal_msg_plan_type" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
-    <div class="modal-dialog modal-lg" role="document" style="width: 800px;margin: 100px auto;">
+<div class="modal fade" id="exampleModal_msg_plan_type" tabindex="" role="dialog" aria-labelledby="ModalLabel"
+     style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
+     min-width:99%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <!--
@@ -21,7 +23,7 @@
                 -->
                 <h4 class="modal-title" id="tip_msg_title_plan_type">信息提示：</h4>
             </div>
-            <div class="modal-body">
+            <div class="modal-body" style="max-height: 680px; overflow-y: auto;">
                 <strong># 计划类型说明：</strong>
                 <pre><code id="rst_code_plan_type">
 <strong><font color="blue">1、正常：</font></strong>按照所填倍数，平刷
