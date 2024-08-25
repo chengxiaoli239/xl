@@ -170,12 +170,12 @@ class LotteryBet
             if($drawStart<=$currentTime){
                 return LotteryBet::STATUS_DRAW; # 当前为开奖抓取时间
             }
-            var_dump('222');
+            //var_dump('222');
             return LotteryBet::STATUS_CLOSE; # 当前为封盘状态
         }elseif ($closeNextStart<=$currentTime && $currentTime<=$closeNextEnd){
             return LotteryBet::STATUS_CLOSE; # 当前为下个封盘状态
         }else{
-            var_dump('2222222');
+            //var_dump('2222222');
             return LotteryBet::STATUS_START; # 当前为开盘状态
         }
     }
