@@ -67,6 +67,8 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $difference = array_diff($otherArray=[1,2,3,4], $positions=[1,4,2]);
+        p($difference);
         $bet_log = Lucky5Service::getBetLog($tz_type=25, $plan_id=	9621);p($bet_log);
         $userId = 21;
         $robotAdmin = WechatUser::find()->where(['user_id'=>$userId, 'is_admin'=>1])->asArray()->limit(1)->one();

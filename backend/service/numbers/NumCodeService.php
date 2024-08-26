@@ -2268,6 +2268,12 @@ class NumCodeService extends BaseService
             ->from('lt_num4_type')
             ->where(['code_type' => $playway+1])
             ->andWhere($notWhere);
+        $difference = array_diff([1,2,3,4], $positions);
+        if($playway != 4 && !empty($difference)){
+            foreach ($difference as $diffPos){
+                $query->andWhere(['=', 'code_'.$diffPos, 'X']);
+            }
+        }
         //$sql = $query->createCommand()->getRawSql();p($sql);
 
         $results = $query->all();
