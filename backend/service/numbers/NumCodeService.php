@@ -2259,13 +2259,14 @@ class NumCodeService extends BaseService
         $filterNum = (int)($hz[strlen($hz)-1]);
         $filterNums = [$filterNum, $filterNum+10, $filterNum+20, $filterNum+30];
         //p([$sumHz, $historyKjData, $hz, $hz[strlen($hz)-1], strlen($hz), $filterNum]);
+        $playway = $plan->playway;
 
         $otherHf = '(code_'.implode('+code_', $positions).')';
         $notWhere = ['NOT', ['IN', $otherHf, $filterNums]]; # '(`code_1`+`code_2`+`code_3`+`code_4`)'
         $query = (new \yii\db\Query())
             ->select(['code', 'code_type'])
             ->from('lt_num4_type')
-            ->where(['code_type' => 4])
+            ->where(['code_type' => $playway+1])
             ->andWhere($notWhere);
         //$sql = $query->createCommand()->getRawSql();p($sql);
 
