@@ -2269,7 +2269,7 @@ class NumCodeService extends BaseService
             ->where(['code_type' => $playway+1])
             ->andWhere($notWhere);
         $difference = array_diff([1,2,3,4], $positions);
-        if($playway != 4 && !empty($difference)){
+        if($playway != 3 && !empty($difference)){
             foreach ($difference as $diffPos){
                 $query->andWhere(['=', 'code_'.$diffPos, 'X']);
             }
