@@ -1271,13 +1271,30 @@ class StaticService extends BaseService {
         foreach ($lottery_types as $lottery_type) {
             $status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opStatic');
             if($status) {
+                $t1 = microtime(true);
                 $rst['staticSDHzPerDateProfits'] = StaticService::staticSDHzPerDateProfits($lottery_type); # 每天四定和值利润统计
+                $t2 = microtime(true);
+                Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '数据统计', ['lottery_type'=>$lottery_type, 'err_msg'=>'1每天四定和值利润统计', 't7' => ($t2-$t1).'s']);
                 $rst['staticHzMonthsProfits'] = StaticService::staticHzMonthsProfits($lottery_type); # 每月四定和值利润统计
+                $t3 = microtime(true);
+                Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '数据统计', ['lottery_type'=>$lottery_type, 'err_msg'=>'2每月四定和值利润统计', 't7' => ($t3-$t2).'s']);
                 $rst['allHzStaticProfits'] = StaticService::allHzStaticProfits($lottery_type); # 每个月份每个和值利润统计
+                $t4 = microtime(true);
+                Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '数据统计', ['lottery_type'=>$lottery_type, 'err_msg'=>'3每个月份每个和值利润统计', 't7' => ($t4-$t3).'s']);
                 $rst['allHzStaticProfitsPerdate'] = StaticService::allHzStaticProfitsPerdate($lottery_type);//p($rst);# 循环计算每天每个和值利润统计
-
+                $t5 = microtime(true);
+                Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '数据统计', ['lottery_type'=>$lottery_type, 'err_msg'=>'4循环计算每天每个和值利润统计', 't7' => ($t5-$t4).'s']);
                 $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth($lottery_type); # 单双利润统计(month)
+                $t6 = microtime(true);
+                Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '数据统计', ['lottery_type'=>$lottery_type, 'err_msg'=>'5单双利润统计(month)', 't7' => ($t6-$t5).'s']);
                 $rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay($lottery_type); # 单双利润统计(day)
+
+                $t7 = microtime(true);
+                Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '数据统计', [
+                    'lottery_type'=>$lottery_type,
+                    'err_msg'=>'6单双利润统计(day)',
+                    't7' => ($t7-$t6).'s',
+                ]);
                 StaticService::afterOpStatic($lottery_type, 'opStatic');
             }
         }
