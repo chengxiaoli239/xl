@@ -5,6 +5,7 @@ use backend\models\BettingRecords;
 use backend\models\DataDealStatus;
 use backend\models\open\PlatformGroup;
 use backend\models\open\PlatformRobot;
+use backend\models\PlanStaticProfits;
 use backend\models\searchs\wechat\Bets;
 use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
@@ -53,6 +54,7 @@ use common\service\wechat\eyun\EYunMessageOperateService;
 use common\service\wechat\WechatUserService;
 use common\tools\KjDataGet;
 use common\tools\Timer;
+use common\tools\Tool_Common;
 use common\tools\Util;
 use DateTime;
 use Yii;
@@ -67,6 +69,26 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $bets = SscDataService::isZjBeforeData(8);
+        $flag = SscDataService::isZjBeforeNew($bets[941699]??[]);
+        p([$flag, $bets]);
+        $lottery_type = 8;
+        # 止盈止损、翻倍止盈止损 计划
+        $where = [
+            'OR',
+            [ 'AND', ['IN', 'plan_type', [0, 1, 3, 5]], ['=', 'status', 1], ['=', 'is_batch_simulate', 0] ],
+            [ 'AND', ['>', 'take_profits', 0], ['>', 'stop_loss', 0], ['=', 'status', 1], ['=', 'is_batch_simulate', 0] ]
+        ];
+        Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划2', ['lottery_type'=>$lottery_type]);
+
+        $logArr = [];
+        $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+
+        $UserSysPlans = UserSysPlans::find()->where($where)->andWhere(['=', 'lottery_type', $lottery_type]);
+        foreach ($UserSysPlans->each(10) as $UserSysPlan){
+            p(['current_kj_qihao'=>$current_kj_qihao, 'UserSysPlan_id'=>$UserSysPlan->id]);
+        }
+        $rst = StaticService::allHzStaticProfits($lottery_type = 8); p($rst);
         $difference = array_diff($otherArray=[1,2,3,4], $positions=[1,4,2]);
         p($difference);
         $bet_log = Lucky5Service::getBetLog($tz_type=25, $plan_id=	9621);p($bet_log);

@@ -917,8 +917,6 @@ class IndexController extends Controller
         p($qihao);
         $data = CqsscKcw::getLotteryKuaiLe8Eight();
         p($data);
-        $rst = StaticService::staticSDHzPerDateProfits($lottery_type = 6);
-        p($rst);
 
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $rst = StaticService::static4dYlCode();

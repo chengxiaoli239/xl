@@ -2139,40 +2139,32 @@ class SscDataService extends BaseService {
 
             $logArr = [];
             $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
-            if($UserSysPlans = UserSysPlans::find()->where($where)->andWhere(['=', 'lottery_type', $lottery_type])->all()){
-                foreach ($UserSysPlans as $UserSysPlan){
-                    try {
-                        $Rkey = __FUNCTION__.'_redis_op_plan_0_1_3_5_'.$lottery_type.'_'.$UserSysPlan->id;
-                        if(!$RedisLock->lock($Rkey, 30)){
-                            \Yii::$app->redis->expire($Rkey, 120);
-                            Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略1', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
-                            continue;
-                        }
+
+            $planIds = UserSysPlans::find()->where(['status'=>1])->column();
+            $planStaticProfitsData = PlanStaticProfits::find()->where(['plan_id'=>$planIds])->indexBy('plan_id')->all();
+
+            $bets = SscDataService::isZjBeforeData($lottery_type);
+
+            $UserSysPlans = UserSysPlans::find()->where($where)->andWhere(['=', 'lottery_type', $lottery_type]);
+            foreach ($UserSysPlans->each(10) as $UserSysPlan){
+                try {
+                    $Rkey = __FUNCTION__.'_redis_op_plan_0_1_3_5_'.$lottery_type.'_'.$UserSysPlan->id;
+                    if(!$RedisLock->lock($Rkey, 30)){
                         \Yii::$app->redis->expire($Rkey, 120);
-                        $profits = SscDataService::getPlanProfits($UserSysPlan);
-                        try {
-                            $transaction = \Yii::$app->db->beginTransaction();
-                            $planStaticProfits = PlanStaticProfits::find()->where(['plan_id'=>$UserSysPlan->id])->limit(1)->one();
-                            if(!empty($planStaticProfits)){
-                                if($planStaticProfits->current_qihao == $current_kj_qihao){
-                                    throw_info('已经统计过');
-                                }
-                                $beforeProfits = $planStaticProfits->cut_profits;
-                            }else{
-                                $beforeProfits = 0.00;
-                                $planStaticProfits = new PlanStaticProfits();
-                                $setPlanStaticProfitsData = [
-                                    'plan_id' => $UserSysPlan->id,
-                                    'current_qihao' => $current_kj_qihao,
-                                    'uid' => $UserSysPlan->uid,
-                                    'cut_profits' => 0.00,
-                                    'updated_at' => $nowTime,
-                                    'created_at' => $nowTime,
-                                ];
-                                $planStaticProfits->setAttributes($setPlanStaticProfitsData, false);
-                                $planStaticProfits->save();
+                        Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略1', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+                        continue;
+                    }
+                    \Yii::$app->redis->expire($Rkey, 120);
+                    try {
+                        $transaction = \Yii::$app->db->beginTransaction();
+                        //$planStaticProfits = PlanStaticProfits::find()->where(['plan_id'=>$UserSysPlan->id])->limit(1)->one();
+                        $planStaticProfits = $planStaticProfitsData[$UserSysPlan->id]??[];
+                        $currentQiProfits = SscDataService::getPlanProfits($UserSysPlan, ['=', 'qihao', $current_kj_qihao]); # 计划本期利润
+                        if(!empty($planStaticProfits)){
+                            if($planStaticProfits->current_qihao == $current_kj_qihao){
+                                throw_info('已经统计过');
                             }
-                            $currentQiProfits = SscDataService::getPlanProfits($UserSysPlan, ['=', 'qihao', $current_kj_qihao]); # 计划本期利润
+                            $beforeProfits = $planStaticProfits->cut_profits;
                             PlanStaticProfits::updateAll([
                                 'cut_profits'=>(new Expression("`cut_profits`+".$currentQiProfits)),
                                 'current_qihao' => $current_kj_qihao,
@@ -2180,63 +2172,77 @@ class SscDataService extends BaseService {
                                 'updated_at' => $nowTime,
                                 'created_at' => $nowTime,
                             ], ['plan_id'=>$UserSysPlan->id]);
-
-                            $profits = PlanStaticProfits::find()->select(['cut_profits'])->where(['plan_id'=>$UserSysPlan->id])->scalar();
-                            $transaction->commit();
-                        }catch (\Exception $e){
-                            $transaction->rollBack();
-                            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '单个计划利润统计-异常', ['plan_id'=>$UserSysPlan->id, 'err_msg'=>$e->getMessage()]);
+                        }else{
+                            $beforeProfits = 0.00;
+                            $planStaticProfits = new PlanStaticProfits();
+                            $setPlanStaticProfitsData = [
+                                'plan_id' => $UserSysPlan->id,
+                                'current_qihao' => $current_kj_qihao,
+                                'uid' => $UserSysPlan->uid,
+                                'cut_profits' => $currentQiProfits,
+                                'updated_at' => $nowTime,
+                                'created_at' => $nowTime,
+                            ];
+                            $planStaticProfits->setAttributes($setPlanStaticProfitsData, false);
+                            $planStaticProfits->save();
                         }
-                        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '单个计划利润统计', [
+
+                        $profits = PlanStaticProfits::find()->select(['cut_profits'])->where(['plan_id'=>$UserSysPlan->id])->scalar();
+                        $transaction->commit();
+                    }catch (\Exception $e){
+                        $profits = SscDataService::getPlanProfits($UserSysPlan);
+                        $transaction->rollBack();
+                        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '单个计划利润统计-异常', ['plan_id'=>$UserSysPlan->id, 'err_msg'=>$e->getMessage()]);
+                    }
+                    Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '单个计划利润统计', [
+                        'plan_id' => $UserSysPlan->id,
+                        'qiHao' => $current_kj_qihao,
+                        'beforeProfits' => $beforeProfits,
+                        'currentQiProfits' => $currentQiProfits,
+                        'afterProfits' => $profits,
+                    ]);
+
+                    $maxQihao = BetService::$maxQihaoArr[$lottery_type];
+                    $qihao = substr($current_kj_qihao,-3); # 最后三位
+                    if(in_array($lottery_type, [8]) && $maxQihao == $qihao){
+                        //$profits = 0.00; # 每天的盈利重新计算
+                    }
+
+                    //if(($UserSysPlan->take_profits!=0 && $UserSysPlan->stop_loss!=0) AND ($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits))){
+                    if($profits>=$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<=(0-$profits)){
+                        $UserSysPlan->status = 0;
+                        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '止盈止损-计划关闭', [
                             'plan_id' => $UserSysPlan->id,
                             'qiHao' => $current_kj_qihao,
                             'beforeProfits' => $beforeProfits,
                             'currentQiProfits' => $currentQiProfits,
                             'afterProfits' => $profits,
+                            'isTakeProfits' => $profits>=$UserSysPlan->take_profits,
+                            'isStopLoss' => $UserSysPlan->stop_loss<=(0-$profits),
                         ]);
-
-                        $maxQihao = BetService::$maxQihaoArr[$lottery_type];
-                        $qihao = substr($current_kj_qihao,-3); # 最后三位
-                        if(in_array($lottery_type, [8]) && $maxQihao == $qihao){
-                            //$profits = 0.00; # 每天的盈利重新计算
-                        }
-
-                        //if(($UserSysPlan->take_profits!=0 && $UserSysPlan->stop_loss!=0) AND ($profits>$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<(0-$profits))){
-                        if($profits>=$UserSysPlan->take_profits OR $UserSysPlan->stop_loss<=(0-$profits)){
-                            $UserSysPlan->status = 0;
-                            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '止盈止损-计划关闭', [
-                                'plan_id' => $UserSysPlan->id,
-                                'qiHao' => $current_kj_qihao,
-                                'beforeProfits' => $beforeProfits,
-                                'currentQiProfits' => $currentQiProfits,
-                                'afterProfits' => $profits,
-                                'isTakeProfits' => $profits>=$UserSysPlan->take_profits,
-                                'isStopLoss' => $UserSysPlan->stop_loss<=(0-$profits),
-                            ]);
-                        }
-                        $hzArr = json_decode($UserSysPlan->hz_Arr, 320);
-                        if(isset($hzArr['filters'])){
-                            $hzArr['filters']['current_kj_qihao'] = $current_kj_qihao;
-                        }
-                        $UserSysPlan->hz_Arr = json_encode($hzArr, 320);
-                        $UserSysPlan->current_profits = $profits;
-                        $saveFlag = $UserSysPlan->save();
-
-                        # 账号级别的盈利
-                        \backend\service\SscDataService::updateUserProfits($UserSysPlan->uid);
-
-                        $logArr['plan_1_3_5'][$UserSysPlan->id] = [
-                            'saveFlag'=>$saveFlag,
-                            'current_profits'=>$profits,
-                            'take_profits'=>$UserSysPlan->take_profits,
-                            'stop_loss'=>$UserSysPlan->stop_loss,
-                            'beforeProfits' => $beforeProfits,
-                            'currentQiProfits' => $currentQiProfits,
-                            'afterProfits' => $profits,
-                        ];
-                    }catch (\Exception $e){
-                        $logArr['plan_1_3_5'][$UserSysPlan->id] = ['err_msg'=>$e->getMessage()];
                     }
+                    $hzArr = json_decode($UserSysPlan->hz_Arr, 320);
+                    if(isset($hzArr['filters'])){
+                        $hzArr['filters']['current_kj_qihao'] = $current_kj_qihao;
+                    }
+                    $UserSysPlan->hz_Arr = json_encode($hzArr, 320);
+                    $UserSysPlan->current_profits = $profits;
+                    $saveFlag = $UserSysPlan->save();
+
+                    # 账号级别的盈利
+                    \backend\service\SscDataService::updateUserProfits($UserSysPlan->uid);
+
+                    $logArr['plan_1_3_5'][$UserSysPlan->id] = [
+                        'saveFlag'=>$saveFlag,
+                        'current_profits'=>$profits,
+                        'take_profits'=>$UserSysPlan->take_profits,
+                        'stop_loss'=>$UserSysPlan->stop_loss,
+                        'beforeProfits' => $beforeProfits,
+                        'currentQiProfits' => $currentQiProfits,
+                        'afterProfits' => $profits,
+                    ];
+                }catch (\Exception $e){
+                    $logArr['plan_1_3_5'][$UserSysPlan->id] = ['err_msg'=>$e->getMessage()];
                 }
             }
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划3', $logArr);
@@ -2247,52 +2253,74 @@ class SscDataService extends BaseService {
             $fb_plan_types = SscDataService::$fb_plan_types;
             $logArr = [];
             $where = ['AND', ['IN', 'plan_type', $fb_plan_types], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
-            if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
-                foreach ($UserSysPlans as $UserSysPlan){
-                    $Rkey = __FUNCTION__.'_redis_op_plan_'.implode('_', $fb_plan_types).'_'.$lottery_type.'_'.$UserSysPlan->id;
-                    if(!$RedisLock->lock($Rkey, 30)){
-                        Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略2', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
-                        continue;
+            $UserSysPlans = UserSysPlans::find()->where($where);
+            foreach ($UserSysPlans->each(10) as $UserSysPlan){
+                $Rkey = __FUNCTION__.'_redis_op_plan_'.implode('_', $fb_plan_types).'_'.$lottery_type.'_'.$UserSysPlan->id;
+                if(!$RedisLock->lock($Rkey, 30)){
+                    Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略2', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+                    continue;
+                }
+                \Yii::$app->redis->expire($Rkey, 120);
+                //$flag = SscDataService::isZjBefore($UserSysPlan->id);
+                $flag = SscDataService::isZjBeforeNew($bets[$UserSysPlan->id]??[]);
+                $flags[$UserSysPlan->uid][$UserSysPlan->id] = $flag;
+                $originSingle = $UserSysPlan->single;
+
+                # 遗漏期数[不中奖期数]
+                $lossQs = self::getLossQs($UserSysPlan->id);
+
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['flag'] = $flag; # 中奖标识
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
+
+                # 倍数处理，中的计划回第一个倍数
+                $singles = explode('-', trim($UserSysPlan->singles));
+                if(empty($singles)) $singles = [$UserSysPlan->single];
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['singles'] = $singles; # 翻倍数据
+                $singles_count = count($singles); # 倍数个数
+
+                $is_init = 1; # 是否初始真实投注
+                $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
+                if(isset($codes_hz['filters'])){
+                    $codes_hz['filters']['current_kj_qihao'] = $current_kj_qihao;
+                }
+                if($flag == 1){ # 中奖
+                    $next_single_key = 0;
+                    $single = $singles[$next_single_key];
+                    if(in_array($UserSysPlan->plan_type, [9, 16])){ # plan_type:遗漏倍投
+                        $current_miss = 0;
+                        $is_init = 1; # 等待状态
+                    }elseif(in_array($UserSysPlan->plan_type, [10])) { # plan_type:中则倍投，不中则回第一个倍数
+                        $single = OperatePlanService::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                     }
-                    \Yii::$app->redis->expire($Rkey, 120);
-                    $flag = SscDataService::isZjBefore($UserSysPlan->id);
-                    $flags[$UserSysPlan->uid][$UserSysPlan->id] = $flag;
-                    $originSingle = $UserSysPlan->single;
-
-                    # 遗漏期数[不中奖期数]
-                    $lossQs = self::getLossQs($UserSysPlan->id);
-
-                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['flag'] = $flag; # 中奖标识
-                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
-
-                    # 倍数处理，中的计划回第一个倍数
-                    $singles = explode('-', trim($UserSysPlan->singles));
-                    if(empty($singles)) $singles = [$UserSysPlan->single];
-                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['singles'] = $singles; # 翻倍数据
-                    $singles_count = count($singles); # 倍数个数
-
-                    $is_init = 1; # 是否初始真实投注
-                    $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
-                    if(isset($codes_hz['filters'])){
-                        $codes_hz['filters']['current_kj_qihao'] = $current_kj_qihao;
-                    }
-                    if($flag == 1){ # 中奖
-                        $next_single_key = 0;
-                        $single = $singles[$next_single_key];
-                        if(in_array($UserSysPlan->plan_type, [9, 16])){ # plan_type:遗漏倍投
-                            $current_miss = 0;
-                            $is_init = 1; # 等待状态
-                        }elseif(in_array($UserSysPlan->plan_type, [10])) { # plan_type:中则倍投，不中则回第一个倍数
+                }else{ # 不中奖
+                    if(in_array($UserSysPlan->plan_type, [9])) { # 遗漏倍投
+                        $current_miss = (int)($codes_hz['current_miss'] + 1); # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
+                        if ($current_miss <= $codes_hz['bet_while_miss']) {
+                            $is_init = 2; # 不中未达到遗漏期数状态 等待状态...
+                            $next_single_key = 0;
+                            $single = $singles[$next_single_key];
+                        } elseif ($current_miss > $codes_hz['bet_while_miss']) {
+                            $is_init = 3; # 开始投注，正在下注状态
                             $single = OperatePlanService::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
+                            if ($codes_hz['is_init'] == 2) {
+                                $next_single_key = 1;
+                                $single = $singles[$next_single_key];
+                            }
                         }
-                    }else{ # 不中奖
-                        if(in_array($UserSysPlan->plan_type, [9])) { # 遗漏倍投
-                            $current_miss = (int)($codes_hz['current_miss'] + 1); # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
-                            if ($current_miss <= $codes_hz['bet_while_miss']) {
+                    }elseif(in_array($UserSysPlan->plan_type, [16])){ # 16 plan_type:遗漏倍投2
+                        $current_miss = (int)$codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
+                        if ($current_miss <= $codes_hz['bet_while_miss']) {
+                            $is_init = 2; # 不中未达到遗漏期数状态 等待状态...
+                            $next_single_key = 0;
+                            $single = $singles[$next_single_key];
+                        } elseif ($current_miss > $codes_hz['bet_while_miss']) {
+                            if($current_miss>=($codes_hz['bet_while_miss']+$singles_count)){
+                                # 投完所有倍数不中，则进入等待状态
                                 $is_init = 2; # 不中未达到遗漏期数状态 等待状态...
                                 $next_single_key = 0;
                                 $single = $singles[$next_single_key];
-                            } elseif ($current_miss > $codes_hz['bet_while_miss']) {
+                                $current_miss = 0;
+                            }else{
                                 $is_init = 3; # 开始投注，正在下注状态
                                 $single = OperatePlanService::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                                 if ($codes_hz['is_init'] == 2) {
@@ -2300,88 +2328,65 @@ class SscDataService extends BaseService {
                                     $single = $singles[$next_single_key];
                                 }
                             }
-                        }elseif(in_array($UserSysPlan->plan_type, [16])){ # 16 plan_type:遗漏倍投2
-                            $current_miss = (int)$codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
-                            if ($current_miss <= $codes_hz['bet_while_miss']) {
-                                $is_init = 2; # 不中未达到遗漏期数状态 等待状态...
-                                $next_single_key = 0;
-                                $single = $singles[$next_single_key];
-                            } elseif ($current_miss > $codes_hz['bet_while_miss']) {
-                                if($current_miss>=($codes_hz['bet_while_miss']+$singles_count)){
-                                    # 投完所有倍数不中，则进入等待状态
-                                    $is_init = 2; # 不中未达到遗漏期数状态 等待状态...
-                                    $next_single_key = 0;
-                                    $single = $singles[$next_single_key];
-                                    $current_miss = 0;
-                                }else{
-                                    $is_init = 3; # 开始投注，正在下注状态
-                                    $single = OperatePlanService::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
-                                    if ($codes_hz['is_init'] == 2) {
-                                        $next_single_key = 1;
-                                        $single = $singles[$next_single_key];
-                                    }
-                                }
-                            }
-                        }elseif(in_array($UserSysPlan->plan_type, [10])){ # plan_type:中则倍投，不中则回第一个倍数
-                            $next_single_key = 0;
-                            $single = $singles[$next_single_key];
-                        }else{
-                            $single = OperatePlanService::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                         }
+                    }elseif(in_array($UserSysPlan->plan_type, [10])){ # plan_type:中则倍投，不中则回第一个倍数
+                        $next_single_key = 0;
+                        $single = $singles[$next_single_key];
+                    }else{
+                        $single = OperatePlanService::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                     }
-                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['single'] = $single; # 最新更新倍数
-                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['before_singles_key'] = $codes_hz['singles_key']; # 更新前倍数key
-                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['next_single_key'] = $next_single_key; # 最新即将下注的倍数key, singles的 key
-                    if(in_array($UserSysPlan->plan_type, [9, 16])){ # plan_type:遗漏倍投
-                        $codes_hz['current_miss'] = (int)$current_miss;
-                        $codes_hz['is_init'] = $is_init; # 开奖之后初始标识改成 0
-                    }
-                    $codes_hz['singles_key'] = $next_single_key;
-                    $whereUpdate = ['id'=>$UserSysPlan->id ]; # 更新条件
-                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['whereUpdate'] = $whereUpdate;
-
-                    $single = (!empty($single)) ? $single : $originSingle;
-                    $updateData = ['single'=>$single];
-                    if(isset($codes_hz['status_val'])){ # 号码切换&倍投
-                        # 号码切换
-                        if($flag == 1) { # 中奖
-                            $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 1 : 2;
-                        }else{
-                            $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 2 : 1;
-                        }
-                    }
-                    $updateData['hz_Arr'] = json_encode($codes_hz, 320);
-                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['updateData'] = $codes_hz;
-
-                    $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
-                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['rst'] = $rst;
                 }
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['single'] = $single; # 最新更新倍数
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['before_singles_key'] = $codes_hz['singles_key']; # 更新前倍数key
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['next_single_key'] = $next_single_key; # 最新即将下注的倍数key, singles的 key
+                if(in_array($UserSysPlan->plan_type, [9, 16])){ # plan_type:遗漏倍投
+                    $codes_hz['current_miss'] = (int)$current_miss;
+                    $codes_hz['is_init'] = $is_init; # 开奖之后初始标识改成 0
+                }
+                $codes_hz['singles_key'] = $next_single_key;
+                $whereUpdate = ['id'=>$UserSysPlan->id ]; # 更新条件
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['whereUpdate'] = $whereUpdate;
+
+                $single = (!empty($single)) ? $single : $originSingle;
+                $updateData = ['single'=>$single];
+                if(isset($codes_hz['status_val'])){ # 号码切换&倍投
+                    # 号码切换
+                    if($flag == 1) { # 中奖
+                        $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 1 : 2;
+                    }else{
+                        $codes_hz['status_val'] = ($codes_hz['status_val'] == 1) ? 2 : 1;
+                    }
+                }
+                $updateData['hz_Arr'] = json_encode($codes_hz, 320);
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['updateData'] = $codes_hz;
+
+                $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['rst'] = $rst;
             }
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划4', $logArr);
 
             # plan_type: 6:中则投，不中则不投、 8:遗漏投
             $logArr = [];
             $where = ['AND', ['IN', 'plan_type', [6, 8, 10, 15, 17]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
-            if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
-                foreach ($UserSysPlans as $UserSysPlan){
-                    switch ($UserSysPlan->plan_type){
-                        case self::PLAN_TYPE_SINGLES_BET: # 中则投、中则投 + 翻倍梯度
-                        case self::PLAN_TYPE_BT_SINGLES_BET: # 中则波推倍投
-                            $logArr['plan_type_6_10'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans_6($UserSysPlan, $current_kj_qihao);
-                            break;
-                        case self::PLAN_TYPE_SINGLES_BET_2:
-                            # 中则投倍投
-                            $logArr['plan_type_15'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans_15($UserSysPlan, $current_kj_qihao);
-                            break;
-                        case 8:
-                            # 遗漏投
-                            $logArr['plan_type_8'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans_8($UserSysPlan, $current_kj_qihao);
-                            break;
-                        case self::PLAN_TYPE_YL_ZZ_SINGLES_BET:
-                            # 遗漏中则投
-                            $logArr['plan_type_17'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans_17($UserSysPlan, $current_kj_qihao);
-                            break;
-                    }
+            $UserSysPlans = UserSysPlans::find()->where($where);
+            foreach ($UserSysPlans->each(10) as $UserSysPlan){
+                switch ($UserSysPlan->plan_type){
+                    case self::PLAN_TYPE_SINGLES_BET: # 中则投、中则投 + 翻倍梯度
+                    case self::PLAN_TYPE_BT_SINGLES_BET: # 中则波推倍投
+                        $logArr['plan_type_6_10'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans_6($UserSysPlan, $current_kj_qihao);
+                        break;
+                    case self::PLAN_TYPE_SINGLES_BET_2:
+                        # 中则投倍投
+                        $logArr['plan_type_15'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans_15($UserSysPlan, $current_kj_qihao);
+                        break;
+                    case 8:
+                        # 遗漏投
+                        $logArr['plan_type_8'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans_8($UserSysPlan, $current_kj_qihao);
+                        break;
+                    case self::PLAN_TYPE_YL_ZZ_SINGLES_BET:
+                        # 遗漏中则投
+                        $logArr['plan_type_17'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans_17($UserSysPlan, $current_kj_qihao);
+                        break;
                 }
             }
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划5', $logArr);
@@ -2389,72 +2394,71 @@ class SscDataService extends BaseService {
             # plan_type:7 中则继续投否则反买
             $logArr = [];
             $where = ['AND', ['IN', 'plan_type', [7]], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
-            if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
-                foreach ($UserSysPlans as $UserSysPlan){
-                    $Rkey = __FUNCTION__.'_redis_op_plan_7_'.$lottery_type.'_'.$UserSysPlan->id;
-                    if(!$RedisLock->lock($Rkey, 30)){
-                        Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略4', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
-                        continue;
-                    }
-                    \Yii::$app->redis->expire($Rkey, 120);
-                    $flag = SscDataService::isZjBefore($UserSysPlan->id);
-                    $buy_type = ($flag == 1) ? $UserSysPlan->buy_type : ($UserSysPlan->buy_type == 1 ? 0 : 1);
-
-                    $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
-                    $updateData = ['buy_type'=>$buy_type];
-                    $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
-                    $logArr['plan_7'][$UserSysPlan->id]['updateData'] = $updateData;
-                    $logArr['plan_7'][$UserSysPlan->id]['rst'] = $rst;
+            $UserSysPlans = UserSysPlans::find()->where($where);
+            foreach ($UserSysPlans->each(10) as $UserSysPlan){
+                $Rkey = __FUNCTION__.'_redis_op_plan_7_'.$lottery_type.'_'.$UserSysPlan->id;
+                if(!$RedisLock->lock($Rkey, 30)){
+                    Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略4', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+                    continue;
                 }
+                \Yii::$app->redis->expire($Rkey, 120);
+                //$flag = SscDataService::isZjBefore($UserSysPlan->id);
+                $flag = SscDataService::isZjBeforeNew($bets[$UserSysPlan->id]??[]);
+                $buy_type = ($flag == 1) ? $UserSysPlan->buy_type : ($UserSysPlan->buy_type == 1 ? 0 : 1);
+
+                $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
+                $updateData = ['buy_type'=>$buy_type];
+                $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                $logArr['plan_7'][$UserSysPlan->id]['updateData'] = $updateData;
+                $logArr['plan_7'][$UserSysPlan->id]['rst'] = $rst;
             }
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划6', $logArr);
 
             # 玩法类型，号码导入:tz_type \Yii::$app->params['IMPORT_CODES_TYPES']
             $logArr = [];
             $where = ['AND', ['IN', 'tz_type', \Yii::$app->params['IMPORT_CODES_TYPES']], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
-            if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
-                foreach ($UserSysPlans as $UserSysPlan){
-                    $Rkey = __FUNCTION__.'_redis_op_plan_'.implode('_', \Yii::$app->params['IMPORT_CODES_TYPES']).'_'.$lottery_type.'_'.$UserSysPlan->id;
-                    if(!$RedisLock->lock($Rkey, 30)){
-                        \Yii::$app->redis->expire($Rkey, 120);
-                        Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略5', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
-                        continue;
-                    }
+            $UserSysPlans = UserSysPlans::find()->where($where);
+            foreach ($UserSysPlans->each(10) as $UserSysPlan){
+                $Rkey = __FUNCTION__.'_redis_op_plan_'.implode('_', \Yii::$app->params['IMPORT_CODES_TYPES']).'_'.$lottery_type.'_'.$UserSysPlan->id;
+                if(!$RedisLock->lock($Rkey, 30)){
                     \Yii::$app->redis->expire($Rkey, 120);
-                    $hzArr = json_decode($UserSysPlan->hz_Arr, true);
-                    if(isset($hzArr['filters'])){
-                        $hzArr['filters']['current_kj_qihao'] = $current_kj_qihao;
-                    }
-                    if(isset($hzArr['change_per']) && $hzArr['change_per'] == 1){ # 每期轮换
-                        $turn_key = \Yii::$app->params['IMPORT_CODES_TURN'] - 1;
-                        if (isset($hzArr['change_turn_pos']) && $hzArr['change_turn_pos']>0){
-                            # 指定位置号码数字，决定号码组数
-                            $newKjCodesStr = SscKjData::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one()['code_str'];
-                            $newKjCodes = explode(',', $newKjCodesStr);
-                            $turn_key = $newKjCodes[$hzArr['change_turn_pos']-1];
-                            Tool_Common::log('/plans/'.__FUNCTION__, 'INFO', '计划位置组', ['newKjCodes'=>$newKjCodes, 'turn_key'=>$turn_key, 'pos'=>$hzArr['change_turn_pos']-1]);
-                        }elseif($hzArr['turn_key']>=$turn_key) {
-                            $turn_key = 0;#非轮换0，轮换:turn_key+1
-                        }else{
-                            $imports = ImportPlanCodes::find()->select(['uid', 'plan_id', 'plan_id_sort_key'])->where(['AND', ['=', 'plan_id', $UserSysPlan->id], ['!=', 'codes', '']])->asArray()->all();
-                            $sortKeys = yii\helpers\ArrayHelper::getColumn($imports, 'plan_id_sort_key');
-                            $current_key = array_search($hzArr['turn_key'], $sortKeys);
-                            $next_key = ($current_key+1>count($sortKeys)) ? 0 : $current_key+1;
-                            $turn_key = $sortKeys[$next_key];
-                        }
-                        $hzArr['turn_key'] = $turn_key;
-                        $HI = date('H:i:s');
-                        if($closingTime<=$HI && $HI<$openingTime){
-                            $hzArr['turn_key'] = 0; # 开盘默认从0组开始
-                        }
-                    }
-
-                    $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
-                    $updateData = ['hz_Arr'=>json_encode($hzArr, 320)];
-                    $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
-                    $logArr['plan_8'][$UserSysPlan->id]['updateData'] = $updateData;
-                    $logArr['plan_8'][$UserSysPlan->id]['rst'] = $rst;
+                    Tool_Common::log('/plan/'.__FUNCTION__.$lottery_type, 'ERR', '重复处理忽略5', ['lottery_type'=>$lottery_type, 'err_msg'=>'获取锁失败']);
+                    continue;
                 }
+                \Yii::$app->redis->expire($Rkey, 120);
+                $hzArr = json_decode($UserSysPlan->hz_Arr, true);
+                if(isset($hzArr['filters'])){
+                    $hzArr['filters']['current_kj_qihao'] = $current_kj_qihao;
+                }
+                if(isset($hzArr['change_per']) && $hzArr['change_per'] == 1){ # 每期轮换
+                    $turn_key = \Yii::$app->params['IMPORT_CODES_TURN'] - 1;
+                    if (isset($hzArr['change_turn_pos']) && $hzArr['change_turn_pos']>0){
+                        # 指定位置号码数字，决定号码组数
+                        $newKjCodesStr = SscKjData::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one()['code_str'];
+                        $newKjCodes = explode(',', $newKjCodesStr);
+                        $turn_key = $newKjCodes[$hzArr['change_turn_pos']-1];
+                        Tool_Common::log('/plans/'.__FUNCTION__, 'INFO', '计划位置组', ['newKjCodes'=>$newKjCodes, 'turn_key'=>$turn_key, 'pos'=>$hzArr['change_turn_pos']-1]);
+                    }elseif($hzArr['turn_key']>=$turn_key) {
+                        $turn_key = 0;#非轮换0，轮换:turn_key+1
+                    }else{
+                        $imports = ImportPlanCodes::find()->select(['uid', 'plan_id', 'plan_id_sort_key'])->where(['AND', ['=', 'plan_id', $UserSysPlan->id], ['!=', 'codes', '']])->asArray()->all();
+                        $sortKeys = yii\helpers\ArrayHelper::getColumn($imports, 'plan_id_sort_key');
+                        $current_key = array_search($hzArr['turn_key'], $sortKeys);
+                        $next_key = ($current_key+1>count($sortKeys)) ? 0 : $current_key+1;
+                        $turn_key = $sortKeys[$next_key];
+                    }
+                    $hzArr['turn_key'] = $turn_key;
+                    $HI = date('H:i:s');
+                    if($closingTime<=$HI && $HI<$openingTime){
+                        $hzArr['turn_key'] = 0; # 开盘默认从0组开始
+                    }
+                }
+
+                $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
+                $updateData = ['hz_Arr'=>json_encode($hzArr, 320)];
+                $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                $logArr['plan_8'][$UserSysPlan->id]['updateData'] = $updateData;
+                $logArr['plan_8'][$UserSysPlan->id]['rst'] = $rst;
             }
             Tool_Common::log('/plan/opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划7', $logArr);
 
@@ -2677,20 +2681,52 @@ class SscDataService extends BaseService {
     public static function isZjBefore($plan_id = 0, &$recordData = ''){
         if(empty($plan_id)) return false;
         # flag 是否中奖金，中的计划回0.1、不中的计划翻倍
-        $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
+        $BettingRecords = BettingRecords::find()->select(['id', 'profits', 'status'])
+            ->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
 
         $recordData = [
-            'record_id' => $BettingRecords->id,
-            'profits' => $BettingRecords->profits,
-            'status' => $BettingRecords->status,
+            'record_id' => $BettingRecords['id'],
+            'profits' => $BettingRecords['profits'],
+            'status' => $BettingRecords['status'],
         ];
 
         if(empty($BettingRecords)) return -1;
 
         # 最近一期是否中中奖
-        $flag = $BettingRecords['profits']>0 ? 1 : 0;
+        return $BettingRecords['profits']>0 ? 1 : 0;
+    }
 
-        return (int)$flag;
+    /**
+     * @desc 所有计划上期是否中奖
+     * @param $planIds
+     * @return array
+     */
+    public static function isZjBeforeData($lotteryType=DEFAULT_LOTTERY_TYPE, $planIds=Null): array
+    {
+        list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lotteryType);
+        $where = ['qihao'=>$currentKjQiHao, 'lottery_type'=>$lotteryType];
+        if(!empty($planIds)){
+            $where['plan_id'] = $planIds;
+        }
+
+        # 最近一期是否中中奖
+        return BettingRecords::find()->select(['id', 'plan_id', 'profits', 'status'])
+            ->where($where)
+            ->indexBy('plan_id')
+            ->orderBy(['id'=>SORT_DESC])->asArray()->all();
+    }
+
+    /**
+     * 上期是否中奖判断  是否中奖金，中的计划回0.1、不中的计划翻倍
+     * @param $BettingRecords
+     * @return int
+     */
+    public static function isZjBeforeNew($BettingRecords): int
+    {
+        if(empty($BettingRecords)) return -1;
+
+        # 最近一期是否中中奖
+        return $BettingRecords['profits']>0 ? 1 : 0;
     }
 
 

@@ -1092,7 +1092,7 @@ class StaticService extends BaseService {
      */
     public static function allMonthSdHzStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $months = [];
-        for ($i=7; $i>=0; $i--){
+        for ($i=2; $i>=0; $i--){
             $months[] = date('Y-m', strtotime('-'.$i.' months'));
         }
         $allStatic = [];
@@ -1316,7 +1316,6 @@ class StaticService extends BaseService {
         //p($allStaticProfits);
 
         $tmpProfits = $allStaticProfits;
-
         foreach ($tmpProfits as $key=>$tmpProfit){
             foreach ($tmpProfit as $k=>$tmp){
                 $date = $k;
@@ -1411,7 +1410,7 @@ class StaticService extends BaseService {
 
         $allStatic = [];
         $flag = StaticHzProfitsPerdate::find()->where(['lottery_type'=>$lottery_type])->count();
-        $i = 5;
+        $i = 3;
         for($s=0; $s<$i; $s++){
             if(!$flag OR !$time = $m->get($mkey)) {
                 $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
@@ -1506,7 +1505,6 @@ class StaticService extends BaseService {
        $allMonthStaticProfits = self::allMonthSdHzStaticProfits($lottery_type);
 
        $tmpProfits = $allMonthStaticProfits;
-
        foreach ($tmpProfits as $tmpProfit){
            foreach ($tmpProfit as $month=>$tmp){
                //if($month != date('Y-m')) continue;
@@ -1616,7 +1614,7 @@ class StaticService extends BaseService {
 
         $allStatic = [];
         $flag = StaticPerHzPerdateProfits::find()->count();
-        static $i = 5;
+        static $i = 3;
         for($s=0; $s<$i; $s++){
             if(!$flag OR !$time = $m->get($mkey)) {
                 $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
@@ -1636,7 +1634,7 @@ class StaticService extends BaseService {
             if($date>date('Y-m-d')) break;
             if($statics = self::staticSdHzProfitsPerdate($date, $lottery_type)){
                 //p(['statics'=>$statics]);
-                $setData = ['date'=>$date, 'lottery_type'=>$lottery_type];
+                $setData = ['date'=>$date];
                 foreach ($statics as $k=>$staticData) {
                     //$tzMoney = $staticData['tzMoney'];
                     $setData['codes_' . $staticData['name']] = $staticData['profits'];
