@@ -2021,8 +2021,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @param $order_type 1、跟投订单 2、大数据订单 3、系统计划订单
      * @return array
      */
-    public function bet($qihao, $plan_id, $codes){
-        return $this->postBatchBet($qihao, $plan_id, $codes, $is_task=0);
+    public function bet($qihao, $plan, $codes){
+        return $this->postBatchBet($qihao, $plan, $codes, $is_task=0);
     }
 
     /**
@@ -2060,9 +2060,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @param $codes - 1,2,3,4@2,3,4,5@5,6,7,8
      * @return array
      */
-    public function postBatchBet($qihao, $plan_id, $codes, $is_task=1){
+    public function postBatchBet($qihao, $plan, $codes, $is_task=1){
         $tmpCodes = $codes;
-        $plan = UserSysPlans::findOne($plan_id);
+        //$plan = UserSysPlans::findOne($plan_id);
+        $plan_id = $plan->id;
         if($plan->tz_type == 22){ # 四定单双,codes格式：13579,13579,02468,13579@13579,13579,02468,02468@13579,02468,13579,13579
             $codesArr = self::getBetCodes($codes, $plan->single, $plan->playway);
         }elseif($plan->tz_type == 18){

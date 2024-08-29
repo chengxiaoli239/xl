@@ -69,6 +69,22 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lotteryType=8);
+        p([$currentKjQiHao, $qiHao]);
+        $rst['data'] = BetService::insertPlansTask($lottery_types=[8]);
+        p($rst);
+        # is_batch_simulate:0正常1批量模拟历史记录
+        $lottery_type = 8;
+        $where = ['AND', ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
+        //$where[] = ['=', 'uid', 17]; # 测试
+
+        $plans = UserSysPlans::find()->where($where); // ->all();
+        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '批量插入任务000', ['lottery_type'=>$lottery_type, 'counts'=>$plans->count()]);
+        if($plans->isEmpty()){
+            Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>'没有开启的计划']);
+            var_dump('kong');
+        }
+        p('dddd');
         $bets = SscDataService::isZjBeforeData(8);
         $flag = SscDataService::isZjBeforeNew($bets[941699]??[]);
         p([$flag, $bets]);

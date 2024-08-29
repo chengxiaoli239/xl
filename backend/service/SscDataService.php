@@ -2143,7 +2143,7 @@ class SscDataService extends BaseService {
             $planIds = UserSysPlans::find()->where(['status'=>1])->column();
             $planStaticProfitsData = PlanStaticProfits::find()->where(['plan_id'=>$planIds])->indexBy('plan_id')->all();
 
-            $bets = SscDataService::isZjBeforeData($lottery_type);
+            //$bets = SscDataService::isZjBeforeData($lottery_type);
 
             $t1 = microtime(true);
             $UserSysPlans = UserSysPlans::find()->where($where)->andWhere(['=', 'lottery_type', $lottery_type]);
@@ -2264,8 +2264,8 @@ class SscDataService extends BaseService {
                     continue;
                 }
                 \Yii::$app->redis->expire($Rkey, 120);
-                //$flag = SscDataService::isZjBefore($UserSysPlan->id);
-                $flag = SscDataService::isZjBeforeNew($bets[$UserSysPlan->id]??[]);
+                $flag = SscDataService::isZjBefore($UserSysPlan->id);
+                //$flag = SscDataService::isZjBeforeNew($bets[$UserSysPlan->id]??[]);
                 $flags[$UserSysPlan->uid][$UserSysPlan->id] = $flag;
                 $originSingle = $UserSysPlan->single;
 
@@ -2343,7 +2343,7 @@ class SscDataService extends BaseService {
                 $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['before_singles_key'] = $codes_hz['singles_key']; # 更新前倍数key
                 $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['next_single_key'] = $next_single_key; # 最新即将下注的倍数key, singles的 key
                 if(in_array($UserSysPlan->plan_type, [9, 16])){ # plan_type:遗漏倍投
-                    $codes_hz['current_miss'] = (int)$current_miss;
+                    $codes_hz['current_miss'] = $current_miss;
                     $codes_hz['is_init'] = $is_init; # 开奖之后初始标识改成 0
                 }
                 $codes_hz['singles_key'] = $next_single_key;
@@ -2409,8 +2409,8 @@ class SscDataService extends BaseService {
                     continue;
                 }
                 \Yii::$app->redis->expire($Rkey, 120);
-                //$flag = SscDataService::isZjBefore($UserSysPlan->id);
-                $flag = SscDataService::isZjBeforeNew($bets[$UserSysPlan->id]??[]);
+                $flag = SscDataService::isZjBefore($UserSysPlan->id);
+                //$flag = SscDataService::isZjBeforeNew($bets[$UserSysPlan->id]??[]);
                 $buy_type = ($flag == 1) ? $UserSysPlan->buy_type : ($UserSysPlan->buy_type == 1 ? 0 : 1);
 
                 $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
@@ -2734,7 +2734,7 @@ class SscDataService extends BaseService {
      * @param $BettingRecords
      * @return int
      */
-    public static function isZjBeforeNew($BettingRecords): int
+    public static function isZjBeforeNew($BettingRecords=[]): int
     {
         if(empty($BettingRecords)) return -1;
 

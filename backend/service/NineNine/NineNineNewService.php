@@ -400,8 +400,8 @@ class NineNineNewService extends BaseTZService {
         return $rst;
     }
 
-    public function postBatchBet($qihao, $plan_id, $code){
-        return $this->bet($qihao, $plan_id, $code);
+    public function postBatchBet($qihao, $plan, $code){
+        return $this->bet($qihao, $plan, $code);
     }
 
     /**
@@ -418,9 +418,10 @@ class NineNineNewService extends BaseTZService {
      * @param $order_type 1、跟投订单 2、大数据订单 3、系统计划订单
      * @return array
      */
-    public function bet($qihao, $plan_id, $code, $is_task=1, $is_auto = 1){
+    public function bet($qihao, $plan, $code, $is_task=1, $is_auto = 1){
         self::__init(self::$user_id, self::$tz_system_id);
-        $plan = UserSysPlans::findOne($plan_id);
+        //$plan = UserSysPlans::findOne($plan_id);
+        $plan_id = $plan->id;
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
         $tz_type = $plan->tz_type ? $plan->tz_type : 0;

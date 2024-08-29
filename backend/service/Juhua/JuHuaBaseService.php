@@ -1589,9 +1589,9 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @param $order_type 1、跟投订单 2、大数据订单 3、系统计划订单
      * @return array
      */
-    public function bet($qihao, $plan_id, $codes){
-        $rst = $this->postBatchBet($qihao, $plan_id, $codes);
-        Tool_Common::log('bet_rst', 'INFO', '下注返回值', ['qihao'=>$qihao, 'plan_id'=>$plan_id, 'codes'=>$codes, 'rst'=>$rst]);
+    public function bet($qihao, $plan, $codes){
+        $rst = $this->postBatchBet($qihao, $plan, $codes);
+        Tool_Common::log('bet_rst', 'INFO', '下注返回值', ['qihao'=>$qihao, 'plan_id'=>$plan->id, 'codes'=>$codes, 'rst'=>$rst]);
         return $rst;
     }
 
@@ -1611,11 +1611,11 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
     /**
      * @desc 批量号码拆解下注
      * @param $qihao
-     * @param $plan_id
+     * @param $plan
      * @param $codes
      * @return array
      */
-    public static function postBatchBet($qihao, $plan_id, $codes){
+    public static function postBatchBet($qihao, $plan, $codes){
         $tmpCodes = $codes;
         $tmpCodes = str_replace(',', '', $tmpCodes);
         $codesArr = explode('@', $tmpCodes);
@@ -1623,7 +1623,8 @@ class JuHuaBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         $codesArrs = self::splitCodes($codesArr,  1700); # 2500一次
 
-        $plan = UserSysPlans::findOne($plan_id);
+        //$plan = UserSysPlans::findOne($plan_id);
+        $plan_id = $plan->id;
         $playway = $plan->playway ? $plan->playway : 3;
         $single = $plan->single ? $plan->single : 0.1;
         $tz_type = $plan->tz_type ? $plan->tz_type : 0;

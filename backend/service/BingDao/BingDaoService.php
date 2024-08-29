@@ -222,8 +222,8 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
      * @param $order_type 1、跟投订单 2、大数据订单 3、系统计划订单
      * @return array
      */
-    public function bet($qihao, $plan_id, $codes) {
-        return $this->postBatchBet($qihao, $plan_id, $codes);
+    public function bet($qihao, $plan, $codes) {
+        return $this->postBatchBet($qihao, $plan, $codes);
     }
     /**
      * @desc 根据playway 2二定3四定 获取投注方式
@@ -1572,15 +1572,15 @@ class BingDaoService extends BaseTZService { # 冰岛时时彩登陆体系
     /**
      * @desc 批量号码拆解下注
      * @param $qihao
-     * @param $plan_id
+     * @param $plan
      * @param $codes
      * @return array
      */
-    public static function postBatchBet($qihao, $plan_id, $codes){
+    public static function postBatchBet($qihao, $plan, $codes){
         //p([$qihao, $plan_id, $codes]);
         Tool_Common::log('bingDao_error', 'INFO', '冰岛多计划-3', ['qihao'=>$qihao, 'plan_id'=>$plan_id]);
         $tmpCodes = $codes;
-        $plan = UserSysPlans::findOne($plan_id);
+        //$plan = UserSysPlans::findOne($plan_id);
         if($plan->tz_type == 22){ # 四定单双,codes格式：13579,13579,02468,13579@13579,13579,02468,02468@13579,02468,13579,13579
             $codesArr = self::getBetCodes($codes, $plan->single, $plan->playway);
         }elseif($plan->tz_type == 18){
