@@ -2145,6 +2145,7 @@ class SscDataService extends BaseService {
 
             $bets = SscDataService::isZjBeforeData($lottery_type);
 
+            $t1 = microtime(true);
             $UserSysPlans = UserSysPlans::find()->where($where)->andWhere(['=', 'lottery_type', $lottery_type]);
             foreach ($UserSysPlans->each(10) as $UserSysPlan){
                 try {
@@ -2245,6 +2246,8 @@ class SscDataService extends BaseService {
                     $logArr['plan_1_3_5'][$UserSysPlan->id] = ['err_msg'=>$e->getMessage()];
                 }
             }
+            $t2 = microtime(true);
+            $logArr['time_consume'] = ($t2-$t1).'s';
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划3', $logArr);
 
             $flags = []; # 计划是否中奖标识
@@ -2363,6 +2366,8 @@ class SscDataService extends BaseService {
                 $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
                 $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['rst'] = $rst;
             }
+            $t3 = microtime(true);
+            $logArr['time_consume'] = ($t3-$t2).'s';
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划4', $logArr);
 
             # plan_type: 6:中则投，不中则不投、 8:遗漏投
@@ -2389,6 +2394,8 @@ class SscDataService extends BaseService {
                         break;
                 }
             }
+            $t4 = microtime(true);
+            $logArr['time_consume'] = ($t4-$t3).'s';
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划5', $logArr);
 
             # plan_type:7 中则继续投否则反买
@@ -2412,6 +2419,8 @@ class SscDataService extends BaseService {
                 $logArr['plan_7'][$UserSysPlan->id]['updateData'] = $updateData;
                 $logArr['plan_7'][$UserSysPlan->id]['rst'] = $rst;
             }
+            $t5 = microtime(true);
+            $logArr['time_consume'] = ($t5-$t4).'s';
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划6', $logArr);
 
             # 玩法类型，号码导入:tz_type \Yii::$app->params['IMPORT_CODES_TYPES']
@@ -2460,12 +2469,16 @@ class SscDataService extends BaseService {
                 $logArr['plan_8'][$UserSysPlan->id]['updateData'] = $updateData;
                 $logArr['plan_8'][$UserSysPlan->id]['rst'] = $rst;
             }
+            $t6 = microtime(true);
+            $logArr['time_consume'] = ($t6-$t5).'s';
             Tool_Common::log('/plan/opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划7', $logArr);
 
             OperatePlanService::opProfitsPlans12_13($lottery_type); # A出x次B出y次投B、A出x次B出y次投B_2 计划处理
 
             OperatePlanService::opProfitsPlans14($lottery_type); # 区间遗漏投 止盈止损 计划处理
             $qihao = HN0898Service::getQihao($lottery_type);
+            $t7 = microtime(true);
+            $logArr['time_consume'] = ($t7-$t6).'s';
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划', ['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
             $dealStatus = 2;
         }catch (\Exception $e){
