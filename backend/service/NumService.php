@@ -313,6 +313,13 @@ class NumService extends BaseService {
         199=>'取后四最近9990组(四定)',
         200=>'取前四最近9999组(四定)',
         201=>'取后四最近9999组(四定)',
+
+        202=>'过滤12位合分',
+        203=>'过滤13位合分',
+        204=>'过滤14位合分',
+        205=>'过滤23位合分',
+        206=>'过滤24位合分',
+        207=>'过滤34位合分',
     ];
 
     const TYPE_POSITIONS = [
@@ -346,6 +353,13 @@ class NumService extends BaseService {
         191=>[1,2,4],
         192=>[1,3,4],
         193=>[2,3,4],
+
+        202=>[1,2],
+        203=>[1,3],
+        204=>[1,4],
+        205=>[2,3],
+        206=>[2,4],
+        207=>[3,4],
     ];
 
     /**
@@ -3465,6 +3479,13 @@ class NumService extends BaseService {
                 case 191:
                 case 192:
                 case 193:
+
+                case 202:
+                case 203:
+                case 204:
+                case 205:
+                case 206:
+                case 207:
                     $codes = NumCodeService::getBeforeKjCodesDynamic126($plan, self::TYPE_HF_POSITIONS[$filter_dynamic_type]);
                     break;
                 case 194:
