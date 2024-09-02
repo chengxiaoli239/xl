@@ -862,8 +862,6 @@ class IndexController extends Controller
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 1);
         p($rst);// 更新单双遗漏
         $rst = HN0898Service::insertDsYl($lottery_type = 1);
-        p($rst); # 七星彩单双
-        $rst = StaticService::opStatic($lottery_types = [1]);
         p($rst);# 和值、四定利润统计
         for ($i = 0; $i < 1000; $i++) {
             $rst['updateDs'] = SscDataService::updateDsData($lottery_type = 6); // 每期开奖遗漏 -- 新开

@@ -588,6 +588,93 @@ class OperatePlanService extends BaseService
     }
 
     /**
+     * 18 - 遗漏x期投y期
+     * @param $lottery_type
+     * @param $currentKjQiHao
+     * @return true
+     */
+    public static function operatePlans18($lottery_type, $currentKjQiHao): bool
+    {
+        $where = ['AND', ['IN', 'plan_type', 18], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
+        $UserSysPlans = UserSysPlans::find()->where($where);
+        foreach ($UserSysPlans->each(10) as $UserSysPlan){
+            try {
+                $planId = $UserSysPlan->id;
+                $flag = SscDataService::isZjBefore($UserSysPlan->id);
+                # 遗漏期数[不中奖期数]
+                //$lossQs = SscDataService::getLossQs($UserSysPlan->id);
+
+                $hzArr = json_decode($UserSysPlan->hz_Arr, true);
+                $beforeHzArr = $hzArr;
+                if(isset($hzArr['filters'])){
+                    $hzArr['filters']['current_kj_qihao'] = $currentKjQiHao;
+                }
+
+                $betStatus = $codes_hz['betStatus']??0; # 开奖之后初始标识改成 0
+                $current_miss = $codes_hz['current_miss']??0; # 当前遗漏
+                $single_key = $codes_hz['single_key']??0; # 倍数索引
+                $betWhileMiss = $codes_hz['bet_while_miss']??0;
+                $has_bet_nums = $codes_hz['has_bet_nums']??0; # 已投数量
+                $singles = explode('-', trim($UserSysPlan->singles));
+                $singles_count = count($singles);
+
+                if(in_array($betStatus, [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
+                    if($flag){
+                        # 中奖
+                        $single_key = 0;
+                        $current_miss = 0;
+                        $has_bet_nums = 0;
+                    }else{
+                        # 不中奖
+                        $current_miss += 1;
+                        if($current_miss>=$betWhileMiss){
+                            $single_key =0;
+                            $betStatus = 1; // 进入下注状态
+                            $has_bet_nums = 1;
+                        }
+                    }
+                }elseif($betStatus == SscDataService::PLAN_BET_STATUS_BETTING){
+                    if($flag){
+                        $current_miss = 0;
+                    }else{
+                        $current_miss += 1;
+                    }
+                    if($single_key<($singles_count-1)){
+                        $single_key += 1; # 还没投完继续投
+                        $has_bet_nums += 1;
+                    }else{
+                        $single_key = 0; # 投完倍数进入等待状态
+                        $betStatus = SscDataService::PLAN_BET_STATUS_WAIT;
+                        $has_bet_nums = 0;
+                    }
+                }
+                if($has_bet_nums>$singles_count){
+                    $has_bet_nums = 1;
+                }
+                $next_single_key = $has_bet_nums - 1;
+                if($has_bet_nums==0 OR $has_bet_nums>$singles_count){
+                    $single_key = 0;
+                }
+
+                $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+                $hzArr = array_merge($hzArr, [
+                    'current_miss' => $current_miss,
+                    'single_key' => $single_key,
+                    'betStatus' => $betStatus,
+                    'has_bet_nums' => $has_bet_nums,
+                ]);
+                $updateData = ['hz_Arr'=>json_encode($hzArr, 320), 'single'=>$single];
+                $rst = UserSysPlans::updateAll($updateData, ['id'=>$UserSysPlan->id]);
+                Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '遗漏投x投y期', ['planId'=>$planId, 'beforeHzArr'=>$beforeHzArr, 'afterHzArr'=>$hzArr, 'rst'=>$rst]);
+            }catch (\Exception $e){
+                Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '遗漏投x投y期', ['planId'=>$planId, 'err_msg'=>$e->getMessage()]);
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * @desc 获取计划下一个倍数
      * @param $plan_id
      * @param $single

@@ -44,9 +44,11 @@ class OpKjService extends BaseService {
                 AoZhou5Service::afterKj();
                 break;
             default:
-                $bettingRecords = BettingRecords::find()->where(['status'=>0, 'lottery_type'=>$lottery_type, 'is_batch_simulate'=>0])->orderBy('id DESC')->limit(100)->all();
-                if(!$bettingRecords) return $rst;
-                foreach ($bettingRecords as $BettingRecord){
+                $bettingRecords = BettingRecords::find()
+                    ->where(['status'=>0, 'lottery_type'=>$lottery_type, 'is_batch_simulate'=>0])
+                    ->orderBy('id DESC'); //->limit(100)->all();
+                //if(!$bettingRecords) return $rst;
+                foreach ($bettingRecords->each(20) as $BettingRecord){
                     $rst['data'][$BettingRecord->id] = OpKjService::opOneBettingRecord($BettingRecord->id, $BettingRecord);
                 }
                 break;

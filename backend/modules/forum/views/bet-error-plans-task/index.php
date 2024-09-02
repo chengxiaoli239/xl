@@ -62,21 +62,21 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'bet_url:url',
                         //'bet_headers',
                         //'post_datas:ntext',
-                        ['attribute' => 'post_datas','label' => '请求内容',
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                $txt = BaseStringHelper::truncate($model->post_datas,15);
-                                $opions = [
-                                    'class' => 'act-post-desc',
-                                    'title' => $model->post_datas,
-                                    'alt'=>$model->post_datas,
-                                    'data-url' => $model->bet_url,
-                                    'data-content' => $model->post_datas,
-                                    'data-error' => $model->error_desc,
-                                ];
-                                return Html::a($txt, 'javascript:;', $opions);
-                            }
-                        ],
+                        //['attribute' => 'post_datas','label' => '请求内容',
+                        //    'format'=>'raw',
+                        //    'value' => function($model) {
+                        //        $txt = BaseStringHelper::truncate($model->post_datas,15);
+                        //        $opions = [
+                        //            'class' => 'act-post-desc',
+                        //            'title' => $model->post_datas,
+                        //            'alt'=>$model->post_datas,
+                        //            'data-url' => $model->bet_url,
+                        //            'data-content' => $model->post_datas,
+                        //            'data-error' => $model->error_desc,
+                        //        ];
+                        //        return Html::a($txt, 'javascript:;', $opions);
+                        //    }
+                        //],
                         //'playway',
                         //['attribute'=>'playway','label'=>'类型',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                         //    'format'=>'raw',

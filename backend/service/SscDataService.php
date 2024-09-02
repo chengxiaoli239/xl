@@ -76,6 +76,7 @@ class SscDataService extends BaseService {
     const PLAN_TYPE_SINGLES_BET_2 = 15; # 中则倍投
     const PLAN_TYPE_BT_SINGLES_BET = 10; # 中则波推倍投，类似于中则投+翻倍梯度倍投
     const PLAN_TYPE_YL_ZZ_SINGLES_BET = 17; # 遗漏中则倍投
+    const PLAN_TYPE_YL_BET_SINGLES_NUM = 18; # 遗漏x期投y期
 
     const PLAN_BET_STATUS_INIT = 0; # 初始状态
     const PLAN_BET_STATUS_BETTING = 1; # 正在下注状态
@@ -2372,7 +2373,7 @@ class SscDataService extends BaseService {
 
             # plan_type: 6:中则投，不中则不投、 8:遗漏投
             $logArr = [];
-            $where = ['AND', ['IN', 'plan_type', [6, 8, 10, 15, 17]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+            $where = ['AND', ['IN', 'plan_type', [6, 8, 10, 15, 17, 18]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
             $UserSysPlans = UserSysPlans::find()->where($where);
             foreach ($UserSysPlans->each(10) as $UserSysPlan){
                 switch ($UserSysPlan->plan_type){
@@ -2391,6 +2392,9 @@ class SscDataService extends BaseService {
                     case self::PLAN_TYPE_YL_ZZ_SINGLES_BET:
                         # 遗漏中则投
                         $logArr['plan_type_17'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans_17($UserSysPlan, $current_kj_qihao);
+                        break;
+                    case self::PLAN_TYPE_YL_BET_SINGLES_NUM:
+                        $logArr['plan_type_18'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans18($UserSysPlan, $current_kj_qihao);
                         break;
                 }
             }
@@ -2747,10 +2751,11 @@ class SscDataService extends BaseService {
      * @desc 计算某个计划多少期不中
      * @return int
      */
-    public static function getLossQs($plan_id){
+    public static function getLossQs($plan_id): int
+    {
         $where = ['plan_id' =>$plan_id];
         $i = 0;
-        if($BettingRecords = BettingRecords::find()->where($where)->asArray()->orderBy(['id'=>SORT_DESC])->limit(100)->all()){
+        if($BettingRecords = BettingRecords::find()->select(['id', 'profits'])->where($where)->asArray()->orderBy(['id'=>SORT_DESC])->limit(100)->all()){
             foreach ($BettingRecords as $BettingRecord){
                 if($BettingRecord['profits']<0){
                     $i = $i + 1;
