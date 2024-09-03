@@ -73,6 +73,7 @@ class SscDataService extends BaseService {
 
     const PLAN_TYPE_SINGLES_BET = 6; # 中则投、中则投+翻倍梯度倍投
     const PLAN_TYPE_YL_BET = 8; # 遗漏投
+    const PLAN_TYPE_AREA_SINGLES_BET = 14; # 区间遗漏投
     const PLAN_TYPE_SINGLES_BET_2 = 15; # 中则倍投
     const PLAN_TYPE_BT_SINGLES_BET = 10; # 中则波推倍投，类似于中则投+翻倍梯度倍投
     const PLAN_TYPE_YL_ZZ_SINGLES_BET = 17; # 遗漏中则倍投
