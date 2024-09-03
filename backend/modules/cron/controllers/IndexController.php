@@ -55,32 +55,6 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 四定单双利润统计
-     * @return array
-     */
-    public function actionStaticSdProfits(){
-        self::_init();
-        if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
-
-        $rst = StaticService::opAllStaticProfits();
-
-        return $rst;
-    }
-
-    /**
-     * @desc 四定和值利润统计
-     * @return array
-     */
-    public function actionStaticHzProfits(){
-        self::_init();
-        if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
-        $post = \Yii::$app->request->post();
-        $rst = StaticService::opStatic($post['lottery_types']); # 和值、四定利润统计
-
-        return $rst;
-    }
-
-    /**
      * @desc 号码和值投注记录
      * @return array
      */
@@ -208,26 +182,6 @@ class IndexController extends Controller
         self::_init();
 
         $rst = BaoTaService::syncBaoTaCrontabs();
-
-        return $rst;
-    }
-
-    /**
-     * @description 本地处理开奖数据
-     * @return array
-     */
-    public function actionOpKj(){
-        self::_init();
-        $time = date("H:i");
-        if(\Yii::$app->params['ssc_kj_time_start'] < $time && $time < \Yii::$app->params['ssc_kj_time_start'] ){
-            $rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
-            return $rst;
-        }
-        $lottery_types = StaticService::getLotteryTypes();
-        foreach ($lottery_types as $lottery_type) {
-            $rst = OpKjService::opSscKjData($lottery_type); # 在抓取完开奖数据已经调用 KjDataGet::grabOne
-            //sleep(2);
-        }
 
         return $rst;
     }

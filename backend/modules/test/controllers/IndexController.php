@@ -810,8 +810,6 @@ class IndexController extends Controller
         p($rst);
         $rst = StaticService::getCreatePeiShuTrueFalseSql();
         p($rst);
-        $miss = SscDataService::getSdHzYlHistoryMiss([5], $lottery_type = 6, 500000);
-        p($miss);
         $rst = Lucky5Service::getQihaoInfo($uid = 10, $tz_system_id = 9, $lottery_type = 8);
         p($rst);
         $str = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx16d295b4421899d4&redirect_uri=http%3A%2F%2Fgoapi.hngoshare.com%2Fpay%2Findex%2Fmiddle-redirect%3Fparams%3D%252Fweixin%252Fwechat.html%253Forder_sn%253D2021011610424878811%2526&response_type=code&scope=snsapi_base&state=STATE&connect_redirect=1#wechat_redirect";
@@ -926,8 +924,6 @@ class IndexController extends Controller
         p($mathes);
         $rst = BaseService::synBalance(51);
         p($rst);
-        $rst[] = StaticService::opAllStaticProfits();
-        p($rst);# 利润统计
         $rst = TennisSportsService::grabTennisSportsGame();
         p($rst);
         $rst = \backend\service\Mbs188\tennis\TennisService::getGames();
@@ -1072,11 +1068,6 @@ class IndexController extends Controller
         $str = '0,9,1,0';
         $rst = CommonService::isCodeType22b($str);
         p($rst);
-        $miss = SscDataService::getSdHzYlHistoryMiss([32], $lottery_type = 5, 80000);
-        p($miss);
-
-        $miss = SscDataService::getSdHzYlHistoryMiss([1], $lottery_type = 5, 900000);
-        p($miss);
 
         $rst = BaseDataService::insertCodeType3();
         p($rst);
@@ -1175,14 +1166,6 @@ class IndexController extends Controller
         p($rst);
 
 
-        $rst['opStaticSdProfitsMonth'] = StaticService::opStaticSdProfitsMonth($lottery_type = 6);
-        p($rst);# 单双利润统计(month)
-        $rst['staticHzMonthsProfits'] = StaticService::staticHzMonthsProfits($lottery_type = 6);
-        p($rst);# 每月四定和值利润统计
-        $rst = StaticService::static4dMonthsProfits($lottery_type = 6);
-        p($rst); # 每月四定单双利润统计，有点慢，四定类型详见：StaticService::$typeArr
-        $rst = StaticService::allHzStaticProfitsPerdate($lottery_type = 6);
-        p($rst);# 循环计算每天每个和值利润统计
         $rst = StaticService::staticAll2NumsYl();
         p($rst); # 统计所有二字现遗漏
         $rst = BetService::bet();
@@ -1266,12 +1249,8 @@ class IndexController extends Controller
         p($qihao);
         $rst = StaticService::getNiceCodes(5);
         p(['最优号码[四现不带双]' => $rst]);
-        $rst['opStaticSdProfitsDay'] = StaticService::opStaticSdProfitsDay();
-        p($rst); # 单双利润统计(day)
         $rst = SscDataService::getCodesDS('1,2,3,4,5');
         p($rst);
-        $rst = StaticService::allHzStaticProfits($lottery_type = 5);
-        p($rst); # 每个月份每个和值利润统计
         $rst = StaticService::staticPerHzProfits('2019-03');
         p($rst); # 某月份每个和值利润统计
         if ($status = StaticService::isCanOpStatic($lottery_type = 5, $mkey = 'opStatic')) {

@@ -7,6 +7,7 @@ use backend\models\open\PlatformGroup;
 use backend\models\open\PlatformRobot;
 use backend\models\PlanStaticProfits;
 use backend\models\searchs\wechat\Bets;
+use backend\models\SscKjData;
 use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
@@ -71,6 +72,18 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $lottery_type = 8;
+        $query = SscKjData::find()->select(['COUNT(id) AS nums'])->where(['date'=>date('Y-m-d'),'codes_4nums_hz'=>[16,17,18,19], 'lottery_type'=>$lottery_type])->limit(1);
+        $sql = $query->createCommand()->getRawSql();p($sql);
+        $today_nums = $query->asArray()->one()['nums'];
+        $t1 = microtime(true);
+        $miss = SscDataService::getSdHzYlHistoryMiss($zuHes=[16,17,18,19,20], $lottery_type=8, $static_nums=500); p($miss, 0);
+        $t2 = microtime(true);
+        $logArr = [
+            't1' => ($t2-$t1).'s',
+        ];
+        p($miss, 0);
+        p($logArr);
         $UserSysPlan = UserSysPlans::findOne(10184);
         $rst = OperatePlanService::operatePlans18($UserSysPlan, $current_kj_qihao='20240902131');
         p($rst);
@@ -111,7 +124,6 @@ class IndexController extends Controller
         foreach ($UserSysPlans->each(10) as $UserSysPlan){
             p(['current_kj_qihao'=>$current_kj_qihao, 'UserSysPlan_id'=>$UserSysPlan->id]);
         }
-        $rst = StaticService::allHzStaticProfits($lottery_type = 8); p($rst);
         $difference = array_diff($otherArray=[1,2,3,4], $positions=[1,4,2]);
         p($difference);
         $bet_log = Lucky5Service::getBetLog($tz_type=25, $plan_id=	9621);p($bet_log);

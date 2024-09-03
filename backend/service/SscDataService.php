@@ -1247,7 +1247,7 @@ class SscDataService extends BaseService {
         if(count($tmpKjData) > 2){
             foreach($tmpKjData as $key=>$r){
                 if($key == 0) continue;
-                $range[$tmpKjData[$key-1]['index_id']."_".$tmpKjData[$key]['index_id']] = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
+                $range[$tmpKjData[$key-1]['index_id']."_". $r['index_id']] = $tmpKjData[$key-1]['index_id'] - $r['index_id'] - 1;
             }
 
             $max_miss = max($range);
@@ -1723,10 +1723,11 @@ class SscDataService extends BaseService {
                 throw_info('未开启统计：'.DealDataService::$dealDataStatusFields[$field], 40001);
             }
             # 大数组：包括二定、三定、四定
-            $updateDsDatas = SscSdHzVal::find()->asArray()->All();
+            $updateDsData = SscSdHzVal::find()->asArray()->All();
             //$rst[$interval] = SscDataService::dsYLStatic($interval);
             //p($updateDsDatas);
-            foreach ($updateDsDatas as $Data){
+            $qishu = SscDataService::getQishus($lottery_type);
+            foreach ($updateDsData as $Data){
                 //if($Data['id'] != 61) continue;
                 $zuHes = explode(',', $Data['val']);
                 $where = [ 'AND',[ 'IN', 'val', $Data['val']], ['=', 'lottery_type', $lottery_type] ];
@@ -1742,7 +1743,6 @@ class SscDataService extends BaseService {
                 $SscSdHzYl->count = $count; # 组合总共组数
                 $SscSdHzYl->updated_at = time();
                 //$SscDsYl->zhi = (string)$num;
-                $qishu = SscDataService::getQishus($lottery_type);
                 $SscSdHzYl->theory_nums_perdate = (string)round(($count*$qishu*0.1) / 995, 2); # 理论次数/天
                 $SscSdHzYl->today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where(['date'=>date('Y-m-d'),'codes_4nums_hz'=>$zuHes, 'lottery_type'=>$lottery_type])->asArray()->limit(1)->one()['nums'];
 
@@ -3616,7 +3616,7 @@ class SscDataService extends BaseService {
                 $date = $pre_date;
             }
         }else{
-            if('00:00'<$time_HI && $time_HI<'04:05'){
+            if('00:00'<$time_HI && $time_HI<'05:05'){
                 $date = $pre_date;
             }
         }

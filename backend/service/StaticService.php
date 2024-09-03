@@ -2302,23 +2302,49 @@ class StaticService extends BaseService {
        }
        foreach ($lottery_types as $lottery_type){
            if($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllStaticProfits')){
+               $t1 = microtime(true);
+               Tool_Common::log('/data/'.__FUNCTION__, "INFO", '处理统计数据-开始', ['lottery_type'=>$lottery_type, 't1'=>$t1]);
                #$rst['opStaticProfits'] = StaticService::opStaticProfits($lottery_type); # 暂停统计利润
+
                $rst['allDateStatic3nPerMonth'] = StaticService::allDateStatic3nPerMonth($lottery_type); # 三现每月统计
+               $t2 = microtime(true);
+
                $rst['allDateStatic4nPerMonth'] = StaticService::allDateStatic4nPerMonth($lottery_type); # 部分四现每月统计
+               $t3 = microtime(true);
 
                $rst['allDateStatic3NumsPerDate'] = StaticService::allDateStatic3NumsPerDate($lottery_type); # 上奖三字现
+               $t4 = microtime(true);
 
                # 每月四定单双利润统计，四定类型详见：StaticService::$typeArr
                $rst['static4dMonthsProfits'] = StaticService::static4dMonthsProfits($lottery_type);
+               $t5 = microtime(true);
+
                # 每天四定利润统计，四定类型详见：StaticService::$typeArr
                //$rst['static4dPerDateProfits'] = StaticService::static4dPerDateProfits($lottery_type);
                # 号码类型每天数量统计
                $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type);
+               $t6 = microtime(true);
+
                # 和值每天数量统计
                $rst['allDateStaticHzPerDate'] = StaticService::allDateStaticHzPerDate($lottery_type);
+               $t7 = microtime(true);
 
                $rst['staticCodeTypeProfitsDate_parent'] = StaticService::staticCodeTypeProfitsDate_parent($lottery_type);
+               $t8 = microtime(true);
+
                $rst['staticCodeTypeProfitsMonth_parent'] = StaticService::staticCodeTypeProfitsMonth_parent($lottery_type);
+               $t9 = microtime(true);
+               Tool_Common::log('/data/'.__FUNCTION__, "INFO", '处理统计数据-开始', [
+                   'lottery_type'=>$lottery_type,
+                   'time_consume1'=>($t2-$t1).'s',
+                   'time_consume2'=>($t3-$t2).'s',
+                   'time_consume3'=>($t4-$t3).'s',
+                   'time_consume4'=>($t5-$t4).'s',
+                   'time_consume5'=>($t6-$t5).'s',
+                   'time_consume6'=>($t7-$t6).'s',
+                   'time_consume7'=>($t8-$t7).'s',
+                   'time_consume8'=>($t9-$t8).'s',
+               ]);
 
                StaticService::afterOpStatic($lottery_type, 'opAllStaticProfits');
            }
