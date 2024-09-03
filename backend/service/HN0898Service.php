@@ -672,6 +672,7 @@ class HN0898Service extends BaseTZService {
             }
             if($code_hz['betStatus']==SscDataService::PLAN_BET_STATUS_BETTING){
                 $code_hz['current_miss'] = SscDataService::PLAN_BET_STATUS_INIT;
+                $code_hz['has_bet_nums'] = 0;
             }
             if(in_array($plan_type, [2,6,9,12,13,14])){
                 $UserSysPlans->single = $singles[0]? : $UserSysPlans->single;
