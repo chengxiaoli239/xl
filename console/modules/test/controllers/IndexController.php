@@ -21,9 +21,11 @@ use backend\service\Lucky5\Lucky5Service;
 use backend\service\numbers\NumCodeService;
 use backend\service\NumService;
 use backend\service\SscDataService;
+use backend\service\statics\plan\OperatePlanService;
 use backend\service\statics\statics_3d\Statics3dUserDataService;
 use backend\service\statics\yl\OneNumYl;
 use backend\service\StaticService;
+use backend\service\TzService;
 use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
 use common\kj\BaseKj;
@@ -69,6 +71,11 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $UserSysPlan = UserSysPlans::findOne(10184);
+        $rst = OperatePlanService::operatePlans18($UserSysPlan, $current_kj_qihao='20240902131');
+        p($rst);
+
+        $rst = TzService::operateSystemBetPlans($lottery_type=8, $qihao='20240902131', $ignore=0); p($rst);# 处理系统投注计划，更新统计数据、
         list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lotteryType=8);
         p([$currentKjQiHao, $qiHao]);
         $rst['data'] = BetService::insertPlansTask($lottery_types=[8]);
