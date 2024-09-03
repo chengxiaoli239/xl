@@ -613,6 +613,7 @@ class OperatePlanService extends BaseService
         $betWhileMiss = $hzArr['bet_while_miss']??0;
         $has_bet_nums = $hzArr['has_bet_nums']??0; # 已投数量
         $singles = explode('-', trim($UserSysPlan->singles));
+        if(empty($singles)) $singles = [$UserSysPlan->single]; # 不填的情况
         $singles_count = count($singles);
 
         if(in_array($betStatus, [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
