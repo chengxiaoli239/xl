@@ -662,7 +662,15 @@ class OperatePlanService extends BaseService
         ]);
         $updateData = ['hz_Arr'=>json_encode($hzArr, 320), 'single'=>$single];
         $rst = UserSysPlans::updateAll($updateData, ['id'=>$UserSysPlan->id]);
-        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '遗漏投x投y期', ['planId'=>$planId, 'flag'=>$flag, 'beforeHzArr'=>$beforeHzArr, 'afterHzArr'=>$hzArr, 'rst'=>$rst]);
+        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '遗漏投x投y期', [
+            'planId'=>$planId,
+            'singles'=>$singles,
+            'singles_count'=>$singles_count,
+            'flag'=>$flag,
+            'beforeHzArr'=>$beforeHzArr,
+            'afterHzArr'=>$hzArr,
+            'rst'=>$rst,
+        ]);
 
         return true;
     }
