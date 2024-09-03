@@ -607,11 +607,11 @@ class OperatePlanService extends BaseService
             $hzArr['filters']['current_kj_qihao'] = $currentKjQiHao;
         }
 
-        $betStatus = $codes_hz['betStatus']??0; # 开奖之后初始标识改成 0
-        $current_miss = $codes_hz['current_miss']??0; # 当前遗漏
-        $single_key = $codes_hz['single_key']??0; # 倍数索引
-        $betWhileMiss = $codes_hz['bet_while_miss']??0;
-        $has_bet_nums = $codes_hz['has_bet_nums']??0; # 已投数量
+        $betStatus = $hzArr['betStatus']??0; # 开奖之后初始标识改成 0
+        $current_miss = $hzArr['current_miss']??0; # 当前遗漏
+        $single_key = $hzArr['single_key']??0; # 倍数索引
+        $betWhileMiss = $hzArr['bet_while_miss']??0;
+        $has_bet_nums = $hzArr['has_bet_nums']??0; # 已投数量
         $singles = explode('-', trim($UserSysPlan->singles));
         $singles_count = count($singles);
 
@@ -664,9 +664,9 @@ class OperatePlanService extends BaseService
         $rst = UserSysPlans::updateAll($updateData, ['id'=>$UserSysPlan->id]);
         Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '遗漏投x投y期', [
             'planId'=>$planId,
+            'flag'=>$flag,
             'singles'=>$singles,
             'singles_count'=>$singles_count,
-            'flag'=>$flag,
             'beforeHzArr'=>$beforeHzArr,
             'afterHzArr'=>$hzArr,
             'rst'=>$rst,
