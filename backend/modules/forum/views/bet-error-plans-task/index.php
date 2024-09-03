@@ -102,13 +102,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         //'single',
                         'qihao',
-                        ['attribute' => 'post_desc','label' => '推送结果',
+                        ['attribute' => 'post_desc','label' => '结果',
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = BaseStringHelper::truncate($model->post_desc,15);
                                 $opions = [
                                     'class' => 'act-post-desc',
-                                    'title' => $model->post_datas,
+                                    //'title' => $model->post_datas,
                                     'alt'=>$model->post_datas,
                                     'data-url' => $model->bet_url,
                                     'data-content' => $model->post_datas,
