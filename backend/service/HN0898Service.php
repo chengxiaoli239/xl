@@ -670,8 +670,9 @@ class HN0898Service extends BaseTZService {
             if(in_array($UserSysPlans->plan_type, [8, 9]) OR $code_hz['bet_while_miss']>0){ # 遗漏投，遗漏倍投
                 $code_hz['current_miss'] = 0;
             }
-            if($code_hz['betStatus']==SscDataService::PLAN_BET_STATUS_BETTING){
-                $code_hz['current_miss'] = SscDataService::PLAN_BET_STATUS_INIT;
+            if(in_array($code_hz['betStatus'], [SscDataService::PLAN_BET_STATUS_BETTING, SscDataService::PLAN_BET_STATUS_WAIT])){
+                $code_hz['betStatus'] = SscDataService::PLAN_BET_STATUS_INIT;
+                $code_hz['current_miss'] = 0;
                 $code_hz['has_bet_nums'] = 0;
             }
             if(in_array($plan_type, [2,6,9,12,13,14])){
