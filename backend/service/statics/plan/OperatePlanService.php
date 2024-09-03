@@ -643,6 +643,7 @@ class OperatePlanService extends BaseService
                 $single_key = 0; # 投完倍数进入等待状态
                 $betStatus = SscDataService::PLAN_BET_STATUS_WAIT;
                 $has_bet_nums = 0;
+                $current_miss = 0;
             }
         }
         if($has_bet_nums>$singles_count){
