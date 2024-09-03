@@ -675,9 +675,9 @@ class HN0898Service extends BaseTZService {
                 $code_hz['current_miss'] = 0;
                 $code_hz['has_bet_nums'] = 0;
             }
-            if(in_array($plan_type, [2,6,9,12,13,14])){
-                $UserSysPlans->single = $singles[0]? : $UserSysPlans->single;
+            if(in_array($plan_type, [2,6,9,12,13,14, 18])){
             }
+            $UserSysPlans->single = $singles[0]?? $UserSysPlans->single;
             if(in_array($plan_type, [12, 13])){
                 $code_hz['A_x_B_y_status'] = 0;
                 $code_hz['start_bet_yl_nums'] = -1;

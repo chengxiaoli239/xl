@@ -609,7 +609,7 @@ class OperatePlanService extends BaseService
 
         $betStatus = $hzArr['betStatus']??0; # 开奖之后初始标识改成 0
         $current_miss = $hzArr['current_miss']??0; # 当前遗漏
-        $single_key = $hzArr['single_key']??0; # 倍数索引
+        $singles_key = $hzArr['singles_key']??0; # 倍数索引
         $betWhileMiss = $hzArr['bet_while_miss']??0;
         $has_bet_nums = $hzArr['has_bet_nums']??0; # 已投数量
         $singles = explode('-', trim($UserSysPlan->singles));
@@ -619,14 +619,14 @@ class OperatePlanService extends BaseService
         if(in_array($betStatus, [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
             if($flag){
                 # 中奖
-                $single_key = 0;
+                $singles_key = 0;
                 $current_miss = 0;
                 $has_bet_nums = 0;
             }else{
                 # 不中奖
                 $current_miss += 1;
                 if($current_miss>=$betWhileMiss){
-                    $single_key =0;
+                    $singles_key =0;
                     $betStatus = 1; // 进入下注状态
                     $has_bet_nums = 1;
                 }
@@ -637,11 +637,11 @@ class OperatePlanService extends BaseService
             }else{
                 $current_miss += 1;
             }
-            if($single_key<($singles_count-1)){
-                $single_key += 1; # 还没投完继续投
+            if($singles_key<($singles_count-1)){
+                $singles_key += 1; # 还没投完继续投
                 $has_bet_nums += 1;
             }else{
-                $single_key = 0; # 投完倍数进入等待状态
+                $singles_key = 0; # 投完倍数进入等待状态
                 $betStatus = SscDataService::PLAN_BET_STATUS_WAIT;
                 $has_bet_nums = 0;
                 $current_miss = 0;
@@ -652,13 +652,13 @@ class OperatePlanService extends BaseService
         }
         $next_single_key = $has_bet_nums - 1;
         if($has_bet_nums==0 OR $has_bet_nums>$singles_count){
-            $single_key = 0;
+            $singles_key = 0;
         }
 
         $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
         $hzArr = array_merge($hzArr, [
             'current_miss' => $current_miss,
-            'single_key' => $single_key,
+            'singles_key' => $singles_key,
             'betStatus' => $betStatus,
             'has_bet_nums' => $has_bet_nums,
         ]);
@@ -680,11 +680,13 @@ class OperatePlanService extends BaseService
     /**
      * @desc 获取计划下一个倍数
      * @param $plan_id
-     * @param $single
+     * @param int $singles_key
+     * @param int $next_single_key
+     * @param int $lottery_type
      * @return mixed
      */
-    public static function getPlanNextSingle($plan_id, $single_key = 0, &$next_single_key = 0, $lottery_type = DEFAULT_LOTTERY_TYPE){
-        if(!$single_key) $single_key = 0;
+    public static function getPlanNextSingle($plan_id, $singles_key = 0, &$next_single_key = 0, $lottery_type = DEFAULT_LOTTERY_TYPE){
+        if(!$singles_key) $singles_key = 0;
         $m = \Yii::$app->cache;
         $UserSysPlans = UserSysPlans::findOne($plan_id);
         $singles = $UserSysPlans->singles;
@@ -693,17 +695,17 @@ class OperatePlanService extends BaseService
             $mkey = 'getPlanNextSingle_1_'.$plan_id.'_'.$BettingRecords->qihao;
             if(!$next_single_key = $m->get($mkey)){
                 //$key = array_search($single, $singlesArr);
-                $next_single_key = $single_key + 1;
+                $next_single_key = $singles_key + 1;
                 if(!isset($singlesArr[$next_single_key])){
                     $next_single_key = 0;
                 }
             }
         }else{
-            $next_single_key = $single_key;
+            $next_single_key = $singles_key;
         }
         $nextSingle = $singlesArr[$next_single_key];
         $time = 7*86400;
-        $logArr = ['plan_id'=>$plan_id, 'single_key'=>$single_key, 'next_single_key'=>$next_single_key, 'time'=>$time, 'lottery_type'=>$lottery_type];
+        $logArr = ['plan_id'=>$plan_id, 'single_key'=>$singles_key, 'next_single_key'=>$next_single_key, 'time'=>$time, 'lottery_type'=>$lottery_type];
         Tool_Common::log('getPlanNextSingle', 'INFO', '倍数获取', $logArr);
         $m->set($mkey, $next_single_key, $time);
 
