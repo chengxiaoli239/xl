@@ -1236,7 +1236,7 @@ class SscDataService extends BaseService {
         $min_id = max($lastIndexId - $recently - 1, 0);
         //p([$lastIndexId, $recently, $min_id]);
 
-        $where = ['AND', ['IN', 'codes_4nums_hz', $zuHes], ['>=', 'index_id', $min_id], ['=', 'lottery_type', $lottery_type]];
+        $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'codes_4nums_hz', $zuHes], ['>=', 'index_id', $min_id]];
         $SscKjData = SscKjData::find()->select(['id','index_id','qihao'])->where($where)->orderBy('id DESC')->limit($recently)->all();
         //p([$where, $zuHes, $last, $SscKjData[0]->id, $SscKjData[1]->id, $recently]);
         if(count($SscKjData)>1){
@@ -1729,6 +1729,7 @@ class SscDataService extends BaseService {
             //p($updateDsDatas);
             $qishu = SscDataService::getQishus($lottery_type);
             foreach ($updateDsData as $Data){
+                $t1 = microtime(true);
                 //if($Data['id'] != 61) continue;
                 $zuHes = explode(',', $Data['val']);
                 $where = [ 'AND',[ 'IN', 'val', $Data['val']], ['=', 'lottery_type', $lottery_type] ];
@@ -1770,6 +1771,8 @@ class SscDataService extends BaseService {
                     $logArr = ['attributes'=>$SscSdHzYl->attributes, 'msg'=>$SscSdHzYl->getErrors()];
                     Tool_Common::log('updateSdHzYl','INFO','四定和值遗漏统计', $logArr);
                 }
+                $t2 = microtime(true);
+                Tool_Common::log('/data/'.__FUNCTION__, '和值统计', '数据处理耗时', ['lottery_type'=>$lottery_type, 'val'=>$Data['val'], 'time_consume'=>($t2-$t1).'s']);
             }
             $dealStatus = 2;
         }catch (\Exception $e){
