@@ -48,6 +48,7 @@ use common\tools\Tool_Common;
 use backend\models\SscDwHzYl;
 use  yii;
 use yii\db\Expression;
+use yii\helpers\ArrayHelper;
 use yii\helpers\BaseStringHelper;
 use yii\helpers\Json;
 
@@ -2142,7 +2143,12 @@ class SscDataService extends BaseService {
             $logArr = [];
             $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
 
-            $planIds = UserSysPlans::find()->where(['status'=>1])->column();
+            //$planIds = UserSysPlans::find()->select('id')->where(['status'=>1])->column();
+            $planIdData = UserSysPlans::find()->select(['uid', 'id'])->where(['status'=>1])->asArray()->all();
+            // 使用 ArrayHelper 提取 uid 和 id 的集合
+            $userIds = array_unique(ArrayHelper::getColumn($planIdData, 'uid'));
+            $planIds = array_unique(ArrayHelper::getColumn($planIdData, 'id'));
+            //p([array_unique($uids), array_unique($planIds), $planIdData]);
             $planStaticProfitsData = PlanStaticProfits::find()->where(['plan_id'=>$planIds])->indexBy('plan_id')->all();
 
             //$bets = SscDataService::isZjBeforeData($lottery_type);
@@ -2231,9 +2237,6 @@ class SscDataService extends BaseService {
                     $UserSysPlan->hz_Arr = json_encode($hzArr, 320);
                     $UserSysPlan->current_profits = $profits;
                     $saveFlag = $UserSysPlan->save();
-
-                    # 账号级别的盈利
-                    \backend\service\SscDataService::updateUserProfits($UserSysPlan->uid);
 
                     $logArr['plan_1_3_5'][$UserSysPlan->id] = [
                         'saveFlag'=>$saveFlag,
@@ -2484,6 +2487,10 @@ class SscDataService extends BaseService {
             $qihao = HN0898Service::getQihao($lottery_type);
             $t7 = microtime(true);
             $logArr['time_consume'] = ($t7-$t6).'s';
+            foreach($userIds as $userId){
+                # 账号级别的盈利
+                \backend\service\SscDataService::updateUserProfits($userId);
+            }
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划', ['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
             $dealStatus = 2;
         }catch (\Exception $e){

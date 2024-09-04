@@ -62,6 +62,7 @@ use common\tools\Util;
 use DateTime;
 use Yii;
 use yii\base\Controller;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
 class IndexController extends Controller
@@ -72,6 +73,13 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $planIdData = UserSysPlans::find()->select(['uid', 'id'])->where(['status'=>1])->asArray()->all();
+        // 使用 ArrayHelper 提取 uid 和 id 的集合
+        $uids = array_unique(ArrayHelper::getColumn($planIdData, 'uid'));
+        $planIds = array_unique(ArrayHelper::getColumn($planIdData, 'id'));
+        p([$uids, $planIds, $planIdData]);
+        $planStaticProfitsData = PlanStaticProfits::find()->where(['plan_id'=>$planIds])->asArray()->indexBy('plan_id')->all();
+        p([$planIds, 'planStaticProfitsData'=>$planStaticProfitsData]);
         $lottery_type = 8;
         $query = SscKjData::find()->select(['COUNT(id) AS nums'])->where(['date'=>date('Y-m-d'),'codes_4nums_hz'=>[16,17,18,19], 'lottery_type'=>$lottery_type])->limit(1);
         $sql = $query->createCommand()->getRawSql();p($sql);
