@@ -73,6 +73,74 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        list($lastQihao, $lastIndexId, $lastId, $nextQihao) = SscDataService::getKjDataLastIndexId($lottery_type=8);
+        p([$lastQihao, $lastIndexId, $lastId, $nextQihao]);
+        # 所有的和值集合，作为字符串
+        $values = [
+            "0,1,2,3,4,5,6",
+            "5,6,7,8,9,10",
+            "11,12,13,14,15",
+            "16,17,18,19",
+            "20,21,22,23,24",
+            "25,26,27,28,29",
+            "30,31,32,33,34,35,36",
+            "5,7,9,11,13,15",
+            "6,8,10,12,14,16",
+            "17,19,21,23,25,27",
+            "18,20,22,24,26,28",
+            "35",
+            "34",
+            "33",
+            "32",
+            "31",
+            "30",
+            "29",
+            "28",
+            "27",
+            "26",
+            "25",
+            "24",
+            "23",
+            "22",
+            "21",
+            "20",
+            "19",
+            "18",
+            "17",
+            "16",
+            "15",
+            "14",
+            "13",
+            "12",
+            "11",
+            "10",
+            "9",
+            "8",
+            "7",
+            "6",
+            "5",
+            "4",
+            "3",
+            "2",
+            "1"
+        ];
+
+        $date_key = 'hz_'.date('Ymd');
+        # 遍历每个字符串并更新哈希表
+        foreach ($values as $value){
+            commonRedis()->hincrby($date_key, $value, 1);
+        }
+        $data = commonRedis()->hgetall($date_key);
+        $dataVal = [];
+        foreach ($data as $count=>$key){
+            //p($key.'=='.$count, 0);
+            $dataVal[$key] = $count;
+        }
+        p(['date_key'=>$date_key, 'dataVal'=>$dataVal]);
+        p(['data'=>$datax]);
+        $codes_4nums_hz = SscKjData::find()->select(['*'])
+            ->where(['lottery_type'=>8])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->all();
+        p($codes_4nums_hz);
         $planIdData = UserSysPlans::find()->select(['uid', 'id'])->where(['status'=>1])->asArray()->all();
         // 使用 ArrayHelper 提取 uid 和 id 的集合
         $uids = array_unique(ArrayHelper::getColumn($planIdData, 'uid'));
@@ -247,8 +315,6 @@ class IndexController extends Controller
             $mkey = CacheKeyService::userLotteryTypes($user_id=40);
             $lottery_types1 = commonRedis()->get($mkey);
             p([$lottery_types, $lottery_types1]);
-            list($lastQihao, $lastIndexId, $lastId, $nextQihao) = SscDataService::getKjDataLastIndexId($lottery_type=8);
-            p([$lastQihao, $lastIndexId, $lastId, $nextQihao]);
             //$rst['updateDsYL'] = SscDataService::updateSdHzYl($lottery_type = 17); p($rst);// 更新和值遗漏
             # 测试回滚
             # 测试回滚2

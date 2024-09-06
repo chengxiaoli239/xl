@@ -133,4 +133,13 @@ trait LotteryCacheKeyTrait
     {
         return 'lottery:open_data:lt_'.$lottery_type.'_'.$qiHao;
     }
+    /**
+     * 排序id key
+     * @param $lottery_type
+     * @return string
+     */
+    public static function lotteryLastIndexKey($lottery_type): string
+    {
+        return 'lottery:last_index_key:lt_'.$lottery_type;
+    }
 }

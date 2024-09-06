@@ -266,9 +266,13 @@ class SscDataService extends BaseService {
      */
     public static function getKjDataLastIndexId($lottery_type = DEFAULT_LOTTERY_TYPE): array
     {
-        $lastQuery = SscKjData::find()->select(['qihao', 'index_id', 'id'])->where(['lottery_type'=>$lottery_type]);
-        //$sql = $lastQuery->createCommand()->getRawSql();p($sql);
-        $last = $lastQuery->orderBy(['id'=>SORT_DESC])->asArray()->one();
+        $mKey = CacheKeyService::lotteryLastIndexKey($lottery_type);
+        if(!$last = commonRedis()->get($mKey)){
+            $lastQuery = SscKjData::find()->select(['qihao', 'index_id', 'id'])->where(['lottery_type'=>$lottery_type]);
+            //$sql = $lastQuery->createCommand()->getRawSql();p($sql);
+            $last = $lastQuery->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
+            commonRedis()->setex($mKey, 60, $last);
+        }
         if(empty($last)){
             $lastIndexId = 0;
         }else{
@@ -1246,12 +1250,14 @@ class SscDataService extends BaseService {
         # 遗漏期间计算 start
         $tmpKjData = $SscKjData;
         if(count($tmpKjData) > 2){
+            $range = [];
             foreach($tmpKjData as $key=>$r){
                 if($key == 0) continue;
                 $range[$tmpKjData[$key-1]['index_id']."_". $r['index_id']] = $tmpKjData[$key-1]['index_id'] - $r['index_id'] - 1;
             }
 
             $max_miss = max($range);
+            /*
             $maxKey = array_search($max_miss, $range);
             $keyArr = explode('_',$maxKey);
             $tmpArr = [];
@@ -1261,11 +1267,12 @@ class SscDataService extends BaseService {
                 }
             }
             $max_range = $tmpArr[1].'-'.$tmpArr[0];  // 近200期内最大遗漏
+            */
             $yl_str = implode('-',$range);
             # 最大遗漏期间计算 end
             //p([$field=>$num,$min_id,'times'=>$times,$SscKjData[0]->id, $SscKjData[1]->id,$max_range]);
         }else{
-            $max_range = $SscKjData[1]['qihao'] ."-". $SscKjData[0]['qihao'];
+            //$max_range = $SscKjData[1]['qihao'] ."-". $SscKjData[0]['qihao'];
         }
         $last_time_miss_range = $SscKjData[1]['qihao'] ."-". $SscKjData[0]['qihao'];
         $current_times = $lastIndexId - $SscKjData[0]->index_id;
@@ -1276,7 +1283,7 @@ class SscDataService extends BaseService {
             'last_times' => $last_times,    // 上次遗漏次数
             'last_time_miss_range' => $last_time_miss_range,    // 上次遗漏范围
             'max_miss' => $max_miss,   // 近200期内的最大遗漏
-            'max_range' => $max_range,   // 近200期内的最大遗漏范围
+            //'max_range' => $max_range,   // 近200期内的最大遗漏范围
             'val' => implode(',', $zuHes),
             'yl_str' => BaseStringHelper::truncate($yl_str,3000),
             //'zihes' => $zuHes,
@@ -1759,7 +1766,7 @@ class SscDataService extends BaseService {
                 $SscSdHzYl->last_time_miss = (string)$miss['last_times']; // 2、上次遗漏
                 $SscSdHzYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
                 $SscSdHzYl->max_miss = $miss['max_miss'];      // 4、近200期内最大遗漏
-                $SscSdHzYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
+                //$SscSdHzYl->max_range = $miss['max_range']; // 5、200期内最大遗漏范围
                 $SscSdHzYl->yl_records = $miss['current_times'].'-'.$miss['yl_str']; // 5、200期内最大遗漏范围
                 $SscSdHzYl->history_max_miss = (string)max($miss['current_times'],$SscSdHzYl->max_miss,$SscSdHzYl->history_max_miss); // 6、历史最大遗漏
                 //$SscSdHzYl->status = $Data['status']; // 7、前台显示状态
