@@ -1776,7 +1776,7 @@ class SscDataService extends BaseService {
                 $rst = $SscSdHzYl->save();
                 if(!$rst){
                     $logArr = ['attributes'=>$SscSdHzYl->attributes, 'msg'=>$SscSdHzYl->getErrors()];
-                    Tool_Common::log('updateSdHzYl','INFO','四定和值遗漏统计', $logArr);
+                    Tool_Common::log('/data/'.__FUNCTION__,'ERR','四定和值遗漏统计', $logArr);
                 }
                 $t2 = microtime(true);
                 Tool_Common::log('/data/'.__FUNCTION__, '和值统计', '数据处理耗时', ['lottery_type'=>$lottery_type, 'val'=>$Data['val'], 'time_consume'=>($t2-$t1).'s']);
@@ -1784,7 +1784,7 @@ class SscDataService extends BaseService {
             $dealStatus = 2;
         }catch (\Exception $e){
             $dealStatus = (strpos($e->getMessage(), '已经处理') !== false) ? 2 : ($e->getCode()>40000? 4: 3);
-            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理异常4', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '数据处理异常4', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
 
         $end_time = microtime(true);
