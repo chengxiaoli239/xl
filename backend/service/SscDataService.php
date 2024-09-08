@@ -254,9 +254,11 @@ class SscDataService extends BaseService {
      * @param int $interval
      */
     public static function getKjDataLastId($lottery_type = DEFAULT_LOTTERY_TYPE){
-        $last_id = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['max(index_id) as last_id'])->limit(1)->asArray()->one()['last_id'];
+        //$last_id = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['max(index_id) as last_id'])->limit(1)->asArray()->one()['last_id']
+        list($lastQiHao, $lastIndexId, $lastId, $nextQiHao) = SscDataService::getKjDataLastIndexId($lottery_type);
 
-        return $last_id;
+
+        return $lastIndexId;
     }
 
     /**
@@ -275,7 +277,7 @@ class SscDataService extends BaseService {
             $last = $lastQuery->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
             commonRedis()->setex($mKey, 5, $last);
         }
-        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新单双状态', ['lottery_type'=>$lottery_type, 'last'=>$last, 'f'=>$f]);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新单双状态', ['lottery_type'=>$lottery_type, 'f'=>$f]);
         if(empty($last)){
             $lastIndexId = 0;
         }else{
@@ -295,9 +297,10 @@ class SscDataService extends BaseService {
      */
     public static function getKjDataLastQihao($lottery_type = DEFAULT_LOTTERY_TYPE){
         //$last_qihao = SscKjData::find()->select(['max(qihao) as last_qihao'])->where(['lottery_type'=>$lottery_type])->asArray()->one()['last_qihao'];
-        $last_qihao = SscKjData::find()->select(['qihao as last_qihao'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one()['last_qihao'];
+        //$last_qihao = SscKjData::find()->select(['qihao as last_qihao'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->asArray()->one()['last_qihao'];
+        list($lastQiHao, $lastIndexId, $lastId, $nextQiHao) = SscDataService::getKjDataLastIndexId($lottery_type);
 
-        return $last_qihao;
+        return $lastQiHao;
     }
 
     /**
