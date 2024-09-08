@@ -75,6 +75,10 @@ class IndexController extends Controller
     {
         list($lastQihao, $lastIndexId, $lastId, $nextQihao) = SscDataService::getKjDataLastIndexId($lottery_type=8);
         p([$lastQihao, $lastIndexId, $lastId, $nextQihao]);
+        $t1 = microtime(true);
+        $rstLog['updateSdHzYL'] = SscDataService::updateSdHzYl($lottery_type=8);$t2 = microtime(true);
+        $rstLog['time_consume']=($t2-$t1).'s';
+        p($rstLog);// 单双遗漏 耗时3.5s
         # 所有的和值集合，作为字符串
         $values = [
             "0,1,2,3,4,5,6",

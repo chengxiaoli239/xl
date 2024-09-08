@@ -138,10 +138,10 @@ class SscDataService extends BaseService {
      */
     public static function updateDsData(int $lottery_type = DEFAULT_LOTTERY_TYPE)
     {
-        list($lastQihao, $lastIndexId, $lastId, $nextQihao) = SscDataService::getKjDataLastIndexId($lottery_type);
+        list($lastQiHao, $lastIndexId, $lastId, $nextQihao) = SscDataService::getKjDataLastIndexId($lottery_type);
 
-        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新单双状态', ['lottery_type'=>$lottery_type, 'lastQihao'=>$lastQihao, 'nextQihao'=>$nextQihao]);
-        $flag = SscDataService::insertSscKjDataDs($lastQihao, $lottery_type);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新单双状态', ['lottery_type'=>$lottery_type, 'lastQiHao'=>$lastQiHao, 'nextQihao'=>$nextQihao]);
+        $flag = SscDataService::insertSscKjDataDs($lastQiHao, $lottery_type);
 
         return (boolean)$flag;
     }
@@ -1394,7 +1394,7 @@ class SscDataService extends BaseService {
             //p(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
             $SscKjDataDs = SscKjDataDs::findOne(['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
             if($SscKjDataDs){
-                return false;
+                throw_info($lottery_type.'=='.$qihao.'单双更新已经存记录');
             }
             $SscKjDataDs = new SscKjDataDs();
             $opData['created_at'] = time();
@@ -1733,7 +1733,7 @@ class SscDataService extends BaseService {
             # 大数组：包括二定、三定、四定
             $updateDsData = SscSdHzVal::find()->asArray()->All();
             //$rst[$interval] = SscDataService::dsYLStatic($interval);
-            //p($updateDsDatas);
+            //p($updateDsData);
             $qishu = SscDataService::getQishus($lottery_type);
             foreach ($updateDsData as $Data){
                 $t1 = microtime(true);
