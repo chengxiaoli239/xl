@@ -267,12 +267,15 @@ class SscDataService extends BaseService {
     public static function getKjDataLastIndexId($lottery_type = DEFAULT_LOTTERY_TYPE): array
     {
         $mKey = CacheKeyService::lotteryLastIndexKey($lottery_type);
+        $f = true;
         if(!$last = commonRedis()->get($mKey)){
+            $f = false;
             $lastQuery = SscKjData::find()->select(['qihao', 'index_id', 'id'])->where(['lottery_type'=>$lottery_type]);
             //$sql = $lastQuery->createCommand()->getRawSql();p($sql);
             $last = $lastQuery->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
-            commonRedis()->setex($mKey, 60, $last);
+            commonRedis()->setex($mKey, 5, $last);
         }
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新单双状态', ['lottery_type'=>$lottery_type, 'last'=>$last, 'f'=>$f]);
         if(empty($last)){
             $lastIndexId = 0;
         }else{
