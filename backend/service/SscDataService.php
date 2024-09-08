@@ -268,7 +268,7 @@ class SscDataService extends BaseService {
     {
         $mKey = CacheKeyService::lotteryLastIndexKey($lottery_type);
         $f = true;
-        if(true OR !$last = commonRedis()->get($mKey)){
+        if(!$last = commonRedis()->get($mKey)){
             $f = false;
             $lastQuery = SscKjData::find()->select(['qihao', 'index_id', 'id'])->where(['lottery_type'=>$lottery_type]);
             //$sql = $lastQuery->createCommand()->getRawSql();p($sql);

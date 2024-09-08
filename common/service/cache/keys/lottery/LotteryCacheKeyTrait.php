@@ -133,6 +133,7 @@ trait LotteryCacheKeyTrait
     {
         return 'lottery:open_data:lt_'.$lottery_type.'_'.$qiHao;
     }
+
     /**
      * 排序id key
      * @param $lottery_type

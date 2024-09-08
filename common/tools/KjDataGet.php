@@ -494,6 +494,10 @@ class KjDataGet
 
         $mKey = CacheKeyService::lotteryGrabInfo($lottery_type);
         commonRedis()->setex($mKey, 300, $qihao.':'.$kjData);
+
+        # 开奖数据缓存
+        $mKey = CacheKeyService::lotteryLastIndexKey($lottery_type);
+        commonRedis()->setex($mKey, 30, $SscKjData->attributes);
         return [
             'status'=>200,
             'msg'=>'开奖数据写入成功',
