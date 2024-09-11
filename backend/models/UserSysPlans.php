@@ -200,6 +200,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     ########################## 过滤前xx期号码 start ########################
     public $is_filter_dynamic; # 是否动态过滤
     public $filter_dynamic_types; # 过滤类型
+    public $filter_dynamic_types2; # 动态过滤类型2
     ########################### 过滤前xx期号码 end #########################
 
     ####################### 中则投、中则倍投、中则波推倍投 #####################

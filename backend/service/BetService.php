@@ -27,6 +27,7 @@ use backend\service\Lucky5\Lucky5Service;
 use backend\service\NineNine\NineNineBaseService;
 use backend\service\NineNine\NineNineNewService;
 use backend\service\NineNine\NineNineService6;
+use backend\service\numbers\DynamicFilterService;
 use backend\service\numbers\NumCodeService;
 use common\kj\cqssc\CqsscKcw;
 use common\service\cache\CacheKeyService;
@@ -889,11 +890,18 @@ abstract class BetService extends BaseBetService {
                 break;
         }
 
-        # 动态过滤
+        # 动态过滤1
         if(isset($codes_hz_data['is_filter_dynamic']) && $codes_hz_data['is_filter_dynamic']==1 && count($codes_hz_data['filter_dynamic_types'])>0){
             $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
             if(!empty($filter_dynamic_codes)){
                 $codesArr = array_intersect($codesArr, $filter_dynamic_codes); # 返回$codesArr和$filter_dynamic_codes交集
+            }
+        }
+        # 动态过滤2
+        if(count($codes_hz_data['filter_dynamic_types2'])>0){
+            $filter_dynamic_codes2 = DynamicFilterService::getFilterDynamic2($plan);
+            if(!empty($filter_dynamic_codes2)){
+                $codesArr = array_intersect($codesArr, $filter_dynamic_codes2); # 返回$codesArr和$filter_dynamic_codes交集
             }
         }
 

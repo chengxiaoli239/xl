@@ -7,6 +7,7 @@ use backend\models\TzSystemsAuth;
 use backend\models\TzSystemsUsers;
 use backend\service\BetService;
 use backend\service\HN0898Service;
+use backend\service\numbers\DynamicFilterService;
 use backend\service\NumService;
 use backend\service\StaticService;
 use backend\service\TzService;
@@ -187,6 +188,7 @@ class UserSysPlansController extends BaseController
             # 4、动态过滤
             'is_filter_dynamic' => $is_filters,
             'filter_dynamic_typesArr' => NumService::$filter_dynamic_types,
+            'filter_dynamic_types2' => DynamicFilterService::DYNAMIC_FILTER_TYPES,
 
             'code_filter_types' => $code_filter_types, # 排除类型
 
@@ -270,11 +272,21 @@ class UserSysPlansController extends BaseController
             }
             unset($hz_Arr_Data['filters']);
 
-            # 动态过滤
+            # 动态过滤1
             if(isset($hz_Arr_Data['is_filter_dynamic'])){
                 $model->is_filter_dynamic = (int)$hz_Arr_Data['is_filter_dynamic'];
                 $model->filter_dynamic_types = $hz_Arr_Data['filter_dynamic_types'];
             }
+            # 动态过滤2
+            if(!empty($hz_Arr_Data['filter_dynamic_types2'])){
+                $filter_dynamic_type2 = [];
+                $dynamicTypes2 = array_column($hz_Arr_Data['filter_dynamic_types2'], null, 'type');
+                foreach (DynamicFilterService::DYNAMIC_FILTER_TYPES as $k=>$dynamicType2){
+                    $filter_dynamic_type2[$k] = $dynamicTypes2[$dynamicType2['type']]??$dynamicType2;
+                }
+                $model->filter_dynamic_types2 = $filter_dynamic_type2;
+            }
+            //p([$dynamicTypes2, $filter_dynamic_type2, DynamicFilterService::DYNAMIC_FILTER_TYPES]);
 
             # 动态排除前x位号码
 
@@ -359,6 +371,7 @@ class UserSysPlansController extends BaseController
             # 4、动态过滤
             'is_filter_dynamic' => $is_filters,
             'filter_dynamic_typesArr' => NumService::$filter_dynamic_types,
+            'filter_dynamic_types2' => $filter_dynamic_type2??DynamicFilterService::DYNAMIC_FILTER_TYPES,
 
             'code_filter_types' => $code_filter_types, # 排除类型
             # 2、排除前x天内同期

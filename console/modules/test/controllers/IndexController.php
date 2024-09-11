@@ -19,6 +19,7 @@ use backend\service\BetService;
 use backend\service\clients\AgentClientsService;
 use backend\service\HN0898Service;
 use backend\service\Lucky5\Lucky5Service;
+use backend\service\numbers\DynamicFilterService;
 use backend\service\numbers\NumCodeService;
 use backend\service\NumService;
 use backend\service\SscDataService;
@@ -409,17 +410,18 @@ class IndexController extends Controller
     public function actionDw1(){
         try {
             //$data = Aozhou::getLucky5($type='json', $is_auto=2);p($data);
+            $plan = UserSysPlans::findOne(10357);
+            $codes = DynamicFilterService::getFilterDynamic2($plan, []);p($codes);
 
-            $plan = UserSysPlans::findOne(9381);
+            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan, $filter_dynamic_types=[193]);p(count($codes));p($codes);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             p($codes);
-            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan, $filter_dynamic_types=[193]);p(count($codes));
             $r = \backend\service\BetService::getTypeNameByTzType($tz_type=25);p($r);
             $historyKjData = NumCodeService::getKjData($qihao='20240224120', $lottery_type=8);p($historyKjData);
             $MessageService = new EYunMessageOperateService($user_id=21);
             $rst = $MessageService->receive(['content'=>'体组六组三 1拖2345、23456 各10元', 'fromUser'=>'wxid_875i1kgd38x122']); p($rst);
         }catch (\Exception $e){
-            p($e->getMessage());
+            p($e->getMessage().$e->getFile().'_'.$e->getLine());
         }
         $wcId = WechatUserService::getCurrentRobotWechat($user_id=22, $robot_wechat='wxid_v44jhsu1852p22');
         $rst = WechatUserService::syncWechatFriends($user_id=22);p($rst);

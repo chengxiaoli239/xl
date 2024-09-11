@@ -24,6 +24,8 @@ class NumService extends BaseService {
     const DOUBLE_TYPE_DD = [1, 3, 5, 6, 7, 8, 9];
     # 大双
     const DOUBLE_TYPE_DS = [0, 2, 4, 5, 6, 7, 8, 9];
+    # 两数位置
+    const TWO_NUM_POS = [[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]];
 
     const EXCLUDE = 1; # 除
     const OBTAIN = 2; # 取
@@ -1260,6 +1262,7 @@ class NumService extends BaseService {
         if(!empty($codes_hz['no_fix_hefen3']) && $codes_hz['no_fix_hefen_pos_3'] == 2){
             $newHefens[] = ['no_fix_hefen'=>$codes_hz['no_fix_hefen3'], 'no_fix_hefen_pos'=>$codes_hz['no_fix_hefen_pos_3']];
         }
+        # 新
         if(!empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])) { # no_fix_hefen:不定位合分值、no_fix_hefen_pos:1两数2三数
             $newHefens[] = ['no_fix_hefen'=>$codes_hz['no_fix_hefen'], 'no_fix_hefen_pos'=>$codes_hz['no_fix_hefen_pos']];
         }

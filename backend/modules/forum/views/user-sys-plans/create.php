@@ -52,8 +52,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
         # 5、动态过滤
         'is_filter_dynamic' => $is_filter_dynamic,
-        # 动态过滤
+        # 动态过滤1
         'filter_dynamic_typesArr' => $filter_dynamic_typesArr,
+        # 动态过滤2
+        'filter_dynamic_types2' => $filter_dynamic_types2,
 
         'lottery_types' => $lottery_types,
 

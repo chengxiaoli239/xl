@@ -295,12 +295,22 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['is_filter_history'], $post['UserSysPlans']['filter_history_nums']);
 
-        # 动态过滤
-        if(isset($UserSysPlans['filter_dynamic_types']) && !empty($UserSysPlans['filter_dynamic_types']) && count($UserSysPlans['filter_dynamic_types'])>0){
+        # 动态过滤1
+        if(!empty($UserSysPlans['filter_dynamic_types']) && count($UserSysPlans['filter_dynamic_types'])>0){
             $tmpFilter['is_filter_dynamic'] = 1;
             $tmpFilter['filter_dynamic_types'] = $UserSysPlans['filter_dynamic_types'];
         }
         unset($post['UserSysPlans']['is_filter_dynamic'], $post['UserSysPlans']['filter_dynamic_types']);
+        # 动态过滤2
+        if(!empty($UserSysPlans['filter_dynamic_types2'])){
+            foreach ($UserSysPlans['filter_dynamic_types2'] as $k=>$filter_dynamic_type2){
+                if($filter_dynamic_type2['type'] == 0){
+                    unset($UserSysPlans['filter_dynamic_types2'][$k]);
+                }
+            }
+            $tmpFilter['filter_dynamic_types2'] = $UserSysPlans['filter_dynamic_types2'];
+        }
+        unset($post['UserSysPlans']['filter_dynamic_types2']);
 
 
         # 17、区间遗漏投 start
@@ -420,7 +430,7 @@ class UserSysPlansService extends BaseService {
         if($UserSysPlans['hefen_pos4'] && count($UserSysPlans['hefen_pos4']) > 0){
             $tmpFilter['hefen_pos4'] = implode(',', $post['UserSysPlans']['hefen_pos4']); # 合分位置
         }
-        unset($post['UserSysPlans']['hefen_pos3']);
+        unset($post['UserSysPlans']['hefen_pos4']);
         # 15.4.2、合分值
         if(isset($post['UserSysPlans']['hefen4']) && ($UserSysPlans['hefen4'] !== '' && ($UserSysPlans['hefen4'] OR $UserSysPlans['hefen4'] == 0))){
             $tmpFilter['hefen4'] = trim($post['UserSysPlans']['hefen4']); # 合分
@@ -574,7 +584,7 @@ class UserSysPlansService extends BaseService {
             }
             unset($post['UserSysPlans']['remove_arises']);
             # 15.2、合分值
-            if(isset($post['UserSysPlans']['hefen1']) && $post['UserSysPlans']['hefen1']){
+            if(!empty($post['UserSysPlans']['hefen1'])){
                 $tmpFilter['hefen1'] = $post['UserSysPlans']['hefen1']; # 合分
             }
             unset($post['UserSysPlans']['hefen']);
@@ -594,15 +604,15 @@ class UserSysPlansService extends BaseService {
         if(!in_array($tz_type, [23]) && in_array($plan_type, [2,3,4,5,9, 12])){ # 翻倍计划
             if($id && $plan = UserSysPlans::findOne($id)){
                 $tmpHzArr = json_decode($plan->hz_Arr, true);
-                $singles_key = isset($tmpHzArr['singles_key']) ? $tmpHzArr['singles_key'] : 0;
-                $current_miss = isset($tmpHzArr['current_miss']) ? $tmpHzArr['current_miss'] : 0;
+                $singles_key = $tmpHzArr['singles_key'] ?? 0;
+                $current_miss = $tmpHzArr['current_miss'] ?? 0;
             }else{
                 $singles_key = 0;
                 $current_miss = 0;
             }
             if($plan->plan_type == 12){ # A_x_B_y_status
                 $tmpHzArr = json_decode($plan->hz_Arr, true);
-                $A_x_B_y_status = isset($tmpHzArr['A_x_B_y_status']) ? $tmpHzArr['A_x_B_y_status'] : 0;
+                $A_x_B_y_status = $tmpHzArr['A_x_B_y_status'] ?? 0;
                 $A_x_B_y_start_time = (isset($tmpHzArr['A_x_B_y_start_time']) && $tmpHzArr['A_x_B_y_start_time']) ? $tmpHzArr['A_x_B_y_start_time'] : date('Y-m-d H:i:s');
                 $tmpFilter['start_bet_yl_nums'] = 0;
                 $tmpFilter['current_arise_A_times'] = 0;
@@ -636,8 +646,8 @@ class UserSysPlansService extends BaseService {
             $filters = array_merge($filters, [
                 'is_filter' => 1,
                 'filter_xQ_before' => (!empty($filter_xQ_before))? trim($filter_xQ_before):'',
-                'filter_pos1' => (isset($UserSysPlans['filter_pos1']) && !empty($UserSysPlans['filter_pos1']))? $UserSysPlans['filter_pos1']:[],
-                'filter_pos2' => (isset($UserSysPlans['filter_pos2']) && !empty($UserSysPlans['filter_pos2']))? $UserSysPlans['filter_pos2']:[],
+                'filter_pos1' => (!empty($UserSysPlans['filter_pos1']))? $UserSysPlans['filter_pos1']:[],
+                'filter_pos2' => (!empty($UserSysPlans['filter_pos2']))? $UserSysPlans['filter_pos2']:[],
             ]);
         }
 
@@ -661,8 +671,8 @@ class UserSysPlansService extends BaseService {
             $filter_dates = array_merge($filter_dates, [
                 'is_filter_date' => 1,
                 'filter_xD_before' => (!empty($filter_xD_before))? trim($filter_xD_before):'',
-                'filter_date_pos1' => (isset($UserSysPlans['filter_date_pos1']) && !empty($UserSysPlans['filter_date_pos1']))? $UserSysPlans['filter_date_pos1']:[],
-                'filter_date_pos2' => (isset($UserSysPlans['filter_date_pos2']) && !empty($UserSysPlans['filter_date_pos2']))? $UserSysPlans['filter_date_pos2']:[],
+                'filter_date_pos1' => (!empty($UserSysPlans['filter_date_pos1']))? $UserSysPlans['filter_date_pos1']:[],
+                'filter_date_pos2' => (!empty($UserSysPlans['filter_date_pos2']))? $UserSysPlans['filter_date_pos2']:[],
             ]);
             $tmpFilter['filter_dates'] = $filter_dates;
         }
@@ -684,6 +694,7 @@ class UserSysPlansService extends BaseService {
             $post['UserSysPlans']['hz_Arr'] = !empty($hz_Arr) ? $hz_Arr : '';
         }
         $post['UserSysPlans']['hz_Arr'] = !$post['UserSysPlans']['hz_Arr'] ? '' : $post['UserSysPlans']['hz_Arr'];
+        //p([$post, $post['UserSysPlans']]);
 
         $post['UserSysPlans']['uid'] = $user_id;
         $post['UserSysPlans']['account'] = $User->username;

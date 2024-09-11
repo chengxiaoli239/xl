@@ -1,12 +1,24 @@
 <!--动态过滤-->
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #da4f49;">
-    <!--
-    <div class="col-lg-2 col-xs-3">
-        <?= $form->field($model, 'is_filter_dynamic')->checkboxList(['1'=>'是'])->label('动态过滤') ?>
-    </div>
-    -->
     <div class="col-lg-10 col-xs-12">
-        <?= $form->field($model, 'filter_dynamic_types')->checkboxList($filter_dynamic_typesArr)->label('动态过滤类型 <span id="tag_filter_dynamic_type" class="glyphicon glyphicon-comment"></span>') ?>
+        <?= $form->field($model, 'filter_dynamic_types')->checkboxList($filter_dynamic_typesArr)->label('动态过滤类型2 <span id="tag_filter_dynamic_type" class="glyphicon glyphicon-comment"></span>') ?>
+    </div>
+</div>
+<div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #da4f49;">
+    <div class="col-lg-10 col-xs-12">
+        <label>动态过滤2：</label>
+        <?php foreach ($filter_dynamic_types2 as $key=>$value): ?>
+        <div style="display: flex; align-items: center;">
+            <div style="margin-right: 2px;padding-top: 3px">
+                <?= $form->field($model, "filter_dynamic_types2[".$key."][type]")->checkbox(['value'=>$value['type'], 'label' => $value['label'], 'labelOptions' => ['style' => 'display:inline;']])->label(false) ?>
+            </div>
+            <!-- 添加隐藏的input字段 -->
+            <input type="hidden" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][label]" value="<?= htmlspecialchars($value['label'], ENT_QUOTES) ?>">
+            <?php foreach ($value['params'] as $k2 => $v2): ?>
+                <input type="number" id="input_<?= $key.'_'.$k2 ?>" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][params][<?= $k2 ?>]" style="width: 45px; margin: -2px 2px;" placeholder="<?= $v2 ?>" value="<?= $v2 ?>">
+            <?php endforeach; ?>
+        </div>
+        <?php endforeach; ?>
     </div>
 </div>
 
