@@ -411,7 +411,7 @@ class IndexController extends Controller
         try {
             //$data = Aozhou::getLucky5($type='json', $is_auto=2);p($data);
             $plan = UserSysPlans::findOne(10357);
-            $codes = DynamicFilterService::getFilterDynamic2($plan, []);p($codes);
+            $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
 
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan, $filter_dynamic_types=[193]);p(count($codes));p($codes);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));

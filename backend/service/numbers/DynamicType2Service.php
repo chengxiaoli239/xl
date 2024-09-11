@@ -54,12 +54,11 @@ class DynamicType2Service extends BaseService {
             ->where(['code_type' => $playway+1])
             ->andWhere($where);
 
-        $sql = $query->createCommand()->getRawSql();p($sql);
-
+        //$sql = $query->createCommand()->getRawSql();p($sql);
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
         //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
-        $betDesc = "过滤[".implode('', $positions)."]位号码:".implode(',', $sumHz)."合分".$filterNum."(四定)";
+        $betDesc = "两合上1[".$hCode."]号码:"."合".implode(',', $hfArr)."(四定)";
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
