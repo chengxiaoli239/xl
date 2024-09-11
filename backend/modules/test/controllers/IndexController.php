@@ -455,7 +455,6 @@ class IndexController extends Controller
         p(['code'=>$code, 'bet_single'=>$bet_single]);
         //p([$code, $data, $err_msg]);
         $rst = self::getPermutations([1, 2, 3]);p($rst);
-        $codes = BetService::getCodesByPlan($plan);
         p($codes);
         list($type_dx, $type_4dx, $type_dx_str) = CommonService::getTypeDx('5,1,1,0,8');
         p([$type_dx, $type_4dx, $type_dx_str]);

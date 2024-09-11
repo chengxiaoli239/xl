@@ -898,7 +898,7 @@ abstract class BetService extends BaseBetService {
             }
         }
         # 动态过滤2
-        if(count($codes_hz_data['filter_dynamic_types2'])>0){
+        if(isset($codes_hz_data['filter_dynamic_types2'])){
             $filter_dynamic_codes2 = DynamicFilterService::getFilterDynamic2($plan);
             if(!empty($filter_dynamic_codes2)){
                 $codesArr = array_intersect($codesArr, $filter_dynamic_codes2); # 返回$codesArr和$filter_dynamic_codes交集
