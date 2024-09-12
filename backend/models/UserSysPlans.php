@@ -224,6 +224,10 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $fenli_shu_code;
     ####################### 分离数结束 #####################
 
+    ####################### 合数与差分-开始 #####################
+    public $hsAndCf_twoFone; # 两合上1
+    ####################### 合数与差分-结束 #####################
+
 
     /**
      * @inheritdoc

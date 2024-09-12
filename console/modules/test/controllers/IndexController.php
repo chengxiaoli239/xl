@@ -409,8 +409,8 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
-            $plan = UserSysPlans::findOne(10334);
-            $codes = BetService::getCodesByPlan($plan);p($codes);
+            $plan = UserSysPlans::findOne(10358);
+            $codes = BetService::getCodesByPlan($plan);p(count(explode('@', $codes)));
             //$data = Aozhou::getLucky5($type='json', $is_auto=2);p($data);
             $plan = UserSysPlans::findOne(10357);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));

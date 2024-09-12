@@ -286,6 +286,12 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['type_22b']);
 
+        # 18、两合上1
+        if($UserSysPlans['hsAndCf_twoFone']){
+            $tmpFilter['hsAndCf_twoFone'] = $UserSysPlans['hsAndCf_twoFone'];
+        }
+        unset($post['UserSysPlans']['type_22b']);
+
         # 排除前xx期号码
         if($UserSysPlans['is_filter_history'] && count($UserSysPlans['is_filter_history']) == 1){
             if(isset($UserSysPlans['filter_history_nums']) && $UserSysPlans['filter_history_nums']>0){

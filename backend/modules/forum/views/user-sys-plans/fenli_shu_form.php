@@ -48,6 +48,14 @@ use yii\widgets\ActiveForm;
             <div class="help-block"></div>
         </div>
     </div>
+
+</div>
+
+<div class="row" style="border-width:1px;margin-top:3px;border-style:solid;border-color: blueviolet;">
+    <div class="col-lg-2 col-xs-6">
+        <!--合数与差分-->
+        <?= $form->field($model, "hsAndCf_twoFone")->textInput(['maxlength' => true])->label("两合上1") ?>
+    </div>
 </div>
 
 <script src="/chat_statics/js/jquery-1.8.0.min.js"></script>

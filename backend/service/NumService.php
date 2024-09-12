@@ -5,6 +5,7 @@ use backend\models\SscKjData;
 use backend\models\StaticProfits;
 use backend\models\SystemConfig;
 use backend\models\UserSysPlans;
+use common\helpers\Code;
 use common\kj\ssc\Lucky5;
 use common\service\ssc\filterCode\FenLiShu;
 use common\tools\KjDataGet;
@@ -1186,6 +1187,7 @@ class NumService extends BaseService {
         $where = NumService::getPosBigWhere($codes_hz, $where);  # 筛选位置：大
         $where = NumService::getPosSmallWhere($codes_hz, $where);  # 筛选位置：小
         $where = NumService::getFenLiShuWhere($codes_hz, $where, $code_type);  # 分离数
+        $where = NumService::hsAndCfTwoFoneWhere($codes_hz, $where, $code_type);  # 两合上1
 
         ####################################  走移 start  ##################################
         # 123千走456各1元 - 未完成待续
@@ -2447,6 +2449,48 @@ class NumService extends BaseService {
     }
 
     /**
+     * 两合上1
+     * @param $codes_hz
+     * @param $where
+     * @param $code_type
+     * @return array
+     */
+    public static function hsAndCfTwoFoneWhere($codes_hz, &$where, $code_type=4): array
+    {
+        if(empty($codes_hz['hsAndCf_twoFone'])){
+            return $where;
+        }
+
+        $hCode = $codes_hz['hsAndCf_twoFone'];
+        $hCodeArr = Code::codeStringToArray($hCode); # 合分数组
+        $hfArr = [];
+        foreach ($hCodeArr as $filterNum){
+            $hfArr = array_merge($hfArr, [$filterNum, $filterNum+10, $filterNum+20, $filterNum+30]);
+        }
+        //p([$params, $historyKjData, $hCode, $hCodeArr, $hfArr]);
+        $cfWhere = ['OR'];
+
+        # 两数合
+        $orWhere1 = ['OR'];
+        foreach (NumService::TWO_NUM_POS as $poss){
+            $orWhere1[] = ['IN', "(`code_".$poss[0]."` + `code_".$poss[1]."`)", $hfArr];
+        }
+        $cfWhere[] = $orWhere1;
+
+        $orWhere2 = [
+            'OR',
+            ['IN', "code_1", $hCodeArr],
+            ['IN', "code_2", $hCodeArr],
+            ['IN', "code_3", $hCodeArr],
+            ['IN', "code_4", $hCodeArr],
+        ];
+        $cfWhere[] = $orWhere2;
+        $where[] = $cfWhere;
+
+        return $where;
+    }
+
+    /**
      * 复式
      * @param $codes_hz
      * @param $where
@@ -2572,8 +2616,8 @@ class NumService extends BaseService {
             if(isset($hz_Arr['arise'])) $filter3['arise'] = $hz_Arr['arise'];// else $filter0['arise'] = 0;
         }
         # 0.2、上奖除 - 新
-        if(isset($hz_Arr['remove_arises']) OR isset($hz_Arr['remove_arises'])){
-            if(isset($hz_Arr['remove_arises'])) $filter4['remove_arises'] = $hz_Arr['remove_arises'];// else $filter0['arise'] = 0;
+        if(isset($hz_Arr['remove_arises'])){
+            $filter4['remove_arises'] = $hz_Arr['remove_arises'];// else $filter0['arise'] = 0;
         }
 
         # 1、双重
@@ -4417,7 +4461,7 @@ class NumService extends BaseService {
         $where = ['AND', ['=', 'code_type', $code_type] , '1=1'];
         $query->where($where);
         if($filter['type'] == 1){ # 过滤前x期号码 type 一般情况下等于 filter_type
-            $limit = $filters['filter_nums'] ? : ($filter['nums'] ? $filter['nums'] : 1);
+            $limit = $filters['filter_nums'] ? : ($filter['nums'] ?: 1);
             $filter_codes_where = ['AND', ['<', 'qihao', $start_qihao], ['=', 'lottery_type', $lottery_type]];
             $SscKjDatas = SscKjData::find()->where($filter_codes_where)->orderBy(['id'=>SORT_DESC])->limit($limit)->all();
             $filter_tmp_where = ['OR'];
@@ -4560,7 +4604,7 @@ class NumService extends BaseService {
      * @param int $type
      * @return string|string[]
      */
-    public static function getTyep4dxStr($type=1){
+    public static function getType4dxStr($type=1){
         $datas = NumService::$type_dx_datas;
         if(isset($datas[$type])) return $datas[$type];
 
