@@ -40,6 +40,7 @@ use backend\models\TzSystemsAuth;
 use backend\models\TzTypes;
 use backend\models\UserSysPlans;
 use backend\service\statics\statics_base\DealDataService;
+use backend\service\statics\statics_qx\StaticsQxMissService;
 use backend\tools\Util;
 use common\service\CommonService;
 use common\service\lottery\LotteryTypeService;
@@ -3078,7 +3079,7 @@ $sql .= '
      */
     public static function getCodeTypeStatic($val = '', $lottery_type = DEFAULT_LOTTERY_TYPE, $static_nums = 5000){
 
-        $miss = SscDataService::getCodeTypeHistoryMiss($val, $lottery_type, $static_nums); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+        $miss = StaticsQxMissService::getCodeTypeHistoryMiss($val, $lottery_type, $static_nums); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
         $miss['val_desc'] = \backend\service\SscDataService::getStaticNameByType($val);
 
         return $miss;

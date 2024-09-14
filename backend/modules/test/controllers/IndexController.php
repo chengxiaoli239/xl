@@ -528,8 +528,6 @@ class IndexController extends Controller
         p($current_qihao);
         $next_qihao = KjDataGet::getNextQihaoByQihao($qihao = '20211215286', $lottery_type = 8);
         p($next_qihao);
-        $rst['updateCodeTypeYLs3'] = SscDataService::updateCodeTypeYLs($type = 3, $lottery_type = 8);
-        p($rst);
         $miss = SscDataService::staticPeiShuDate($lottery_type = 8);
         p($miss);
         $rst['kj'] = KjDataGet::grabKjData();
@@ -1100,8 +1098,6 @@ class IndexController extends Controller
         }
         p(trim($codes, '@'));
         p(3 % 5);
-        $rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5);
-        p($rst); # 70s
         $rst = BaseDataService::insertCode($type = 5);
         p($rst); # 插入三字现、四字现
         $rst = StaticService::staticHzPerDateProfits('2019-10-31', $lottery_type = 5);

@@ -25,6 +25,7 @@ use backend\service\NumService;
 use backend\service\SscDataService;
 use backend\service\statics\plan\OperatePlanService;
 use backend\service\statics\statics_3d\Statics3dUserDataService;
+use backend\service\statics\statics_qx\StaticsQxMissService;
 use backend\service\statics\yl\OneNumYl;
 use backend\service\StaticService;
 use backend\service\TzService;
@@ -409,6 +410,8 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
+            $miss = StaticsQxMissService::getCodeTypeHistoryMiss('type_log', $lottery_type=8, $static_nums=470); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
+            p($miss);
             $plan = UserSysPlans::findOne(10358);
             $codes = BetService::getCodesByPlan($plan);p(count(explode('@', $codes)));
             //$data = Aozhou::getLucky5($type='json', $is_auto=2);p($data);
