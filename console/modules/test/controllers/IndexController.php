@@ -75,6 +75,19 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        //$r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%static_code_type_arise_perdate}}'); p($r);
+        $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type=8);p($rst);
+        $codeTypes = StaticService::getAllCodeTypes($type = 2); p($codeTypes);# 统计基础号码类型筛选,类型：1和值2号码类型[例如:双双重、三重]
+        $HI = date('H:i');
+        if('21:00'<$HI AND $HI<'22:00'){
+            print_r('rrrr');
+        }else{
+            print_r('bbbbb');
+        }
+        p('dddd');
+
+        $sscData = SscKjData::find()->where(['date'=>'2024-09-15', 'lottery_type'=>8])->asArray()->all();
+        p(array_column($sscData, 'qihao'));
         $status = (new LotteryBet())->checkLotteryStatus($lottery_type=1); p([$lottery_type, $status]);# 是否封盘, 封盘之时即是抓取之时
         $rst['kj'] = KjDataGet::grabKjData();
         p($rst);
@@ -253,7 +266,6 @@ class IndexController extends Controller
             $members = NumCodeService::getRandBetDesc($planId, $dateString);
             p([$r, $members]);
             $status = KjDataGet::isCanGrab($lottery_type=8); p($status);
-            $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%lottery_type}}'); p($r);
             $tzSystemUser = TzSystemsUsers::findOne(76);
             $userInfo = (new ActionYIFanService($tzSystemUser))->getUserData($isAuto=1);p($userInfo);
             $logData = Json::decode('{"log_member_quick_select_id":"14169549","member_id":"9806","account":"Abc123bb","nickname":"","fix_num":"40","bet_count":"5017","bet_money":"1003.4","operation_content":"[四定位]，配数“[取]”：第2位：[01356]，第3位：[24789]，固定合分除值：第[2]位选中，第[3]位选中，第[4]位选中，内容：[2]；，不定合分值(两数合)：[01234]，不定合分值(三数合)：[012345]，合分值范围：[8-28]，包含“[取]”数：[43560]，三兄弟“[除]”操作，四兄弟“[除]”操作，对数“[除]”数：[16]，","operation_datetime":"06-13 14:37:44","time_value":"2024/6/13 14:37:44","operation_ip":"112.66.*.*","ip_value":"112.66.28.70","operation_ip_extension":"112.66.28.70","is_package":"0","log_type":"102"}');

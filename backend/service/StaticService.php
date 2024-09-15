@@ -1855,7 +1855,7 @@ class StaticService extends BaseService {
 
     /**
      * @desc 返回号码类型
-     * @param $type 类型：1和值2号码类型[例如:双双重、三重]
+     * @param $type - 类型：1和值2号码类型[例如:双双重、三重]
      * @return array
      */
     public static function getAllCodeTypes($type = 2){
