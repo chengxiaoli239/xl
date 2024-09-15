@@ -143,7 +143,7 @@ class LotteryBet
         # 七星、排列五
         if(in_array($lotteryType, [LotteryType::HN_SEVEN, LotteryType::PL_5, LotteryType::PL_3D])){
             $HI = date('H:i');
-            if('21:00'<$HI OR $HI<'22:00'){
+            if('21:00'<$HI AND $HI<'22:00'){
                 return LotteryBet::STATUS_DRAW; # 当前为开奖抓取时间
             }else{
                 return LotteryBet::STATUS_CLOSE; # 当前为封盘状态

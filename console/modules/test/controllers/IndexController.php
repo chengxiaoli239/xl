@@ -75,11 +75,7 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
-        for ($i=0; $i<190; $i++){
-            $rst = KjDataGet::insertOneLotteryKjData($lottery_type=17);//p($rst); # 开奖
-            p(['i'=>$i, 'rst'=>$rst], 0);
-            sleep(2);
-        }
+        $status = (new LotteryBet())->checkLotteryStatus($lottery_type=1); p([$lottery_type, $status]);# 是否封盘, 封盘之时即是抓取之时
         $rst['kj'] = KjDataGet::grabKjData();
         p($rst);
         $countArr = SscDataService::getAriseCounts($val='type_log', $count=4360, $lottery_type=8);p($countArr);
