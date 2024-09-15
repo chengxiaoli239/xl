@@ -18,7 +18,7 @@ class LotteryType extends LotteryTypeModel
     public function rules()
     {
         return [
-            [['id', 'lottery_type', 'enable', 'grabDataStatus', 'isDelete', 'sort', 'data_ftime', 'defaultViewGroup', 'android', 'num'], 'integer'],
+            [['id', 'lottery_type', 'enable', 'grabDataStatus', 'isDelete', 'sort', 'data_ftime', 'defaultViewGroup', 'android', 'num', 'open_num_perdate'], 'integer'],
             [['name', 'codeList', 'title', 'shortName', 'info', 'onGetNoed', 'typeGroupName'], 'safe'],
         ];
     }

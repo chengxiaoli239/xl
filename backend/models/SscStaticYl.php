@@ -21,7 +21,7 @@ use Yii;
  * @property int $static_nums 默认统计期数
  * @property string $theory_nums_perdate 理论次数/天
  * @property int $today_nums 今日出现
- * @property int $ytd_nums 昨日出现次数
+ * @property int $ytd_nums 昨日出次数
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property int $type 1和值2号码类型[例如:双双重、三重]3三字现带双重4四字现带双重5四字现不带双重
  * @property int $status 是否显示:0不显示1显示
@@ -80,11 +80,11 @@ class SscStaticYl extends \common\models\base\BaseModel
             'max_range' => '最大遗漏范围(近200期)',
             'yl_records' => '遗漏记录',
             'history_max_miss' => '历史最大遗漏',
-            'count' => '组合总共组数',
-            'static_nums' => '默认统计期数',
+            'count' => '组合组数',
+            'static_nums' => '统计期数',
             'theory_nums_perdate' => '理论次数/天',
-            'today_nums' => '今日出现',
-            'ytd_nums' => '昨日出现次数',
+            'today_nums' => '今出(次)',
+            'ytd_nums' => '昨出(次)',
             'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
             'type' => '1和值2号码类型[例如:双双重、三重]3三字现带双重4四字现带双重5四字现不带双重',
             'status' => '是否显示:0不显示1显示',

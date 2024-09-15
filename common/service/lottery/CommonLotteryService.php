@@ -2,10 +2,9 @@
 
 namespace common\service\lottery;
 
-use backend\models\TzSystems;
-use backend\models\TzSystemsUsers;
-use common\models\thirdD\LocalToSiteMethod;
+use backend\models\LotteryType;
 use common\service\BaseService;
+use common\service\cache\CacheKeyService;
 
 class CommonLotteryService extends BaseService
 {
@@ -47,5 +46,17 @@ class CommonLotteryService extends BaseService
         self::STATUS_LT_SUCCESS,
         self::STATUS_LT_FAIL,
     ];
+
+    public static function getLotteryBaseInfo($lotteryType, $useCache=1)
+    {
+        $mKey = CacheKeyService::lotteryBaseInfo($lotteryType);
+        $lotteryBaseInfo = commonRedis()->get($mKey);
+        if(!$useCache OR empty($lotteryBaseInfo)){
+            $lotteryBaseInfo = LotteryType::find()->where(['lottery_type'=>$lotteryType])->limit(1)->asArray()->one();
+            commonRedis()->setnx($mKey, $lotteryBaseInfo);
+        }
+
+        return $lotteryBaseInfo;
+    }
 
 }

@@ -20,7 +20,7 @@ class GrabKjDatasJob extends CommonJob {
         $qihao = $params['qihao']??'';
         $kjData = $params['kj_data']??[];
         try {
-            $rst = KjDataGet::insertOneLotteryKjData($qihao, $kjData, $lottery_type);
+            $rst = KjDataGet::insertOneLotteryKjData($lottery_type, $qihao, $kjData);
         }catch (\Exception $e){
             return $e->getMessage();
         }

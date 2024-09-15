@@ -17,49 +17,52 @@ use yii\widgets\ActiveForm;
             <div class="panel-body">
                 <?php $form = ActiveForm::begin(); ?>
                 <div class="row">
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-3 col-xs-4">
                         <?= $form->field($model, 'lottery_type')->textInput()->label('彩种lottery_type') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-3 col-xs-4">
                         <?= $form->field($model, 'sort')->textInput()->label('排序') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-3 col-xs-4">
                         <?= $form->field($model, 'name')->textInput(['maxlength' => true])->label('名称') ?>
                     </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-3 col-xs-4">
                         <?= $form->field($model, 'codeList')->textInput(['maxlength' => true])->label('可选号码') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-4">
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-3 col-xs-4">
                         <?= $form->field($model, 'title')->textInput(['maxlength' => true])->label('标题') ?>
                     </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-3 col-xs-4">
                         <?= $form->field($model, 'shortName')->textInput(['maxlength' => true])->label('简称') ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <?= $form->field($model, 'info')->textInput(['maxlength' => true])->label('描述') ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <?= $form->field($model, 'onGetNoed')->textInput(['maxlength' => true])->label('事件函数') ?>
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="col-lg-4 col-xs-4">
-                        <?= $form->field($model, 'info')->textInput(['maxlength' => true])->label('描述') ?>
-                    </div>
-                    <div class="col-lg-4 col-xs-4">
-                        <?= $form->field($model, 'onGetNoed')->textInput(['maxlength' => true])->label('事件函数') ?>
-                    </div>
-                    <div class="col-lg-4 col-xs-4">
+                    <div class="col-lg-3 col-xs-4">
                         <?= $form->field($model, 'data_ftime')->textInput() ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <?= $form->field($model, 'defaultViewGroup')->textInput() ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <?= $form->field($model, 'num')->textInput() ?>
+                    </div>
+                    <div class="col-lg-3 col-xs-4">
+                        <?= $form->field($model, 'typeGroupName')->textInput(['maxlength' => true]) ?>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 col-xs-4">
-                        <?= $form->field($model, 'defaultViewGroup')->textInput() ?>
-                    </div>
-                    <div class="col-lg-4 col-xs-4">
-                        <?= $form->field($model, 'num')->textInput() ?>
-                    </div>
-                    <div class="col-lg-4 col-xs-4">
-                        <?= $form->field($model, 'typeGroupName')->textInput(['maxlength' => true]) ?>
+                    <div class="col-lg-3 col-xs-4">
+                        <?= $form->field($model, 'open_num_perdate')->textInput(['maxlength' => true]) ?>
                     </div>
                 </div>
                 <div class="form-group">

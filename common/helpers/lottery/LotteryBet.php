@@ -140,9 +140,18 @@ class LotteryBet
             '求余秒数'=>$now%300
         ],0);
         */
+        # 七星、排列五
+        if(in_array($lotteryType, [LotteryType::HN_SEVEN, LotteryType::PL_5, LotteryType::PL_3D])){
+            $HI = date('H:i');
+            if('21:00'<$HI OR $HI<'22:00'){
+                return LotteryBet::STATUS_DRAW; # 当前为开奖抓取时间
+            }else{
+                return LotteryBet::STATUS_CLOSE; # 当前为封盘状态
+            }
+        }
 
         if (!isset($this->schedule[$lotteryType])) {
-            throw_info("彩种配置不存在");
+            throw_info("彩种时间配置不存在");
         }
 
         $lotterySchedule = $this->schedule[$lotteryType];

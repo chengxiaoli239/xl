@@ -1108,8 +1108,6 @@ class IndexController extends Controller
         p($rst);
         $rst = BetService::isCanBet($lottery_type = 5);
         p($rst);
-        $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 6);
-        p($rst); # 号码类型遗漏
         $rst = CommonService::isCodeType3n2b('0,0,5,6');
         p($rst);
         $rst = CommonService::isCodeType3n2b('1,2,3,4');
@@ -1129,8 +1127,6 @@ class IndexController extends Controller
         p($rst);
         $miss = SscDataService::getCodeTypeYlHistoryMiss('555', $lottery_type = 5, 20000);
         p($miss);
-        $rst = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);
-        p($rst); # 号码类型遗漏
         $rst = SscDataService::getLastIndexId(6);
         p($rst);
         $rst = StaticService::static2NumsYl($lottery_type = 8);
@@ -1211,9 +1207,6 @@ class IndexController extends Controller
         $statics = StaticService::staticKj3NumCounts($date = '2019-09-01', $lottery_type = 5);
         p($statics);
         set_time_limit(0);
-        # 号码类型：双重、双双重、四重、三兄弟、四兄弟
-        $rst['updateCodeTypeYL'] = SscDataService::updateCodeTypeYL($type = 2, $lottery_type = 5);
-        p($rst);
         # 三字现带双重
         //$rst['updateCodeTypeYLs5'] = SscDataService::updateCodeTypeYLs($type = 5, $lottery_type = 5); p($rst);
         $rst = CommonService::getLotteryName();
@@ -1254,10 +1247,6 @@ class IndexController extends Controller
         p(rand());
         $rst = StaticService::staticSdHzProfitsPerdate();
         p($rst); # 每天每个和值利润统计
-
-        # 三字现带双重
-        $rst['updateCodeTypeYLs'] = SscDataService::updateCodeTypeYLs($type = 4);
-        p($rst);
 
 
         $rst = NumService::getCodesArise(['003']);

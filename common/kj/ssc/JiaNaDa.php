@@ -46,7 +46,6 @@ class JiaNaDa extends BaseKj {
             $rst = self::getCurl($url, $headers);
             //文本转码
             $rst = mb_convert_encoding($rst, 'utf-8','GB2312');
-            p($rst);
             $data = $rst['data']['drawInfo']['historyDraw'];
 
             if (empty($data)) return false;

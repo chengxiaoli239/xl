@@ -25,6 +25,7 @@ use Yii;
  * @property int $defaultViewGroup 默认显示哪个玩法组
  * @property int $android
  * @property int $num 彩种期数
+ * @property int $open_num_perdate 每天开奖期数
  * @property string $typeGroupName 彩种分类名称
  * @property int $updated_at 更新时间
  * @property int $created_at 创建时间
@@ -46,7 +47,7 @@ class LotteryType extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['lottery_type', 'enable', 'grabDataStatus', 'isDelete', 'sort', 'data_ftime', 'defaultViewGroup', 'android', 'num', 'updated_at', 'created_at'], 'integer'],
+            [['lottery_type', 'enable', 'grabDataStatus', 'isDelete', 'sort', 'data_ftime', 'defaultViewGroup', 'android', 'num', 'open_num_perdate', 'updated_at', 'created_at'], 'integer'],
             [['name', 'title', 'info', 'num'], 'required'],
             [['opening_time', 'closing_time', 'update_time'], 'safe'],
             [['name'], 'string', 'max' => 32],
@@ -82,6 +83,7 @@ class LotteryType extends \common\models\base\BaseModel
             'defaultViewGroup' => Yii::t('app', '默认显示哪个玩法组'),
             'android' => Yii::t('app', 'Android'),
             'num' => Yii::t('app', '彩种期数'),
+            'open_num_perdate' => Yii::t('app', '每天开期数'),
             'typeGroupName' => Yii::t('app', '彩种分类名称'),
             'updated_at' => Yii::t('app', '更新时间'),
             'created_at' => Yii::t('app', '创建时间'),

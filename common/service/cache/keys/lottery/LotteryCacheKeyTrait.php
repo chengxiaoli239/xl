@@ -143,4 +143,14 @@ trait LotteryCacheKeyTrait
     {
         return 'lottery:last_index_key:lt_'.$lottery_type;
     }
+
+    /**
+     * 彩种基本信息
+     * @param $lottery_type
+     * @return string
+     */
+    public static function lotteryBaseInfo($lottery_type): string
+    {
+        return 'lottery:lottery_base_info:lt_'.$lottery_type;
+    }
 }

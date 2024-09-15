@@ -119,8 +119,8 @@ class KjDataGet
     public static function grabKjData(): bool
     {
         $m = \Yii::$app->cache;
-        $lottery_types = StaticService::getGrabDataLotteryTypes();
-        foreach ($lottery_types as $lotteryData){
+        $lotteryTypeData = StaticService::getGrabDataLotteryTypes();
+        foreach ($lotteryTypeData as $lotteryData){
             try {
                 $lottery_type = (int)$lotteryData['lottery_type'];
                 $initLotteryKey = SystemService::getInitLotteryDataKey($lottery_type);
@@ -138,7 +138,7 @@ class KjDataGet
                 $m->set($initLotteryKey, 1, $cacheTime);
 
                 KjDataGet::isCanGrab($lottery_type, $isCanGrab);
-                $status = (new LotteryBet())->checkLotteryStatus($lottery_type); # 是否封盘, 封盘之时即是抓去之时
+                $status = (new LotteryBet())->checkLotteryStatus($lottery_type); # 是否封盘, 封盘之时即是抓取之时
                 if($status != LotteryBet::STATUS_DRAW){
                     Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖数据抓取-异常28', [
                         'lottery_type'=>$lottery_type,
@@ -183,7 +183,7 @@ class KjDataGet
      * @param int $lottery_type
      * @return array|null
      */
-    public static function insertOneLotteryKjData($qihao='', $kjData=[], int $lottery_type=DEFAULT_LOTTERY_TYPE): ?array
+    public static function insertOneLotteryKjData(int $lottery_type=DEFAULT_LOTTERY_TYPE, $qihao='', $kjData=[]): ?array
     {
         $RedisLock = new RedisLock();
         $KjConfigs = KjConfig::findAll(['enable'=>1, 'lottery_type'=>$lottery_type]);

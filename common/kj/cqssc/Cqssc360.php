@@ -11,7 +11,7 @@ class Cqssc360 extends BaseKj {
 
     public static function getLotteryNo($returnType = 'json'){
 
-        if(!$kjData = self::getCurrentKjData(self::$lotter_type)){
+        if(!$kjData = self::getCurrentKjData(self::$lottery_type)){
             $domain = BaseKj::getApiHost(5);
             $url = $domain.'/zst/qkj/?lotId=255401';
             $content=file_get_contents($url);
@@ -31,7 +31,7 @@ class Cqssc360 extends BaseKj {
         $opencode = $kjData['opencode'];
 
         # 设置开奖数据缓存
-        self::setKjDataCache(self::$lotter_type, $expect, $kjData);
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
