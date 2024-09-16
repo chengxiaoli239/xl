@@ -31,7 +31,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
-                    'filterModel' => $searchModel,
+                    //'filterModel' => $searchModel,
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
@@ -48,6 +48,11 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         //'created_at',
                         //'updated_at',
                         //'update_time',
+                        ['attribute' => 'update_time','headerOptions'=>['width'=>'3%'],'label'=>'时间',
+                            'value' => function($model) {
+                                return substr($model->update_time, 10, 9);
+                            }
+                        ],
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],

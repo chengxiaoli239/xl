@@ -32,7 +32,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
-                    'filterModel' => $searchModel,
+                    //'filterModel' => $searchModel,
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
@@ -50,19 +50,38 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                 return Html::a($txt, 'javascript:;', $options);
                             }
                         ],
-                        'current_miss',
+                        ['attribute' => 'current_miss','headerOptions'=>['width'=>'3%'],'label'=>'当前',
+                            'value' => function($model) {
+                                return $model->current_miss;
+                            }
+                        ],
                         //'last_time_miss',
                         //'last_time_miss_range',
                         //'max_miss',
                         //'max_range',
                         'yl_records:ntext',
-                        'history_max_miss',
-                        'count',
+                        //'history_max_miss',
+                        ['attribute' => 'history_max_miss','headerOptions'=>['width'=>'3%'],'label'=>'历史最大',
+                            'value' => function($model) {
+                                return $model->history_max_miss;
+                            }
+                        ],
+                        //'count',
+                        ['attribute' => 'count','headerOptions'=>['width'=>'3%'],'label'=>'总组数',
+                            'value' => function($model) {
+                                return $model->count;
+                            }
+                        ],
                         'today_nums',
                         'theory_nums_perdate',
                         //'created_at',
                         //'updated_at',
-                        'update_time',
+                        //'update_time',
+                        ['attribute' => 'update_time','headerOptions'=>['width'=>'3%'],'label'=>'时间',
+                            'value' => function($model) {
+                                return substr($model->update_time, 10, 9);
+                            }
+                        ],
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],

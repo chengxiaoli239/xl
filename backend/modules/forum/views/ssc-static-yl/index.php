@@ -33,7 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
-                    'filterModel' => $searchModel,
+                    //'filterModel' => $searchModel,
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
@@ -73,10 +73,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'status',
                         //'created_at',
                         //'updated_at',
-                        ['attribute' => 'update_time','label'=>'更新时间', # 'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'update_time','label'=>'时间', # 'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                return substr($model->update_time, 5, -3);
+                                return substr($model->update_time, 10, 9);
                             }
                         ],
 
