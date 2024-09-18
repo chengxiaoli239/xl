@@ -1,8 +1,10 @@
 <?php
 namespace common\service\jobs\kj_data;
 
+use backend\tools\Tools;
 use common\service\jobs\CommonJob;
 use common\tools\KjDataGet;
+use common\tools\Tool_Common;
 
 class GrabKjDatasJob extends CommonJob {
 
@@ -20,6 +22,10 @@ class GrabKjDatasJob extends CommonJob {
         $qihao = $params['qihao']??'';
         $kjData = $params['kj_data']??[];
         try {
+            $dateHI = date('H:i');
+            if($lottery_type==DEFAULT_LOTTERY_TYPE && '05:01'<$dateHI && $dateHI<'08:00'){
+                return '幸运五非抓取数据时间节点';
+            }
             $rst = KjDataGet::insertOneLotteryKjData($lottery_type, $qihao, $kjData);
         }catch (\Exception $e){
             return $e->getMessage();
