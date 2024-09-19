@@ -247,7 +247,8 @@ class UserSysPlans extends \common\models\base\BaseModel
             [['uid', 'account', 'created_at', 'updated_at'], 'required'],
             [['single', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
             [['update_time'], 'safe'],
-            [['children_plan_id', 'singles'], 'string', 'max' => 255],
+            [['children_plan_id'], 'string', 'max' => 255],
+            [['singles'], 'string'],
             [['account', 'tz_sites'], 'string', 'max' => 24],
             [['hz_Arr'], 'string', 'max' => 640],
         ];
