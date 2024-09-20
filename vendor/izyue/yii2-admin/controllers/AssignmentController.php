@@ -2,8 +2,11 @@
 
 namespace izyue\admin\controllers;
 
+use backend\models\BetErrorPlansTask;
+use backend\models\BettingRecords;
 use backend\models\SignupForm;
 use backend\models\TzSystemsUsers;
+use backend\models\UserSysPlans;
 use backend\service\UserService;
 use backend\service\UserSysPlansService;
 use common\models\AdminModel;
@@ -402,7 +405,10 @@ class AssignmentController extends Controller
             }
             AdminModel::deleteRecord($where);
             TzSystemsUsers::deleteRecord(['uid'=>$id]);
-            
+            UserSysPlans::deleteRecord(['uid'=>$id]);
+            BettingRecords::deleteRecord(['uid'=>$id]);
+            BetErrorPlansTask::deleteRecord(['uid'=>$id]);
+
             $transaction->commit();
         }catch (\Exception $e){
             $transaction->rollBack();
