@@ -67,7 +67,7 @@ $(function () {
         //    console.log($(this))
         //    $(this).find('input').prop("checked",false);
         //})
-        $(this).find('input').prop("checked",true);
+        $(this).find('input').prop("checked", !$(this).find('input').prop('checked'));
     });
 })
 </script>
