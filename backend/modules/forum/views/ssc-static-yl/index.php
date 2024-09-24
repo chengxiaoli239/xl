@@ -1,5 +1,6 @@
 <?php
 
+use backend\service\SscDataService;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -10,12 +11,15 @@ use yii\grid\GridView;
 //p($codeTypeName);
 $this->title = Yii::t('app', 'Ssc Static Yls'); # .' [ '.$codeTypeName.' ]';
 $this->params['breadcrumbs'][] = $this->title;
+
+$qiShu = SscDataService::getQiShu($lottery_type);
+$hasOpenQiShu = \backend\models\SscKjData::find()->where(['lottery_type'=>$lottery_type, 'date'=>date('Y-m-d')])->count();
 ?>
 <section class="ssc-static-yl-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title) ?>
+            <?= Html::encode($this->title) . '，总期数:<font color="#663399">'.$qiShu.'</font>期，已开:<font color="green">'.$hasOpenQiShu . '</font>期，待开:<font color="red">'.($qiShu-$hasOpenQiShu).'</font>期'; ?>
             <?php include(dirname(__FILE__).'/index_tab.php'); ?>
         </header>
         <div class="panel-body">
