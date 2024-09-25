@@ -15,6 +15,23 @@ use yii\widgets\ActiveForm;
     <div class="col-lg-3 col-xs-6">
         <?= $form->field($model, 'exclude_codes')->textInput()->label('排除') ?>
     </div>
+    <div class="col-lg-3 col-xs-6">
+        <?= $form->field($model, 'is_init_perdate')->checkboxList(
+            [1=>'否',2=>'是'],
+            [
+                'item' => function ($index, $label, $name, $checked, $value) {
+                    $options = [
+                        'class' => 'checkbox-item',
+                        'label' => $label,
+                        'value' => $value,
+                        'checked' => $checked,
+                    ];
+
+                    return Html::checkbox($name, $checked, $options);
+                }
+            ]
+        )->label('每天初始化(翻倍计划)') ?>
+    </div>
 
     <?php if($model->playway==1){ ?>
     <div class="col-lg-2 col-xs-6">

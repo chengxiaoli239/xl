@@ -93,6 +93,12 @@ class UserSysPlansService extends BaseService {
             $tmpFilter['fixed_pos_sel'] = NumService::OBTAIN;
         }
 
+        # 每天初始化
+        if($UserSysPlans['is_init_perdate'] && count($UserSysPlans['is_init_perdate']) == 1){
+            $post['UserSysPlans']['is_init_perdate'] = (int)$UserSysPlans['is_init_perdate'][0];
+        }
+        unset($UserSysPlans['is_init_perdate']);
+
         # 定位置：千、百、十、个
         if($UserSysPlans['fixed_pos_sel'] && count($UserSysPlans['fixed_pos_sel']) == 1){
             $tmpFilter['fixed_pos_sel'] = (int)$UserSysPlans['fixed_pos_sel'][0];

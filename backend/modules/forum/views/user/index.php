@@ -165,7 +165,8 @@ $this->registerJs($js);
     </div>
 </div>
 
-<script src="https://cdn.bootcss.com/jquery/2.0.3/jquery.js"></script>
+<script src="/statics/js/jquery-2.0.3.js"></script>
+<!--script src="https://cdn.bootcss.com/jquery/2.0.3/jquery.js"></script-->
 <script src="/chat_statics/js/clipboard.min.js"></script>
 <script>
 $(function () {
