@@ -250,7 +250,7 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
 </div>
 
 <script src="/statics/js/jquery-2.0.3.js"></script>
-<!--script src="https://cdn.bootcss.com/jquery/2.0.3/jquery.js"></script>
+<!--script src="https://cdn.bootcss.com/jquery/2.0.3/jquery.js"></script-->
 <script>
 $(function () {
     function updateBalance(id) {
