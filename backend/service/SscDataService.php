@@ -2259,6 +2259,8 @@ class SscDataService extends BaseService {
 
                     # 勾选每天初始化，倍数、遗漏、
                     if($closingTime>$now_HI && $now_HI<$openingTime && $codes_hz['is_init_perdate']==UserSysPlans::IS_INIT_PERDATE_Y){
+                        $beforeSingleKey = $codes_hz['singles_key'];
+                        $beforeCurrentMiss = $codes_hz['current_miss'];
                         $codes_hz['current_miss'] = 0;
                         $codes_hz['singles_key'] = 0;
                         PlanStaticProfits::updateAll([
@@ -2266,7 +2268,12 @@ class SscDataService extends BaseService {
                             'current_qihao' => $current_kj_qihao,
                             'uid' => $UserSysPlan->uid,
                         ], ['plan_id'=>$UserSysPlan->id]);
-                        Tool_Common::log('/data/'.__FUNCTION__.'_init', 'INFO', '每天翻倍几乎初始化', ['plan_id'=>$UserSysPlan->id]);
+                        Tool_Common::log('/data/'.__FUNCTION__.'_init', 'INFO', '每天翻倍几乎初始化', [
+                            'plan_id'=>$UserSysPlan->id,
+                            'beforeSingle' => $single,
+                            'beforeSingleKey' => $beforeSingleKey,
+                            'beforeCurrentMiss' => $beforeCurrentMiss,
+                        ]);
                         $single = $singles[0]??$single;
                     }
                 }
