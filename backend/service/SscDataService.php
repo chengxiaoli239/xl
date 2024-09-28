@@ -2252,15 +2252,28 @@ class SscDataService extends BaseService {
                         $single = OperatePlanService::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                     }
                 }
+                $codes_hz['singles_key'] = $next_single_key;
+                if(in_array($UserSysPlan->plan_type, [9, 16])){ # plan_type:倍投、遗漏倍投
+                    $codes_hz['current_miss'] = $current_miss;
+                    $codes_hz['is_init'] = $is_init; # 开奖之后初始标识改成 0
+
+                    # 勾选每天初始化，倍数、遗漏、
+                    if($closingTime>$now_HI && $now_HI<$openingTime && $codes_hz['is_init_perdate']==UserSysPlans::IS_INIT_PERDATE_Y){
+                        $codes_hz['current_miss'] = 0;
+                        $codes_hz['singles_key'] = 0;
+                        PlanStaticProfits::updateAll([
+                            'cut_profits'=>0,
+                            'current_qihao' => $current_kj_qihao,
+                            'uid' => $UserSysPlan->uid,
+                        ], ['plan_id'=>$UserSysPlan->id]);
+                        Tool_Common::log('/data/'.__FUNCTION__.'_init', 'INFO', '每天翻倍几乎初始化', ['plan_id'=>$UserSysPlan->id]);
+                        $single = $singles[0]??$single;
+                    }
+                }
+                $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
                 $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['single'] = $single; # 最新更新倍数
                 $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['before_singles_key'] = $codes_hz['singles_key']; # 更新前倍数key
                 $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['next_single_key'] = $next_single_key; # 最新即将下注的倍数key, singles的 key
-                if(in_array($UserSysPlan->plan_type, [9, 16])){ # plan_type:遗漏倍投
-                    $codes_hz['current_miss'] = $current_miss;
-                    $codes_hz['is_init'] = $is_init; # 开奖之后初始标识改成 0
-                }
-                $codes_hz['singles_key'] = $next_single_key;
-                $whereUpdate = ['id'=>$UserSysPlan->id ]; # 更新条件
                 $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['whereUpdate'] = $whereUpdate;
 
                 $single = (!empty($single)) ? $single : $originSingle;

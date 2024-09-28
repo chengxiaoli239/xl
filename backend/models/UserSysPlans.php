@@ -228,6 +228,9 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $hsAndCf_twoFone; # 两合上1
     ####################### 合数与差分-结束 #####################
 
+    const IS_INIT_PERDATE_N = 1;
+    const IS_INIT_PERDATE_Y = 2;
+
 
     /**
      * @inheritdoc
