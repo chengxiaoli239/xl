@@ -1,7 +1,17 @@
+<style>
+.tooltip {
+    display: none;
+    position: absolute;
+    background-color: yellow;
+    padding: 5px;
+    border: 1px solid #ccc;
+    z-index: 1000; /* 确保 tooltip 在最上面 */
+}
+</style>
 <!--动态过滤-->
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #da4f49;">
     <div class="col-lg-10 col-xs-12">
-        <?= $form->field($model, 'filter_dynamic_types')->checkboxList($filter_dynamic_typesArr)->label('动态过滤类型2 <span id="tag_filter_dynamic_type" class="glyphicon glyphicon-comment"></span>') ?>
+        <?= $form->field($model, 'filter_dynamic_types')->checkboxList($filter_dynamic_typesArr)->label('动态过滤1 <span id="tag_filter_dynamic_type" class="glyphicon glyphicon-comment"></span>') ?>
     </div>
 </div>
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #da4f49;">
@@ -10,8 +20,18 @@
         <?php foreach ($filter_dynamic_types2 as $key=>$value): ?>
         <div style="display: flex; align-items: center;">
             <div style="margin-right: 2px;padding-top: 3px">
-                <?= $form->field($model, "filter_dynamic_types2[".$key."][type]")->checkbox(['value'=>$value['type'], 'label' => $value['label'], 'labelOptions' => ['style' => 'display:inline;']])->label(false) ?>
+                <?= $form->field($model, "filter_dynamic_types2[".$key."][type]")->checkbox([
+                    'value'=>$value['type'],
+                    'label' => $value['label'],
+                    'labelOptions' => [
+                        'style' => 'display:inline;',
+                        'title' => $value['desc'],
+                    ],
+                    'title' => $value['desc'],
+                    'alt' => $value['desc'],
+                ])->label(false) ?>
             </div>
+            <div class="tooltip" style="display:none; position:absolute; background-color:yellow; padding:5px; border:1px solid #ccc;"><?=$value['desc']?></div>
             <!-- 添加隐藏的input字段 -->
             <input type="hidden" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][label]" value="<?= htmlspecialchars($value['label'], ENT_QUOTES) ?>">
             <?php foreach ($value['params'] as $k2 => $v2): ?>
@@ -91,6 +111,19 @@
     </div>
 </div>
 <script>
+// 监听动态过滤2中的复选框点击事件
+$('input[type="checkbox"][name^="UserSysPlans[filter_dynamic_types2]"]').click(function() {
+    // 获取提示框
+    var tooltip = $('.tooltip');
+
+    // 显示提示
+    tooltip.css({top: $(this).offset().top + 20, left: $(this).offset().left}).fadeIn();
+
+    // 设置定时器，3秒后隐藏提示
+    setTimeout(function() {
+        tooltip.fadeOut();
+    }, 3000); // 3000毫秒 = 3秒
+});
 $(function () {
     $('#tag_filter_dynamic_type').click(function () {
         $('#exampleModal_msg_filter_dynamic_type').modal('show');

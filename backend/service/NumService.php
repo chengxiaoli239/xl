@@ -5,6 +5,7 @@ use backend\models\SscKjData;
 use backend\models\StaticProfits;
 use backend\models\SystemConfig;
 use backend\models\UserSysPlans;
+use backend\service\numbers\DynamicFilterService;
 use common\helpers\Code;
 use common\kj\ssc\Lucky5;
 use common\service\ssc\filterCode\FenLiShu;
@@ -188,10 +189,10 @@ class NumService extends BaseService {
 
         87=>'过滤昨天同期号[千]位双重',
 
-        88=>'过滤[千]位号码近5天号码(四定)',
-        94=>'过滤[百]位号码近5天号码(四定)',
-        95=>'过滤[十]位号码近5天号码(四定)',
-        96=>'过滤[个]位号码近5天号码(四定)',
+        88=>'过滤[千]位一致近5天号码(四定)',
+        94=>'过滤[百]位一致近5天号码(四定)',
+        95=>'过滤[十]位一致近5天号码(四定)',
+        96=>'过滤[个]位一致近5天号码(四定)',
 
         89=>'过滤[千]位号码及合分(四定)',
         90=>'过滤[百]位号码及合分(四定)',
@@ -323,6 +324,10 @@ class NumService extends BaseService {
         205=>'过滤23位合分',
         206=>'过滤24位合分',
         207=>'过滤34位合分',
+
+        208=>'过滤近3天直码',
+        209=>'过滤近5天直码',
+        210=>'过滤近7天直码',
     ];
 
     const TYPE_POSITIONS = [
@@ -3279,16 +3284,16 @@ class NumService extends BaseService {
                 case 87: # 过滤昨天同期号[千]位双重(四定)
                     $codes = NumCodeService::getBeforeKjCodesDynamic79($plan, $positions=[1]);
                     break;
-                case 88: # 过滤[千]位号码及对数近5天(四定)
+                case 88: # 过滤[千]位一致号码近5天(四定)
                     $codes = NumCodeService::getBeforeKjCodesDynamic80($plan, $positions=[1], $dateNum=5);
                     break;
-                case 94: # 过滤[百]位号码及对数近5天(四定)
+                case 94: # 过滤[百]位一致近5天号码(四定)
                     $codes = NumCodeService::getBeforeKjCodesDynamic80($plan, $positions=[2], $dateNum=5);
                     break;
                 case 95: # 过滤[十]位号码及对数近5天(四定)
                     $codes = NumCodeService::getBeforeKjCodesDynamic80($plan, $positions=[3], $dateNum=5);
                     break;
-                case 96: # 过滤[个]位号码及对数近5天(四定)
+                case 96: # 过滤[个]位一直近5天号码(四定)
                     $codes = NumCodeService::getBeforeKjCodesDynamic80($plan, $positions=[4], $dateNum=5);
                     break;
                 case 89: # 过滤[千]位号码及合分(四定)
@@ -3558,6 +3563,13 @@ class NumService extends BaseService {
                     break;
                 case 201: # 取后四最近9999组号码
                     $codes = NumCodeService::getBeforeKjCodesDynamic18($plan, $lottery_type, 9999);
+                    break;
+                case 208: # 过滤近3天直码
+                case 209: # 过滤近5天直码
+                case 210: # 过滤近7天直码
+                    $nums = [ 208 => 3, 209 => 5, 210 => 7, ];
+                    $params = ['type'=>2, 'params'=>['x'=>$nums[$filter_dynamic_type]]]; # 动态过滤2，对应的\backend\service\numbers\DynamicFilterService::DYNAMIC_FILTER_TYPES
+                    $codes = DynamicFilterService::getFilterDynamic2($plan, $params);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);

@@ -10,9 +10,10 @@ class DynamicFilterService extends BaseService {
 
     # 动态过滤2
     const DYNAMIC_FILTER_TYPES = [
-        ['type'=>1, 'label'=>'两合上1', 'params'=>['x'=>'']],
-        //['type'=>2, 'label'=>'两合上13', 'params'=>['x'=>'', 'y'=>'']],
+        ['type'=>1, 'label'=>'两合上1', 'params'=>['x'=>''], 'desc'=>'两数合为该合分或该数字上奖'],
+        ['type'=>2, 'label'=>'过滤近x天直码', 'params'=>['x'=>''], 'desc'=>'过滤近x天的直码'],
     ];
+    public static int $filterType = 0;
 
     /**
      * 动态过滤
@@ -31,9 +32,13 @@ class DynamicFilterService extends BaseService {
 
         $codesArr = $allCodes;
         foreach ($dynamicTypes as $dynamic){
+            self::$filterType = $dynamic['type'];
             switch ($dynamic['type']){
                 case 1: # 两合上1
                     $codes = DynamicType2Service::filter1($plan, $dynamic);
+                    break;
+                case 2: # 过滤近x天直码
+                    $codes = DynamicType2Service::filter2($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
             }
             $codesArr = array_intersect($codesArr, $codes);
@@ -42,4 +47,5 @@ class DynamicFilterService extends BaseService {
 
         return $codesArr;
     }
+
 }
