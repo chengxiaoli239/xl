@@ -3568,7 +3568,9 @@ class NumService extends BaseService {
                 case 209: # 过滤近5天直码
                 case 210: # 过滤近7天直码
                     $nums = [ 208 => 3, 209 => 5, 210 => 7, ];
-                    $params = ['type'=>2, 'params'=>['x'=>$nums[$filter_dynamic_type]]]; # 动态过滤2，对应的\backend\service\numbers\DynamicFilterService::DYNAMIC_FILTER_TYPES
+                    $params = [
+                        ['type'=>2, 'params'=>['x'=>$nums[$filter_dynamic_type]]]
+                    ]; # 动态过滤2，对应的\backend\service\numbers\DynamicFilterService::DYNAMIC_FILTER_TYPES
                     $codes = DynamicFilterService::getFilterDynamic2($plan, $params);
                     break;
             }
