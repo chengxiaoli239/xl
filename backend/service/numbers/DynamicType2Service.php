@@ -86,7 +86,7 @@ class DynamicType2Service extends BaseService {
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
         //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
-        $betDesc = $filterDesc['desc'].":".$x."天(四定)";
+        $betDesc = $filterDesc['desc'].":过滤近".$x."天直码(四定)";
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
