@@ -73,17 +73,46 @@ class SscDataService extends BaseService {
     const DEAL_DATA_STATUS_FAIL = 3; # 处理失败
     const DEAL_DATA_STATUS_NOT_NEED_DEAL = 4; # 无需处理
 
-    const PLAN_TYPE_SINGLES_BET = 6; # 中则投、中则投+翻倍梯度倍投
+    const PLAN_TYPE_NORMAL = 0; # 正常
+    const PLAN_TYPE_SINGLES_BET = 2; # 倍投
+    const PLAN_TYPE_SINGLES_BET_WIN = 6; #  中则投、中则投+翻倍梯度倍投
     const PLAN_TYPE_YL_BET = 8; # 遗漏投
+    const PLAN_TYPE_YL_BET_SINGLES = 9; # 遗漏倍投
     const PLAN_TYPE_AREA_SINGLES_BET = 14; # 区间遗漏投
     const PLAN_TYPE_SINGLES_BET_2 = 15; # 中则倍投
     const PLAN_TYPE_BT_SINGLES_BET = 10; # 中则波推倍投，类似于中则投+翻倍梯度倍投
+    const PLAN_TYPE_YL_BET_SINGLES_2 = 16; # 遗漏倍投2
     const PLAN_TYPE_YL_ZZ_SINGLES_BET = 17; # 遗漏中则倍投
     const PLAN_TYPE_YL_BET_SINGLES_NUM = 18; # 遗漏x期投y期
+    const PLAN_TYPE_YL_START_BET_SINGLES = 19; # 遗漏x期起投
+    const PLAN_TYPE_OPTIONS = [
+        # 计划类型:0正常1止盈止损计划
+        self::PLAN_TYPE_NORMAL => '正常',
+        //1=>'止盈止损',
+        self::PLAN_TYPE_SINGLES_BET => '倍投',
+        //3=>'倍投&止盈止损',
+        //4=>'倍投&号码切换',
+        //5=>'倍投&号码切换止盈止损',
+        self::PLAN_TYPE_SINGLES_BET_WIN => '中则投',
+        7=>'中则投否则反买',
+        8 => '遗漏投',  # 遗漏x期数则开始投，投中了后就再等遗漏x期再继续投
+        self::PLAN_TYPE_YL_BET_SINGLES => '遗漏倍投', # 遗漏x期数则开始倍投，投中了后就回到第一个倍数再等遗漏x期再继续倍投
+        self::PLAN_TYPE_BT_SINGLES_BET => '中则波推倍投',
+        //11=>'中则交叉正反',
+        12=>'A出x次B出y次投B',
+        13=>'A出x次B出y次投B_2',
+        14=>'区间遗漏投',
+        self::PLAN_TYPE_SINGLES_BET_2 => '中则倍投',
+        self::PLAN_TYPE_YL_BET_SINGLES_2 => '遗漏倍投2',
+        self::PLAN_TYPE_YL_ZZ_SINGLES_BET => '遗漏中则倍投',
+        self::PLAN_TYPE_YL_BET_SINGLES_NUM => '遗漏x期投y期',
+        self::PLAN_TYPE_YL_START_BET_SINGLES => '遗漏x期起投',
+    ];
 
     const PLAN_BET_STATUS_INIT = 0; # 初始状态
     const PLAN_BET_STATUS_BETTING = 1; # 正在下注状态
     const PLAN_BET_STATUS_WAIT = 2; # 等待状态
+
     /**
      * @desc 定位和值统计
      * @return mixed
@@ -2309,7 +2338,7 @@ class SscDataService extends BaseService {
             $UserSysPlans = UserSysPlans::find()->where($where);
             foreach ($UserSysPlans->each(10) as $UserSysPlan){
                 switch ($UserSysPlan->plan_type){
-                    case self::PLAN_TYPE_SINGLES_BET: # 中则投、中则投 + 翻倍梯度
+                    case self::PLAN_TYPE_SINGLES_BET_WIN: # 中则投、中则投 + 翻倍梯度
                     case self::PLAN_TYPE_BT_SINGLES_BET: # 中则波推倍投
                         $logArr['plan_type_6_10'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans_6($UserSysPlan, $current_kj_qihao);
                         break;
@@ -2326,7 +2355,12 @@ class SscDataService extends BaseService {
                         $logArr['plan_type_17'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans_17($UserSysPlan, $current_kj_qihao);
                         break;
                     case self::PLAN_TYPE_YL_BET_SINGLES_NUM:
+                        # 遗漏x期投y期
                         $logArr['plan_type_18'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans18($UserSysPlan, $current_kj_qihao);
+                        break;
+                    case self::PLAN_TYPE_YL_START_BET_SINGLES:
+                        # 遗漏x期起投
+                        $logArr['plan_type_19'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans19($UserSysPlan, $current_kj_qihao);
                         break;
                 }
             }

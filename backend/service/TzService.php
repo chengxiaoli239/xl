@@ -400,19 +400,15 @@ class TzService extends BaseService {
         return false;
     }
 
-    public static function filterTz($account = 'gaozi2017'){
-        $HN0898Service = new HN0898Service($account);
-        $data = [ 'code'=>$code, 'qihao'=>$qihao, 'playway'=>$playway, 'single'=>$single, 'is_simulate'=>$is_simulate,'order_type'=>$order_type,'position'=>$position ];
-        $rst = $HN0898Service->tz($data);
-    }
-
     /**
      * @desc 获取投注系统 getTzPlanTypes
      * @return mixed
      */
     public static function getTzPlanTypes($type = ''){
 
-        $datas = [
+        $data = SscDataService::PLAN_TYPE_OPTIONS;
+        /*
+        $data = [
             # 计划类型:0正常1止盈止损计划
             0=>'正常',
             //1=>'止盈止损',
@@ -434,9 +430,10 @@ class TzService extends BaseService {
             17=>'遗漏中则倍投',
             18=>'遗漏x期投y期',
         ];
-        if(isset($datas[$type])) return $datas[$type];
+        */
+        if(isset($data[$type])) return $data[$type];
 
-        return $datas;
+        return $data;
     }
 
     /**

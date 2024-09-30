@@ -432,9 +432,9 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
+            $AUTH_ACCESS_TOKENS = TzSystemUsersService::getAuthAccessTokens(2);p($AUTH_ACCESS_TOKENS);
             $plan = UserSysPlans::findOne(10435);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
-            $AUTH_ACCESS_TOKENS = TzSystemUsersService::getAuthAccessTokens(2);p($AUTH_ACCESS_TOKENS);
             $miss = StaticsQxMissService::getCodeTypeHistoryMiss('type_log', $lottery_type=8, $static_nums=470); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
             p($miss);
             $plan = UserSysPlans::findOne(10358);

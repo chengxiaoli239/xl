@@ -627,7 +627,7 @@ class OperatePlanService extends BaseService
                 $current_miss += 1;
                 if($current_miss>=$betWhileMiss){
                     $singles_key =0;
-                    $betStatus = 1; // 进入下注状态
+                    $betStatus = SscDataService::PLAN_BET_STATUS_BETTING; // 进入下注状态
                     $has_bet_nums = 1;
                 }
             }
@@ -664,7 +664,92 @@ class OperatePlanService extends BaseService
         ]);
         $updateData = ['hz_Arr'=>json_encode($hzArr, 320), 'single'=>$single];
         $rst = UserSysPlans::updateAll($updateData, ['id'=>$UserSysPlan->id]);
-        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '遗漏投x投y期', [
+        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '遗漏x期投y期', [
+            'planId'=>$planId,
+            'flag'=>$flag,
+            'singles'=>$singles,
+            'singles_count'=>$singles_count,
+            'beforeHzArr'=>$beforeHzArr,
+            'afterHzArr'=>$hzArr,
+            'rst'=>$rst,
+        ]);
+
+        return true;
+    }
+
+    /**
+     * 19 - 遗漏x期起投
+     * @param $UserSysPlan
+     * @param $currentKjQiHao
+     * @return true
+     */
+    public static function operatePlans19($UserSysPlan, $currentKjQiHao): bool
+    {
+        $planId = $UserSysPlan->id;
+        $lottery_type = $UserSysPlan->lottery_type;
+        $flag = SscDataService::isZjBefore($UserSysPlan->id);
+        # 遗漏期数[不中奖期数]
+        //$lossQs = SscDataService::getLossQs($UserSysPlan->id);
+
+        $hzArr = json_decode($UserSysPlan->hz_Arr, true);
+        $beforeHzArr = $hzArr;
+        if(isset($hzArr['filters'])){
+            $hzArr['filters']['current_kj_qihao'] = $currentKjQiHao;
+        }
+
+        $betStatus = $hzArr['betStatus']??0; # 开奖之后初始标识改成 0
+        $current_miss = $hzArr['current_miss']??0; # 当前遗漏
+        $singles_key = $hzArr['singles_key']??0; # 倍数索引
+        $betWhileMiss = $hzArr['bet_while_miss']??0;
+        $has_bet_nums = $hzArr['has_bet_nums']??0; # 已投数量
+        $singles = explode('-', trim($UserSysPlan->singles));
+        if(empty($singles)) $singles = [$UserSysPlan->single]; # 不填的情况
+        $singles_count = count($singles);
+
+        if(in_array($betStatus, [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
+            if($flag){
+                $betStatus = SscDataService::PLAN_BET_STATUS_WAIT; # 进入等待状态
+                # 中奖
+                $singles_key = 0;
+                $current_miss = 0;
+                $has_bet_nums = 0;
+            }else{
+                # 不中奖
+                $current_miss += 1;
+                if($current_miss>=$betWhileMiss){
+                    $singles_key =0;
+                    $betStatus = SscDataService::PLAN_BET_STATUS_BETTING; // 进入下注状态
+                    $has_bet_nums = 1;
+                }
+            }
+        }elseif($betStatus == SscDataService::PLAN_BET_STATUS_BETTING){
+            $betStatus = SscDataService::PLAN_BET_STATUS_BETTING;
+            $has_bet_nums += 1;
+            if($flag){
+                $singles_key = 0; # 中回到第一个倍数
+                $current_miss = 0;
+            }else{
+                $current_miss += 1;
+                if($singles_key<($singles_count-1)){
+                    $singles_key += 1; # 还没投完继续投
+                }else{
+                    $singles_key = 0;
+                    //$betStatus = SscDataService::PLAN_BET_STATUS_WAIT; # 投完倍数进入等待状态
+                }
+            }
+        }
+        $next_single_key = $singles_key;
+
+        $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+        $hzArr = array_merge($hzArr, [
+            'current_miss' => $current_miss,
+            'singles_key' => $singles_key,
+            'betStatus' => $betStatus,
+            'has_bet_nums' => $has_bet_nums,
+        ]);
+        $updateData = ['hz_Arr'=>json_encode($hzArr, 320), 'single'=>$single];
+        $rst = UserSysPlans::updateAll($updateData, ['id'=>$UserSysPlan->id]);
+        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '遗漏x期起投', [
             'planId'=>$planId,
             'flag'=>$flag,
             'singles'=>$singles,
