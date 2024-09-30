@@ -69,7 +69,7 @@ $columns = array_merge(
                 }
             }
         ],
-        ['attribute' => 'plan_type','label'=>'计划类型',#'headerOptions'=>['width'=>'5%'],
+        ['attribute' => 'plan_type','label'=>'计划类型', 'headerOptions'=>['width'=>'5%'],
             'format'=>'raw',
             'value' => function($model) {
                 $txt = \backend\service\TzService::getTzPlanTypes($model->plan_type).'_';
