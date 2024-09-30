@@ -6,6 +6,7 @@ use backend\service\BaseService;
 use backend\service\NumService;
 use common\helpers\Code;
 use common\service\ssc\QihaoService;
+use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 
 class DynamicType2Service extends BaseService {
@@ -71,7 +72,9 @@ class DynamicType2Service extends BaseService {
         //$historyKjData = NumCodeService::getKjData($currentKjQiHao, $lottery_type);
         $params = $dynamic['params'];
         $x = $params['x'];
-        $filterCodes = SscKjData::find()->select('code_4n_str')->where(['>=', 'created_at', (time()-$x*86400)])->column();
+        $filterCodesQuery = SscKjData::find()->select(['code_4n_str'])->where(['>=', 'created_at', (time()-$x*86400)])->andWhere(['lottery_type'=>$lottery_type]);
+        //p($filterCodesQuery->createCommand()->getRawSql());
+        $filterCodes = $filterCodesQuery->column();
         $where = ['NOT IN', 'code', $filterCodes];
 
         $playway = $plan->playway;
@@ -82,7 +85,13 @@ class DynamicType2Service extends BaseService {
             ->where(['code_type' => $playway+1])
             ->andWhere($where);
 
-        //$sql = $query->createCommand()->getRawSql();p($sql);
+        $sql = $query->createCommand()->getRawSql();//p($sql);
+        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤两个位置一样的所有号码', [
+            'plan_id'=>$plan->id,
+            'lottery_type'=>$lottery_type,
+            'current_kj_qihao'=>$currentKjQiHao,
+            'sql'=>$sql
+        ]);
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
         //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);

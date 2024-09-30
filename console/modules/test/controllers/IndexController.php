@@ -17,6 +17,7 @@ use backend\service\agent\AgentUsersService;
 use backend\service\BaseService;
 use backend\service\BetService;
 use backend\service\clients\AgentClientsService;
+use backend\service\clients\TzSystemUsersService;
 use backend\service\HN0898Service;
 use backend\service\Lucky5\Lucky5Service;
 use backend\service\numbers\DynamicFilterService;
@@ -433,6 +434,7 @@ class IndexController extends Controller
         try {
             $plan = UserSysPlans::findOne(10435);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
+            $AUTH_ACCESS_TOKENS = TzSystemUsersService::getAuthAccessTokens(2);p($AUTH_ACCESS_TOKENS);
             $miss = StaticsQxMissService::getCodeTypeHistoryMiss('type_log', $lottery_type=8, $static_nums=470); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
             p($miss);
             $plan = UserSysPlans::findOne(10358);
