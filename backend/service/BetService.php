@@ -1244,7 +1244,18 @@ abstract class BetService extends BaseBetService {
         #$UserSysPlans = UserSysPlans::findOne($planId);
         $planId = $UserSysPlans->id;
         $hzArr = json_decode($UserSysPlans->hz_Arr, true);
-        if(in_array($plan_type, array_merge([6, 8, 9, 10, 14, 15, 16, 17, 18], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
+        if(in_array($plan_type, array_merge([
+            SscDataService::PLAN_TYPE_SINGLES_BET_WIN,
+            SscDataService::PLAN_TYPE_YL_BET,
+            SscDataService::PLAN_TYPE_YL_BET_SINGLES,
+            SscDataService::PLAN_TYPE_BT_SINGLES_BET,
+            SscDataService::PLAN_TYPE_AREA_SINGLES_BET,
+            SscDataService::PLAN_TYPE_SINGLES_BET_2,
+            SscDataService::PLAN_TYPE_YL_BET_SINGLES_2,
+            SscDataService::PLAN_TYPE_YL_ZZ_SINGLES_BET,
+            SscDataService::PLAN_TYPE_YL_BET_SINGLES_NUM,
+            SscDataService::PLAN_TYPE_YL_START_BET_SINGLES,
+        ], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
             //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
             $flag = BetService::getIsBetTrue($UserSysPlans);
             if(in_array($flag, [0, -1]) && $isAuto == 1){
