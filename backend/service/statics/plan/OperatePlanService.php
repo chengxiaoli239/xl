@@ -717,7 +717,7 @@ class OperatePlanService extends BaseService
                 # 不中奖
                 $current_miss += 1;
                 if($current_miss>=$betWhileMiss){
-                    $singles_key =0;
+                    $singles_key = 0;
                     $betStatus = SscDataService::PLAN_BET_STATUS_BETTING; // 进入下注状态
                     $has_bet_nums = 1;
                 }
@@ -731,16 +731,16 @@ class OperatePlanService extends BaseService
             }else{
                 $current_miss += 1;
                 if($singles_key<($singles_count-1)){
-                    $singles_key += 1; # 还没投完继续投
+                    $singles_key += 1; # 不中，还没投完继续投
+                    //$single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
                 }else{
                     $singles_key = 0;
                     //$betStatus = SscDataService::PLAN_BET_STATUS_WAIT; # 投完倍数进入等待状态
                 }
             }
         }
-        $next_single_key = $singles_key;
+        $single = $singles[$singles_key];
 
-        $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
         $hzArr = array_merge($hzArr, [
             'current_miss' => $current_miss,
             'singles_key' => $singles_key,
@@ -750,13 +750,13 @@ class OperatePlanService extends BaseService
         $updateData = ['hz_Arr'=>json_encode($hzArr, 320), 'single'=>$single];
         $rst = UserSysPlans::updateAll($updateData, ['id'=>$UserSysPlan->id]);
         Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '遗漏x期起投', [
-            'planId'=>$planId,
-            'flag'=>$flag,
-            'singles'=>$singles,
-            'singles_count'=>$singles_count,
-            'beforeHzArr'=>$beforeHzArr,
-            'afterHzArr'=>$hzArr,
-            'rst'=>$rst,
+            'planId' => $planId,
+            'flag' => $flag,
+            'singles' => $singles,
+            'singles_count' => $singles_count,
+            'beforeHzArr' => $beforeHzArr,
+            'afterHzArr' => $hzArr,
+            'rst' => $rst,
         ]);
 
         return true;
