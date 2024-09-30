@@ -659,7 +659,11 @@ class HN0898Service extends BaseTZService {
         $UserSysPlans->status = (int)$status;
 
         $plan_type = $UserSysPlans->plan_type;
-        if(in_array($plan_type, [2,3,4,5,6,8,9,12,13,14, 17, 18])){ # 倍投
+        if(in_array($plan_type, [2,3,4,5,6,8,9,12,13,14,
+            SscDataService::PLAN_TYPE_YL_ZZ_SINGLES_BET,
+            SscDataService::PLAN_TYPE_YL_BET_SINGLES_NUM,
+            SscDataService::PLAN_TYPE_YL_START_BET_SINGLES,
+        ])){ # 倍投
             $singles = explode('-', $UserSysPlans->singles);
 
             $code_hz = json_decode($UserSysPlans->hz_Arr, true);
@@ -667,16 +671,18 @@ class HN0898Service extends BaseTZService {
             if(in_array($UserSysPlans->plan_type, [4, 5])){ # 切换
                 $code_hz['status_val'] = 1;# 切换开关号码回第一组
             }
-            if(in_array($UserSysPlans->plan_type, [8, 9]) OR $code_hz['bet_while_miss']>0){ # 遗漏投，遗漏倍投
+            if($code_hz['bet_while_miss']>0){ # 遗漏投，遗漏倍投
                 $code_hz['current_miss'] = 0;
             }
-            if(in_array($plan_type, [SscDataService::PLAN_TYPE_YL_BET_SINGLES_NUM, SscDataService::PLAN_TYPE_YL_START_BET_SINGLES])){
+            if(in_array($plan_type, [
+                SscDataService::PLAN_TYPE_YL_BET_SINGLES_NUM,
+                SscDataService::PLAN_TYPE_YL_START_BET_SINGLES,
+            ])){
                 $code_hz['betStatus'] = SscDataService::PLAN_BET_STATUS_INIT;
                 $code_hz['current_miss'] = 0;
                 $code_hz['has_bet_nums'] = 0;
             }
-            if(in_array($plan_type, [2,6,9,12,13,14, 18])){
-            }
+
             $UserSysPlans->single = $singles[0]?? $UserSysPlans->single;
             if(in_array($plan_type, [12, 13])){
                 $code_hz['A_x_B_y_status'] = 0;
