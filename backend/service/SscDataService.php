@@ -2334,7 +2334,18 @@ class SscDataService extends BaseService {
 
             # plan_type: 6:中则投，不中则不投、 8:遗漏投
             $logArr = [];
-            $where = ['AND', ['IN', 'plan_type', [6, 8, 10, 15, 17, 18]], ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]];
+            $where = ['AND',
+                ['IN', 'plan_type', [
+                    SscDataService::PLAN_TYPE_SINGLES_BET_WIN,
+                    SscDataService::PLAN_TYPE_YL_BET,
+                    SscDataService::PLAN_TYPE_BT_SINGLES_BET,
+                    SscDataService::PLAN_TYPE_SINGLES_BET_2,
+                    SscDataService::PLAN_TYPE_YL_ZZ_SINGLES_BET,
+                    SscDataService::PLAN_TYPE_YL_BET_SINGLES_NUM,
+                    SscDataService::PLAN_TYPE_YL_START_BET_SINGLES,
+                ]],
+                ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]
+            ];
             $UserSysPlans = UserSysPlans::find()->where($where);
             foreach ($UserSysPlans->each(10) as $UserSysPlan){
                 switch ($UserSysPlan->plan_type){
