@@ -2257,8 +2257,8 @@ class SscDataService extends BaseService {
                     $codes_hz['current_miss'] = $current_miss;
                     $codes_hz['is_init'] = $is_init; # 开奖之后初始标识改成 0
 
-                    # 勾选每天初始化，倍数、遗漏、
-                    if($closingTime>$now_HI && $now_HI<$openingTime && $codes_hz['is_init_perdate']==UserSysPlans::IS_INIT_PERDATE_Y){
+                    # 勾选每天初始化，倍数、遗漏、 05:00:00 < 当前 < 08:00:00
+                    if($closingTime<$now_HI && $now_HI<$openingTime && $codes_hz['is_init_perdate']==UserSysPlans::IS_INIT_PERDATE_Y){
                         $beforeSingleKey = $codes_hz['singles_key'];
                         $beforeCurrentMiss = $codes_hz['current_miss'];
                         $codes_hz['current_miss'] = 0;
