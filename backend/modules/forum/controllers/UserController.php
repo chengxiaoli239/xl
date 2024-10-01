@@ -20,6 +20,7 @@ use Yii;
 use backend\models\User;
 use backend\models\searchs\Admin as UserSearch;
 use backend\controllers\BaseController;
+use yii\helpers\Json;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use backend\service\HN0898Service;
@@ -375,12 +376,14 @@ class UserController extends BaseController
                         'updated_at' => $nowTime,
                     ]);
                     $TzSystemUsers->setAttributes($setData);
-                    //p([$TzSystemUsers->attributes, $postData]);
-                    $TzSystemUsers->save();
+                    if(!$TzSystemUsers->save()){
+                        throw_info(Json::encode($TzSystemUsers->getErrors()));
+                    }
+                    $new_access_token = UserService::resetToken($TzSystemUsers->uid);
                     \common\service\thirdD\Odds3dService::addUserOdds($model->id, $TzSystems->system_type_id); # 3d 用户添加赔率
                 }else{
                     \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                    $errMsg = $model->getErrors()?current(current($model->getErrors())):'';
+                    $errMsg = $model->getErrors()?current(current($model->getErrors())):$model->getErrors();
                     //throw_info($errMsg?:'处理异常'); // $model->getErrors()
                     return ['status'=>301, 'msg'=>$errMsg];
                 }

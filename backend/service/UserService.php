@@ -20,6 +20,7 @@ use common\tools\Tool_Common;
 use backend\models\User;
 use backend\models\UserFollowData;
 use  yii;
+use yii\helpers\Json;
 
 class UserService extends BaseService {
     const USER_CLIENT_LOGIN_NO = 0;
@@ -59,7 +60,9 @@ class UserService extends BaseService {
                     'updated_at'=> $now_time,
                 ];
                 $User->setAttributes($insertData);
-                $rst = $User->save();
+                if(!$User->save()){
+                    throw_info(Json::encode($User->getErrors()));
+                }
                 //p(['3d'=>UserService::is3dAdmin(\Yii::$app->user->identity), 'attr'=>$User->attributes]);
 
                 AuthAssignment::deleteRecord(['user_id'=>$admin_id, 'item_name'=>$role]);
@@ -71,12 +74,13 @@ class UserService extends BaseService {
                     'updated_at'=>$now_time,
                 ];
                 $AuthAssignment->setAttributes($insertData);
-                $rst = $AuthAssignment->save(false);
+                if(!$AuthAssignment->save(false)){
+                    throw_info(Json::encode($AuthAssignment->getErrors()));
+                }
             }
         }else{
             # 删除用户记录
             $rst = User::deleteRecord(['admin_id'=>$admin_id]);
-            //d($rst);
         }
 
         return $rst;

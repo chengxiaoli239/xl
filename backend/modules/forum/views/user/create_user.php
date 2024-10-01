@@ -10,7 +10,7 @@ $this->title = '添加/编辑用户';
 $user = \Yii::$app->user;
 $sitesOptions = [];
 foreach ($sites as $site){
-    $sitesOptions[$site['id']] = $site['ssc_domain'].' ('.$site['kj_num'].'个数)';
+    $sitesOptions[$site['id']] = $site['ssc_domain'].' ('.$site['kj_num'].'个数)'.$site['name'];
 }
 $editing = isset($_GET['id']);
 

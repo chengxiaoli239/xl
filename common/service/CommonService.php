@@ -12,6 +12,7 @@ use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
 use backend\service\NumService;
 use backend\service\StaticService;
+use common\models\AuthItem;
 use common\models\thirdD\PlayMethod;
 use common\models\User;
 use common\service\thirdD\CommonBaseService;
@@ -35,9 +36,27 @@ class  CommonService{
      */
     public static function opUser($admin_id, $action, $role = '收费会员'): bool
     {
-        # 1、时时彩用户记录添加
-        $rst1 = UserService::opUser($admin_id, $action, $role);
-        //$rst1 = UserService::opTzSystemsUsers($admin_id, $action, $role);
+        try {
+            $role = ($role=='七星')?'首费会员':$role;
+            if(!AuthItem::find()->where(['name'=>$role])->limit(1)->one()){
+                $authItem = new AuthItem();
+                $setData = [
+                    'name' => $role,
+                    'type' => 1,
+                    'description' => $role,
+                    'created_at' => time(),
+                    'updated_at' => time(),
+                ];
+                $authItem->setAttributes($setData);
+                $authItem->save();
+            }
+            # 1、时时彩用户记录添加
+            $rst1 = UserService::opUser($admin_id, $action, $role);
+            //$rst1 = UserService::opTzSystemsUsers($admin_id, $action, $role);
+        }catch (\Exception $e){
+            Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '处理用户信息', ['admin_id', 'action'=>$action, 'role'=>$role, 'err_msg'=>$e->getMessage()]);
+            throw_info($e);
+        }
 
         return $rst1;
     }
