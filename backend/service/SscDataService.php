@@ -2434,47 +2434,6 @@ class SscDataService extends BaseService {
             $logArr['time_consume'] = ($t6-$t5).'s';
             Tool_Common::log('/plan/opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划7', $logArr);
 
-            # 勾选每天初始化，倍数、遗漏、 05:00:00 < 当前 < 08:00:00
-            if($closingTime<$now_HI && $now_HI<$openingTime){
-                # 翻倍计划初始化
-                $where = ['AND', ['=', 'is_init_perdate', UserSysPlans::IS_INIT_PERDATE_Y], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
-                $UserSysPlans = UserSysPlans::find()->where($where);
-                foreach ($UserSysPlans->each(10) as $UserSysPlan){
-                    if(empty($UserSysPlan->singles)) continue; // 目前暂时只处理翻倍计划
-                    $beforeSingle = $UserSysPlan->single;
-                    $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
-                    $beforeSingleKey = $codes_hz['singles_key'];
-                    $beforeCurrentMiss = $codes_hz['current_miss'];
-
-                    $singles = explode('-', trim($UserSysPlan->singles));
-                    if(empty($singles)) $singles = [$UserSysPlan->single];
-                    $codes_hz['current_miss'] = 0;
-                    $codes_hz['singles_key'] = 0;
-
-                    # 盈利归零
-                    PlanStaticProfits::updateAll([
-                        'cut_profits'=>0,
-                        'current_qihao' => $current_kj_qihao,
-                        'uid' => $UserSysPlan->uid,
-                    ], ['plan_id'=>$UserSysPlan->id]);
-
-                    $single = $singles[0]??$beforeSingle;
-                    $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
-                    $updateData = ['single'=>$single];
-                    $updateData['hz_Arr'] = json_encode($codes_hz, 320);
-
-                    $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
-                    Tool_Common::log('/data/'.__FUNCTION__.'_init', 'INFO', '每天翻倍计划初始化', [
-                        'plan_id'=>$UserSysPlan->id,
-                        'beforeSingle' => $beforeSingle,
-                        'beforeSingleKey' => $beforeSingleKey,
-                        'beforeCurrentMiss' => $beforeCurrentMiss,
-                        'afterCodesHz' => $codes_hz,
-                        'rst' => $rst,
-                    ]);
-                }
-            }
-
             OperatePlanService::opProfitsPlans12_13($lottery_type); # A出x次B出y次投B、A出x次B出y次投B_2 计划处理
 
             OperatePlanService::opProfitsPlans14($lottery_type); # 区间遗漏投 止盈止损 计划处理

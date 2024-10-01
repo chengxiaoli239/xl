@@ -432,6 +432,10 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
+            $rst = OperatePlanService::initPlanPerDate($lottery_type=8, 1);
+            p($rst);
+
+
             $AUTH_ACCESS_TOKENS = TzSystemUsersService::getAuthAccessTokens(2);p($AUTH_ACCESS_TOKENS);
             $plan = UserSysPlans::findOne(10435);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));

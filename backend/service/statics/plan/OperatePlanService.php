@@ -2,15 +2,81 @@
 namespace backend\service\statics\plan;
 
 use backend\models\BettingRecords;
+use backend\models\PlanStaticProfits;
 use backend\models\UserSysPlans;
 use backend\service\BaseService;
 use backend\service\HN0898Service;
 use backend\service\SscDataService;
+use common\service\lottery\LotteryTypeService;
 use common\tools\RedisLock;
 use common\tools\Tool_Common;
 
 class OperatePlanService extends BaseService
 {
+    public static function initPlanPerDate($lotteryType=DEFAULT_LOTTERY_TYPE, $isAuto=1): bool
+    {
+        $now_HI = date('H:i:s', time()+300);
+        $lotteryTypeData = LotteryTypeService::getLotteryTypeData();
+        $openingTime = $lotteryTypeData[$lotteryType]['opening_time'];
+        $closingTime = $lotteryTypeData[$lotteryType]['closing_time'];
+        # 勾选每天初始化，倍数、遗漏、 05:00:00 < 当前 < 08:00:00
+        if($isAuto==2 OR ($closingTime<$now_HI && $now_HI<$openingTime)){
+            $currentKjQiHao = HN0898Service::getCurrentQihao($lotteryType);
+            # 翻倍计划初始化
+            $where = [
+                'AND',
+                ['=', 'is_init_perdate', UserSysPlans::IS_INIT_PERDATE_Y],
+                ['=', 'status', 1],
+                ['=', 'is_batch_simulate', 0],
+                ['=', 'lottery_type', $lotteryType]
+            ];
+            $UserSysPlans = UserSysPlans::find()->where($where);
+            foreach ($UserSysPlans->each(10) as $UserSysPlan){
+                if(empty($UserSysPlan->singles)) continue; // 目前暂时只处理翻倍计划
+                $beforeSingle = $UserSysPlan->single;
+                $codes_hz = json_decode($UserSysPlan->hz_Arr, true);
+                $beforeCodesHz = $codes_hz;
+                $beforeSingleKey = $codes_hz['singles_key'];
+                $beforeCurrentMiss = $codes_hz['current_miss'];
+
+                $singles = explode('-', trim($UserSysPlan->singles));
+                if(empty($singles)) $singles = [$UserSysPlan->single];
+                $codes_hz['current_miss'] = 0;
+                $codes_hz['singles_key'] = 0;
+                $codes_hz['has_bet_nums'] = 0;
+                $codes_hz['betStatus'] = SscDataService::PLAN_BET_STATUS_INIT;
+
+                # 盈利归零
+                PlanStaticProfits::updateAll([
+                    'cut_profits'=>0,
+                    'current_qihao' => $currentKjQiHao,
+                    'uid' => $UserSysPlan->uid,
+                ], ['plan_id'=>$UserSysPlan->id]);
+
+                $single = $singles[0]??$beforeSingle;
+                $whereUpdate = ['id'=>$UserSysPlan->id]; # 更新条件
+                $updateData = [
+                    'single' => $single,
+                    'hz_Arr' => json_encode($codes_hz, 320),
+                ];
+
+                $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
+                Tool_Common::log('/data/'.__FUNCTION__.'_init', 'INFO', '每天翻倍计划初始化', [
+                    'plan_id'=>$UserSysPlan->id,
+                    'beforeSingle' => $beforeSingle,
+                    'afterSingle' => $single,
+                    'beforeSingleKey' => $beforeSingleKey,
+                    'beforeCurrentMiss' => $beforeCurrentMiss,
+                    'beforeCodesHz' => $beforeCodesHz,
+                    'afterCodesHz' => $codes_hz,
+                    'rst' => $rst,
+                ]);
+            }
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * 中则投、中则波推倍投

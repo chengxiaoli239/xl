@@ -13,9 +13,9 @@ class LotteryTypeService extends BaseService
 {
     public static function getLotteryTypeData($grabStatus='', $useCache=1): array
     {
-        $mkey = CacheKeyService::lotteryData($grabStatus);
+        $mKey = CacheKeyService::lotteryData($grabStatus);
 
-        $lotteryTypeData = commonRedis()->get($mkey);
+        $lotteryTypeData = commonRedis()->get($mKey);
         if(!$useCache OR empty($lotteryTypeData)){
             $lotteryTypeDataQuery = LotteryType::find();
             if($grabStatus !== ''){
@@ -23,7 +23,7 @@ class LotteryTypeService extends BaseService
             }
             $lotteryTypeData = $lotteryTypeDataQuery->indexBy(['lottery_type'])->asArray()->all();
 
-            commonRedis()->setex($mkey, 1800, $lotteryTypeData);
+            commonRedis()->setex($mKey, 1800, $lotteryTypeData);
         }
 
         return $lotteryTypeData;
