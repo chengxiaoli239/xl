@@ -2444,6 +2444,7 @@ class SscDataService extends BaseService {
                 # 账号级别的盈利
                 \backend\service\SscDataService::updateUserProfits($userId);
             }
+            OperatePlanService::initPlanPerDate($lottery_type); // 每天收盘初始化需要初始化的计划
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划', ['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
             $dealStatus = 2;
         }catch (\Exception $e){
