@@ -1,5 +1,6 @@
 <?php
 
+use backend\service\SscDataService;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -348,7 +349,7 @@ use yii\widgets\ActiveForm;
                 <?php include(dirname(__FILE__).'/filter_dynamic.php'); # 动态过滤号码 ?>
 
                 <!--区间盈利止盈止损-->
-                <?php include(dirname(__FILE__).'/take_profits_area.php'); ?>
+                <?php if(isset(SscDataService::PLAN_TYPE_OPTIONS[SscDataService::PLAN_TYPE_AREA_SINGLES_BET])){ include(dirname(__FILE__).'/take_profits_area.php');} ?>
 
                 <!--止盈止损-->
                 <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
