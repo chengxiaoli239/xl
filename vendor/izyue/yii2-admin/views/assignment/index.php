@@ -47,6 +47,11 @@ $columns = array_merge(
                         'class'=>'btn btn-xs btn-warning',
                         'style'=>'margin-bottom:15px;',
                         'onclick'=>"return confirm('确定删除 “".$model->username."”吗?');"
+                    ]).' '
+                    .Html::a(Yii::t('app', 'Role assign'), ['view', 'id'=>$model->id], [
+                        'class'=>'btn btn-xs btn-success',
+                        'style'=>'margin-bottom:15px;',
+                        //'onclick'=>"return confirm('确定删除 “".$model->username."”吗?');"
                     ]);
             }
         ]

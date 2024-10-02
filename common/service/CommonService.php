@@ -37,7 +37,7 @@ class  CommonService{
     public static function opUser($admin_id, $action, $role = '收费会员'): bool
     {
         try {
-            $role = ($role=='七星')?'首费会员':$role;
+            $role = ($role=='七星')?'收费会员':$role;
             if(!AuthItem::find()->where(['name'=>$role])->limit(1)->one()){
                 $authItem = new AuthItem();
                 $setData = [
