@@ -1,5 +1,6 @@
 <?php
 
+use backend\service\SscDataService;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -86,8 +87,8 @@ use yii\widgets\ActiveForm;
                 <!--导入号码组轮换-->
                 <?php include(dirname(__FILE__).'/import_codes.php'); ?>
 
-                <!--区间盈利止盈止损-->
-                <?php include(dirname(__FILE__).'/take_profits_area.php'); ?>
+                <!--区间遗漏盈利止盈止损-->
+                <?php if(isset(SscDataService::PLAN_TYPE_OPTIONS[SscDataService::PLAN_TYPE_AREA_SINGLES_BET])){ include(dirname(__FILE__).'/take_profits_area.php');} ?>
 
 
                 <?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:1-3-7-15-31-62-125-251') ?>

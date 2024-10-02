@@ -101,7 +101,7 @@ class SscDataService extends BaseService {
         //11=>'中则交叉正反',
         12=>'A出x次B出y次投B',
         13=>'A出x次B出y次投B_2',
-        14=>'区间遗漏投',
+        //self::PLAN_TYPE_AREA_SINGLES_BET => '区间遗漏投',
         self::PLAN_TYPE_SINGLES_BET_2 => '中则倍投',
         self::PLAN_TYPE_YL_BET_SINGLES_2 => '遗漏倍投2',
         self::PLAN_TYPE_YL_ZZ_SINGLES_BET => '遗漏中则倍投',
