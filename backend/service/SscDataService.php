@@ -85,6 +85,7 @@ class SscDataService extends BaseService {
     const PLAN_TYPE_YL_ZZ_SINGLES_BET = 17; # 遗漏中则倍投
     const PLAN_TYPE_YL_BET_SINGLES_NUM = 18; # 遗漏x期投y期
     const PLAN_TYPE_YL_START_BET_SINGLES = 19; # 遗漏x期起投
+    const PLAN_TYPE_ZZ_BET_SINGLES_2 = 20; # 中则倍投2
     const PLAN_TYPE_OPTIONS = [
         # 计划类型:0正常1止盈止损计划
         self::PLAN_TYPE_NORMAL => '正常',
@@ -107,6 +108,7 @@ class SscDataService extends BaseService {
         self::PLAN_TYPE_YL_ZZ_SINGLES_BET => '遗漏中则倍投',
         self::PLAN_TYPE_YL_BET_SINGLES_NUM => '遗漏x期投y期',
         self::PLAN_TYPE_YL_START_BET_SINGLES => '遗漏x期起投',
+        self::PLAN_TYPE_ZZ_BET_SINGLES_2 => '中则倍投2',
     ];
 
     const PLAN_BET_STATUS_INIT = 0; # 初始状态
@@ -2323,6 +2325,7 @@ class SscDataService extends BaseService {
                     SscDataService::PLAN_TYPE_YL_ZZ_SINGLES_BET,
                     SscDataService::PLAN_TYPE_YL_BET_SINGLES_NUM,
                     SscDataService::PLAN_TYPE_YL_START_BET_SINGLES,
+                    SscDataService::PLAN_TYPE_ZZ_BET_SINGLES_2,
                 ]],
                 ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]
             ];
@@ -2352,6 +2355,10 @@ class SscDataService extends BaseService {
                     case self::PLAN_TYPE_YL_START_BET_SINGLES:
                         # 遗漏x期起投
                         $logArr['plan_type_19'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans19($UserSysPlan, $current_kj_qihao);
+                        break;
+                    case self::PLAN_TYPE_ZZ_BET_SINGLES_2:
+                        # 遗漏x期起投
+                        $logArr['plan_type_19'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans20($UserSysPlan, $current_kj_qihao);
                         break;
                 }
             }

@@ -829,6 +829,83 @@ class OperatePlanService extends BaseService
     }
 
     /**
+     * 20 - 中则倍投2
+     * @param $UserSysPlan
+     * @param $currentKjQiHao
+     * @return true
+     */
+    public static function operatePlans20($UserSysPlan, $currentKjQiHao): bool
+    {
+        $planId = $UserSysPlan->id;
+        $lottery_type = $UserSysPlan->lottery_type;
+        $flag = SscDataService::isZjBefore($UserSysPlan->id);
+        # 遗漏期数[不中奖期数]
+        //$lossQs = SscDataService::getLossQs($UserSysPlan->id);
+
+        $hzArr = json_decode($UserSysPlan->hz_Arr, true);
+        $beforeHzArr = $hzArr;
+        if(isset($hzArr['filters'])){
+            $hzArr['filters']['current_kj_qihao'] = $currentKjQiHao;
+        }
+
+        $betStatus = $hzArr['betStatus']??0; # 开奖之后初始标识改成 0
+        $current_miss = $hzArr['current_miss']??0; # 当前遗漏
+        $singles_key = $hzArr['singles_key']??0; # 倍数索引
+        $has_bet_nums = $hzArr['has_bet_nums']??0; # 已投数量
+        $singles = explode('-', trim($UserSysPlan->singles));
+        if(empty($singles)) $singles = [$UserSysPlan->single]; # 不填的情况
+        $singles_count = count($singles);
+        $has_bet_nums += 1;
+
+        if(in_array($betStatus, [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
+            $betStatus = SscDataService::PLAN_BET_STATUS_BETTING; # 进入等待状态
+            if($flag){
+                # 中奖
+                $singles_key += 1;
+                $current_miss = 0;
+            }else{
+                # 不中奖
+                $current_miss += 1;
+                $singles_key = 0;
+            }
+        }elseif($betStatus == SscDataService::PLAN_BET_STATUS_BETTING){
+            $betStatus = SscDataService::PLAN_BET_STATUS_BETTING;
+            if($flag){
+                $current_miss = 0;
+                if($singles_key<($singles_count-1)){
+                    $singles_key += 1; # 不中，还没投完继续投
+                }else{
+                    $singles_key = 0;
+                }
+            }else{
+                $singles_key = 0; # 不中回到第一个倍数
+                $current_miss += 1;
+            }
+        }
+        $single = $singles[$singles_key];
+
+        $hzArr = array_merge($hzArr, [
+            'current_miss' => $current_miss,
+            'singles_key' => $singles_key,
+            'betStatus' => $betStatus,
+            'has_bet_nums' => $has_bet_nums,
+        ]);
+        $updateData = ['hz_Arr'=>json_encode($hzArr, 320), 'single'=>$single];
+        $rst = UserSysPlans::updateAll($updateData, ['id'=>$UserSysPlan->id]);
+        Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '遗漏x期起投', [
+            'planId' => $planId,
+            'flag' => $flag,
+            'singles' => $singles,
+            'singles_count' => $singles_count,
+            'beforeHzArr' => $beforeHzArr,
+            'afterHzArr' => $hzArr,
+            'rst' => $rst,
+        ]);
+
+        return true;
+    }
+
+    /**
      * @desc 获取计划下一个倍数
      * @param $plan_id
      * @param int $singles_key

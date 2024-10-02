@@ -181,7 +181,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         //'create_time',
                         ['attribute' => 'create_time','label'=>'时间',//'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
-                                return $model->create_time;
+                                return substr($model->create_time, 11);
                             }
                         ],
 

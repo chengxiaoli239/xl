@@ -663,6 +663,7 @@ class HN0898Service extends BaseTZService {
             SscDataService::PLAN_TYPE_YL_ZZ_SINGLES_BET,
             SscDataService::PLAN_TYPE_YL_BET_SINGLES_NUM,
             SscDataService::PLAN_TYPE_YL_START_BET_SINGLES,
+            SscDataService::PLAN_TYPE_ZZ_BET_SINGLES_2,
         ])){ # 倍投
             $singles = explode('-', $UserSysPlans->singles);
 
@@ -681,6 +682,10 @@ class HN0898Service extends BaseTZService {
                 $code_hz['betStatus'] = SscDataService::PLAN_BET_STATUS_INIT;
                 $code_hz['current_miss'] = 0;
                 $code_hz['has_bet_nums'] = 0;
+            }
+            if($plan_type == SscDataService::PLAN_TYPE_ZZ_BET_SINGLES_2){
+                # 中则倍投2
+                $code_hz['betStatus'] = SscDataService::PLAN_BET_STATUS_BETTING;
             }
 
             $UserSysPlans->single = $singles[0]?? $UserSysPlans->single;
