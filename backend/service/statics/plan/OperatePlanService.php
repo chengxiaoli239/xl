@@ -886,7 +886,7 @@ class OperatePlanService extends BaseService
                 $current_miss += 1;
             }
         }
-        $single = $singles[$singles_key];
+        $single = $singles[(int)$singles_key];
 
         $hzArr = array_merge($hzArr, [
             'current_miss' => $current_miss,
