@@ -247,7 +247,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     {
         return [
             [['is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'is_batch_simulate', 'is_init_perdate', 'lottery_type', 'plan_type', 'tz_sort', 'created_at', 'updated_at'], 'integer'],
-            [['uid', 'account', 'created_at', 'updated_at'], 'required'],
+            [['uid', 'account', 'single', 'created_at', 'updated_at'], 'required'],
             [['single', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
             [['update_time'], 'safe'],
             [['children_plan_id'], 'string', 'max' => 255],
