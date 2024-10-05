@@ -10,6 +10,7 @@ namespace common\service\ssc;
 use backend\models\SscKjData;
 use common\service\CommonService;
 use common\service\jobs\kj_data\OperateKjDataJob;
+use yii\helpers\ArrayHelper;
 
 class SscKjDataService extends CommonService
 {
@@ -62,4 +63,28 @@ class SscKjDataService extends CommonService
         return ['status' => 200, 'msg'=>'接收成功'];
     }
 
+    /**
+     * 获取x位近num个码
+     * @param int $lotteryType
+     * @param array $positions
+     * @param int $num
+     * @return array
+     */
+    public static function getRecentlyPosCodes(int $lotteryType=DEFAULT_LOTTERY_TYPE, array $positions=[1], int $num=1): array
+    {
+        $positions_str = 'code'.implode(',",",code', $positions);
+        $groupByPos = [];
+        foreach ($positions as $pp){
+            $groupByPos[] = 'code'.$pp;
+        }
+        $beforeQuery = SscKjData::find()->select(['codes_str'=>'CONCAT('.$positions_str.')', 'qihao'=>'MAX(qihao)'])
+            ->where(['lottery_type'=>$lotteryType])->groupBy($groupByPos)->orderBy(['MAX(qihao)'=>SORT_DESC])->limit($num);
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+        $beforeQuery->andWhere(['<=', 'qihao', $currentKjQiHao]);
+        //p($beforeQuery->createCommand()->getRawSql());
+        $currentKjCodes = $beforeQuery->asArray()->all(); # 最新一期
+        //p($currentKjCodes);
+
+        return ArrayHelper::getColumn($currentKjCodes, 'codes_str');
+    }
 }

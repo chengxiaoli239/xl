@@ -328,6 +328,10 @@ class NumService extends BaseService {
         208=>'过滤近3天直码 ',
         209=>'过滤近5天直码 ',
         210=>'过滤近7天直码 ',
+        211=>'1(1234)位近4个码最多上2个',
+        212=>'2(1234)位近4个码最多上2个',
+        213=>'3(1234)位近4个码最多上2个',
+        214=>'4(1234)位近4个码最多上2个',
     ];
 
     const TYPE_POSITIONS = [
@@ -3017,7 +3021,7 @@ class NumService extends BaseService {
         $allCodes = ArrayHelper::getColumn($NumTypes, 'code');
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
         $filter_dynamic_types = $filter_dynamic_types ? :$hzArr['filter_dynamic_types'];
-        #$filter_dynamic_types = [130];
+        //p($filter_dynamic_types);
 
         $codesArr = $allCodes;
         foreach ($filter_dynamic_types as $filter_dynamic_type){
@@ -3570,6 +3574,16 @@ class NumService extends BaseService {
                     $nums = [ 208 => 3, 209 => 5, 210 => 7, ];
                     $params = [
                         ['type'=>2, 'params'=>['x'=>$nums[$filter_dynamic_type]]]
+                    ]; # 动态过滤2，对应的\backend\service\numbers\DynamicFilterService::DYNAMIC_FILTER_TYPES
+                    $codes = DynamicFilterService::getFilterDynamic2($plan, $params);
+                    break;
+                case 211: # x(1234)位近y个码最多上z个
+                case 212: # x(1234)位近y个码最多上z个
+                case 213: # x(1234)位近y个码最多上z个
+                case 214: # x(1234)位近y个码最多上z个
+                    $positions = [ 211=>1, 212=>2, 213=>3, 214=>4];
+                    $params = [
+                        ['type'=>3, 'params'=>['x'=>$positions[$filter_dynamic_type], 'y'=>4, 'z'=>2]]
                     ]; # 动态过滤2，对应的\backend\service\numbers\DynamicFilterService::DYNAMIC_FILTER_TYPES
                     $codes = DynamicFilterService::getFilterDynamic2($plan, $params);
                     break;

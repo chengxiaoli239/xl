@@ -50,6 +50,7 @@ use common\service\open\aozhou5\ActionYIFanService;
 use common\service\open\telegram\AoZhouKjService;
 use common\service\open\telegram\MessageOperateService;
 use common\service\ssc\QihaoService;
+use common\service\ssc\SscKjDataService;
 use common\service\thirdD\match\MatchCodeService;
 use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\OperateLotteryService;
@@ -76,6 +77,7 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $codes = SscKjDataService::getRecentlyPosCodes($lotteryType=8, $positions=[3], $num = 4);p($codes);
         $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user_sys_plans}}'); p($r);
         $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type=8);p($rst);
         $codeTypes = StaticService::getAllCodeTypes($type = 2); p($codeTypes);# 统计基础号码类型筛选,类型：1和值2号码类型[例如:双双重、三重]
@@ -432,20 +434,19 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
+            $plan = UserSysPlans::findOne(10502);
+            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
+            $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $AUTH_ACCESS_TOKENS = TzSystemUsersService::getAuthAccessTokens(2);p($AUTH_ACCESS_TOKENS);
             $rst = OperatePlanService::initPlanPerDate($lottery_type=8, 1);
             p($rst);
 
 
-            $plan = UserSysPlans::findOne(10435);
-            $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $miss = StaticsQxMissService::getCodeTypeHistoryMiss('type_log', $lottery_type=8, $static_nums=470); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
             p($miss);
-            $plan = UserSysPlans::findOne(10358);
             $codes = BetService::getCodesByPlan($plan);p(count(explode('@', $codes)));
             //$data = Aozhou::getLucky5($type='json', $is_auto=2);p($data);
 
-            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan, $filter_dynamic_types=[193]);p(count($codes));p($codes);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             p($codes);
             $r = \backend\service\BetService::getTypeNameByTzType($tz_type=25);p($r);

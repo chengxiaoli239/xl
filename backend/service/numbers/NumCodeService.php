@@ -593,7 +593,7 @@ class NumCodeService extends BaseService
             ->where($where)
             ->andWhere(['=', 'code_type', $playway+1]);
         $sql = $query->createCommand()->getRawSql();
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤两个位置一样的所有号码', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'short_current_kj_qihao'=>$short_current_kj_qihao, 'current_kj_qihao'=>$current_kj_qihao, 'sql1'=>$sql1, 'sql'=>$sql]);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤两个位置一样的所有号码', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'short_current_kj_qihao'=>$short_current_kj_qihao, 'current_kj_qihao'=>$current_kj_qihao, 'sql1'=>$sql1, 'sql'=>$sql]);
         #p();
         $NumTypes = $query->asArray()->all();
         $filterIds = ArrayHelper::getColumn($NumTypes, 'id');
@@ -1106,11 +1106,11 @@ class NumCodeService extends BaseService
         }
         $beforeQuery = SscKjData::find()->select(['codes_str'=>'CONCAT('.$positions_str.')', 'qihao'=>'MAX(qihao)'])
             ->where(['lottery_type'=>$lottery_type])->groupBy($groupByPos)->orderBy(['MAX(qihao)'=>SORT_DESC])->limit($cNum);
-        list($current_kj_qihao, $next_qihao) = QihaoService::getKjQiHao($lottery_type);
-        $filterCodes = [];
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
 
+        $filterCodes = [];
         foreach ($positions as $p){
-            $beforeQuery->andWhere(['<=', 'qihao', $current_kj_qihao]);
+            $beforeQuery->andWhere(['<=', 'qihao', $currentKjQiHao]);
             //p($beforeQuery->createCommand()->getRawSql());
             $currentKjCodes = $beforeQuery->asArray()->all(); # 最新一期
             $filterCodes = ArrayHelper::getColumn($currentKjCodes, 'codes_str');
@@ -1121,7 +1121,7 @@ class NumCodeService extends BaseService
             ->where(['=', 'code_type', $playway+1])
             ->andWhere(['AND', ['IN', 'CONCAT('.$positions_str_4.')', $filterCodes]]);
         $sql = $query->createCommand()->getRawSql();
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '取x为最近n个码', ['current_kj_qihao'=>$current_kj_qihao, 'lottery_type'=>$lottery_type, 'currentKjCodes'=>$currentKjCodes, 'sql'=>$sql]);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '取x位最近n个码', ['currentKjQiHao'=>$currentKjQiHao, 'lottery_type'=>$lottery_type, 'currentKjCodes'=>$currentKjCodes, 'sql'=>$sql]);
         $NumTypes = $query->asArray()->all();
         //p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
@@ -2328,7 +2328,7 @@ class NumCodeService extends BaseService
             ->where(['code_type' => 4])
             ->andWhere($notWhere);
         $sql = $query->createCommand()->getRawSql();//p($sql);
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '取上期号码4个码上1个', ['plan_id'=>$plan->id, 'current_kj_qihao'=>$currentKjQiHao, 'lottery_type'=>$lottery_type, 'fourCodes'=>$fourCodes, 'sql'=>$sql]);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '取上期号码4个码上1个', ['plan_id'=>$plan->id, 'current_kj_qihao'=>$currentKjQiHao, 'lottery_type'=>$lottery_type, 'fourCodes'=>$fourCodes, 'sql'=>$sql]);
 
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');

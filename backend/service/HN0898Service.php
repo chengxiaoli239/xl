@@ -640,9 +640,10 @@ class HN0898Service extends BaseTZService {
     }
 
     /**
-     * @description 更新计划表状态
+     * @description 更新计划表status状态
      * @param $id
-     * @param $account
+     * @param $status
+     * @param string $uid
      * @return array
      */
     public static function updateSysPlansStatus($id, $status, $uid = '') {

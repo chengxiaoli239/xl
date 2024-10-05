@@ -501,9 +501,11 @@ class UserSysPlansController extends BaseController
         $post = \Yii::$app->request->post();
 
         try {
-            //HN0898Service::batchSwitchStatus($post['ids'], '\backend\models\UserSysPlans', $post['field'], $post['val'], $this->_user_id);
-            foreach ($post['ids'] as $id){
-                HN0898Service::updateSysPlansStatus($id, $post['val'], $this->_user_id);
+            HN0898Service::batchSwitchStatus($post['ids'], '\backend\models\UserSysPlans', $post['field'], $post['val'], $this->_user_id);
+            if($post['field'] == 'status'){
+                foreach ($post['ids'] as $id){
+                    HN0898Service::updateSysPlansStatus($id, $post['val'], $this->_user_id);
+                }
             }
         }catch (\Exception $e){
             return ['status'=>300, 'msg'=>$e->getMessage()];
