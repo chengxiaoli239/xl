@@ -600,8 +600,10 @@ class OperatePlanService extends BaseService
                         }
                         $next_single_key = 0;
                         $hzArr['area_arise_qishus'] = $area_arise_qishus;
-                        $logArr['area_arise_qishus'] = $area_arise_qishus;
-                        $logArr['bet_msg'] = '监控中-'.$bmsg.'['.$UserSysPlan->id.']';
+                        $logArr = array_merge($logArr, [
+                            'area_arise_qishus' => $area_arise_qishus,
+                            'bet_msg' => '监控中-'.$bmsg.'['.$UserSysPlan->id.']',
+                        ]);
                     }else{
                         $profits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao', $hzArr['start_qihao']]); # 一个计划当前利润
                         $hzArr['current_area_profits'] = $profits;
