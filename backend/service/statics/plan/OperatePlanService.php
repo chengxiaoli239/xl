@@ -809,6 +809,7 @@ class OperatePlanService extends BaseService
                 }
             }
         }
+        $singles_key = $singles_key??0;
         $single = $singles[$singles_key];
 
         $hzArr = array_merge($hzArr, [
