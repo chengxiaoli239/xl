@@ -842,8 +842,6 @@ class IndexController extends Controller
         p($data);
         $data = CqsscKcw::getLotteryBg($type = 'json', $is_auto = 0);
         p($data, 0);
-        $rst = BetErrorPlansTaskService::reBetErrorPlans($lottery_types = [12]);
-        p($rst);
         $snInfo = BingDaoService::getSn($uid = 12, $tz_system_id = 13, $lottery_type = 13);
         p($snInfo);// 用户信息 Array ( [sn] => 403054677338701312 [qihao] => 190412023 [snid] => 31724311|1,31724312|1 )
         $rst = BingDaoService::login($uid = 12, $tz_system_id = 13);

@@ -80,21 +80,4 @@ class BetErrorPlansTaskService extends BaseService {
         return $flag;
     }
 
-    /**
-     * @desc 重新下注失败计划
-     * @return array
-     */
-    public static function reBetErrorPlans($lottery_type = []){
-        $rst = ['status'=>300, 'msg'=>'操作成功'];
-        if(empty($lottery_type)){
-            $lottery_types = StaticService::getLotteryTypes();
-        }
-        foreach ($lottery_types as $lottery_type) {
-            $where = ['AND', ['IN', 'status', [0,1]], ['=', 'lottery_type', $lottery_type]];
-            $BetErrorPlansTask = BetErrorPlansTask::find($where)->orderBy(['id'=>SORT_ASC])->all();
-            p($BetErrorPlansTask);
-        }
-
-        return $rst;
-    }
 }

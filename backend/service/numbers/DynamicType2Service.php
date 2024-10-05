@@ -118,7 +118,7 @@ class DynamicType2Service extends BaseService {
 
         $codes = DynamicType2Service::getRecordsByCodes($filterCodes, $z);
         //p([$x.'位filterCodes'=>$filterCodes, '最多'=>$z.'个', 'count'=>count($codes)]);
-        $betDesc = $filterDesc['desc']."过滤第".$x."位最近".$y."个码（".implode(',', $filterCodes)."）最多上奖".$z."个(四定)";
+        $betDesc = $filterDesc['desc']."过滤第".$x."位最近".$y."个码:".implode(',', $filterCodes)."最多上奖".$z."个(四定)";
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;

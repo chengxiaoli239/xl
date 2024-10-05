@@ -434,7 +434,7 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
-            $plan = UserSysPlans::findOne(10502);
+            $plan = UserSysPlans::findOne(10552);
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $AUTH_ACCESS_TOKENS = TzSystemUsersService::getAuthAccessTokens(2);p($AUTH_ACCESS_TOKENS);
