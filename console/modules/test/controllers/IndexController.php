@@ -26,6 +26,7 @@ use backend\service\NumService;
 use backend\service\SscDataService;
 use backend\service\statics\plan\OperatePlanService;
 use backend\service\statics\statics_3d\Statics3dUserDataService;
+use backend\service\statics\statics_qx\PositionDxDsService;
 use backend\service\statics\statics_qx\StaticsQxMissService;
 use backend\service\statics\yl\OneNumYl;
 use backend\service\StaticService;
@@ -77,6 +78,13 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        for ($i=0; $i<15; $i++){
+            $date = date('Y-m-d', strtotime('2024-09-23')+$i*86400);
+            if($date>date('Y-m-d')) return false;
+            $rst = PositionDxDsService::staticPositionDxDs(8, $date);
+            print_r(['date'=>$date, 'rst'=>$rst]);
+        }
+        p($rst);
         $codes = SscKjDataService::getRecentlyPosCodes($lotteryType=8, $positions=[3], $num = 4);p($codes);
         $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user_sys_plans}}'); p($r);
         $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type=8);p($rst);

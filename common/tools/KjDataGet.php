@@ -23,6 +23,7 @@ use common\helpers\LotteryType;
 use common\kj\cqssc\CqsscKcw;
 use common\service\cache\CacheKeyService;
 use common\service\CommonService;
+use common\service\jobs\kj_data\CommonDataStaticsJob;
 use common\service\jobs\kj_data\GrabKjDatasJob;
 use common\service\jobs\kj_data\PeiShuProfitsJob;
 use common\service\jobs\kj_data\PushKjDataToOutSiteJob;
@@ -344,7 +345,12 @@ class KjDataGet
     {
 
         list($code, $qihao) = SscDataService::insertDealDataTask($lottery_type); # 数据处理任务写入
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖后处理', ['code'=>$code, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '开奖后处理', ['code'=>$code, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
+        if($lottery_type == LotteryType::LUCKY_5 && substr($qihao, -3)=='288'){
+            $tmpDate = date('Y-m-d', time()-86400);
+        }else{
+            $tmpDate = date('Y-m-d');
+        }
 
         $rst = ['status'=>200, 'msg'=>'处理成功'];
         if($code!=0) {
@@ -373,6 +379,7 @@ class KjDataGet
 
                 # 2、数据统计处理  底下的统计有待于添加开关控制
                 push_queue(PeiShuProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>5]);
+                push_queue(CommonDataStaticsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'date'=>$tmpDate, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>5]);
                 push_queue(StaticAll2NumsYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>10]);
                 push_queue(Update1NumYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>10]);
                 push_queue(StaticHzProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>15]);
@@ -417,7 +424,11 @@ class KjDataGet
         }elseif (!empty($opentime)){
             $tmpDate = substr($opentime, 0, 10);
         }else{
-            $tmpDate = date('Y-m-d H:i:s');
+            if($lottery_type == LotteryType::LUCKY_5 && substr($qihao, -3)=='288'){
+                $tmpDate = date('Y-m-d H:i:s', time()-86400);
+            }else{
+                $tmpDate = date('Y-m-d H:i:s');
+            }
         }
         if(in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES)){
             $codesArr = [$kjDatasArr[0],$kjDatasArr[1],$kjDatasArr[2]];
