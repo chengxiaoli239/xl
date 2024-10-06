@@ -681,7 +681,7 @@ class SscDataService extends BaseService {
             $date = date('Y-m-d',strtotime("-1 day") );
             $rstData['ytd_nums'] =  self::getAcountByDate($vals, $date, $lottery_type);
         }
-        $rstData['theory_nums_perdate'] = (string)round(($count*$qiShu*0.1)/995, 2); # 理论次数/天
+        $rstData['theory_nums_perdate'] = (string)round(($count*$qiShu*0.1)/995, 2); # 理论次/天
 
         return $rstData;
     }
@@ -736,7 +736,7 @@ class SscDataService extends BaseService {
                 $where  = array_merge($where, [['=', $val, 1]]);
             }
             $Num4Type = Num4Type::find()->select('COUNT(id) AS count')->where($where)->limit(1)->asArray()->one();
-            $SscStaticYl->theory_nums_perdate = (string)round(($Num4Type['count']*$qishu*0.1) / 995, 2); # 理论次数/天
+            $SscStaticYl->theory_nums_perdate = (string)round(($Num4Type['count']*$qishu*0.1) / 995, 2); # 理论次/天
             $today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', date('Y-m-d')]]);
             //$today_nums_where = array_merge($where,[['=', 'lottery_type', $lottery_type],['=', 'date', '2019-05-24']]);
             $today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where($today_nums_where)->asArray()->all()[0]['nums'];
@@ -802,7 +802,7 @@ class SscDataService extends BaseService {
             $field = $len == 3 ? 'code_3n' : 'code_4n';
             $where = ['AND', ['LIKE', $field, $dsData['val']]];
             $nums = self::getTheoryNums($count, $qiShu);
-            $SscStaticYl->theory_nums_perdate = (string)$nums; # 理论次数/天
+            $SscStaticYl->theory_nums_perdate = (string)$nums; # 理论次/天
 
             $SscStaticYl->last_time_miss = $miss['last_times']; // 2、上次遗漏
             $SscStaticYl->last_time_miss_range = $miss['last_time_miss_range']; // 3、上次遗漏范围
@@ -1689,7 +1689,7 @@ class SscDataService extends BaseService {
                 $SscSdHzYl->count = $count; # 组合总共组数
                 $SscSdHzYl->updated_at = time();
                 //$SscDsYl->zhi = (string)$num;
-                $SscSdHzYl->theory_nums_perdate = (string)round(($count*$qishu*0.1) / 995, 2); # 理论次数/天
+                $SscSdHzYl->theory_nums_perdate = (string)round(($count*$qishu*0.1) / 995, 2); # 理论次/天
                 $SscSdHzYl->today_nums = SscKjData::find()->select(['COUNT(id) AS nums'])->where(['date'=>date('Y-m-d'),'codes_4nums_hz'=>$zuHes, 'lottery_type'=>$lottery_type])->asArray()->limit(1)->one()['nums'];
 
                 $SscSdHzYl->updated_at = time();
