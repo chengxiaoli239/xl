@@ -386,7 +386,7 @@ class UserService extends BaseService {
         $TzSystemsUsers = TzSystemsUsers::findOne(['access_token'=>$data['access_token']]);
         $rstData = [
             //'uid' => $TzSystemsUsers->uid,
-            'username' => $TzSystemsUsers->username . " 到期时间：".date('Y-m-d H:i:s', $TzSystemsUsers->expire_time),
+            'username' => $TzSystemsUsers->username . "           到期时间：".date('Y-m-d H:i:s', $TzSystemsUsers->expire_time),
             'ssc_domain' => $TzSystemsUsers->ssc_domain,
             'account' => $TzSystemsUsers->account,
             'password' => $TzSystemsUsers->password,
