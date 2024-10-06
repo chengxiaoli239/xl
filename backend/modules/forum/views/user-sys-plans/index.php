@@ -216,6 +216,8 @@ $columns = array_merge(
                 <?= Html::button("批量删除", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchDelete']) ?> &nbsp;
                 <?= Html::button("批量真实", ['class' => 'btn btn-success btn-xs', 'id' => 'batchTrue']) ?> &nbsp;
                 <?= Html::button("批量模拟", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchSimulate']) ?> &nbsp;
+                <?= Html::button("批量正", ['class' => 'btn btn-success btn-xs', 'id' => 'batchForward']) ?> &nbsp;
+                <?= Html::button("批量反", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchReverse']) ?> &nbsp;
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
@@ -311,6 +313,20 @@ $columns = array_merge(
             }).get();
 
             batchUpdate('is_test', selectedIds, 1);
+        });
+        $('#batchForward').click(function () {
+            var selectedIds = $('input[name="selection[]"]:checked').map(function () {
+                return this.value;
+            }).get();
+
+            batchUpdate('buy_type', selectedIds, 1);
+        });
+        $('#batchReverse').click(function () {
+            var selectedIds = $('input[name="selection[]"]:checked').map(function () {
+                return this.value;
+            }).get();
+
+            batchUpdate('buy_type', selectedIds, 0);
         });
         function batchUpdate(field, ids, val) {
             console.log(field, ids, val)
