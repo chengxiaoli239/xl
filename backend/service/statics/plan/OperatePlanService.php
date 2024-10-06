@@ -77,9 +77,10 @@ class OperatePlanService extends BaseService
             }
         }catch (\Exception $e){
             Tool_Common::log('/plan/'.__FUNCTION__.'_err', 'ERR', '计划处理异常999', ['lottery_type'=>$lotteryType, 'err_msg'=>$e->getMessage()]);
+            return $e->getMessage();
         }
 
-        return false;
+        return 'lottery_type:'.$lotteryType.'计划初始化处理完成';
     }
 
     /**

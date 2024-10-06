@@ -39,6 +39,7 @@ use backend\service\statics\statics_base\DealDataService;
 use backend\service\statics\statics_qx\StaticsQxMissService;
 use common\service\cache\CacheKeyService;
 use common\service\CommonService;
+use common\service\jobs\plan\UserPlanInitJob;
 use common\service\lottery\CommonLotteryService;
 use common\service\lottery\LotteryTypeService;
 use common\service\ssc\QihaoService;
@@ -2466,7 +2467,11 @@ class SscDataService extends BaseService {
                 # 账号级别的盈利
                 \backend\service\SscDataService::updateUserProfits($userId);
             }
-            OperatePlanService::initPlanPerDate($lottery_type); // 每天收盘初始化需要初始化的计划
+            $nowHIp2 = date('H:i:s', time() + 300);
+            if ($closingTime < $nowHIp2 && $nowHIp2 < $openingTime) {
+                //OperatePlanService::initPlanPerDate($lottery_type); // 每天收盘初始化需要初始化的计划
+                push_queue(UserPlanInitJob::class, ['lottery_type'=>$lottery_type, 'queue_delay_time'=>180]);
+            }
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划', ['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
             $dealStatus = 2;
         }catch (\Exception $e){
