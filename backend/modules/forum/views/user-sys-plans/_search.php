@@ -7,6 +7,7 @@ use yii\widgets\ActiveForm;
 /* @var $model backend\models\searchs\UserSysPlans */
 /* @var $form yii\widgets\ActiveForm */
 $userId = \Yii::$app->user->id;
+$userNameList = \common\models\AdminModel::find()->select(['username'])->where('id>1 and user_type=1')->indexBy('username')->column();
 ?>
 
 <div class="user-sys-plans-search">
@@ -18,10 +19,10 @@ $userId = \Yii::$app->user->id;
     <div class="row">
         <?php if($userId == 1){?>
         <div class="col-lg-2 col-xs-6">
-            <?= $form->field($model, 'uid') ?>
+            <?= $form->field($model, 'id')->label('计划ID') ?>
         </div>
         <div class="col-lg-2 col-xs-6">
-            <?= $form->field($model, 'account') ?>
+            <?= $form->field($model, 'account')->dropDownList($userNameList)->label('账号名称') ?>
         </div>
         <?php }?>
         <div class="col-lg-2 col-xs-6">
