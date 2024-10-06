@@ -11,8 +11,13 @@ $this->title = '位置大小单双';
 $this->params['breadcrumbs'][] = $this->title;
 $type1Class = $type==1 ? 'btn-success' : 'btn-default';
 $type2Class = $type==2 ? 'btn-success' : 'btn-default';
-$p1Name = $type==1 ? '大' : '单';
-$p2Name = $type==2 ? '小' : '双';
+if($type == \backend\models\searchs\statics\StaticPositionTypeArisePerdate::TYPE_DX){
+    $p1Name = '大';
+    $p2Name = '小';
+}else{
+    $p1Name = '单';
+    $p2Name = '双';
+}
 ?>
 <section class="static-position-type-arise-perdate-index wrapper site-min-height">
     <!-- page start-->
