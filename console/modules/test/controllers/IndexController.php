@@ -442,7 +442,8 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
-            $plan = UserSysPlans::findOne(10552);
+            $plan = UserSysPlans::findOne(10670);
+            $codes = BetService::getCodesByPlan($plan);p(count(explode('@', $codes)));
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $AUTH_ACCESS_TOKENS = TzSystemUsersService::getAuthAccessTokens(2);p($AUTH_ACCESS_TOKENS);
@@ -452,7 +453,6 @@ class IndexController extends Controller
 
             $miss = StaticsQxMissService::getCodeTypeHistoryMiss('type_log', $lottery_type=8, $static_nums=470); // return ['times'=>$times, 'last_time_range'=>$last_time_range, 'max_range'=>$max_range];
             p($miss);
-            $codes = BetService::getCodesByPlan($plan);p(count(explode('@', $codes)));
             //$data = Aozhou::getLucky5($type='json', $is_auto=2);p($data);
 
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));

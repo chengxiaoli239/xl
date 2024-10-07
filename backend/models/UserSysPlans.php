@@ -224,7 +224,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $fenli_shu_sel_11;
     public $fenli_shu_code;
     ####################### 分离数结束 #####################
-    public $base_codes;
+    //public $base_codes;
 
     ####################### 合数与差分-开始 #####################
     public $hsAndCf_twoFone; # 两合上1
