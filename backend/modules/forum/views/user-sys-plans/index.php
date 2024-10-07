@@ -24,10 +24,12 @@ $columns = array_merge(
         ['class' => 'yii\grid\CheckboxColumn', 'headerOptions'=>['width'=>'2%']],
 
         ['attribute' => 'playway','headerOptions'=>['width'=>'5%'],'label'=>'类型1',
+            'format'=>'raw',
             'value' => function($model) {
-                $playway_Arr = [1=>'二字定', 2=>'三字定', 3=>'四字定', 4=>'一字定', 6=>'X字现'];
+                $playWayArr = [1=>'二字定', 2=>'三字定', 3=>'四字定', 4=>'一字定', 6=>'X字现'];
 
-                return $playway_Arr[$model->playway].'['.$model->id.']';
+                $url = '/forum/betting-records/index?BettingRecords[plan_id]='.$model->id;
+                return $playWayArr[$model->playway].'['.Html::a($model->id, $url).']';
             }
         ],
 
@@ -44,7 +46,7 @@ $columns = array_merge(
                     $xians = [36=>'二字现', 17=>'三字现', 37=>'四字现'];
                     return $xians[$model->tz_type];
                 }
-                return $typeName;
+                return str_replace('三定-', '', str_replace('四定-', '', $typeName));
             }
         ],
         //'buy_type',

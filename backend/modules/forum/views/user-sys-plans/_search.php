@@ -28,11 +28,12 @@ $userNameList = \common\models\AdminModel::find()->select(['username'])->where('
         <div class="col-lg-2 col-xs-6">
             <?= $form->field($model, 'status')->dropDownList([0=>'关闭', 1=>'开启'])->label('状态') ?>
         </div>
-    </div>
-
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-default']) ?>
+        <div class="col-lg-2 col-xs-6 d-flex align-items-center">
+            <div class="form-group mb-0" style="margin-top: 20px">
+                <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-default']) ?>
+                <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
+            </div>
+        </div>
     </div>
 
     <?php ActiveForm::end(); ?>

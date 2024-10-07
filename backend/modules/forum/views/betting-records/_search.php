@@ -16,7 +16,8 @@ $userNameList = \common\models\AdminModel::find()->select(['username'])->where('
         'action' => ['index'],
         'method' => 'get',
         'options' => [
-            'data-pjax' => 1
+            'data-pjax' => 1,
+            'class' => 'd-flex align-items-center' // 使用 Flexbox 对齐
         ],
     ]); ?>
 
@@ -29,17 +30,13 @@ $userNameList = \common\models\AdminModel::find()->select(['username'])->where('
             <?= $form->field($model, 'account')->dropDownList($userNameList)->label('账号名称') ?>
         </div>
         <?php }?>
-        <div class="col-lg-2 col-xs-6">
-            <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-default']) ?>
-        </div>
-        <div class="col-lg-2 col-xs-6">
-            <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
-        </div>
-    </div>
 
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-default']) ?>
+        <div class="col-lg-2 col-xs-6 d-flex align-items-center">
+            <div class="form-group mb-0" style="margin-top: 20px">
+                <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-default']) ?>
+                <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
+            </div>
+        </div>
     </div>
 
     <?php ActiveForm::end(); ?>

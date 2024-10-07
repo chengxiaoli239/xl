@@ -6,6 +6,7 @@ return [
     'query' => '查询',
     'Save' => '保存',
     'Delete' => '删除',
+    'Reset' => '重置',
     'Role assign' => '权限分配',
 
     'Admin Log' => '访问日志',
