@@ -215,7 +215,9 @@ class UserSysPlansController extends BaseController
 
         UserSysPlansService::preOpData($this->_post, $this->_user_id, $id);
         $this->_post['update_time'] = date('Y-m-d H:i:s');
+        //p([$model->load($this->_post), $model->attributes, $model->save()]);
         if ($model->load($this->_post) && $model->save()) {
+            //p([$model->load($this->_post), $model->attributes]);
             if(in_array($this->_post['UserSysPlans']['tz_type'], \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
                 UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)$this->_post['UserSysPlans']['change_per'][0], $this->_user_id);
             }
@@ -224,7 +226,7 @@ class UserSysPlansController extends BaseController
                 # 批量模拟数据
                 $delete_sql = 'DELETE FROM {{%betting_records}} WHERE plan_id="'.$model->id.'"';
                 $rst_delete = $db->createCommand($delete_sql)->execute();
-                Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '模拟下注', ['plan_id'=>$model->id, 'delete_sql'=>$delete_sql, 'rst_delete'=>$rst_delete]);
+                Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '模拟下注', ['plan_id'=>$model->id, 'delete_sql'=>$delete_sql, 'rst_delete'=>$rst_delete]);
             }
             return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$model->lottery_type]);
         }
@@ -378,7 +380,6 @@ class UserSysPlansController extends BaseController
             'is_filter_qihaos' => $is_filters,
         ];
         $data = array_merge($data, UserSysPlansService::getSysPlansTypeDatas($model->playway, $model->tz_type));
-        //p($data);
 
         return $this->render('update',$data);
     }

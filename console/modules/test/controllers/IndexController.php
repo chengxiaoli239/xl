@@ -78,6 +78,7 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user_sys_plans}}'); d($r);
         for ($i=0; $i<15; $i++){
             $date = date('Y-m-d', strtotime('2024-09-23')+$i*86400);
             if($date>date('Y-m-d')) return false;
@@ -86,7 +87,6 @@ class IndexController extends Controller
         }
         p($rst);
         $codes = SscKjDataService::getRecentlyPosCodes($lotteryType=8, $positions=[3], $num = 4);p($codes);
-        $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user_sys_plans}}'); p($r);
         $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type=8);p($rst);
         $codeTypes = StaticService::getAllCodeTypes($type = 2); p($codeTypes);# 统计基础号码类型筛选,类型：1和值2号码类型[例如:双双重、三重]
         $HI = date('H:i');

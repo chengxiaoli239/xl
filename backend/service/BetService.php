@@ -877,11 +877,13 @@ abstract class BetService extends BaseBetService {
                         $codesArr[] = $arr[0].','.$arr[1].','.$arr[2].','.$arr[3];
                     }
                 }elseif(in_array($tz_type, [20, 25])){ # 过滤
-                    $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true));
+                    $baseCodes = explode(',', $plan->base_codes??'');
+                    $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type, $baseCodes);
                 }elseif($tz_type == 26){ # 去除近xxx期号码
                     $codesArr = NumService::getNotLatelyCodes(json_decode($codes_hz, true));
                 }elseif($tz_type == 28){ # 系统快捷
-                    $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true));
+                    $baseCodes = explode(',', $plan->base_codes??'');
+                    $codesArr = NumService::getCodesKuaiXuan(json_decode($codes_hz, true), $code_type, $baseCodes);
                 }
 
                 break;

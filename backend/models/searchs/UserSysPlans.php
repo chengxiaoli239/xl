@@ -19,8 +19,9 @@ class UserSysPlans extends UserSysPlansModel
     {
         return [
             [['id', 'is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'is_batch_simulate', 'lottery_type', 'plan_type', 'created_at', 'updated_at'], 'integer'],
-            [['children_plan_id', 'singles', 'account', 'tz_sites', 'hz_Arr', 'update_time'], 'safe'],
+            [['children_plan_id', 'singles', 'base_codes', 'account', 'tz_sites', 'hz_Arr', 'update_time'], 'safe'],
             [['single', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
+            [['base_codes'], 'string'],
         ];
     }
 

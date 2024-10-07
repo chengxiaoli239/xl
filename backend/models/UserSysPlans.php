@@ -35,6 +35,7 @@ use Yii;
  * @property string $get_arise 上奖 除
  * @property string $remove_arise 上奖 除
  * @property string $current_profits 当前盈利
+ * @property string $base_codes 基础号码
  * @property int $plan_type 计划类型:0正常1止盈止损计划
  * @property int $change_per 号码轮换
  * @property int $tz_sort 投注排序:从小到大
@@ -223,6 +224,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $fenli_shu_sel_11;
     public $fenli_shu_code;
     ####################### 分离数结束 #####################
+    public $base_codes;
 
     ####################### 合数与差分-开始 #####################
     public $hsAndCf_twoFone; # 两合上1
@@ -251,7 +253,7 @@ class UserSysPlans extends \common\models\base\BaseModel
             [['single', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
             [['update_time'], 'safe'],
             [['children_plan_id'], 'string', 'max' => 255],
-            [['singles'], 'string'],
+            [['singles', 'base_codes'], 'string'],
             [['account', 'tz_sites'], 'string', 'max' => 24],
             [['hz_Arr'], 'string', 'max' => 640],
         ];
@@ -289,6 +291,7 @@ class UserSysPlans extends \common\models\base\BaseModel
             'current_profits' => '当前盈利',
             'plan_type' => '计划类型:0正常1止盈止损计划',
             'tz_sort' => '投注排序:从小到大',
+            'base_codes' => '基础号码',
             'desc' => '计划备注',
             'created_at' => '创建时间',
             'updated_at' => '更新时间',

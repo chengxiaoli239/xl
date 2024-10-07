@@ -347,6 +347,13 @@ use yii\widgets\ActiveForm;
 
                 <!--动态过滤号码-->
                 <?php include(dirname(__FILE__).'/filter_dynamic.php'); # 动态过滤号码 ?>
+                <div class="row">
+                    <div class="col-lg-12 col-xs-12">
+                        <!--?= $form->field($model,"desc")->textarea([ 'autofocus' => false,'style'=>'height:60px' ])?-->
+                        <?= $form->field($model,"base_codes")->label('导入号码(<span id="base_codes_nums">0</span>)')->textarea([ 'autofocus' => false,'style'=>'height:200px','id'=>'model-base_codes'])?>
+                    </div>
+                </div>
+
 
                 <!--区间盈利止盈止损-->
                 <?php if(isset(SscDataService::PLAN_TYPE_OPTIONS[SscDataService::PLAN_TYPE_AREA_SINGLES_BET])){ include(dirname(__FILE__).'/take_profits_area.php');} ?>
@@ -361,11 +368,10 @@ use yii\widgets\ActiveForm;
                 <!--?= $form->field($model, 'updated_at')->textInput() ?-->
 
                 <!--?= $form->field($model, 'update_time')->textInput() ?-->
-
                 <div class="row">
                     <div class="col-lg-12 col-xs-12">
                         <!--?= $form->field($model,"desc")->textarea([ 'autofocus' => false,'style'=>'height:60px' ])?-->
-                        <?= $form->field($model,"codes")->label('号码(<span id="codes_nums">0</span>)')->textarea([ 'autofocus' => false,'style'=>'height:200px' ])?>
+                        <?= $form->field($model,"codes")->label('最终号码(<span id="codes_nums">0</span>)')->textarea([ 'autofocus' => false,'style'=>'height:200px' ])?>
                     </div>
                 </div>
                 <?php include(dirname(__FILE__).'/act-button.php');?>
@@ -611,6 +617,30 @@ $(function () {
     $('.checkbox-item').click(function() {
         var name = $(this).attr('name');
         $('input[name="' + name + '"]').not(this).prop('checked', false);
+    });
+
+    // 监听失去焦点事件
+    $('#model-base_codes').on('blur', function() {
+        // 获取输入框的内容
+        var inputValue = $(this).val();
+
+        // 去掉前后多余的空格和换行符
+        inputValue = $.trim(inputValue);
+
+        // 替换中文逗号为英文逗号
+        inputValue = inputValue.replace(/，/g, ',');
+
+        // 去掉多余空格或换行符，使用英文逗号分隔号码
+        inputValue = inputValue.replace(/\s+/g, ',').replace(/,+/g, ',');
+
+        // 去掉开头和结尾多余的逗号
+        inputValue = inputValue.replace(/^,+|,+$/g, '');
+
+        // 重新赋值回输入框
+        $(this).val(inputValue);
+
+        // 更新显示的号码数量
+        $('#base_codes_nums').text(inputValue.split(',').length);
     });
 });
 </script>

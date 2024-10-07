@@ -3099,13 +3099,18 @@ $sql .= '
         $code_type = $code_types[$data['UserSysPlans']['playway']];
         $in_codes = $data['UserSysPlans']['in_codes']? trim($data['UserSysPlans']['in_codes'], ','):''; # 在此号码范围内
         $in_codes = (!empty($in_codes)) ? explode(',', str_replace(['，', ' '], ',', $in_codes)) : [];
+
+        $base_codes = $data['UserSysPlans']['base_codes']? trim($data['UserSysPlans']['base_codes'], ','):''; # 在此号码范围内
+        $base_codes = (!empty($base_codes)) ? explode(',', str_replace(['，', ' '], ',', $base_codes)) : [];
+
         $tz_type = $data['UserSysPlans']['tz_type'];
         $lottery_type = $data['UserSysPlans']['lottery_type'];
         $model = new UserSysPlans();
         UserSysPlansService::preOpData($data, $user_id=1);
         $model->load($data);
         $codes_hz = json_decode($model->hz_Arr, true);
-        $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type, $in_codes);
+        $baseOnCodes = array_merge($in_codes, $base_codes);
+        $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type, $baseOnCodes);
 
         if($type == 1) {
             # 1 遗漏
@@ -3118,6 +3123,14 @@ $sql .= '
             $rst = StaticService::getYlByCodes($codes, $lottery_type, $tz_type);
         }
         $rst['code_desc'] = \backend\service\NumService::getDescByKuaixuan($codes_hz);
+        if(!empty($base_codes)){
+            $code_desc = '导入号码('.count($base_codes).'):'.substr($data['UserSysPlans']['base_codes'], 0, 60).'...';
+            if(empty($rst['code_desc'])){
+                $rst['code_desc'] = $code_desc;
+            }else{
+                $rst['code_desc'] .= ','.$code_desc;
+            }
+        }
 
         return $rst;
     }
