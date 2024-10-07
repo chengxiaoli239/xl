@@ -46,7 +46,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <?php include(dirname(__FILE__).'/index_tab.php'); ?>
                 <?php Pjax::begin(); ?>
-                <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+                <?php if(\Yii::$app->user->id == 1) echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,

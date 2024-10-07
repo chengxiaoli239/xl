@@ -7,6 +7,24 @@
     border: 1px solid #ccc;
     z-index: 1000; /* 确保 tooltip 在最上面 */
 }
+input::placeholder {
+    color: #999; /* 更改 placeholder 文字颜色 */
+    opacity: 1;  /* 提高可见度 */
+    font-weight: bold; /* 加粗文字 */
+}
+
+input {
+    background-color: #f9f9f9; /* 改变输入框背景色 */
+    border: 1px solid #ccc; /* 增加边框 */
+}
+
+input:focus {
+    border-color: #66afe9; /* 获取焦点时的边框颜色 */
+    outline: none; /* 去掉默认轮廓 */
+}
+.help-block{
+    margin-bottom: -9px;
+}
 </style>
 <!--动态过滤-->
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #da4f49;">
@@ -35,7 +53,7 @@
             <!-- 添加隐藏的input字段 -->
             <input type="hidden" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][label]" value="<?= htmlspecialchars($value['label'], ENT_QUOTES) ?>">
             <?php foreach ($value['params'] as $k2 => $v2): ?>
-                <input type="number" id="input_<?= $key.'_'.$k2 ?>" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][params][<?= $k2 ?>]" style="width: 45px; margin: -2px 2px;" placeholder="<?= $v2 ?>" value="<?= $v2 ?>">
+                <input type="number" id="input_<?= $key.'_'.$k2 ?>" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][params][<?= $k2 ?>]" style="width: 45px; margin: -2px 2px;" placeholder="<?= $k2 ?>" value="<?= $v2 ?>">
             <?php endforeach; ?>
         </div>
         <?php endforeach; ?>
