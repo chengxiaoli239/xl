@@ -952,7 +952,7 @@ class OperatePlanService extends BaseService
         if(in_array($betStatus, [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
             if((0-$areaProfits) >= $areaLossStart){ # 亏损 > 起始亏损金
                 # 满足指定期数条件 -> 启动下注
-                $areaMsg = '符合亏损条件【'.$areaProfits.'>='.$areaLossStart.'】';
+                $areaMsg = '【亏'.abs($areaProfits).'>='.$areaLossStart.'符合条件】';
                 $hzArr['filters']['start_qihao'] = HN0898Service::getQihao($lottery_type); # 当前期号，统计利润时候不包含记录的记录的期号
                 $betStatus = SscDataService::PLAN_BET_STATUS_BETTING;
             }else{
