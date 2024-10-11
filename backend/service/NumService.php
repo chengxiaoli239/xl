@@ -2930,7 +2930,7 @@ class NumService extends BaseService {
             }
 
 
-            $type_desc .= '|止盈:'.$hz_Arr['area_profits'].'止损:'.$hz_Arr['area_loss'];
+            $type_desc .= '|区间止盈:'.$hz_Arr['area_profits'].'止损:'.$hz_Arr['area_loss'];
 
             $type_desc .= isset($hz_Arr['current_area_profits']) ? '当前:'.number_format($hz_Arr['current_area_profits'], 2) : ''; # 当前遗漏
             $type_desc .= ($hz_Arr['areaBetStatus']==1) ? "|起投期:".$hz_Arr['start_qihao'] : ''; # 当前遗漏
