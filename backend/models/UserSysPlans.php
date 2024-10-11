@@ -197,6 +197,8 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $areaBetStatus; # 0监控状态1下注状态
     public $current_area_profits; # 区间利润
     public $area_arise_qishus; # 统计区间上奖次数
+    public $area_msg; # 区间描述
+    public $start_loss; # 触发亏损门槛条件
     ########################### 统计期数区间 止盈止损 end #########################
 
     ########################## 过滤前xx期号码 start ########################

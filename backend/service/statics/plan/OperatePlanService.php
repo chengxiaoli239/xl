@@ -938,6 +938,7 @@ class OperatePlanService extends BaseService
         $singles_key = $hzArr['singles_key']??0; # 倍数索引
         $has_bet_nums = $hzArr['has_bet_nums']??0; # 已投数量
         $areaLossStart = $hzArr['area_loss_start']??0; # 区间亏损起投金额
+        $startLoss = $hzArr['start_loss']??0; # 触发启动金额
         $areaLossEnd = $hzArr['area_loss']??0; # 区间止损金额
         $areaProfitsEnd = $hzArr['area_profits']??0; # 区间止盈金额
         $singles = (!empty(trim($UserSysPlan->singles))) ? explode('-', trim($UserSysPlan->singles)) : [];
@@ -952,8 +953,9 @@ class OperatePlanService extends BaseService
         if(in_array($betStatus, [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
             if((0-$areaProfits) >= $areaLossStart){ # 亏损 > 起始亏损金
                 # 满足指定期数条件 -> 启动下注
-                $areaMsg = '【亏'.abs($areaProfits).'>='.$areaLossStart.'符合条件】';
+                $areaMsg = '【亏'.abs($areaProfits).'>='.$areaLossStart.'符合启动条件，开始下注...】';
                 $hzArr['filters']['start_qihao'] = HN0898Service::getQihao($lottery_type); # 当前期号，统计利润时候不包含记录的记录的期号
+                $startLoss = $areaProfits;
                 $betStatus = SscDataService::PLAN_BET_STATUS_BETTING;
             }else{
                 $betStatus = SscDataService::PLAN_BET_STATUS_WAIT;
@@ -1001,6 +1003,7 @@ class OperatePlanService extends BaseService
             'current_miss' => $current_miss,
             'singles_key' => $singles_key,
             'betStatus' => $betStatus,
+            'start_loss' => $startLoss,
             'has_bet_nums' => $has_bet_nums,
             'area_msg' => $areaMsg,
         ]);

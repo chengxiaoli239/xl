@@ -2923,7 +2923,7 @@ class NumService extends BaseService {
         if($UserSysPlans && in_array($UserSysPlans->plan_type, [SscDataService::PLAN_TYPE_AREA_SINGLES_BET, SscDataService::PLAN_TYPE_LOSS_MONEY_BET_SINGLES])){
             if(!empty($hz_Arr['area_loss_start'])){
                 $type_desc = '【条件:亏'.$hz_Arr['area_loss_start'].'元起投】';
-                $type_desc .= (in_array($hz_Arr['betStatus'], [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT]))? ',当前'.($hz_Arr['current_area_profits']??0.00).'元' : '';
+                $type_desc .= (in_array($hz_Arr['betStatus'], [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT]))? ',当前'.($hz_Arr['current_area_profits']??0.00).'元' : $hz_Arr['start_loss'].'触发启动';
                 $type_desc .= ' '.($hz_Arr['area_msg']??'');
             }else{
                 $type_desc = '【条件:'.$hz_Arr['area_all_qishus'].'漏'.$hz_Arr['area_yl_qishus'].'期';
