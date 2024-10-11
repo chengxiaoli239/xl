@@ -959,7 +959,7 @@ class OperatePlanService extends BaseService
                 $betStatus = SscDataService::PLAN_BET_STATUS_BETTING;
             }else{
                 $betStatus = SscDataService::PLAN_BET_STATUS_WAIT;
-                $areaMsg = '不符合条件【'.$areaProfits.'<=('.$areaLossStart.')】，等待中...';
+                $areaMsg = '不符合条件，等待中...';
             }
             $singles_key = 0;
             $hzArr['current_area_profits'] = $areaProfits; # 当前区间利润

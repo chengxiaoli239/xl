@@ -2930,12 +2930,11 @@ class NumService extends BaseService {
                 $type_desc .= ($hz_Arr['areaBetStatus']==0)? ',当前'.($hz_Arr['area_arise_qishus']??0.00).'期' : '';
             }
 
-            $type_desc .= '【区间止盈:'.$hz_Arr['area_profits'].'止损:'.$hz_Arr['area_loss'];
+            $type_desc .= '【区间止盈:'.$hz_Arr['area_profits'].'止损:'.$hz_Arr['area_loss'].'】';
 
-            $type_desc .= isset($hz_Arr['current_area_profits']) ? '，当前:'.number_format($hz_Arr['current_area_profits'], 2) : ''; # 当前遗漏
-            $type_desc .= ($hz_Arr['areaBetStatus']==1) ? "|起投期:".$hz_Arr['start_qihao'] : ''; # 当前遗漏
+            //$type_desc .= isset($hz_Arr['current_area_profits']) ? '，当前:'.number_format($hz_Arr['current_area_profits'], 2) : ''; # 当前遗漏
+            $type_desc .= ($hz_Arr['betStatus']==1 OR $hz_Arr['areaBetStatus']==1) ? " 起投期:".($hz_Arr['start_qihao']??$hz_Arr['filters']['start_qihao']) : ''; # 当前遗漏
 
-            $type_desc .= '】';
             $desc = $type_desc . ' '. $desc;
         }
         # 类型取
