@@ -996,7 +996,7 @@ class OperatePlanService extends BaseService
 
         $single = $singles[(int)$singles_key];
         $hzArr = array_merge($hzArr, [
-            'areaProfits' => $areaProfits,
+            'current_area_profits' => $areaProfits,
             'current_miss' => $current_miss,
             'singles_key' => $singles_key,
             'betStatus' => $betStatus,
