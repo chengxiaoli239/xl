@@ -1990,19 +1990,23 @@ class SscDataService extends BaseService {
      * @param array $andWhere
      * @return bool|int|mixed|string|null  正负数
      */
-    public static function getPlanProfits($UserSysPlan, $andWhere = []){
+    public static function getPlanProfits($UserSysPlan, $andWhere = [], $simple=0){
         $where = ['AND',
             ['=', 'plan_id', $UserSysPlan->id],
-            ['=', 'is_profits_record', 1],
-            ['OR',
+        ];
+        if(!$simple){
+            $where[] = ['=', 'is_profits_record', 1];
+            $where[] = ['OR',
                 ['=', 'is_simulate', 0],
                 ['AND', ['=','is_simulate', 1], ['=', 'sn', BetService::$test_true_sn]],
-            ],
-        ];
+            ];
+        }
         if(!empty($andWhere)){
             $where[] = $andWhere;
         }
-        $profits = BettingRecords::find()->where($where)->sum('profits');
+        $query = BettingRecords::find()->where($where);
+        //$sql = $query->createCommand()->getRawSql();p($sql);
+        $profits = $query->sum('profits');
 
         return $profits??0.00;
     }

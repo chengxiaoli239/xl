@@ -946,7 +946,7 @@ class OperatePlanService extends BaseService
         $has_bet_nums += 1;
 
         //$areaLoss = SscDataService::getPlanAreaLoss($UserSysPlan, $hzArr['start_qihao']);
-        $areaProfits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao', $hzArr['start_qihao']]); # 计划当前区间利润
+        $areaProfits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao', $hzArr['start_qihao']], 1); # 计划当前区间利润
         $hzArr['current_area_profits'] = $areaProfits; # 当前区间利润
         # 2 # 监控中状态统计
         if(in_array($betStatus, [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){

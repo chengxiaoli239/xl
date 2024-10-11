@@ -442,7 +442,9 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
-            $plan = UserSysPlans::findOne(10670);
+            $plan = UserSysPlans::findOne(10742);
+            $areaProfits = SscDataService::getPlanProfits($plan, ['>=', 'qihao', '20241011255'], 1); # 计划当前区间利润
+            p($areaProfits);
             $codes = BetService::getCodesByPlan($plan);p(count(explode('@', $codes)));
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
