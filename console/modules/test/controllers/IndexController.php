@@ -443,6 +443,7 @@ class IndexController extends Controller
     public function actionDw1(){
         try {
             $plan = UserSysPlans::findOne(10742);
+            $r = OperatePlanService::operatePlans21($plan, $current_kj_qihao='20241011255'); p($r);
             $areaProfits = SscDataService::getPlanProfits($plan, ['>=', 'qihao', '20241011255'], 1); # 计划当前区间利润
             p($areaProfits);
             $codes = BetService::getCodesByPlan($plan);p(count(explode('@', $codes)));

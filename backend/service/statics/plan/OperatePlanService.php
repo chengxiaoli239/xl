@@ -940,24 +940,24 @@ class OperatePlanService extends BaseService
         $areaLossStart = $hzArr['area_loss_start']??0; # 区间亏损起投金额
         $areaLossEnd = $hzArr['area_loss']??0; # 区间止损金额
         $areaProfitsEnd = $hzArr['area_profits']??0; # 区间止盈金额
-        $singles = explode('-', trim($UserSysPlan->singles));
+        $singles = (!empty(trim($UserSysPlan->singles))) ? explode('-', trim($UserSysPlan->singles)) : [];
         if(empty($singles)) $singles = [$UserSysPlan->single]; # 不填的情况
         $singles_count = count($singles);
         $has_bet_nums += 1;
 
         //$areaLoss = SscDataService::getPlanAreaLoss($UserSysPlan, $hzArr['start_qihao']);
-        $areaProfits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao', $hzArr['start_qihao']], 1); # 计划当前区间利润
+        $areaProfits = SscDataService::getPlanProfits($UserSysPlan, ['>=', 'qihao', $hzArr['filters']['start_qihao']], 1); # 计划当前区间利润
         $hzArr['current_area_profits'] = $areaProfits; # 当前区间利润
         # 2 # 监控中状态统计
         if(in_array($betStatus, [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
             if((0-$areaProfits) >= $areaLossStart){ # 亏损 > 起始亏损金
                 # 满足指定期数条件 -> 启动下注
                 $areaMsg = '符合亏损条件【'.$areaProfits.'>='.$areaLossStart.'】';
-                $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 当前期号，统计利润时候不包含记录的记录的期号
+                $hzArr['filters']['start_qihao'] = HN0898Service::getQihao($lottery_type); # 当前期号，统计利润时候不包含记录的记录的期号
                 $betStatus = SscDataService::PLAN_BET_STATUS_BETTING;
             }else{
                 $betStatus = SscDataService::PLAN_BET_STATUS_WAIT;
-                $areaMsg = '不符合条件【'.$areaProfits.'<=('.$areaLossStart.')】';
+                $areaMsg = '不符合条件【'.$areaProfits.'<=('.$areaLossStart.')】，等待中...';
             }
             $singles_key = 0;
             $hzArr['current_area_profits'] = $areaProfits; # 当前区间利润
@@ -966,16 +966,17 @@ class OperatePlanService extends BaseService
                 $areaMsg = '符合止损:亏'.(0-$areaProfits).'>='.$areaLossEnd;
                 $betStatus = SscDataService::PLAN_BET_STATUS_WAIT;
                 $hzArr['current_area_profits'] = 0.00;
-                $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 重新设置开始计算期号，避免无时间间隔的连续止损，大遗漏倍投问题
+                $hzArr['filters']['start_qihao'] = HN0898Service::getQihao($lottery_type); # 重新设置开始计算期号，避免无时间间隔的连续止损，大遗漏倍投问题
                 $singles_key = 0; # 止损，倍数重新
             }elseif($areaProfits>=$areaProfitsEnd){
                 $areaMsg = '符合止赢:赢'.$areaProfits.'>'.$areaProfitsEnd;
                 $betStatus = SscDataService::PLAN_BET_STATUS_WAIT;
                 $hzArr['area_arise_qishus'] = 0;
                 $hzArr['current_area_profits'] = 0.00;
-                $hzArr['start_qihao'] = HN0898Service::getQihao($lottery_type); # 重新设置开始计算期号，避免大遗漏倍投问题
+                $hzArr['filters']['start_qihao'] = HN0898Service::getQihao($lottery_type); # 重新设置开始计算期号，避免大遗漏倍投问题
             }else{
-                $areaMsg = '不符合止盈'.$areaProfitsEnd.'止损'.$areaLossEnd;
+                //$areaMsg = '不符合止盈'.$areaProfitsEnd.'止损'.$areaLossEnd;
+                $areaMsg = '下注中，本回合盈利：'.$areaProfits.'[计划ID：'.$UserSysPlan->id.']';
             }
             if(!$isZjBefore){
                 //self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
@@ -989,10 +990,10 @@ class OperatePlanService extends BaseService
                 $current_miss = 0;
                 $singles_key = 0;
             }
-            $areaMsg = '下注中，本回合盈利：'.$areaProfits.','.$areaMsg.'['.$UserSysPlan->id.']';
         }
         $hzArr['betStatus'] = $betStatus; # 下注状态
         $hzArr['singles_key'] = $singles_key; # 下注状态
+        $hzArr['filters']['current_kj_qihao'] = $currentKjQiHao;
 
         $single = $singles[(int)$singles_key];
         $hzArr = array_merge($hzArr, [
@@ -1001,6 +1002,7 @@ class OperatePlanService extends BaseService
             'singles_key' => $singles_key,
             'betStatus' => $betStatus,
             'has_bet_nums' => $has_bet_nums,
+            'area_msg' => $areaMsg,
         ]);
         $updateData = ['hz_Arr'=>json_encode($hzArr, 320), 'single'=>$single];
         $rst = UserSysPlans::updateAll($updateData, ['id'=>$UserSysPlan->id]);

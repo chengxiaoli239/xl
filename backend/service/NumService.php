@@ -2924,11 +2924,11 @@ class NumService extends BaseService {
             if(!empty($hz_Arr['area_loss_start'])){
                 $type_desc = '【条件:亏'.$hz_Arr['area_loss_start'].'元起投】';
                 $type_desc .= (in_array($hz_Arr['betStatus'], [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT]))? ',当前'.($hz_Arr['current_area_profits']??0.00).'元' : '';
+                $type_desc .= ' '.($hz_Arr['area_msg']??'');
             }else{
                 $type_desc = '【条件:'.$hz_Arr['area_all_qishus'].'漏'.$hz_Arr['area_yl_qishus'].'期';
                 $type_desc .= ($hz_Arr['areaBetStatus']==0)? ',当前'.($hz_Arr['area_arise_qishus']??0.00).'期' : '';
             }
-
 
             $type_desc .= '|区间止盈:'.$hz_Arr['area_profits'].'止损:'.$hz_Arr['area_loss'];
 
