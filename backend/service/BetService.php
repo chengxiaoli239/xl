@@ -1258,6 +1258,7 @@ abstract class BetService extends BaseBetService {
             SscDataService::PLAN_TYPE_YL_BET_SINGLES_NUM,
             SscDataService::PLAN_TYPE_YL_START_BET_SINGLES,
             SscDataService::PLAN_TYPE_ZZ_BET_SINGLES_2,
+            SscDataService::PLAN_TYPE_LOSS_MONEY_BET_SINGLES,
         ], UserSysPlans::$A_x_arise_B_y_arise_bet_B_types))){ # 6中则投 8、9遗漏多少期投
             //j$flag = SscDataService::isZjBefore($planId); # 上期是否中奖，第一次下注认为是上期不中
             $flag = BetService::getIsBetTrue($UserSysPlans);
@@ -1391,6 +1392,7 @@ abstract class BetService extends BaseBetService {
                 SscDataService::PLAN_TYPE_YL_BET_SINGLES_NUM,
                 SscDataService::PLAN_TYPE_YL_START_BET_SINGLES,
                 SscDataService::PLAN_TYPE_ZZ_BET_SINGLES_2,
+                SscDataService::PLAN_TYPE_LOSS_MONEY_BET_SINGLES,
             ])) { # 中则投、中则投+翻倍梯度倍投、遗漏中则倍投
                 $flag = ($codes_hz['betStatus'] == SscDataService::PLAN_BET_STATUS_BETTING) ? 1 : 0;
             }else if(in_array($plan->plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types)) { # A出x次B出y次投B

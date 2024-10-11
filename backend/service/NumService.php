@@ -2919,10 +2919,16 @@ class NumService extends BaseService {
             }
             $desc .= '[A出:'.$hz_Arr['arise_A_times'].'次当前:'.(int)$hz_Arr['current_arise_A_times'].'次&B出:'.$hz_Arr['arise_B_times'].'次,遗漏:'.$yl_desc.']';
         }
-        if($UserSysPlans && in_array($UserSysPlans->plan_type, [14])){
-            $type_desc = '【条件:'.$hz_Arr['area_all_qishus'].'漏'.$hz_Arr['area_yl_qishus'].'期';
 
-            $type_desc .= ($hz_Arr['areaBetStatus']==0)? ',当前'.$hz_Arr['area_arise_qishus'].'期' : '';
+        if($UserSysPlans && in_array($UserSysPlans->plan_type, [SscDataService::PLAN_TYPE_AREA_SINGLES_BET, SscDataService::PLAN_TYPE_LOSS_MONEY_BET_SINGLES])){
+            if(!empty($hz_Arr['area_loss_start'])){
+                $type_desc = '【条件:亏'.$hz_Arr['area_loss_start'].'元起投】';
+                $type_desc .= (in_array($hz_Arr['betStatus'], [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT]))? ',当前'.($hz_Arr['current_area_profits']??0.00).'元' : '';
+            }else{
+                $type_desc = '【条件:'.$hz_Arr['area_all_qishus'].'漏'.$hz_Arr['area_yl_qishus'].'期';
+                $type_desc .= ($hz_Arr['areaBetStatus']==0)? ',当前'.($hz_Arr['area_arise_qishus']??0.00).'期' : '';
+            }
+
 
             $type_desc .= '|止盈:'.$hz_Arr['area_profits'].'止损:'.$hz_Arr['area_loss'];
 

@@ -326,19 +326,24 @@ class UserSysPlansService extends BaseService {
 
 
         # 17、区间遗漏投 start
-        if(!empty($UserSysPlans['area_all_qishus'])){
+        if(!empty($UserSysPlans['area_all_qishus'])){ // 1、统计期数
             $tmpFilter['area_all_qishus'] = $UserSysPlans['area_all_qishus'];
         }
         unset($post['UserSysPlans']['area_all_qishus']);
-        if(!empty($UserSysPlans['area_yl_qishus'])){
+        if(!empty($UserSysPlans['area_yl_qishus'])){ // 1、区间统计期数
             $tmpFilter['area_yl_qishus'] = $UserSysPlans['area_yl_qishus'];
         }
         unset($post['UserSysPlans']['area_yl_qishus']);
-        if(!empty($UserSysPlans['area_profits'])){
+        if(!empty($UserSysPlans['area_loss_start'])){ // 2、亏损x元起投
+            $tmpFilter['area_loss_start'] = $UserSysPlans['area_loss_start'];
+        }
+        unset($post['UserSysPlans']['area_loss_start']);
+
+        if(!empty($UserSysPlans['area_profits'])){ // a.区间止盈金额
             $tmpFilter['area_profits'] = $UserSysPlans['area_profits'];
         }
         unset($post['UserSysPlans']['area_profits']);
-        if(!empty($UserSysPlans['area_loss'])){
+        if(!empty($UserSysPlans['area_loss'])){ // a.区间止损金额
             $tmpFilter['area_loss'] = $UserSysPlans['area_loss'];
         }
         unset($post['UserSysPlans']['area_loss']);

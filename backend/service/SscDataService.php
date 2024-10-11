@@ -87,6 +87,7 @@ class SscDataService extends BaseService {
     const PLAN_TYPE_YL_BET_SINGLES_NUM = 18; # 遗漏x期投y期
     const PLAN_TYPE_YL_START_BET_SINGLES = 19; # 遗漏x期起投
     const PLAN_TYPE_ZZ_BET_SINGLES_2 = 20; # 中则倍投2
+    const PLAN_TYPE_LOSS_MONEY_BET_SINGLES = 21; # 区间亏损起投
     const PLAN_TYPE_OPTIONS = [
         # 计划类型:0正常1止盈止损计划
         self::PLAN_TYPE_NORMAL => '正常',
@@ -103,13 +104,14 @@ class SscDataService extends BaseService {
         //11=>'中则交叉正反',
         12=>'A出x次B出y次投B',
         13=>'A出x次B出y次投B_2',
-        //self::PLAN_TYPE_AREA_SINGLES_BET => '区间遗漏投',
+        self::PLAN_TYPE_AREA_SINGLES_BET => '区间遗漏投',
         self::PLAN_TYPE_SINGLES_BET_2 => '中则倍投',
         self::PLAN_TYPE_YL_BET_SINGLES_2 => '遗漏倍投2',
         self::PLAN_TYPE_YL_ZZ_SINGLES_BET => '遗漏中则倍投',
         self::PLAN_TYPE_YL_BET_SINGLES_NUM => '遗漏x期投y期',
         self::PLAN_TYPE_YL_START_BET_SINGLES => '遗漏x期起投',
         self::PLAN_TYPE_ZZ_BET_SINGLES_2 => '中则倍投2',
+        self::PLAN_TYPE_LOSS_MONEY_BET_SINGLES => '区间亏损起投',
     ];
 
     const PLAN_BET_STATUS_INIT = 0; # 初始状态
@@ -1986,7 +1988,7 @@ class SscDataService extends BaseService {
      * @desc 获取一个计划当前的利润
      * @param $UserSysPlan
      * @param array $andWhere
-     * @return bool|int|mixed|string|null
+     * @return bool|int|mixed|string|null  正负数
      */
     public static function getPlanProfits($UserSysPlan, $andWhere = []){
         $where = ['AND',
@@ -2331,6 +2333,7 @@ class SscDataService extends BaseService {
                     SscDataService::PLAN_TYPE_YL_BET_SINGLES_NUM,
                     SscDataService::PLAN_TYPE_YL_START_BET_SINGLES,
                     SscDataService::PLAN_TYPE_ZZ_BET_SINGLES_2,
+                    SscDataService::PLAN_TYPE_LOSS_MONEY_BET_SINGLES,
                 ]],
                 ['=', 'status', 1], ['=', 'lottery_type', $lottery_type]
             ];
@@ -2364,7 +2367,11 @@ class SscDataService extends BaseService {
                             break;
                         case self::PLAN_TYPE_ZZ_BET_SINGLES_2:
                             # 中则倍投2
-                            $logArr['plan_type_19'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans20($UserSysPlan, $current_kj_qihao);
+                            $logArr['plan_type_20'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans20($UserSysPlan, $current_kj_qihao);
+                            break;
+                        case self::PLAN_TYPE_LOSS_MONEY_BET_SINGLES:
+                            # 区间亏损起投
+                            $logArr['plan_type_21'][$UserSysPlan->id]['rst'] = OperatePlanService::operatePlans21($UserSysPlan, $current_kj_qihao);
                             break;
                     }
                 }catch (\Exception $e){
