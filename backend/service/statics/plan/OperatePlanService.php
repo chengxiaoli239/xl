@@ -978,7 +978,7 @@ class OperatePlanService extends BaseService
                 $hzArr['filters']['start_qihao'] = HN0898Service::getQihao($lottery_type); # 重新设置开始计算期号，避免大遗漏倍投问题
             }else{
                 //$areaMsg = '不符合止盈'.$areaProfitsEnd.'止损'.$areaLossEnd;
-                $areaMsg = '下注中，本回合盈利：'.$areaProfits;
+                $areaMsg = '下注中...';
             }
             if(!$isZjBefore){
                 //self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
