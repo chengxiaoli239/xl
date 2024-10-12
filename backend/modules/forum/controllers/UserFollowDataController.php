@@ -150,15 +150,6 @@ class UserFollowDataController extends BaseController
     }
 
     /**
-     *@desc 立即投注
-     */
-    public function actionTzNow($id){
-        $rst = HN0898Service::tzNow($this->_account, $id);
-
-        return $this->redirect(['index']);
-    }
-
-    /**
      * Finds the UserFollowData model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param string $id
