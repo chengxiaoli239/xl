@@ -671,8 +671,8 @@ class HN0898Service extends BaseTZService {
 
             $code_hz = json_decode($UserSysPlans->hz_Arr, true);
             $code_hz['singles_key'] = 0;# 切换开关翻倍回第一次
-            if($status && isset($code_hz['start_qihao'])){
-                $code_hz['start_qihao'] = HN0898Service::getQihao($UserSysPlans->lottery_type); # 重新设置开始计算期号，避免无时间间隔的连续止损，大遗漏倍投问题
+            if($status && isset($code_hz['filters']['start_qihao'])){
+                $code_hz['filters']['start_qihao'] = HN0898Service::getQihao($UserSysPlans->lottery_type); # 重新设置开始计算期号，避免无时间间隔的连续止损，大遗漏倍投问题
             }
 
             if(in_array($UserSysPlans->plan_type, [4, 5])){ # 切换
