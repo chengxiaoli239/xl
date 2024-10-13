@@ -973,7 +973,6 @@ class OperatePlanService extends BaseService
             }elseif($areaProfits>=$areaProfitsEnd){
                 $areaMsg = '符合止赢:赢'.$areaProfits.'>'.$areaProfitsEnd;
                 $betStatus = SscDataService::PLAN_BET_STATUS_WAIT;
-                $hzArr['area_arise_qishus'] = 0;
                 $hzArr['current_area_profits'] = 0.00;
                 $hzArr['filters']['start_qihao'] = HN0898Service::getQihao($lottery_type); # 重新设置开始计算期号，避免大遗漏倍投问题
             }else{
