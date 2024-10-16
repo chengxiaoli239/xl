@@ -1,6 +1,7 @@
 <?php
 namespace console\modules\test\controllers;
 
+use backend\models\BetErrorPlansTask;
 use backend\models\BettingRecords;
 use backend\models\DataDealStatus;
 use backend\models\open\PlatformGroup;
@@ -442,6 +443,11 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
+            $where = ['uid'=>25, 'plan_id'=>'10892', 'qihao'=>'20241016200', 'lottery_type'=>8];
+            $r = BetErrorPlansTask::find()->where($where)->orderBy(['status'=>SORT_ASC])
+                ->orderBy('id DESC')->addOrderBy(['id'=>SORT_DESC])->one()->toArray();
+            p($r);
+            $rst = SscDataService::getLastIndexId(8, 7); p($rst);
             $plan = UserSysPlans::findOne(10742);
             $r = OperatePlanService::operatePlans21($plan, $current_kj_qihao='20241011255'); p($r);
             $areaProfits = SscDataService::getPlanProfits($plan, ['>=', 'qihao', '20241011255'], 1); # 计划当前区间利润

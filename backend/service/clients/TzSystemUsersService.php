@@ -617,6 +617,7 @@ class TzSystemUsersService extends ClientsBaseService{
                 $data[] = [
                     'task_id' => $row->id,
                     'bet_url' => $bet_url,
+                    'bet_sort_key' => $row->bet_sort_key,
                     'plan_type' => self::PlAN_TYPE_RE_LOCAL,
                     'plan_id' => $plan_id,
                     'account' => $account,

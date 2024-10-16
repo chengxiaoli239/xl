@@ -1040,11 +1040,18 @@ class SscDataService extends BaseService {
      * @param int $lottery_type
      * @return mixed
      */
-    public static function getLastIndexId($lottery_type = DEFAULT_LOTTERY_TYPE, $use_cache=false){
+    public static function getLastIndexId($lottery_type = DEFAULT_LOTTERY_TYPE, $dateNum=0, $useCache=false){
         $m = \Yii::$app->cache;
-        $mkey = 'getLastIndexId_x_'.$lottery_type;
-        if(!$use_cache OR !$index_id = $m->get($mkey)){
-            $last = SscKjData::find()->where(['lottery_type'=>$lottery_type])->select(['index_id'])->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+        $mkey = 'getLastIndexId_x_'.$lottery_type.'_'.$dateNum;
+        if(!$useCache OR !$index_id = $m->get($mkey)){
+            $lastQuery = SscKjData::find()->where(['lottery_type'=>$lottery_type])
+                ->select(['index_id'])->orderBy(['id'=>SORT_DESC])->limit(1);
+            if($dateNum>0){
+                $date = date('Y-m-d', time()-$dateNum*86400);
+                $lastQuery->andWhere(['<=', 'date', $date]);
+            }
+            //p($lastQuery->createCommand()->getRawSql());
+            $last = $lastQuery->asArray()->one();
             $index_id = $last['index_id'];
             //$qihao = HN0898Service::getQihao($lottery_type);
             //$time = BetService::getBetCacheTime($lottery_type, $qihao);

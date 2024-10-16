@@ -2487,25 +2487,27 @@ class StaticService extends BaseService {
      * @param $codes
      * @param int $lottery_type
      * @param int $playway
-     * @param $tz_type 一字定倍数切换方案
+     * @param $tz_type - 一字定倍数切换方案
      * @return int|array
      */
     public static function getYlByCodes($codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $tz_type = 18){
-        $yl = 0;
         $tzTypes = TzTypes::findOne(['type'=>$tz_type]);
         $playway = $tzTypes->playway;
 
-        $codeDatas = str_replace('@', ',', str_replace(',', '', implode('@', $codes)));
+        $codeData = str_replace('@', ',', str_replace(',', '', implode('@', $codes)));
 
+        $lastIndexId = SscDataService::getLastIndexId($lottery_type);
+        $lastIndexId7 = SscDataService::getLastIndexId($lottery_type, 7);
+        $lastIndexId30 = SscDataService::getLastIndexId($lottery_type, 30);
         switch ($playway){
             case 1: # 二字定
                 break;
             case 2: # 三字定
                 break;
             case 3: # 四字定
-                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'code_4n_str', $codes]];
+                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'code_4n_str', $codes], ['>=', 'index_id', $lastIndexId30]];
                 $query = SscKjData::find()->select(['id', 'index_id', 'qihao', 'code_4n_str'])->where($where);
-                $SscKjDatas = $query->asArray()->orderBy('id DESC')->limit(20000)->all();
+                $SscKjData = $query->asArray()->orderBy('id DESC')->limit(20000)->all();
                 break;
             case 4: # 一字定
             case 10:
@@ -2525,64 +2527,104 @@ class StaticService extends BaseService {
                     }
                 }
                 $record = SscKjData::find()->select(['qihao','code_str'])->where($where)->andWhere(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
-                $last_Qihao = SscDataService::getKjDataLastQihao($lottery_type); # 表记录最后一条id
-                $yl = self::qihaoSpace($record['qihao'], $last_Qihao);
+                $last_QiHao = SscDataService::getKjDataLastQihao($lottery_type); # 表记录最后一条id
+                $yl = self::qihaoSpace($record['qihao'], $last_QiHao);
                 break;
         }
 
-        $last_index_id = SscDataService::getLastIndexId($lottery_type);
-        $tmpKjData = $SscKjDatas;
-        if(count($tmpKjData) > 2){
+        $maxWeekHit = 0; # 近一周最大连中
+        $maxWeekHitSet = [];
+        $maxWeekYl = 0; # 近一周最大遗漏
+        $maxWeekYlSet = [];
+        $maxMonthHit = 0; # 近一月最大连中
+        $maxMonthHitSet = [];
+        $maxMonthYl = 0; # 近一月最大遗漏
+        $maxMonthYlSet = [];
+        $maxHit = 0; # 最大连中
+        $maxHitSet = []; # 最大连中集合
+        if(count($SscKjData) > 2){
             $max_len = 0;
             $allKjData = [];
-            foreach($tmpKjData as $key=>$r){
+            foreach($SscKjData as $key=>$r){
+                //p([$r['index_id'], $lastIndexId, $lastIndexId7, $lastIndexId30], 0);
                 if($key == 0) continue;
-                $len = $tmpKjData[$key-1]['index_id'] - $tmpKjData[$key]['index_id'] - 1;
-                $range[$tmpKjData[$key-1]['index_id'].'_'.$tmpKjData[$key]['index_id']] = $len;
-                $allKjData[$tmpKjData[$key]['index_id']] = $r;
+                $len = $SscKjData[$key-1]['index_id'] - $r['index_id'] - 1;
+                $range[$SscKjData[$key-1]['index_id'].'_'. $r['index_id']] = $len;
+                if($len==0){
+                    # 中，统计连中:周、月
+                    $maxHit += 1;
+                    if($r['index_id']>=$lastIndexId7){
+                        $maxWeekHit += 1;
+                        $maxWeekYlSet[] = $maxWeekYl;
+                        $maxWeekYl = 0;
+                    }
+                    if($r['index_id']>=$lastIndexId30){
+                        $maxMonthHit += 1;
+                        $maxMonthYlSet[] = $maxMonthYl;
+                        $maxMonthYl = 0;
+                    }
+                }else{
+                    # 不中、统计连中:周、月
+                    if($r['index_id']>=$lastIndexId7){
+                        $maxWeekYl += 1;
+                        $maxWeekHitSet[] = $maxWeekHit;
+                        $maxWeekHit = 0;
+                    }
+                    if($r['index_id']>=$lastIndexId30){
+                        $maxMonthYl += 1;
+                        $maxMonthHitSet[] = $maxMonthHit;
+                        $maxMonthHit = 0;
+                    }
+                    $maxHitSet[] = $maxHit;
+                }
+                $range[$SscKjData[$key-1]['index_id'].'_'. $r['index_id']] = $len;
+                $allKjData[$r['index_id']] = $r;
                 if($len > $max_len){
                     $max_len =  $len;
-                    $tmpArrKey = [$tmpKjData[$key]['index_id'], $tmpKjData[$key-1]['index_id']];
+                    $tmpArrKey = [$r['index_id'], $SscKjData[$key-1]['index_id']];
                 }
             }
-            $tmpArr[0] = $allKjData[$tmpArrKey[0]]['qihao'];
-            $tmpArr[1] = $allKjData[$tmpArrKey[1]]['qihao'];
-
             $max_miss = max($range);
-            $max_range = $tmpArr[1].'-'.$tmpArr[0];  // 近200期内最大遗漏
             $yl_str = implode('-',$range);
             # 最大遗漏期间计算 end
             //p([$field=>$num,$min_id, $SscKjData[1]->id,$max_range]);
-        }else{
-            $max_range = $SscKjDatas[1]['qihao'] .'-'. $SscKjDatas[0]['qihao'];
         }
         $last_times = 0;
-        if(count($SscKjDatas)>1){
-            $last_times = $SscKjDatas[0]['index_id'] - $SscKjDatas[1]['index_id'] - 1;  // 上次遗漏次数
+        if(count($SscKjData)>1){
+            $last_times = $SscKjData[0]['index_id'] - $SscKjData[1]['index_id'] - 1;  // 上次遗漏次数
         }
-        $last_time_miss_range = $SscKjDatas[1]['qihao'] .'-'. $SscKjDatas[0]['qihao'];
-        $current_times = $last_index_id - $SscKjDatas[0]['index_id'];
+        $last_time_miss_range = $SscKjData[1]['qihao'] .'-'. $SscKjData[0]['qihao'];
+        $current_times = $lastIndexId - $SscKjData[0]['index_id'];
         if(empty($yl_str)) $yl_str = $last_times;
-        $rstData = [
+        $yl_str = str_replace('-'.max($maxWeekYlSet).'-', '-'.'<strong><font color="red">'.max($maxWeekYlSet).'</font></strong>-', $yl_str).'-';
+        //$yl_str = str_replace('-'.max($maxWeekHitSet).'-', '-'.'<strong><font color="green">'.max($maxWeekHitSet).'</font></strong>-', $yl_str);
+        $yl_str = str_replace('-'.max($maxMonthYlSet).'-', '-'.'<strong><font color="#a52a2a">'.max($maxMonthYlSet).'</font></strong>-', $yl_str);
+        //$yl_str = str_replace('-'.max($maxMonthHitSet).'-', '-'.'<strong><font color="#adff2f">'.max($maxMonthHitSet).'</font></strong>-', $yl_str);
+
+        //p(['maxMonthYlSet'=>$maxMonthYlSet, 'maxWeekYlSet'=>$maxWeekYlSet]);
+        return [
             'current_times' => $current_times,    // 当前遗漏次数
             'last_times' => $last_times,    // 上次遗漏次数
             'last_time_miss_range' => $last_time_miss_range,    // 上次遗漏范围
-            'max_miss' => $max_miss ? $max_miss : $last_times,   // 近200期内的最大遗漏
-            'max_range' => $max_range,   // 近200期内的最大遗漏范围
+            'week_max_miss' => max($maxWeekYlSet),   // 本周最大遗漏
+            'week_max_hit' => max($maxWeekHitSet),   // 本周最大连中
+            'month_max_miss' => max($maxMonthYlSet),   // 本月最大遗漏
+            'month_max_hit' => max($maxMonthHitSet),   // 近本周最大连中
+            'max_miss' => $max_miss ?: $last_times,   // 历史最大遗漏
+            'max_hit' => max($maxHitSet) ?: 1,   // 历史最大连中
+            //'max_range' => $max_range,   // 近200期内的最大遗漏范围
             'counts' => count($codes),   // 组数
-            'yl_str' => BaseStringHelper::truncate($yl_str,1000),
-            'codeDatas' => $codeDatas,
+            //'yl_str' => BaseStringHelper::truncate($yl_str,1000),
+            'yl_str' => $yl_str,
+            'codeData' => $codeData,
         ];
-
-        return $rstData;
     }
 
     /**
      * @desc 给定号码计算遗漏 未完待续 -- 2019.05.09
      * @param $codes
      * @param int $lottery_type
-     * @param int $playway
-     * @param $tz_type 一字定倍数切换方案
+     * @param int $tz_type - 一字定倍数切换方案
      * @return array
      */
    public static function getYlByCodes2($codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $tz_type = 18){
@@ -2590,25 +2632,27 @@ class StaticService extends BaseService {
        $tzTypes = TzTypes::findOne(['type'=>$tz_type]);
        $playway = $tzTypes->playway;
 
-       $codeDatas = str_replace('@', ',', str_replace(',', '', implode('@', $codes)));
+       $codeData = str_replace('@', ',', str_replace(',', '', implode('@', $codes)));
 
-       $last_index_id = SscDataService::getLastIndexId($lottery_type, false);
+       $lastIndexId = SscDataService::getLastIndexId($lottery_type);
+       $lastIndexId7 = SscDataService::getLastIndexId($lottery_type, 7);
+       $lastIndexId30 = SscDataService::getLastIndexId($lottery_type, 30);
        $static_nums = 300;
-       $min_index_id = $last_index_id-$static_nums;
+       $min_index_id = $lastIndexId-$static_nums;
        switch ($playway){
            case 1: # 二字定
                break;
            case 2: # 三字定
                break;
            case 3: # 四字定
-               $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>=', 'index_id', $min_index_id] ];
+               $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>=', 'index_id', $lastIndexId30] ];
                $query = SscKjData::find()->select(['qihao','index_id', 'is_zj'=>'SUM(1-0)'])->where($where);
                $query1 = $query->andWhere(['IN', 'code_4n_str', $codes]);
                #$sql = $query1->createCommand()->getRawSql();p($sql);
                $zjSscKjDatas = $query1->orderBy('id DESC')->indexBy(['index_id'])->groupBy(['index_id'])->asArray()->all(); # 中奖记录
                #Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '遗漏统计', ['sql'=>$sql]);
                $query = SscKjData::find()->select(['qihao','index_id', 'is_zj'=>'SUM(0)'])->where($where);
-               $allSscKjDatas = $query->orderBy('id DESC')->indexBy(['index_id'])->groupBy(['index_id'])->asArray()->all(); # 所有记录
+               $allSscKjData = $query->orderBy('id DESC')->indexBy(['index_id'])->groupBy(['index_id'])->asArray()->all(); # 所有记录
                break;
            case 4: # 一字定
            case 10:
@@ -2634,11 +2678,22 @@ class StaticService extends BaseService {
                break;
        }
 
-       if(count($allSscKjDatas) > 2){
+       $maxWeekHit = 1; # 近一周最大连中
+       $maxWeekHitSet = [];
+       $maxWeekYl = 1; # 近一周最大遗漏
+       $maxWeekYlSet = [];
+       $maxMonthHit = 1; # 近一月最大连中
+       $maxMonthHitSet = [];
+       $maxMonthYl = 1; # 近一月最大遗漏
+       $maxMonthYlSet = [];
+       $maxHit = 1; # 最大连中
+       $maxYl = 1; # 最大遗漏
+       //p(['$allSscKjData'=>$allSscKjData]);
+       if(count($allSscKjData) > 2){
            $yl_Arr = []; # 遗漏数据
            $max_miss_Arr = [];
            $max_miss = 0; # 最大遗漏统计
-           foreach($allSscKjDatas as $index_id=>$SscKjData){
+           foreach($allSscKjData as $index_id=>$SscKjData){
                if(isset($zjSscKjDatas[$index_id])){
                    $max_miss_Arr[] = $max_miss_Arr;
                    $max_miss = 0;
@@ -2647,26 +2702,63 @@ class StaticService extends BaseService {
                    $max_miss +=1;
                    $yl_Arr[] = 0;
                }
+               //p($zjSscKjDatas[$index_id]??[], 0);
+               if(isset($zjSscKjDatas[$index_id])){
+                   # 中，统计连中:周、月
+                   $maxHit += 1;
+                   $maxYl = 0;
+                   //var_dump($lastIndexId.'='.$lastIndexId7.'='.$lastIndexId30);
+                   if($index_id>=$lastIndexId7){
+                       $maxWeekHit += 1;
+                       $maxWeekYlSet[] = $maxWeekYl;
+                       $maxWeekYl = 0;
+                   }
+                   if($index_id>=$lastIndexId30){
+                       $maxMonthHit += 1;
+                       $maxMonthYlSet[] = $maxMonthYl;
+                       $maxMonthYl = 0;
+                   }
+               }else{
+                   $maxYl += 1;
+                   $maxHit = 0;
+                   # 不中、统计连中:周、月
+                   if($index_id>=$lastIndexId7){
+                       $maxWeekYl += 1;
+                       $maxWeekHitSet[] = $maxWeekHit;
+                       $maxWeekHit = 0;
+                   }
+                   if($index_id>=$lastIndexId30){
+                       $maxMonthYl += 1;
+                       $maxMonthHitSet[] = $maxMonthHit;
+                       $maxMonthHit = 0;
+                   }
+               }
            }
            $current_times = $yl_Arr[0];
            $yl_str = implode('-', $yl_Arr);
        }
+       $last_times = $yl_Arr[1]??1;  // 上次遗漏次数
+       //p([$maxWeekYlSet, $maxWeekHitSet, $maxMonthYlSet, $maxMonthHitSet]);
+       //$yl_str = ltrim(BaseStringHelper::truncate($yl_str,1000), '-');
 
-       $last_times = $yl_Arr[1];  // 上次遗漏次数
+       $yl_str = str_replace(max($maxWeekYlSet), '<strong><font color="red">'.max($maxWeekYlSet).'</font></strong>', $yl_str);
+       //$yl_str = str_replace(max($maxWeekHitSet), '<strong><font color="green">'.max($maxWeekHitSet).'</font></strong>', $yl_str);
+       $yl_str = str_replace(max($maxMonthYlSet), '<strong><font color="#a52a2a">'.max($maxMonthYlSet).'</font></strong>', $yl_str);
+       //$yl_str = str_replace(max($maxMonthHitSet), '<strong><font color="#adff2f">'.max($maxMonthHitSet).'</font></strong>', $yl_str);
 
-
-       $rstData = [
-           'current_times' => $current_times,    // 当前遗漏次数
+       return [
+           'current_times' => $current_times??0,    // 当前遗漏次数
            'last_times' => $last_times,    // 上次遗漏次数
-           'last_time_miss_range' => $last_time_miss_range,    // 上次遗漏范围
-           'max_miss' => count(explode('-', $max_miss ? $max_miss : $last_times)),   // 近200期内的最大遗漏
-           'max_range' => $max_range,   // 近200期内的最大遗漏范围
+           'week_max_miss' => max($maxWeekYlSet),   // 本周最大遗漏
+           'week_max_hit' => max($maxWeekHitSet),   // 本周最大连中
+           'month_max_miss' => max($maxMonthYlSet),   // 本月最大遗漏
+           'month_max_hit' => max($maxMonthHitSet),   // 近本周最大连中
+           'max_miss' => $maxYl, // 最大遗漏
+           'max_hit' => $maxHit, // 最大连中
            'counts' => count($codes),   // 组数
-           'yl_str' => ltrim(BaseStringHelper::truncate($yl_str,1000), '-'),
-           'codeDatas' => $codeDatas,
+           'yl_str' => $yl_str,
+           'codeData' => $codeData,
        ];
-
-       return $rstData;
    }
 
     /**

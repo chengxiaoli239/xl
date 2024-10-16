@@ -632,7 +632,7 @@ abstract class BetService extends BaseBetService {
             $class = self::getBetModel($lottery_type);
             if($lottery_type == \common\helpers\LotteryType::LUCKY_5){
                 $where = ['uid'=>$TzSystemsUsers->uid, 'plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
-                $model = $class::findOne($where);
+                $model = $class::find()->where($where)->orderBy(['id'=>SORT_DESC])->orderBy('status asc')->addOrderBy(['id'=>SORT_DESC])->one();
                 if(empty($model)){
                     throw_info('任务记录找不到');
                 }

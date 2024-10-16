@@ -1,21 +1,6 @@
-CREATE TABLE `lt_static_position_type_arise_perdate` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `date` varchar(10) DEFAULT NULL COMMENT '日期',
-  `type` int(10) NOT NULL DEFAULT '1' COMMENT '类型',
-  `p1_1` int(10) NOT NULL DEFAULT '0' COMMENT 'p1_1数量',
-  `p1_2` int(10) NOT NULL DEFAULT '0' COMMENT 'p1_2数量',
-  `p2_1` int(10) NOT NULL DEFAULT '0' COMMENT 'p2_1数量',
-  `p2_2` int(10) NOT NULL DEFAULT '0' COMMENT 'p2_2数量',
-  `p3_1` int(10) NOT NULL DEFAULT '0' COMMENT 'p3_1数量',
-  `p3_2` int(10) NOT NULL DEFAULT '0' COMMENT 'p3_2数量',
-  `p4_1` int(10) NOT NULL DEFAULT '0' COMMENT 'p4_1数量',
-  `p4_2` int(10) NOT NULL DEFAULT '0' COMMENT 'p4_2数量',
-  `p5_1` int(10) NOT NULL DEFAULT '0' COMMENT 'p5_1数量',
-  `p5_2` int(10) NOT NULL DEFAULT '0' COMMENT 'p5_2数量',
-  `lottery_type` int(11) DEFAULT '5' COMMENT '彩种类型',
-  `created_at` int(11) DEFAULT NULL COMMENT '创建时间',
-  `updated_at` int(11) NOT NULL COMMENT '更新时间',
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `date_type` (`date`,`type`,`lottery_type`) USING BTREE
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='每个位置类型数量统计(天)';
+6935035006029665898
+6917554871813962757
+6917559573464383264
+6934998813537277740
+6934973810536224661
+6934885107835016382

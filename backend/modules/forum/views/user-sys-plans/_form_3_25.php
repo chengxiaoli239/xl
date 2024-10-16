@@ -10,8 +10,27 @@ use yii\widgets\ActiveForm;
 ?>
 <style>
     .form-control{
-        padding: 0px 1px;
+        padding: 0 1px;
     }
+    /* 添加样式以启用滚动条 */
+    #tip_msg_rst {
+        max-height: 600px;  /* 根据需要设置最大高度 */
+        overflow-y: auto;   /* 在内容过多时显示垂直滚动条 */
+    }
+    @media (max-width: 768px) { /* 针对手机 */
+        #rstTipModal .modal-dialog {
+            max-width: 95%; /* 手机宽度为屏幕的 85% */
+            width: 95%; /* 设置宽度 */
+        }
+    }
+
+    @media (min-width: 769px) { /* 针对电脑 */
+        #rstTipModal .modal-dialog {
+            max-width: 60%; /* 电脑宽度为屏幕的 60% */
+            width: 60%; /* 设置宽度 */
+        }
+    }
+
 </style>
 
 <div class="user-sys-plans-form row">
@@ -576,10 +595,17 @@ $(function () {
         url = '/forum/ssc-static-yl/query'
         data = $('#w0').serialize()+'&type='+$(this).data('type');
         $.post(url, data, function(rst) {
-            $('#tip_msg_rst').html('<strong>号码：</strong>'+rst.code_desc + "<br>" +'<strong>组数：</strong>'+ rst.counts + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录：</strong>"  +rst.yl_str)
+            $('#tip_msg_rst').html(
+                '<strong>号码：</strong>' + rst.code_desc + "<br>"
+                + '<strong>组数：</strong>' + rst.counts + "<br>"
+                + '<strong>当前：</strong>' + rst.current_times + "<br>"
+                + '<strong>本周：最大遗漏: </strong>'+ rst.week_max_miss + '次&nbsp;&nbsp;&nbsp;<strong>最大连中: </strong>'+ rst.week_max_hit + "次<br>"
+                + '<strong>本月：最大遗漏: </strong>'+ rst.month_max_miss + '次&nbsp;&nbsp;&nbsp;<strong>最大连中: </strong>'+ rst.month_max_hit + "次<br>"
+                + "<strong>遗漏记录：</strong>"  +rst.yl_str
+            )
             $('#rstTipModal').modal('show');
             $('#codes_nums').html(rst.counts)
-            $('#usersysplans-codes').html(rst.codeDatas);
+            $('#usersysplans-codes').html(rst.codeData);
         });
     });
 

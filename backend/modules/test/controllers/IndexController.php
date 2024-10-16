@@ -1125,8 +1125,6 @@ class IndexController extends Controller
         p($rst);
         $miss = SscDataService::getCodeTypeYlHistoryMiss('555', $lottery_type = 5, 20000);
         p($miss);
-        $rst = SscDataService::getLastIndexId(6);
-        p($rst);
         $rst = StaticService::static2NumsYl($lottery_type = 8);
         p($rst);
 
