@@ -2543,7 +2543,6 @@ class StaticService extends BaseService {
         $maxHit = 0; # 最大连中
         $maxHitSet = []; # 最大连中集合
         if(count($SscKjData) > 2){
-            $max_len = 0;
             $allKjData = [];
             foreach($SscKjData as $key=>$r){
                 //p([$r['index_id'], $lastIndexId, $lastIndexId7, $lastIndexId30], 0);
@@ -2555,37 +2554,30 @@ class StaticService extends BaseService {
                     $maxHit += 1;
                     if($r['index_id']>=$lastIndexId7){
                         $maxWeekHit += 1;
-                        $maxWeekYlSet[] = $maxWeekYl;
-                        $maxWeekYl = 0;
                     }
                     if($r['index_id']>=$lastIndexId30){
                         $maxMonthHit += 1;
-                        $maxMonthYlSet[] = $maxMonthYl;
-                        $maxMonthYl = 0;
                     }
                 }else{
                     # 不中、统计连中:周、月
                     if($r['index_id']>=$lastIndexId7){
-                        $maxWeekYl += 1;
+                        $maxWeekYlSet[] = $len;
                         $maxWeekHitSet[] = $maxWeekHit;
                         $maxWeekHit = 0;
                     }
                     if($r['index_id']>=$lastIndexId30){
-                        $maxMonthYl += 1;
+                        $maxMonthYlSet[] = $len;
                         $maxMonthHitSet[] = $maxMonthHit;
                         $maxMonthHit = 0;
                     }
                     $maxHitSet[] = $maxHit;
                 }
-                $range[$SscKjData[$key-1]['index_id'].'_'. $r['index_id']] = $len;
+                //$range[$SscKjData[$key-1]['index_id'].'_'. $r['index_id']] = $len;
                 $allKjData[$r['index_id']] = $r;
-                if($len > $max_len){
-                    $max_len =  $len;
-                    $tmpArrKey = [$r['index_id'], $SscKjData[$key-1]['index_id']];
-                }
             }
+            //p(['range'=>$range]);
             $max_miss = max($range);
-            $yl_str = implode('-',$range);
+            $yl_str = implode('-', array_values($range));
             # 最大遗漏期间计算 end
             //p([$field=>$num,$min_id, $SscKjData[1]->id,$max_range]);
         }
@@ -2596,10 +2588,19 @@ class StaticService extends BaseService {
         $last_time_miss_range = $SscKjData[1]['qihao'] .'-'. $SscKjData[0]['qihao'];
         $current_times = $lastIndexId - $SscKjData[0]['index_id'];
         if(empty($yl_str)) $yl_str = $last_times;
-        $yl_str = str_replace('-'.max($maxWeekYlSet).'-', '-'.'<strong><font color="red">'.max($maxWeekYlSet).'</font></strong>-', $yl_str).'-';
-        //$yl_str = str_replace('-'.max($maxWeekHitSet).'-', '-'.'<strong><font color="green">'.max($maxWeekHitSet).'</font></strong>-', $yl_str);
-        $yl_str = str_replace('-'.max($maxMonthYlSet).'-', '-'.'<strong><font color="#a52a2a">'.max($maxMonthYlSet).'</font></strong>-', $yl_str);
-        //$yl_str = str_replace('-'.max($maxMonthHitSet).'-', '-'.'<strong><font color="#adff2f">'.max($maxMonthHitSet).'</font></strong>-', $yl_str);
+        //p([max($maxWeekYlSet), max($maxMonthYlSet), 'maxWeekYlSet'=>$maxWeekYlSet, 'maxMonthYlSet'=>$maxMonthYlSet, 'yl_str'=>$yl_str]);
+        $yl_str = str_replace('-'.max($maxWeekYlSet).'-', '-<strong><font color="red">'.max($maxWeekYlSet).'</font></strong>-', $yl_str).'-';
+        $yl_str = str_replace('-'.max($maxMonthYlSet).'-', '-'.'<strong><font color="green">'.max($maxMonthYlSet).'</font></strong>-', $yl_str);
+
+        # 月最大连中
+        $maxMonthHit = max($maxMonthHitSet); # 月最大连中
+        $maxMonthHitArr = array_fill(0, $maxMonthHit, 0);
+        $yl_str = str_replace('-'.implode('-', $maxMonthHitArr).'-', '-'.'<strong><font color="#adff2f">'.implode('-', $maxMonthHitArr).'</font></strong>-', $yl_str);
+
+        # 周最大连中
+        $maxWeekHit = max($maxWeekHitSet); # 周最大连中
+        $maxWeekHitArr = array_fill(0, $maxWeekHit, 0);
+        $yl_str = str_replace('-'.implode('-', $maxWeekHitArr).'-', '-<strong><font color="#8b008b">'.implode('-', $maxWeekHitArr).'</font></strong>-', $yl_str);
 
         //p(['maxMonthYlSet'=>$maxMonthYlSet, 'maxWeekYlSet'=>$maxWeekYlSet]);
         return [
@@ -2607,9 +2608,9 @@ class StaticService extends BaseService {
             'last_times' => $last_times,    // 上次遗漏次数
             'last_time_miss_range' => $last_time_miss_range,    // 上次遗漏范围
             'week_max_miss' => max($maxWeekYlSet),   // 本周最大遗漏
-            'week_max_hit' => max($maxWeekHitSet),   // 本周最大连中
+            'week_max_hit' => $maxWeekHit,   // 本周最大连中
             'month_max_miss' => max($maxMonthYlSet),   // 本月最大遗漏
-            'month_max_hit' => max($maxMonthHitSet),   // 近本周最大连中
+            'month_max_hit' => $maxMonthHit,   // 近本周最大连中
             'max_miss' => $max_miss ?: $last_times,   // 历史最大遗漏
             'max_hit' => max($maxHitSet) ?: 1,   // 历史最大连中
             //'max_range' => $max_range,   // 近200期内的最大遗漏范围
@@ -2702,49 +2703,46 @@ class StaticService extends BaseService {
                    $max_miss +=1;
                    $yl_Arr[] = 0;
                }
-               //p($zjSscKjDatas[$index_id]??[], 0);
-               if(isset($zjSscKjDatas[$index_id])){
+               $len = $SscKjData[$key-1]['index_id'] - $index_id - 1;
+               $range[$SscKjData[$key-1]['index_id'].'_'. $index_id] = $len;
+               if($len==0){
                    # 中，统计连中:周、月
                    $maxHit += 1;
-                   $maxYl = 0;
-                   //var_dump($lastIndexId.'='.$lastIndexId7.'='.$lastIndexId30);
                    if($index_id>=$lastIndexId7){
                        $maxWeekHit += 1;
-                       $maxWeekYlSet[] = $maxWeekYl;
-                       $maxWeekYl = 0;
                    }
                    if($index_id>=$lastIndexId30){
                        $maxMonthHit += 1;
-                       $maxMonthYlSet[] = $maxMonthYl;
-                       $maxMonthYl = 0;
                    }
                }else{
-                   $maxYl += 1;
-                   $maxHit = 0;
                    # 不中、统计连中:周、月
                    if($index_id>=$lastIndexId7){
-                       $maxWeekYl += 1;
+                       $maxWeekYlSet[] = $len;
                        $maxWeekHitSet[] = $maxWeekHit;
                        $maxWeekHit = 0;
                    }
                    if($index_id>=$lastIndexId30){
-                       $maxMonthYl += 1;
+                       $maxMonthYlSet[] = $len;
                        $maxMonthHitSet[] = $maxMonthHit;
                        $maxMonthHit = 0;
                    }
+                   $maxHitSet[] = $maxHit;
                }
            }
            $current_times = $yl_Arr[0];
            $yl_str = implode('-', $yl_Arr);
        }
        $last_times = $yl_Arr[1]??1;  // 上次遗漏次数
-       //p([$maxWeekYlSet, $maxWeekHitSet, $maxMonthYlSet, $maxMonthHitSet]);
-       //$yl_str = ltrim(BaseStringHelper::truncate($yl_str,1000), '-');
+       # 月最大连中
+       $maxMonthHit = max($maxMonthHitSet); # 月最大连中
+       $maxMonthHitArr = array_fill(1, $maxMonthHit, 1);
+       $yl_str = str_replace('-'.implode('-', $maxMonthHitArr).'-', '-'.'<strong><font color="#adff2f">'.implode('-', $maxMonthHitArr).'</font></strong>-', $yl_str);
 
-       $yl_str = str_replace(max($maxWeekYlSet), '<strong><font color="red">'.max($maxWeekYlSet).'</font></strong>', $yl_str);
-       //$yl_str = str_replace(max($maxWeekHitSet), '<strong><font color="green">'.max($maxWeekHitSet).'</font></strong>', $yl_str);
-       $yl_str = str_replace(max($maxMonthYlSet), '<strong><font color="#a52a2a">'.max($maxMonthYlSet).'</font></strong>', $yl_str);
-       //$yl_str = str_replace(max($maxMonthHitSet), '<strong><font color="#adff2f">'.max($maxMonthHitSet).'</font></strong>', $yl_str);
+       # 周最大连中
+       $maxWeekHit = max($maxWeekHitSet); # 周最大连中
+       $maxWeekHitArr = array_fill(1, $maxWeekHit, 1);
+       $yl_str = str_replace('-'.implode('-', $maxWeekHitArr).'-', '-<strong><font color="#8b008b">'.implode('-', $maxWeekHitArr).'</font></strong>-', $yl_str);
+
 
        return [
            'current_times' => $current_times??0,    // 当前遗漏次数
