@@ -36,7 +36,7 @@ $this->title = '站点添加:'.$model->name;
 
             <div class="row">
                 <div class="col-lg-12">
-                    <?= $form->field($model, 'ssc_domain')->textInput(['maxlength' => true])->label('网盘地址(格式：http://f9.ww666733.xyz:5678，或http://f9.ww666733.xyz)') ?>
+                    <?= $form->field($model, 'ssc_domain')->textInput(['maxlength' => true])->label('网盘地址(格式：http://f1.ww666733.xyz，或http://f9.ww66733.xyz:)') ?>
                 </div>
             </div>
 

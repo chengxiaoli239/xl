@@ -699,7 +699,7 @@ class OperatePlanService extends BaseService
                 # 不中奖
                 $current_miss += 1;
                 if($current_miss>=$betWhileMiss){
-                    $singles_key =0;
+                    $singles_key = 0;
                     $betStatus = SscDataService::PLAN_BET_STATUS_BETTING; // 进入下注状态
                     $has_bet_nums = 1;
                 }
@@ -728,7 +728,8 @@ class OperatePlanService extends BaseService
             $singles_key = 0;
         }
 
-        $single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+        //$single = self::getPlanNextSingle($UserSysPlan->id, $hzArr['singles_key'], $next_single_key, $lottery_type);
+        $single = $singles[$singles_key];
         $hzArr = array_merge($hzArr, [
             'current_miss' => $current_miss,
             'singles_key' => $singles_key,
