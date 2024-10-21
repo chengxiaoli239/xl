@@ -2588,18 +2588,21 @@ class StaticService extends BaseService {
         $last_time_miss_range = $SscKjData[1]['qihao'] .'-'. $SscKjData[0]['qihao'];
         $current_times = $lastIndexId - $SscKjData[0]['index_id'];
         if(empty($yl_str)) $yl_str = $last_times;
-        //p([max($maxWeekYlSet), max($maxMonthYlSet), 'maxWeekYlSet'=>$maxWeekYlSet, 'maxMonthYlSet'=>$maxMonthYlSet, 'yl_str'=>$yl_str]);
+        if(empty($maxWeekYlSet)){
+            $maxWeekYlSet = $maxMonthYlSet;
+        }
+        //p([/*max($maxWeekYlSet), max($maxMonthYlSet), */'maxWeekYlSet'=>$maxWeekYlSet, 'maxMonthYlSet'=>$maxMonthYlSet, 'yl_str'=>$yl_str]);
         $yl_str = str_replace('-'.max($maxWeekYlSet).'-', '-<strong><font color="red">'.max($maxWeekYlSet).'</font></strong>-', $yl_str).'-';
         $yl_str = str_replace('-'.max($maxMonthYlSet).'-', '-'.'<strong><font color="green">'.max($maxMonthYlSet).'</font></strong>-', $yl_str);
 
         # 月最大连中
-        $maxMonthHit = max($maxMonthHitSet); # 月最大连中
+        $maxMonthHit = $maxMonthHitSet ? max($maxMonthHitSet) : []; # 月最大连中
         $maxMonthHitArr = array_fill(0, $maxMonthHit, 0);
         $yl_str = str_replace('-'.implode('-', $maxMonthHitArr).'-', '-'.'<strong><font color="#adff2f">'.implode('-', $maxMonthHitArr).'</font></strong>-', $yl_str);
 
         # 周最大连中
-        $maxWeekHit = max($maxWeekHitSet); # 周最大连中
-        $maxWeekHitArr = array_fill(0, $maxWeekHit, 0);
+        $maxWeekHit = $maxWeekHitSet ? max($maxWeekHitSet) : []; # 周最大连中
+        $maxWeekHitArr = $maxWeekHit ? array_fill(0, $maxWeekHit, 0) : [];
         $yl_str = str_replace('-'.implode('-', $maxWeekHitArr).'-', '-<strong><font color="#8b008b">'.implode('-', $maxWeekHitArr).'</font></strong>-', $yl_str);
 
         //p(['maxMonthYlSet'=>$maxMonthYlSet, 'maxWeekYlSet'=>$maxWeekYlSet]);
@@ -2616,7 +2619,7 @@ class StaticService extends BaseService {
             //'max_range' => $max_range,   // 近200期内的最大遗漏范围
             'counts' => count($codes),   // 组数
             //'yl_str' => BaseStringHelper::truncate($yl_str,1000),
-            'yl_str' => $yl_str,
+            'yl_str' => trim($yl_str, '-'),
             'codeData' => $codeData,
         ];
     }
