@@ -39,6 +39,7 @@ use backend\models\ThreeNum;
 use backend\models\TzSystemsAuth;
 use backend\models\TzTypes;
 use backend\models\UserSysPlans;
+use backend\service\numbers\DynamicFilterService;
 use backend\service\statics\statics_base\DealDataService;
 use backend\service\statics\statics_qx\StaticsQxMissService;
 use backend\tools\Util;
@@ -2589,14 +2590,18 @@ class StaticService extends BaseService {
         $current_times = $lastIndexId - $SscKjData[0]['index_id'];
         if(empty($yl_str)) $yl_str = $last_times;
         if(empty($maxWeekYlSet)){
-            $maxWeekYlSet = $maxMonthYlSet;
+            $maxWeekYlSet = $maxMonthYlSet ? : [1];
         }
         //p([/*max($maxWeekYlSet), max($maxMonthYlSet), */'maxWeekYlSet'=>$maxWeekYlSet, 'maxMonthYlSet'=>$maxMonthYlSet, 'yl_str'=>$yl_str]);
-        $yl_str = str_replace('-'.max($maxWeekYlSet).'-', '-<strong><font color="red">'.max($maxWeekYlSet).'</font></strong>-', $yl_str).'-';
-        $yl_str = str_replace('-'.max($maxMonthYlSet).'-', '-'.'<strong><font color="green">'.max($maxMonthYlSet).'</font></strong>-', $yl_str);
+        if(!empty($maxWeekYlSet)){
+            $yl_str = str_replace('-'.max($maxWeekYlSet).'-', '-<strong><font color="red">'.max($maxWeekYlSet).'</font></strong>-', $yl_str).'-';
+        }
+        if(!empty($maxMonthYlSet)){
+            $yl_str = str_replace('-'.max($maxMonthYlSet).'-', '-'.'<strong><font color="green">'.max($maxMonthYlSet).'</font></strong>-', $yl_str);
+        }
 
         # 月最大连中
-        $maxMonthHit = $maxMonthHitSet ? max($maxMonthHitSet) : []; # 月最大连中
+        $maxMonthHit = $maxMonthHitSet ? max($maxMonthHitSet) : 1; # 月最大连中
         $maxMonthHitArr = array_fill(0, $maxMonthHit, 0);
         $yl_str = str_replace('-'.implode('-', $maxMonthHitArr).'-', '-'.'<strong><font color="#adff2f">'.implode('-', $maxMonthHitArr).'</font></strong>-', $yl_str);
 
@@ -2612,10 +2617,10 @@ class StaticService extends BaseService {
             'last_time_miss_range' => $last_time_miss_range,    // 上次遗漏范围
             'week_max_miss' => max($maxWeekYlSet),   // 本周最大遗漏
             'week_max_hit' => $maxWeekHit,   // 本周最大连中
-            'month_max_miss' => max($maxMonthYlSet),   // 本月最大遗漏
+            'month_max_miss' => max($maxMonthYlSet?:[1]),   // 本月最大遗漏
             'month_max_hit' => $maxMonthHit,   // 近本周最大连中
             'max_miss' => $max_miss ?: $last_times,   // 历史最大遗漏
-            'max_hit' => max($maxHitSet) ?: 1,   // 历史最大连中
+            'max_hit' => max($maxHitSet?:[1]) ?: 1,   // 历史最大连中
             //'max_range' => $max_range,   // 近200期内的最大遗漏范围
             'counts' => count($codes),   // 组数
             //'yl_str' => BaseStringHelper::truncate($yl_str,1000),
@@ -3204,6 +3209,25 @@ $sql .= '
         $codes_hz = json_decode($model->hz_Arr, true);
         $baseOnCodes = array_merge($in_codes, $base_codes);
         $codes = NumService::getCodesKuaiXuan($codes_hz, $code_type, $baseOnCodes);
+
+        /*
+        ####################### 调整 开始 ########################
+        # 动态过滤1 -- 遗漏查询调整
+        if(isset($codes_hz['is_filter_dynamic']) && $codes_hz['is_filter_dynamic']==1 && count($codes_hz['filter_dynamic_types'])>0){
+            $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($model);
+            if(!empty($filter_dynamic_codes)){
+                $codesArr = array_intersect($codes, $filter_dynamic_codes); # 返回$codesArr和$filter_dynamic_codes交集
+            }
+        }
+        # 动态过滤2 -- 遗漏查询调整
+        if(isset($codes_hz['filter_dynamic_types2'])){
+            $filter_dynamic_codes2 = DynamicFilterService::getFilterDynamic2($model);
+            if(!empty($filter_dynamic_codes2)){
+                $codesArr = array_intersect($codesArr, $filter_dynamic_codes2); # 返回$codesArr和$filter_dynamic_codes交集
+            }
+        }
+        ####################### 调整 开始 ########################
+        */
 
         if($type == 1) {
             # 1 遗漏
