@@ -2688,77 +2688,75 @@ class StaticService extends BaseService {
        }
 
        $maxWeekHit = 1; # 近一周最大连中
-       $maxWeekHitSet = [];
        $maxWeekYl = 1; # 近一周最大遗漏
-       $maxWeekYlSet = [];
        $maxMonthHit = 1; # 近一月最大连中
-       $maxMonthHitSet = [];
        $maxMonthYl = 1; # 近一月最大遗漏
-       $maxMonthYlSet = [];
        $maxHit = 1; # 最大连中
        $maxYl = 1; # 最大遗漏
-       //p(['$allSscKjData'=>$allSscKjData]);
        if(count($allSscKjData) > 2){
            $yl_Arr = []; # 遗漏数据
-           $max_miss_Arr = [];
-           $max_miss = 0; # 最大遗漏统计
+           $tmpMaxWeekYl = 0; # 周最大遗漏
+           $tmpMaxWeekHit = 0; # 周最大连中
+           $tmpMaxMonthYl = 0; # 月最大遗漏
+           $tmpMaxMonthHit = 0; # 月最大连中
            foreach($allSscKjData as $index_id=>$SscKjData){
                if(isset($zjSscKjDatas[$index_id])){
-                   $max_miss_Arr[] = $max_miss_Arr;
-                   $max_miss = 0;
                    $yl_Arr[] = 1;
-               }else{
-                   $max_miss +=1;
-                   $yl_Arr[] = 0;
-               }
-               $len = $SscKjData[$key-1]['index_id'] - $index_id - 1;
-               $range[$SscKjData[$key-1]['index_id'].'_'. $index_id] = $len;
-               if($len==0){
                    # 中，统计连中:周、月
                    $maxHit += 1;
                    if($index_id>=$lastIndexId7){
-                       $maxWeekHit += 1;
+                       $tmpMaxWeekHit += 1;
+                       $maxWeekHit = max([$maxWeekHit, $tmpMaxWeekHit]);
+                       $tmpMaxWeekYl = 0;
                    }
                    if($index_id>=$lastIndexId30){
-                       $maxMonthHit += 1;
+                       $tmpMaxMonthHit += 1;
+                       $maxMonthHit = max([$maxMonthHit, $tmpMaxMonthHit]);
+                       $tmpMaxMonthYl = 0;
                    }
                }else{
+                   $yl_Arr[] = 0;
                    # 不中、统计连中:周、月
                    if($index_id>=$lastIndexId7){
-                       $maxWeekYlSet[] = $len;
-                       $maxWeekHitSet[] = $maxWeekHit;
-                       $maxWeekHit = 0;
+                       $tmpMaxWeekYl += 1;
+                       $maxWeekYl = max([$maxWeekYl, $tmpMaxWeekYl]);
+                       $tmpMaxWeekHit = 0;
                    }
                    if($index_id>=$lastIndexId30){
-                       $maxMonthYlSet[] = $len;
-                       $maxMonthHitSet[] = $maxMonthHit;
-                       $maxMonthHit = 0;
+                       $tmpMaxMonthYl += 1;
+                       $maxMonthYl = max([$maxMonthYl, $tmpMaxMonthYl]);
+                       $tmpMaxMonthHit = 0;
                    }
-                   $maxHitSet[] = $maxHit;
                }
+               $len = $SscKjData[$key-1]['index_id'] - $index_id - 1;
+               $range[$SscKjData[$key-1]['index_id'].'_'. $index_id] = $len;
            }
            $current_times = $yl_Arr[0];
            $yl_str = implode('-', $yl_Arr);
        }
        $last_times = $yl_Arr[1]??1;  // 上次遗漏次数
        # 月最大连中
-       $maxMonthHit = max($maxMonthHitSet); # 月最大连中
        $maxMonthHitArr = array_fill(1, $maxMonthHit, 1);
-       $yl_str = str_replace('-'.implode('-', $maxMonthHitArr).'-', '-'.'<strong><font color="#adff2f">'.implode('-', $maxMonthHitArr).'</font></strong>-', $yl_str);
-
+       $yl_str = str_replace('-'.implode('-', $maxMonthHitArr).'-', '-'.'<strong><font color="#189365">'.implode('-', $maxMonthHitArr).'</font></strong>-', $yl_str);
        # 周最大连中
-       $maxWeekHit = max($maxWeekHitSet); # 周最大连中
        $maxWeekHitArr = array_fill(1, $maxWeekHit, 1);
-       $yl_str = str_replace('-'.implode('-', $maxWeekHitArr).'-', '-<strong><font color="#8b008b">'.implode('-', $maxWeekHitArr).'</font></strong>-', $yl_str);
+       $yl_str = str_replace('-'.implode('-', $maxWeekHitArr).'-', '-'.'<strong><font color="#065f3e">'.implode('-', $maxWeekHitArr).'</font></strong>-', $yl_str);
 
+       # 月最大遗漏
+       $maxMonthYlArr = array_fill(0, $maxWeekHit, 0);
+       $yl_str = str_replace('-'.implode('-', $maxMonthYlArr).'-', '-<strong><font color="#962017">'.implode('-', $maxMonthYlArr).'</font></strong>-', $yl_str);
+       # 周最大遗漏
+       $maxWeekYlArr = array_fill(0, $maxWeekYl, 0);
+       $yl_str = str_replace('-'.implode('-', $maxWeekYlArr).'-', '-<strong><font color="#581611">'.implode('-', $maxWeekYlArr).'</font></strong>-', $yl_str);
+       //p([$maxWeekHit, $maxWeekYl, $maxMonthHit, $maxMonthYl]);
 
        return [
            'current_times' => $current_times??0,    // 当前遗漏次数
            'last_times' => $last_times,    // 上次遗漏次数
-           'week_max_miss' => max($maxWeekYlSet),   // 本周最大遗漏
-           'week_max_hit' => max($maxWeekHitSet),   // 本周最大连中
-           'month_max_miss' => max($maxMonthYlSet),   // 本月最大遗漏
-           'month_max_hit' => max($maxMonthHitSet),   // 近本周最大连中
+           'week_max_miss' => $maxWeekYl,   // 本周最大遗漏
+           'week_max_hit' => $maxWeekHit,   // 本周最大连中
+           'month_max_miss' => $maxMonthYl,   // 本月最大遗漏
+           'month_max_hit' => $maxMonthHit,   // 近本周最大连中
            'max_miss' => $maxYl, // 最大遗漏
            'max_hit' => $maxHit, // 最大连中
            'counts' => count($codes),   // 组数
