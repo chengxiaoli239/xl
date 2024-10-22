@@ -44,7 +44,28 @@ use yii\widgets\ActiveForm;
                         ])->label('真/模拟') ?>
                     </div>
                 </div>
-                <?= $form->field($model, 'single')->textInput() ?>
+                <div class="row">
+                    <div class="col-lg-4 col-xs-6">
+                        <?= $form->field($model, 'single')->textInput() ?>
+                    </div>
+                    <div class="col-lg-4 col-xs-6">
+                        <?= $form->field($model, 'is_init_perdate')->checkboxList(
+                            [1=>'否',2=>'是'],
+                            [
+                                'item' => function ($index, $label, $name, $checked, $value) {
+                                    $options = [
+                                        'class' => 'checkbox-item',
+                                        'label' => $label,
+                                        'value' => $value,
+                                        'checked' => $checked,
+                                    ];
+
+                                    return Html::checkbox($name, $checked, $options);
+                                }
+                            ]
+                        )->label('每天初始化(翻倍计划)') ?>
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="col-lg-12 col-xs-12">
