@@ -79,6 +79,10 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $p = '123';
+        $pos = str_split($p);
+        p($pos);
+
         $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user_sys_plans}}'); d($r);
         for ($i=0; $i<15; $i++){
             $date = date('Y-m-d', strtotime('2024-09-23')+$i*86400);
@@ -443,17 +447,24 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
+            try {
+                $plan = UserSysPlans::findOne(11461);
+                $codes = BetService::getCodesByPlan($plan);
+            }catch (\Exception $e){
+                p(['err_msg'=>$e->getMessage()]);
+            }
+            p($codes);
+            $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
+            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             $where = ['uid'=>25, 'plan_id'=>'10892', 'qihao'=>'20241016200', 'lottery_type'=>8];
             $r = BetErrorPlansTask::find()->where($where)->orderBy(['status'=>SORT_ASC])
                 ->orderBy('id DESC')->addOrderBy(['id'=>SORT_DESC])->one()->toArray();
             p($r);
             $rst = SscDataService::getLastIndexId(8, 7); p($rst);
-            $plan = UserSysPlans::findOne(10742);
             $r = OperatePlanService::operatePlans21($plan, $current_kj_qihao='20241011255'); p($r);
             $areaProfits = SscDataService::getPlanProfits($plan, ['>=', 'qihao', '20241011255'], 1); # 计划当前区间利润
             p($areaProfits);
             $codes = BetService::getCodesByPlan($plan);p(count(explode('@', $codes)));
-            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $AUTH_ACCESS_TOKENS = TzSystemUsersService::getAuthAccessTokens(2);p($AUTH_ACCESS_TOKENS);
             $rst = OperatePlanService::initPlanPerDate($lottery_type=8, 1);
@@ -464,7 +475,6 @@ class IndexController extends Controller
             p($miss);
             //$data = Aozhou::getLucky5($type='json', $is_auto=2);p($data);
 
-            $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             p($codes);
             $r = \backend\service\BetService::getTypeNameByTzType($tz_type=25);p($r);
             $historyKjData = NumCodeService::getKjData($qihao='20240224120', $lottery_type=8);p($historyKjData);

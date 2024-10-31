@@ -332,6 +332,24 @@ class NumService extends BaseService {
         212=>'2(1234)位近4个码最多上2个',
         213=>'3(1234)位近4个码最多上2个',
         214=>'4(1234)位近4个码最多上2个',
+
+        215=>'定1234位上期147上2个则下期至少上1个',
+        216=>'定123位上期147上2个则下期123位至少上1个',
+        217=>'定124位上期147上2个则下期124位至少上1个',
+        218=>'定134位上期147上2个则下期134位至少上1个',
+        219=>'定234位上期147上2个则下期234位至少上1个',
+
+        220=>'定1234位上期258上2个则下期至少上1个',
+        221=>'定123位上期258上2个则下期123位至少上1个',
+        222=>'定124位上期258上2个则下期124位至少上1个',
+        223=>'定134位上期258上2个则下期134位至少上1个',
+        224=>'定234位上期258上2个则下期234位至少上1个',
+
+        225=>'定1234位上期369上2个则下期至少上1个',
+        226=>'定123位上期369上2个则下期123位至少上1个',
+        227=>'定124位上期369上2个则下期124位至少上1个',
+        228=>'定134位上期369上2个则下期134位至少上1个',
+        229=>'定234位上期369上2个则下期234位至少上1个',
     ];
 
     const TYPE_POSITIONS = [
@@ -3026,7 +3044,6 @@ class NumService extends BaseService {
         $allCodes = ArrayHelper::getColumn($NumTypes, 'code');
         $hzArr = yii\helpers\Json::decode($plan->hz_Arr);
         $filter_dynamic_types = $filter_dynamic_types ? :$hzArr['filter_dynamic_types'];
-        //p($filter_dynamic_types);
 
         $codesArr = $allCodes;
         foreach ($filter_dynamic_types as $filter_dynamic_type){
@@ -3586,12 +3603,48 @@ class NumService extends BaseService {
                 case 212: # x(1234)位近y个码最多上z个
                 case 213: # x(1234)位近y个码最多上z个
                 case 214: # x(1234)位近y个码最多上z个
-                    $positions = [ 211=>1, 212=>2, 213=>3, 214=>4];
+                    $posData = [ 211=>1, 212=>2, 213=>3, 214=>4];
                     $params = [
-                        ['type'=>3, 'params'=>['x'=>$positions[$filter_dynamic_type], 'y'=>4, 'z'=>2]]
+                        ['type'=>3, 'params'=>['x'=>$posData[$filter_dynamic_type], 'y'=>4, 'z'=>2]]
                     ]; # 动态过滤2，对应的\backend\service\numbers\DynamicFilterService::DYNAMIC_FILTER_TYPES
                     $codes = DynamicFilterService::getFilterDynamic2($plan, $params);
                     break;
+                case 215: # 定1234位号码147上2个则下期至少上1个
+                case 216: # 定123位号码147上2个则下期至少上1个
+                case 217: # 定124位号码147上2个则下期至少上1个
+                case 218: # 定134位号码147上2个则下期至少上1个
+                case 219: # 定234位号码147上2个则下期至少上1个
+                    $posData = [215=>'1234', 216=>'123', 217=>'124', 218=>'134', 219=>'234'];
+                    $params = [
+                        ['type'=>4, 'params'=>['x'=>$posData[$filter_dynamic_type], 'y'=>'147', 'z'=>1]]
+                    ]; # 动态过滤2，对应的\backend\service\numbers\DynamicFilterService::DYNAMIC_FILTER_TYPES
+                    $codes = DynamicFilterService::getFilterDynamic2($plan, $params);
+                    break;
+                case 220: # 定1234位号码258上2个则下期至少上1个
+                case 221: # 定123位号码258上2个则下期至少上1个
+                case 222: # 定124位号码258上2个则下期至少上1个
+                case 223: # 定134位号码258上2个则下期至少上1个
+                case 224: # 定234位号码258上2个则下期至少上1个
+                $posData = [220=>'1234', 221=>'123', 222=>'124', 223=>'134', 224=>'234'];
+                    $params = [
+                        ['type'=>4, 'params'=>['x'=>$posData[$filter_dynamic_type], 'y'=>'258', 'z'=>1]]
+                    ]; # 动态过滤2，对应的\backend\service\numbers\DynamicFilterService::DYNAMIC_FILTER_TYPES
+                    $codes = DynamicFilterService::getFilterDynamic2($plan, $params);
+                    break;
+                case 225: # 定1234位号码369上2个则下期至少上1个
+                case 226: # 定123位号码3692个则下期至少上1个
+                case 227: # 定124位号码3692个则下期至少上1个
+                case 228: # 定134位号码3692个则下期至少上1个
+                case 229: # 定234位号码3692个则下期至少上1个
+                    $posData = [225=>'1234', 226=>'123', 227=>'124', 228=>'134', 229=>'234'];
+                    $params = [
+                        ['type'=>4, 'params'=>['x'=>$posData[$filter_dynamic_type], 'y'=>'369', 'z'=>1]]
+                    ]; # 动态过滤2，对应的\backend\service\numbers\DynamicFilterService::DYNAMIC_FILTER_TYPES
+                    $codes = DynamicFilterService::getFilterDynamic2($plan, $params);
+                    break;
+            }
+            if(empty($codes)){
+                $codes = $codesArr;
             }
             $codesArr = array_intersect($codesArr, $codes);
         }

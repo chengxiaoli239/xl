@@ -165,6 +165,7 @@ class UserSysPlansController extends BaseController
         $filter_pos1 = NumService::$pos_to_desc;
         $filter_pos2 = NumService::$pos_to_desc;
         $code_filter_types = NumService::get_code_filter_types();
+        $filter_dynamic_typesArr = NumService::$filter_dynamic_types;
         $data =  [
             'model' => $model,
             'tz_type' => $tz_type,
@@ -187,7 +188,7 @@ class UserSysPlansController extends BaseController
 
             # 4、动态过滤
             'is_filter_dynamic' => $is_filters,
-            'filter_dynamic_typesArr' => NumService::$filter_dynamic_types,
+            'filter_dynamic_typesArr' => $filter_dynamic_typesArr,
             'filter_dynamic_types2' => DynamicFilterService::DYNAMIC_FILTER_TYPES,
 
             'code_filter_types' => $code_filter_types, # 排除类型

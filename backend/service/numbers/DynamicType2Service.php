@@ -124,6 +124,76 @@ class DynamicType2Service extends BaseService {
         return $codes;
     }
 
+    # 定x位号码y最少上z个
+    public static function filter4(object $plan, $dynamic=[], $filterDesc = []): array
+    {
+        $lotteryType = $plan->lottery_type;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
+
+        //$historyKjData = NumCodeService::getKjData($currentKjQiHao, $lottery_type);
+        $params = $dynamic['params'];
+        $x = trim($params['x']); # x位置
+        $y = trim($params['y']); # 号码：258
+        $z = (int)trim($params['z']); # 最多上奖数量
+        $xPos = str_split($x);
+        $xCodes = str_split($y);
+        //p(['xPos'=>$xPos, 'xCodes'=>$xCodes]);
+        // 开奖号码
+        $fourCodes = [1=>$historyKjData['code1'], 2=>$historyKjData['code2'], 3=>$historyKjData['code3'], 4=>$historyKjData['code4']];
+        $fixedCodes = [];
+        foreach ($xPos as $po){
+            $fixedCodes[] = $fourCodes[$po];
+        }
+        $n = 0;
+        foreach ($fixedCodes as $xc){
+            if(in_array($xc, $xCodes)){
+                $n += 1;
+            }
+        }
+        if($n<2){
+            Tool_Common::log('/data/'.__FUNCTION__, "ERR", '147、258、369本期上2个则下期至少上1个', ['plan_id'=>$plan->id, 'params'=>$params, 'code_str'=>$historyKjData['code_str'], 'fixedCodes'=>$fixedCodes, 'n'=>$n]);
+        }
+
+        $lottery_type = $plan->lottery_type;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+
+        //p([$historyKjData, $fourCodes]);
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type');
+        $query->where(['code_type' => ($plan->playway+1)]);
+        $where = ['OR'];
+        if($n>=2 && (strlen($x) == 4 OR $plan->playway == 3)){
+            # 四定
+            $where[] = ['IN', 'code_1', $xCodes];
+            $where[] = ['IN', 'code_2', $xCodes];
+            $where[] = ['IN', 'code_3', $xCodes];
+            $where[] = ['IN', 'code_4', $xCodes];
+        }else{
+            $diff = array_diff([1,2,3,4], $xPos);
+            $currentPos = current($diff);
+            $query->andWhere(['=', 'code_'.$currentPos, 'X']);
+            if($n>=2){
+                foreach ($xPos as $xp){
+                    $where[] = ['IN', 'code_'.$xp, $xCodes];
+                }
+            }
+        }
+
+        $query->andWhere($where);
+        $sql = $query->createCommand()->getRawSql();//p($sql);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '定x位y码至少上1个', ['plan_id'=>$plan->id, 'current_kj_qihao'=>$currentKjQiHao, 'lottery_type'=>$lottery_type, 'fourCodes'=>$fourCodes, 'sql'=>$sql, 'n'=>$n]);
+
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
+        $betDesc = $filterDesc['desc']."定".$x."位号码".$y.",下期".$x."位至少上".$z."个";
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+
+        return $codes;
+    }
+
     /**
      * @param array $nCode
      * @param int $cNum
