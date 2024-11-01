@@ -2498,12 +2498,34 @@ class StaticService extends BaseService {
         $codeData = str_replace('@', ',', str_replace(',', '', implode('@', $codes)));
 
         $lastIndexId = SscDataService::getLastIndexId($lottery_type);
+        $dateNum = ($playway == 3) ? 7 : 3;
         $lastIndexId7 = SscDataService::getLastIndexId($lottery_type, 7);
-        $lastIndexId30 = SscDataService::getLastIndexId($lottery_type, 30);
+        $dateNum = ($playway == 3) ? 30 : 10;
+        $lastIndexId30 = SscDataService::getLastIndexId($lottery_type, $dateNum);
         switch ($playway){
             case 1: # 二字定
                 break;
             case 2: # 三字定
+                $oneCodes = explode(',', $codes[0]);
+                $xpos = array_search('X', $oneCodes) + 1;
+                switch ($xpos){
+                    case 1:
+                        $concatStr = "CONCAT('X,', code2, ',', code3, ',', code4)";
+                        break;
+                    case 2:
+                        $concatStr = "CONCAT(code1, ',X,', code3, ',', code4)";
+                        break;
+                    case 3:
+                        $concatStr = "CONCAT(code1, ',', code2, ',X,', code4)";
+                        break;
+                    case 4:
+                        $concatStr = "CONCAT(code1, ',', code2, ',', code3, ',X')";
+                        break;
+                }
+                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', $concatStr, $codes], ['>=', 'index_id', $lastIndexId30]];
+                $query = SscKjData::find()->select(['id', 'index_id', 'qihao', 'code_4n_str'])->where($where);
+                //p($query->createCommand()->getRawSql());
+                $SscKjData = $query->asArray()->orderBy('id DESC')->limit(20000)->all();
                 break;
             case 3: # 四字定
                 $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'code_4n_str', $codes], ['>=', 'index_id', $lastIndexId30]];

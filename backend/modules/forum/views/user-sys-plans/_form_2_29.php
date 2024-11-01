@@ -141,22 +141,61 @@ use yii\widgets\ActiveForm;
                 <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
 
                 <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
-                <div class="form-group">
-                    <div class="col-lg-offset-2 col-lg-10">
-                        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-danger']) ?>
-                    </div>
-                </div>
+                <?php include(dirname(__FILE__).'/act-button.php');?>
+                <input type="hidden" id="lottery_type" name="UserSysPlans[lottery_type]" value="<?=$lottery_type?>">
                 <?php ActiveForm::end(); ?>
             </div>
         </section>
     </div>
 </div>
+<div class="modal fade" id="rstTipModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     style="display: none;left: 50%; top: 50%;transform: translate(-50%,-50%);
+     min-width:90%;min-height:50%;overflow: visible;bottom: inherit; right: inherit;
+">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="tip_msg_title">提示信息</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group up-reason">
+                    <label id="tip_msg_rst" for="tip_msg_rst"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="opRstConfirm">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
+<?php include(dirname(__FILE__).'/query-profits.php');?>
 <script>
 $(function () {
     $('.checkbox-item').click(function() {
         var name = $(this).attr('name');
         $('input[name="' + name + '"]').not(this).prop('checked', false);
     });
+    $(".id-query").click(function () {
+        url = '/forum/ssc-static-yl/query'
+        data = $('#w0').serialize()+'&type='+$(this).data('type');
+        $.post(url, data, function(rst) {
+            $('#tip_msg_rst').html(
+                '<strong>号码：</strong>' + rst.code_desc + "<br>"
+                + '<strong>组数：</strong>' + rst.counts + "<br>"
+                + '<strong>当前：</strong>' + rst.current_times + "<br>"
+                + '<strong>本周：最大遗漏: </strong>'+ rst.week_max_miss + '次&nbsp;&nbsp;&nbsp;<strong>最大连中: </strong>'+ rst.week_max_hit + "次<br>"
+                + '<strong>本月：最大遗漏: </strong>'+ rst.month_max_miss + '次&nbsp;&nbsp;&nbsp;<strong>最大连中: </strong>'+ rst.month_max_hit + "次<br>"
+                + "<strong>遗漏记录：</strong>"  +rst.yl_str
+            )
+            $('#rstTipModal').modal('show');
+            $('#codes_nums').html(rst.counts)
+            $('#usersysplans-codes').html(rst.codeData);
+        });
+    });
+
 });
 </script>
