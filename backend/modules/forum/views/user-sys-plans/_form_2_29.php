@@ -128,6 +128,12 @@ use yii\widgets\ActiveForm;
 
                 <!--动态过滤号码-->
                 <?php include(dirname(__FILE__).'/filter_dynamic.php'); # 动态过滤号码 ?>
+                <div class="row">
+                    <div class="col-lg-12 col-xs-12">
+                        <!--?= $form->field($model,"desc")->textarea([ 'autofocus' => false,'style'=>'height:60px' ])?-->
+                        <?= $form->field($model,"base_codes")->label('导入号码(<span id="base_codes_nums">'.(empty($model->base_codes)?0:count(explode(',', $model->base_codes))).'</span>)')->textarea([ 'autofocus' => false,'style'=>'height:200px','id'=>'model-base_codes'])?>
+                    </div>
+                </div>
 
                 <div class="row">
                     <div class="col-lg-3 col-xs-6">
