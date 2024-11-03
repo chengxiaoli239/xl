@@ -1989,7 +1989,7 @@ class NumCodeService extends BaseService
                 'hefen1' => $hefen1,
             ]);
         }elseif ($filter_type==3){
-            $betDesc .= '随机数：'.$log1;
+            $betDesc .= '两数同上：'.$log1;
             $hzArr = array_merge((array)$hzArr, [
                 'log_sel' => 1,
                 'log_1' => $log1,
