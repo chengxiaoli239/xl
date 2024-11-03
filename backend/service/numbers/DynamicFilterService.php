@@ -13,7 +13,7 @@ class DynamicFilterService extends BaseService {
         ['type'=>1, 'label'=>'两合上1', 'params'=>['x'=>''], 'desc'=>'两数合为该合分或该数字上奖'],
         ['type'=>2, 'label'=>'过滤近x天直码', 'params'=>['x'=>''], 'desc'=>'过滤近x天的直码'],
         ['type'=>3, 'label'=>'x(1234)位近y个码最多上z个', 'params'=>['x'=>'', 'y'=>'', 'z'=>''], 'desc'=>'x(1234)位近y个码最多上z个'],
-        ['type'=>4, 'label'=>'定x位号码y对应位置最少z个', 'params'=>['x'=>'', 'y'=>'', 'z'=>''], 'desc'=>'定x位号码y对应位置最少z个'],
+        ['type'=>4, 'label'=>'定x位号码y对应位置最少上z个', 'params'=>['x'=>'', 'y'=>'', 'z'=>''], 'desc'=>'定x位号码y对应位置最少上z个'],
     ];
     public static int $filterType = 0;
 

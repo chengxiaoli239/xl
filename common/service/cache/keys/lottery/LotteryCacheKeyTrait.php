@@ -153,4 +153,16 @@ trait LotteryCacheKeyTrait
     {
         return 'lottery:lottery_base_info:lt_'.$lottery_type;
     }
+
+    /**
+     * 获取随机号码key
+     * @param $planId
+     * @param $qiHao
+     * @param $type
+     * @return string
+     */
+    public static function getRangeCode($planId, $qiHao, $type): string
+    {
+        return 'lottery:rand_code:lt_'.$planId.'_'.$qiHao.'_'.$type;
+    }
 }

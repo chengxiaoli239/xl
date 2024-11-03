@@ -1971,8 +1971,9 @@ class NumCodeService extends BaseService
         # 随机内容添加："log_sel":1,"log_1":"05","fixed_pos_hefen_sel":2,"hefen_pos1":"1,2,3","hefen1":"012356789"
         //p($hzArr, 0);
         $betDesc = '随机过滤';
+        list($log1, $hefen1) = NumCodeService::getRandCode($plan->id, $current_kj_qihao, $filter_type);
         if($filter_type==1){
-            $log1 = ['05', '16', '27', '38', '49'][rand(0,4)];
+            //$log1 = ['05', '16', '27', '38', '49'][rand(0,4)];
             $betDesc .= '对数：'.$log1;
             $hzArr = array_merge((array)$hzArr, [
                 'log_sel' => 1,
@@ -1980,16 +1981,23 @@ class NumCodeService extends BaseService
                 'fixed_pos_hefen_sel' => 2,
             ]);
         }elseif ($filter_type==2){
-            $hefen1 = str_replace(rand(0, 9), '', '0123456789');
+            //$hefen1 = str_replace(rand(0, 9), '', '0123456789');
             $betDesc .= '合分：'.$hefen1;
             $hzArr = array_merge((array)$hzArr, [
                 'fixed_pos_hefen_sel' => 2,
                 'hefen_pos1' => '1,2,3',
                 'hefen1' => $hefen1,
             ]);
+        }elseif ($filter_type==3){
+            $betDesc .= '随机数：'.$log1;
+            $hzArr = array_merge((array)$hzArr, [
+                'log_sel' => 1,
+                'log_1' => $log1,
+                'fixed_pos_hefen_sel' => 2,
+            ]);
         }else{
-            $log1 = ['05', '16', '27', '38', '49'][rand(0,4)];
-            $hefen1 = str_replace(rand(0, 9), '', '0123456789');
+            //$log1 = ['05', '16', '27', '38', '49'][rand(0,4)];
+            //$hefen1 = str_replace(rand(0, 9), '', '0123456789');
             $betDesc .= '对数：'.$log1;
             $betDesc .= '&合分：'.$hefen1;
             $hzArr = array_merge((array)$hzArr, [
@@ -2377,9 +2385,42 @@ class NumCodeService extends BaseService
             $mKey = CacheKeyService::getBetRandDescKey($planId, $qiHao);
             $members = commonRedis()->smembers($mKey);
 
-            $str = implode('; ', $members);
+            $str = implode('; ', array_unique($members));
         }catch (\Exception $e){}
 
         return $flag?$str:$members;
+    }
+
+    /**
+     * 随机合分、对数
+     * @param $planId
+     * @param $qiHao
+     * @param $type
+     * @return array|mixed
+     */
+    public static function getRandCode($planId, $qiHao, $type)
+    {
+        $mKey = CacheKeyService::getRangeCode($planId, $qiHao, $type);
+        if(!$randData = commonRedis()->get($mKey)){
+            $logData = [];
+            if($type == 3){
+                $numbers = range(0, 9); // 创建包含 0 到 9 的数组
+                shuffle($numbers); // 打乱数组顺序
+
+                $groups = array_chunk($numbers, 2); // 将数组分成五个组，每组包含5个数字
+                foreach ($groups as $group){
+                    $logData[] = implode('', $group);
+                }
+                $log = $logData[rand(0, 4)];
+            }else{
+                $log = ['05', '16', '27', '38', '49'][rand(0,4)];
+            }
+            $heFen = str_replace(rand(0, 9), '', '0123456789');
+            $randData = [$log, $heFen];
+
+            commonRedis()->setex($mKey,300, $randData);
+        }
+
+        return $randData;
     }
 }

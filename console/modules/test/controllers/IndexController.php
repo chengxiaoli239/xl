@@ -79,6 +79,7 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        list($code, $hfx, $a) = \backend\service\numbers\NumCodeService::getRandCode($planId=11496, $qiHao='20241103223', $type=3); p([$code, $hfx, $a]);
         $p = '123';
         $pos = str_split($p);
         p($pos);
