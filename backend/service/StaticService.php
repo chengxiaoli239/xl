@@ -2645,8 +2645,8 @@ class StaticService extends BaseService {
             'max_hit' => max($maxHitSet?:[1]) ?: 1,   // 历史最大连中
             //'max_range' => $max_range,   // 近200期内的最大遗漏范围
             'counts' => count($codes),   // 组数
-            //'yl_str' => BaseStringHelper::truncate($yl_str,1000),
-            'yl_str' => trim($yl_str, '-'),
+            'yl_str' => BaseStringHelper::truncate($yl_str,1400),
+            //'yl_str' => trim($yl_str, '-'),
             'codeData' => $codeData,
         ];
     }
