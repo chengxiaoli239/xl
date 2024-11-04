@@ -296,6 +296,7 @@ class UserService extends BaseService {
         $options = [
             'class' => 'renew-account',
             'data-id' => $Model->id,
+            'data-expire-time' => date('Y-m-d H:i', $Model->expire_time),
             'data-username' => $Model->username,
             'id' => 'renew_'.$Model->id,
         ];

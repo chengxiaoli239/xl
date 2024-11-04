@@ -16,6 +16,12 @@
                     <span for="dtp_input3" class="input-group-addon">到期时间：</span>
                     <input type="text" class="form-control" style="width: 200px;" id="default_datetimepicker">
                     <!--span class="input-group-addon">.00</span00-->
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="setCurrent">当前</button>
+                        <button class="btn btn-default" type="button" id="addOneHour">+1小时</button> &nbsp;
+                        <button class="btn btn-warning" type="button" id="addOneWeek">+1周</button>
+                        <button class="btn btn-info" type="button" id="addOneMonth">+1月</button> &nbsp;
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -51,6 +57,7 @@
 </div>
 <script src="/statics/datetimepicker/jquery.js"></script>
 <script src="/statics/datetimepicker/build/jquery.datetimepicker.full.js"></script>
+<script src="/statics/assets/bootstrap-daterangepicker/moment.js"></script>
 <script>
 $.datetimepicker.setLocale('en');
 $('#default_datetimepicker').datetimepicker({
@@ -68,9 +75,48 @@ $(function () {
 
         op_id = $(this).attr('data-id');
         $('#ApplyCmConfirm').attr('data-op-id', op_id);
+        console.log('expire-time', $(this).data('expire-time'))
+        $("#default_datetimepicker").val($(this).data('expire-time'))
         txt = '正在修改 [<strong><font color="#a52a2a">'+$("#renew_"+op_id).attr('data-username')+'</font></strong>] 过期时间：';
         showTips('过期时间', txt);
     });
+
+    // 添加按钮点击事件处理程序
+    $('#addOneMonth').click(function () {
+        var datetimepicker = $("#default_datetimepicker");
+        var currentDate = datetimepicker.val();
+        var newDate = moment(currentDate).add(1, 'month').format('YYYY-MM-DD HH:mm');
+        datetimepicker.val(newDate);
+    });
+
+    $('#addOneWeek').click(function () {
+        var datetimepicker = $("#default_datetimepicker");
+        var currentDate = datetimepicker.val();
+        var newDate = moment(currentDate).add(1, 'week').format('YYYY-MM-DD HH:mm');
+        datetimepicker.val(newDate);
+    });
+
+    $('#addOneHour').click(function () {
+        var datetimepicker = $("#default_datetimepicker");
+        var currentDate = datetimepicker.val();
+        var newDate = moment(currentDate).add(1, 'hour').format('YYYY-MM-DD HH:mm');
+        datetimepicker.val(newDate);
+    });
+    $('#setCurrent').click(function() {
+        $("#default_datetimepicker").val(getCurrentDateTime());
+    });
+    // 获取当前时间的函数
+    function getCurrentDateTime() {
+        var currentDate = new Date();
+        var year = currentDate.getFullYear();
+        var month = ('0' + (currentDate.getMonth() + 1)).slice(-2);
+        var day = ('0' + currentDate.getDate()).slice(-2);
+        var hours = ('0' + currentDate.getHours()).slice(-2);
+        var minutes = ('0' + currentDate.getMinutes()).slice(-2);
+
+        return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes;
+    }
+
     /**
      * @desc 显示修改结果提示框
      * @param tip_msg
@@ -100,7 +146,7 @@ $(function () {
             Qrst = rst.data;
             status = rst.status;
             desc = '操作成功~';
-            if(rst.status == 200){
+            if(rst.status === 200){
                 expire_time = Qrst.expire_time;
                 if(expire_time == null || expire_time == '' || expire_time == NaN){
                     desc = '永久';
