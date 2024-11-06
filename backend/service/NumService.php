@@ -351,6 +351,11 @@ class NumService extends BaseService {
         227=>'定124位上期369上2个则下期124位至少上1个',
         228=>'定134位上期369上2个则下期134位至少上1个',
         229=>'定234位上期369上2个则下期234位至少上1个',
+
+        231=>'1(1234)位近4个码最多上1个',
+        232=>'2(1234)位近4个码最多上1个',
+        233=>'3(1234)位近4个码最多上1个',
+        234=>'4(1234)位近4个码最多上1个',
     ];
 
     const TYPE_POSITIONS = [
@@ -3607,6 +3612,16 @@ class NumService extends BaseService {
                     $posData = [ 211=>1, 212=>2, 213=>3, 214=>4];
                     $params = [
                         ['type'=>3, 'params'=>['x'=>$posData[$filter_dynamic_type], 'y'=>4, 'z'=>2]]
+                    ]; # 动态过滤2，对应的\backend\service\numbers\DynamicFilterService::DYNAMIC_FILTER_TYPES
+                    $codes = DynamicFilterService::getFilterDynamic2($plan, $params);
+                    break;
+                case 231: # x(1234)位近y个码最多上z个
+                case 232: # x(1234)位近y个码最多上z个
+                case 233: # x(1234)位近y个码最多上z个
+                case 234: # x(1234)位近y个码最多上z个
+                    $posData = [ 231=>1, 232=>2, 233=>3, 234=>4];
+                    $params = [
+                        ['type'=>3, 'params'=>['x'=>$posData[$filter_dynamic_type], 'y'=>4, 'z'=>1]]
                     ]; # 动态过滤2，对应的\backend\service\numbers\DynamicFilterService::DYNAMIC_FILTER_TYPES
                     $codes = DynamicFilterService::getFilterDynamic2($plan, $params);
                     break;
