@@ -326,6 +326,7 @@ class NumService extends BaseService {
         206=>'过滤24位合分',
         207=>'过滤34位合分',
 
+        235=>'过滤近1天直码 ',
         208=>'过滤近3天直码 ',
         209=>'过滤近5天直码 ',
         210=>'过滤近7天直码 ',
@@ -3596,6 +3597,7 @@ class NumService extends BaseService {
                 case 201: # 取后四最近9999组号码
                     $codes = NumCodeService::getBeforeKjCodesDynamic18($plan, $lottery_type, 9999);
                     break;
+                case 235: # 过滤近1天直码
                 case 208: # 过滤近3天直码
                 case 209: # 过滤近5天直码
                 case 210: # 过滤近7天直码
