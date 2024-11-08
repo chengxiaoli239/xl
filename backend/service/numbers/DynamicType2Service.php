@@ -69,17 +69,49 @@ class DynamicType2Service extends BaseService {
     public static function filter2(object $plan, $dynamic=[], $filterDesc = []): array
     {
         $lottery_type = $plan->lottery_type;
+        $playway = $plan->playway;
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
 
         //$historyKjData = NumCodeService::getKjData($currentKjQiHao, $lottery_type);
         $params = $dynamic['params'];
         $x = $params['x'];
-        $filterCodesQuery = SscKjData::find()->select(['code_4n_str'])->where(['>=', 'created_at', (time()-$x*86400)])->andWhere(['lottery_type'=>$lottery_type]);
+        $filterField = 'code_4n_str';
+        if($playway==1){
+            $filterField = [
+                'CONCAT(`code1`, ",", `code2`, ",X,X") c1',
+                'CONCAT(`code1`, ",X,", `code3`, ",X") c2',
+                'CONCAT(`code1`, ",X,X", ",", `code4`) c3',
+                'CONCAT("X,", `code2`, ",", `code3`, ",X") c4',
+                'CONCAT("X,", `code2`, ",X,", `code4`) c5',
+                'CONCAT("X,X,", `code3`, ",", `code4`) c6',
+            ];
+        }elseif($playway==2){
+            $filterField = [
+                'CONCAT(`code1`, ",", `code2`, ",", `code3`, ",X") c1',
+                'CONCAT(`code1`, ",", `code2`, ",X,", `code4`) c2',
+                'CONCAT(`code1`, ",X,", `code3`, ",", `code4`) c3',
+                'CONCAT("X,", `code2`, ",", `code3`, ",", `code4`) c4',
+            ];
+        }
+        $filterCodesQuery = SscKjData::find()->select($filterField)->where(['>=', 'created_at', (time()-$x*86400)])->andWhere(['lottery_type'=>$lottery_type]);
         //p($filterCodesQuery->createCommand()->getRawSql());
-        $filterCodes = $filterCodesQuery->column();
+        $filterCodes = [];
+        if($playway == 1){
+            $filterCodesData = $filterCodesQuery->asArray()->all();
+            $filterCodes = array_merge($filterCodes, array_column($filterCodesData, 'c1'));
+            $filterCodes = array_merge($filterCodes, array_column($filterCodesData, 'c2'));
+            $filterCodes = array_merge($filterCodes, array_column($filterCodesData, 'c3'));
+            $filterCodes = array_merge($filterCodes, array_column($filterCodesData, 'c4'));
+        }elseif($playway == 2){
+            $filterCodesData = $filterCodesQuery->asArray()->all();
+            $filterCodes = array_merge($filterCodes, array_column($filterCodesData, 'c1'));
+            $filterCodes = array_merge($filterCodes, array_column($filterCodesData, 'c2'));
+            $filterCodes = array_merge($filterCodes, array_column($filterCodesData, 'c3'));
+            $filterCodes = array_merge($filterCodes, array_column($filterCodesData, 'c4'));
+        }else{
+            $filterCodes = $filterCodesQuery->column();
+        }
         $where = ['NOT IN', 'code', $filterCodes];
-
-        $playway = $plan->playway;
 
         $query = (new \yii\db\Query())
             ->select(['code', 'code_type'])
@@ -87,18 +119,19 @@ class DynamicType2Service extends BaseService {
             ->where(['code_type' => $playway+1])
             ->andWhere($where);
 
-        $sql = $query->createCommand()->getRawSql();//p($sql);
-        Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '过滤两个位置一样的所有号码', [
+        //$sql = $query->createCommand()->getRawSql();//p($sql);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤两个位置一样的所有号码', [
             'plan_id'=>$plan->id,
             'lottery_type'=>$lottery_type,
             'current_kj_qihao'=>$currentKjQiHao,
-            'sql'=>$sql
+            //'sql'=>$sql
         ]);
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
         //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
-        $betDesc = $filterDesc['desc'].":过滤近".$x."天直码(四定)";
+        $betDesc = $filterDesc['desc'].":过滤近".$x."天直码";
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+        //p([count($codes)]);
 
         return $codes;
     }
