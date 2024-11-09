@@ -165,7 +165,7 @@ class UserSysPlansController extends BaseController
         $filter_pos1 = NumService::$pos_to_desc;
         $filter_pos2 = NumService::$pos_to_desc;
         $code_filter_types = NumService::get_code_filter_types();
-        $filter_dynamic_typesArr = NumService::$filter_dynamic_types;
+        $filter_dynamic_typesArr = NumService::getDynamicType($playway);  # 动态过滤1
         $data =  [
             'model' => $model,
             'tz_type' => $tz_type,
@@ -373,8 +373,8 @@ class UserSysPlansController extends BaseController
 
             # 4、动态过滤
             'is_filter_dynamic' => $is_filters,
-            'filter_dynamic_typesArr' => NumService::$filter_dynamic_types,
-            'filter_dynamic_types2' => $filter_dynamic_type2??DynamicFilterService::DYNAMIC_FILTER_TYPES,
+            'filter_dynamic_typesArr' => NumService::getDynamicType($model->playway), # 动态过滤1
+            'filter_dynamic_types2' => $filter_dynamic_type2??DynamicFilterService::DYNAMIC_FILTER_TYPES, # 动态过滤2
 
             'code_filter_types' => $code_filter_types, # 排除类型
             # 2、排除前x天内同期
@@ -465,7 +465,7 @@ class UserSysPlansController extends BaseController
             'is_filter_dates' => $is_filters,
             'filter_date_pos1' => $filter_pos1,
             'filter_date_pos2' => $filter_pos2,
-            'filter_dynamic_typesArr' => NumService::$filter_dynamic_types,
+            'filter_dynamic_typesArr' => NumService::getDynamicType($playway),
             'lottery_types' => $lottery_types,
             'lottery_type' => $lottery_type,
 

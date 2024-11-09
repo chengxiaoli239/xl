@@ -178,7 +178,7 @@ class DynamicType2Service extends BaseService {
         foreach ($xPos as $po){
             $fixedCodes[] = $fourCodes[$po];
         }
-        $n = 0;
+        $n = 0; // 开奖号码对应147、258、369 上的个数
         foreach ($fixedCodes as $xc){
             if(in_array($xc, $xCodes)){
                 $n += 1;
