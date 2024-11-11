@@ -2,6 +2,7 @@
 namespace common\helpers;
 
 use common\models\thirdD\BetOrderId;
+use common\tools\KjDataGet;
 
 class LotteryType
 {
@@ -65,5 +66,21 @@ class LotteryType
         }
 
         return $BetOrderId->bet_order_id;
+    }
+
+    /**
+     * 获取前x期期号
+     * @param $qiHao
+     * @param int $beforeNum
+     * @param int $lotteryType
+     * @return bool|int|mixed|string
+     */
+    public static function getBeforeNQiHao($qiHao, int $beforeNum=1, int $lotteryType=DEFAULT_LOTTERY_TYPE)
+    {
+        for($i=0; $i<$beforeNum; $i++){
+            $qiHao = KjDataGet::getBeforeQiHaoByQiHao($qiHao, $lotteryType);
+        }
+
+        return $qiHao;
     }
 }

@@ -79,6 +79,10 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $qiHao = LotteryType::getBeforeNQiHao($currentKjQiHao='20241111123', $n=2, $lotteryType=8);
+        p([$currentKjQiHao, $qiHao]);
+        $currentKjQiHao = KjDataGet::getBeforeQiHaoByQiHao($currentKjiHao='20241111123', $lottery_type=8);
+        p([$currentKjQiHao, $lottery_type]);
         list($code, $hfx, $a) = \backend\service\numbers\NumCodeService::getRandCode($planId=11496, $qiHao='20241103223', $type=3); p([$code, $hfx, $a]);
         $p = '123';
         $pos = str_split($p);
@@ -448,7 +452,7 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
-            $plan = UserSysPlans::findOne(11712);
+            $plan = UserSysPlans::findOne(11800);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             $where = ['uid'=>25, 'plan_id'=>'10892', 'qihao'=>'20241016200', 'lottery_type'=>8];

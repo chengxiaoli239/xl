@@ -27,6 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'lottery_type' => $lottery_type,
         'kArr' => $kArr,
         'tz_type' => $tz_type,
+        'playway' => $playway,
         'hzArr' => $hzArr,
         'hefen' => $hefen,
         'sel_pos' => $sel_pos,

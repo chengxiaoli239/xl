@@ -10,10 +10,12 @@ class DynamicFilterService extends BaseService {
 
     # 动态过滤2
     const DYNAMIC_FILTER_TYPES = [
-        ['type'=>1, 'label'=>'两合上1', 'params'=>['x'=>''], 'desc'=>'两数合为该合分或该数字上奖'],
-        ['type'=>2, 'label'=>'过滤近x天直码', 'params'=>['x'=>''], 'desc'=>'过滤近x天的直码'],
-        ['type'=>3, 'label'=>'x(1234)位近y个码最多上z个', 'params'=>['x'=>'', 'y'=>'', 'z'=>''], 'desc'=>'x(1234)位近y个码最多上z个'],
-        ['type'=>4, 'label'=>'定x位号码y对应位置最少上z个', 'params'=>['x'=>'', 'y'=>'', 'z'=>''], 'desc'=>'定x位号码y对应位置最少上z个'],
+        ['type'=>1, 'label'=>'两合上1', 'params'=>['x'=>''], 'desc'=>'两数合为该合分或该数字上奖', 'playway'=>[1, 2, 3]],
+        ['type'=>2, 'label'=>'过滤近x天直码', 'params'=>['x'=>''], 'desc'=>'过滤近x天的直码', 'playway'=>[1, 2, 3]],
+        ['type'=>3, 'label'=>'x(1234)位近y个码最多上z个', 'params'=>['x'=>'', 'y'=>'', 'z'=>''], 'desc'=>'x(1234)位近y个码最多上z个', 'playway'=>[1, 2, 3]],
+        ['type'=>4, 'label'=>'定x位号码y对应位置最少上z个', 'params'=>['x'=>'', 'y'=>'', 'z'=>''], 'desc'=>'定x位号码y对应位置最少上z个', 'playway'=>[1, 2, 3]],
+        ['type'=>5, 'label'=>'过滤1234最近x期开过号码全转', 'params'=>['x'=>''], 'desc'=>'过滤1234最近x期开过号码全转', 'playway'=>[3]],
+        ['type'=>6, 'label'=>'过滤1234前第x期同位置号码(6561)', 'params'=>['x'=>''], 'desc'=>'过滤1234上x期同位置号码', 'playway'=>[3]],
     ];
     public static int $filterType = 0;
 
@@ -47,6 +49,12 @@ class DynamicFilterService extends BaseService {
                     break;
                 case 4: # 定x位号码y上期上两个则下期至少上1个
                     $codes = DynamicType2Service::filter4($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 5: # 过滤1234最近x期开过号码全转
+                    $codes = DynamicType2Service::filter5($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 6: # 过滤1234前第x期同位置号码(6561)
+                    $codes = DynamicType2Service::filter6($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
             }
             if(empty($codes)){

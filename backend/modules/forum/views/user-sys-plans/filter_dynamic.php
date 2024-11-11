@@ -29,33 +29,35 @@ input:focus {
 <!--动态过滤-->
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #da4f49;">
     <div class="col-lg-10 col-xs-12">
-        <?= $form->field($model, 'filter_dynamic_types')->checkboxList($filter_dynamic_typesArr)->label('动态过滤1 <span id="tag_filter_dynamic_type" class="glyphicon glyphicon-comment"></span>') ?>
+        <?= $form->field($model, 'filter_dynamic_types')->checkboxList($filter_dynamic_typesArr)->label('.动态过滤1 <span id="tag_filter_dynamic_type" class="glyphicon glyphicon-comment"></span>') ?>
     </div>
 </div>
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #da4f49;">
     <div class="col-lg-10 col-xs-12">
         <label>动态过滤2：</label>
         <?php foreach ($filter_dynamic_types2 as $key=>$value): ?>
-        <div style="display: flex; align-items: center;">
-            <div style="margin-right: 2px;padding-top: 3px">
-                <?= $form->field($model, "filter_dynamic_types2[".$key."][type]")->checkbox([
-                    'value'=>$value['type'],
-                    'label' => $value['label'],
-                    'labelOptions' => [
-                        'style' => 'display:inline;',
+            <?php if(empty($value['playway']) OR in_array($playway, $value['playway'])): ?> <!--这里报错了，没有闭合-->
+            <div style="display: flex; align-items: center;">
+                <div style="margin-right: 2px;padding-top: 3px">
+                    <?= $form->field($model, "filter_dynamic_types2[".$key."][type]")->checkbox([
+                        'value'=>$value['type'],
+                        'label' => $value['label'],
+                        'labelOptions' => [
+                            'style' => 'display:inline;',
+                            'title' => $value['desc'],
+                        ],
                         'title' => $value['desc'],
-                    ],
-                    'title' => $value['desc'],
-                    'alt' => $value['desc'],
-                ])->label(false) ?>
+                        'alt' => $value['desc'],
+                    ])->label(false) ?>
+                </div>
+                <div class="tooltip" style="display:none; position:absolute; background-color:yellow; padding:5px; border:1px solid #ccc;"><?=$value['desc']?></div>
+                <!-- 添加隐藏的input字段 -->
+                <input type="hidden" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][label]" value="<?= htmlspecialchars($value['label'], ENT_QUOTES) ?>">
+                <?php foreach ($value['params'] as $k2 => $v2): ?>
+                    <input type="number" id="input_<?= $key.'_'.$k2 ?>" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][params][<?= $k2 ?>]" style="width: 45px; margin: -2px 2px;" placeholder="<?= $k2 ?>" value="<?= $v2 ?>">
+                <?php endforeach; ?>
             </div>
-            <div class="tooltip" style="display:none; position:absolute; background-color:yellow; padding:5px; border:1px solid #ccc;"><?=$value['desc']?></div>
-            <!-- 添加隐藏的input字段 -->
-            <input type="hidden" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][label]" value="<?= htmlspecialchars($value['label'], ENT_QUOTES) ?>">
-            <?php foreach ($value['params'] as $k2 => $v2): ?>
-                <input type="number" id="input_<?= $key.'_'.$k2 ?>" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][params][<?= $k2 ?>]" style="width: 45px; margin: -2px 2px;" placeholder="<?= $k2 ?>" value="<?= $v2 ?>">
-            <?php endforeach; ?>
-        </div>
+            <?php endif; ?>
         <?php endforeach; ?>
     </div>
 </div>

@@ -228,6 +228,83 @@ class DynamicType2Service extends BaseService {
     }
 
     /**
+     * 过滤类型号码 - 前x期开过的号码全转
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     */
+    public static function filter5(object $plan, $dynamic=[], $filterDesc = []): array
+    {
+        $lottery_type = $plan->lottery_type;
+        $playway = $plan->playway;
+        list($current_kj_qihao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+
+        $params = $dynamic['params'];
+        $num = trim($params['x']); # x位置
+        $positions_str_4 = 'code'.implode(',code', $positions=[1,2,3,4]);
+        $needCodesQuery = SscKjData::find()->select($positions_str_4)
+            ->where(['lottery_type'=>$lottery_type])->andWhere(['<=', 'qihao', $current_kj_qihao])
+            ->orderBy(['id'=>SORT_DESC])->limit($num);
+        //$sql = $needCodesQuery->createCommand()->getRawSql();
+        $needCodes = $needCodesQuery->asArray()->all();
+        $filterCodes = array_values($needCodes);
+        $code4nArr = [];
+        foreach ($filterCodes as $filterCode){
+            sort($filterCode);
+            $code4nArr[] = implode('', $filterCode);
+        }
+        $filterCodesStr = implode('","', $code4nArr);
+
+        $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
+            ->where('n.code_str NOT IN("'.$filterCodesStr.'")')
+            ->andWhere(['=', 'code_type', $playway+1]);
+        #$sql = $query->createCommand()->getRawSql();p($sql);
+        $NumTypes = $query->asArray()->all();
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        $betDesc = $filterDesc['desc'].'过滤前'.$num.'期开过的号码全转';
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - 去除上x期同位置 9 * 9 * 9 * 9 = 81 * 81 = 6561 组
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     */
+    public static function filter6(object $plan, $dynamic=[], $filterDesc = []){
+        $playway = $plan->playway;
+        $lotteryType = $plan->lottery_type;
+
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
+        #p($historyKjData);
+
+        $params = $dynamic['params'];
+        $qiNum = trim($params['x']); # x位置
+        $query = Num4Type::find()->select(['code'])
+            ->where(['AND', ['!=', 'code_1', $historyKjData['code1']], ['!=', 'code_2', $historyKjData['code2']], ['!=', 'code_3', $historyKjData['code3']], ['!=', 'code_4', $historyKjData['code4']]])
+            ->andWhere(['=', 'code_type', $playway+1]);
+        $sql = $query->createCommand()->getRawSql();
+        #p($sql);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '去除上期同位置6561组', ['current_kj_qihao'=>$currentKjQiHao, 'lottery_type'=>$lotteryType, 'historyKjData'=>$historyKjData, 'sql'=>$sql]);
+        $NumTypes = $query->asArray()->all();
+        #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        $betDesc = $filterDesc['desc'].'：'."去除上".$qiNum."期同位置号码：千!={$historyKjData['code_1']}百!={$historyKjData['code_2']}十!={$historyKjData['code_3']}个!={$historyKjData['code_4']}";
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+
+        return $codes;
+    }
+
+
+
+    /**
      * @param array $nCode
      * @param int $cNum
      * @param int $playWay
@@ -261,23 +338,45 @@ class DynamicType2Service extends BaseService {
             ];
         }elseif ($cNum == 1){
             # 排除上两个、三个、四个的情况
-            $whereFilterKjCodes = [
-                'OR',
-                # 两个
-                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], 'code_1<>code_2'],
-                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], 'code_1<>code_3'],
-                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_1<>code_4'],
-                ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], 'code_2<>code_3'],
-                ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_2<>code_4'],
-                ['AND', ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_3<>code_4'],
-                # 三个
-                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], 'code_1<>code_2 and code_1<>code_3 and code_2<>code_3'],
-                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_1<>code_2 and code_1<>code_4 and code_2<>code_4'],
-                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_1<>code_3 and code_1<>code_4 and code_3<>code_4'],
-                ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_2<>code_3 and code_2<>code_4 and code_3<>code_4'],
-                # 四个
-                ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_1<>code_2 and code_1<>code_3 and code_1<>code_4 and code_2<>code_3 and code_2<>code_4 and code_3<>code_4'],
-            ];
+            if(false){
+                # 双重算一个
+                $whereFilterKjCodes = [
+                    'OR',
+                    # 两个
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], 'code_1<>code_2'],
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], 'code_1<>code_3'],
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_1<>code_4'],
+                    ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], 'code_2<>code_3'],
+                    ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_2<>code_4'],
+                    ['AND', ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_3<>code_4'],
+                    # 三个
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], 'code_1<>code_2 and code_1<>code_3 and code_2<>code_3'],
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_1<>code_2 and code_1<>code_4 and code_2<>code_4'],
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_1<>code_3 and code_1<>code_4 and code_3<>code_4'],
+                    ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_2<>code_3 and code_2<>code_4 and code_3<>code_4'],
+                    # 四个
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes], 'code_1<>code_2 and code_1<>code_3 and code_1<>code_4 and code_2<>code_3 and code_2<>code_4 and code_3<>code_4'],
+                ];
+            }else{
+                # 双重算一个
+                $whereFilterKjCodes = [
+                    'OR',
+                    # 两个
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes]],
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes]],
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes]],
+                    ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes]],
+                    ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes]],
+                    ['AND', ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes]],
+                    # 三个
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes]],
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes]],
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes]],
+                    ['AND', ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes], ['IN', 'code_4', $filterNumKjCodes]],
+                    # 四个
+                    ['AND', ['IN', 'code_1', $filterNumKjCodes], ['IN', 'code_2', $filterNumKjCodes], ['IN', 'code_3', $filterNumKjCodes]],
+                ];
+            }
         }else{
             $whereFilterKjCodes = '1=1';
         }
