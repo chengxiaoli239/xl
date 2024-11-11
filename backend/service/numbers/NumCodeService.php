@@ -2010,7 +2010,7 @@ class NumCodeService extends BaseService
         }
         Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '随机对数或合分', ['plan_id'=>$plan->id, 'qihao'=>$current_kj_qihao, 'hzArr'=>$hzArr, 'filter_type'=>$filter_type]);
         # {"ps_sel":2,"ps_2":"34689","ps_3":"01257","log_sel":1,"log_1":"05","fixed_pos_hefen_sel":2,"hefen_pos1":"1,2,3","hefen1":"012356789","arise_in_sel":2,"arise_in":"02356","filters":{"playway":"3","start_qihao":"20231226281","lottery_type":"8"}}
-        $codes = NumService::getCodesKuaiXuan($hzArr);
+        $codes = NumService::getCodesKuaiXuan($hzArr, $plan->playway+1);
 
         NumCodeService::addBetDescRand($plan->id, $next_qihao, $betDesc); # 添加动态计划下注描述
         #p(['count'=>count($codes), 'historyKjData'=>$historyKjData, 'codes'=>$codes]);
