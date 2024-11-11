@@ -286,7 +286,6 @@ class DynamicType2Service extends BaseService {
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
         $currentKjQiHao = LotteryType::getBeforeNQiHao($currentKjQiHao, $qiNum);
         $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
-        #p($historyKjData);
 
         $query = Num4Type::find()->select(['code'])
             ->where(['AND', ['!=', 'code_1', $historyKjData['code1']], ['!=', 'code_2', $historyKjData['code2']], ['!=', 'code_3', $historyKjData['code3']], ['!=', 'code_4', $historyKjData['code4']]])

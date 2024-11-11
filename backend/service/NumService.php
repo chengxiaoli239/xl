@@ -3773,6 +3773,9 @@ class NumService extends BaseService {
                     $codes = DynamicFilterService::getFilterDynamic2($plan, $params);
                     break;
                 case 237: # 去除前第x期同位置 9 * 9 * 9 * 9 = 81 * 81 = 6561 组
+                case 238: # 去除前第x期同位置 9 * 9 * 9 * 9 = 81 * 81 = 6561 组
+                case 239: # 去除前第x期同位置 9 * 9 * 9 * 9 = 81 * 81 = 6561 组
+                case 240: # 去除前第x期同位置 9 * 9 * 9 * 9 = 81 * 81 = 6561 组
                     $qiData = [237=>1, 238=>2, 239=>3, 240=>4];
                     $params = [
                         ['type'=>6, 'params'=>['x'=>$qiData[$filter_dynamic_type]]]
