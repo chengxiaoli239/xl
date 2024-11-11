@@ -6,6 +6,7 @@ use backend\models\SscKjData;
 use backend\service\BaseService;
 use backend\service\NumService;
 use common\helpers\Code;
+use common\helpers\LotteryType;
 use common\service\ssc\QihaoService;
 use common\service\ssc\SscKjDataService;
 use common\tools\Tool_Common;
@@ -280,12 +281,13 @@ class DynamicType2Service extends BaseService {
         $playway = $plan->playway;
         $lotteryType = $plan->lottery_type;
 
+        $params = $dynamic['params'];
+        $qiNum = trim($params['x']); # x位置
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+        $currentKjQiHao = LotteryType::getBeforeNQiHao($currentKjQiHao, $qiNum);
         $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
         #p($historyKjData);
 
-        $params = $dynamic['params'];
-        $qiNum = trim($params['x']); # x位置
         $query = Num4Type::find()->select(['code'])
             ->where(['AND', ['!=', 'code_1', $historyKjData['code1']], ['!=', 'code_2', $historyKjData['code2']], ['!=', 'code_3', $historyKjData['code3']], ['!=', 'code_4', $historyKjData['code4']]])
             ->andWhere(['=', 'code_type', $playway+1]);
