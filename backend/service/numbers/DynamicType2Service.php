@@ -187,6 +187,7 @@ class DynamicType2Service extends BaseService {
         }
         if($n<2){
             Tool_Common::log('/data/'.__FUNCTION__, "ERR", '147、258、369本期上2个则下期至少上1个', ['plan_id'=>$plan->id, 'params'=>$params, 'code_str'=>$historyKjData['code_str'], 'fixedCodes'=>$fixedCodes, 'n'=>$n]);
+            throw_info('不满足条件不投');
         }
 
         $lottery_type = $plan->lottery_type;
