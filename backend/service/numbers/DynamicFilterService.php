@@ -15,7 +15,7 @@ class DynamicFilterService extends BaseService {
         ['type'=>3, 'label'=>'x(1234)位近y个码最多上z个', 'params'=>['x'=>'', 'y'=>'', 'z'=>''], 'desc'=>'x(1234)位近y个码最多上z个', 'playway'=>[1, 2, 3]],
         ['type'=>4, 'label'=>'定x位号码y对应位置最少上z个', 'params'=>['x'=>'', 'y'=>'', 'z'=>''], 'desc'=>'定x位号码y对应位置最少上z个', 'playway'=>[1, 2, 3]],
         ['type'=>5, 'label'=>'过滤1234最近x期开过号码全转', 'params'=>['x'=>''], 'desc'=>'过滤1234最近x期开过号码全转', 'playway'=>[3]],
-        ['type'=>6, 'label'=>'过滤1234前第x期同位置号码(6561)', 'params'=>['x'=>''], 'desc'=>'过滤1234上x期同位置号码', 'playway'=>[3]],
+        ['type'=>6, 'label'=>'过滤1234前第x期同位置号码(6561组)', 'params'=>['x'=>''], 'desc'=>'过滤1234上x期同位置号码', 'playway'=>[3]],
     ];
     public static int $filterType = 0;
 
