@@ -13,12 +13,13 @@
             </div>
             <div class="modal-body" id="modal-body-cm">
                 <div class="input-group">
-                    <span for="dtp_input3" class="input-group-addon">到期时间：</span>
-                    <input type="text" class="form-control" style="width: 200px;" id="default_datetimepicker">
+                    <span for="dtp_input" class="input-group-addon">到期时间</span>
+                    <input type="text" class="form-control" style="width: 160px;" id="default_datetimepicker">
                     <!--span class="input-group-addon">.00</span00-->
                     <div class="input-group-btn">
                         <button class="btn btn-default" id="setCurrent">当前</button>
                         <button class="btn btn-default" type="button" id="addOneHour">+1小时</button> &nbsp;
+                        <button class="btn btn-warning" type="button" id="addOneDay">+1天</button>
                         <button class="btn btn-warning" type="button" id="addOneWeek">+1周</button>
                         <button class="btn btn-info" type="button" id="addOneMonth">+1月</button> &nbsp;
                     </div>
@@ -93,6 +94,13 @@ $(function () {
         var datetimepicker = $("#default_datetimepicker");
         var currentDate = datetimepicker.val();
         var newDate = moment(currentDate).add(1, 'week').format('YYYY-MM-DD HH:mm');
+        datetimepicker.val(newDate);
+    });
+
+    $('#addOneDay').click(function () {
+        const datetimepicker = $("#default_datetimepicker");
+        const currentDate = datetimepicker.val();
+        const newDate = moment(currentDate).add(1, 'day').format('YYYY-MM-DD HH:mm');
         datetimepicker.val(newDate);
     });
 
