@@ -11,6 +11,7 @@ use common\service\ssc\QihaoService;
 use common\service\ssc\SscKjDataService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 class DynamicType2Service extends BaseService {
 
@@ -299,6 +300,94 @@ class DynamicType2Service extends BaseService {
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
         $betDesc = $filterDesc['desc'].'：'."去除上".$qiNum."期同位置号码：千!={$historyKjData['code_1']}百!={$historyKjData['code_2']}十!={$historyKjData['code_3']}个!={$historyKjData['code_4']}";
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - 过滤最近x期开过号码全转
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     */
+    public static function filter7(object $plan, $dynamic=[], $filterDesc = []){
+        $playway = $plan->playway;
+        $lotteryType = $plan->lottery_type;
+
+        $params = $dynamic['params'];
+        $qiNum = trim($params['x']); # x位置
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+        $currentKjQiHao = LotteryType::getBeforeNQiHao($currentKjQiHao, $qiNum);
+        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
+        $positions = [];
+        $allPos = NumService::$ALL_POSES;
+        $whereQuery = [];
+        if($playway != 3){
+            $codeHz = Json::decode($plan->hz_Arr);
+            $fixedSelPos = explode(',', $codeHz['fixed_sel_pos']); // 定位位置
+            $whereQuery[] = 'AND';
+            foreach ($allPos as $k=>$pos){
+                if(in_array($pos, $fixedSelPos)){
+                    $whereQuery[] = ['=', 'code_'.$pos, 'X'];
+                    unset($allPos[$k]);
+                }
+            }
+            $allPos = array_values($allPos);
+            $len = count($allPos);
+            if($len == 2){
+                $positions = [
+                    [$allPos[0], $allPos[1]],
+                    [$allPos[1], $allPos[0]],
+                ];
+            }elseif ($len == 3){
+                $positions = [
+                    [$allPos[0], $allPos[1], $allPos[2]],
+                    [$allPos[0], $allPos[2], $allPos[1]],
+                    [$allPos[1], $allPos[0], $allPos[2]],
+                    [$allPos[1], $allPos[2], $allPos[0]],
+                    [$allPos[2], $allPos[0], $allPos[1]],
+                    [$allPos[2], $allPos[1], $allPos[0]],
+                ];
+            }else{
+                throw_info('过滤号码异常');
+            }
+            //p(['allPos'=>$allPos, 'fixedSelPos'=>$fixedSelPos]);
+        }else{
+            $positions[] = $allPos;
+        }
+        $selects = [];
+        foreach ($positions as $pos){
+            //$selects[] = 'CONCAT('.'code'.implode(',","'.',code', $pos).')'; // 含逗号
+            $selects[] = 'CONCAT('.'code'.implode(',code', $pos).')';
+        }
+
+        $needCodesQuery = SscKjData::find()->select($selects)
+            ->where(['lottery_type'=>$lotteryType])
+            ->andWhere(['<=', 'qihao', $currentKjQiHao])
+            ->orderBy(['id'=>SORT_DESC])->limit($qiNum);
+        $sql = $needCodesQuery->createCommand()->getRawSql();//p($sql);
+        $needCodes = $needCodesQuery->asArray()->all();
+        $filterCodes = []; // 过滤全倒的号码
+        foreach ($needCodes as $needCode){
+            $filterCodes = array_merge($filterCodes, array_values($needCode));
+        }
+        $filterCodesStr = implode('","', $filterCodes);
+        //p(['needCodes'=>$needCodes, 'filterCodes'=>$filterCodes]);
+
+        $query = Num4Type::find()->alias('n')->select(['code', 'code_type'])
+            ->where('CONCAT(`code_'.implode('`,`code_', $allPos).'`) NOT IN("'.$filterCodesStr.'")')
+            ->andWhere(['=', 'code_type', $playway+1]);
+        if(!empty($whereQuery)){
+            $query->andwhere($whereQuery);
+        }
+        $sql = $query->createCommand()->getRawSql();p($sql);
+        $NumTypes = $query->asArray()->all();
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+        //p(count($codes));
+
+        $betDesc = $filterDesc['desc'].'：过滤前'.$qiNum.'期开过的号码全转';
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;

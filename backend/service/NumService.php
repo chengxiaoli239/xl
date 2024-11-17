@@ -259,7 +259,8 @@ class NumService extends BaseService {
         147=>'胆码2跨1-2个(四定)', # 0的2跨是2、1的2跨就只是3、8的2跨是6、9的2跨是7
         148=>'随机对数1对、前三合分9个(四定)', # 0的2跨是2、1的2跨就只是3、8的2跨是6、9的2跨是7
         149=>'随机除对数1对(四定)', #
-        230=>'随机除两数同上', #
+        230=>'随机除两数同上1', #
+        238=>'随机除两数同上2', #
         150=>'随机取前三合分9个(四定)', # 0的2跨是2、1的2跨就只是3、8的2跨是6、9的2跨是7
         151=>'配数单双互排除及该位置号码(四定)',
         152=>'0123路配数-除-千位X',
@@ -408,7 +409,8 @@ class NumService extends BaseService {
             227, // '定124位上期369上2个则下期124位至少上1个',
             228, // '定134位上期369上2个则下期134位至少上1个',
             229, // '定234位上期369上2个则下期234位至少上1个',
-            230, // 随机除两数同上
+            230, // 随机除两数同上1
+            238, // 随机除两数同上2
         ],
         # 四定，与二三定不一样，是指定 ------ 剔除
         3 => [
@@ -3760,7 +3762,9 @@ class NumService extends BaseService {
                     $codes = DynamicFilterService::getFilterDynamic2($plan, $params);
                     break;
                 case 230: # 随机过滤两数同上
-                    $codes = NumCodeService::getBeforeKjCodesDynamic120($plan, $randType=3);
+                case 238: # 随机过滤两数同上
+                    $randType = [230=>3, 238=>4][$filter_dynamic_type];
+                    $codes = NumCodeService::getBeforeKjCodesDynamic120($plan, $randType);
                     break;
                 case 236: # 过滤最近x期号码全转
                     $numData = [236=>30];

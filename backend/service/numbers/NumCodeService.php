@@ -1966,12 +1966,12 @@ class NumCodeService extends BaseService
     public static function getBeforeKjCodesDynamic120(object $plan, int $filter_type=0): array
     {
         $lottery_type = $plan->lottery_type;
-        list($current_kj_qihao, $next_qihao) = QihaoService::getKjQiHao($lottery_type);
+        list($currentKjQihao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
         $hzArr = Json::decode($plan->hz_Arr);
         # 随机内容添加："log_sel":1,"log_1":"05","fixed_pos_hefen_sel":2,"hefen_pos1":"1,2,3","hefen1":"012356789"
         //p($hzArr, 0);
         $betDesc = '随机过滤';
-        list($log1, $hefen1) = NumCodeService::getRandCode($plan->id, $current_kj_qihao, $filter_type);
+        list($log1, $hefen1) = NumCodeService::getRandCode($plan->id, $currentKjQihao, $filter_type);
         if($filter_type==1){
             //$log1 = ['05', '16', '27', '38', '49'][rand(0,4)];
             $betDesc .= '对数：'.$log1;
@@ -1988,7 +1988,7 @@ class NumCodeService extends BaseService
                 'hefen_pos1' => '1,2,3',
                 'hefen1' => $hefen1,
             ]);
-        }elseif ($filter_type==3){
+        }elseif (in_array($filter_type, [3, 4])){
             $betDesc .= '两数同上：'.$log1;
             $hzArr = array_merge((array)$hzArr, [
                 'log_sel' => 1,
@@ -2008,11 +2008,11 @@ class NumCodeService extends BaseService
                 'hefen1' => $hefen1,
             ]);
         }
-        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '随机对数或合分', ['plan_id'=>$plan->id, 'qihao'=>$current_kj_qihao, 'hzArr'=>$hzArr, 'filter_type'=>$filter_type]);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '随机对数或合分', ['plan_id'=>$plan->id, 'qihao'=>$currentKjQihao, 'hzArr'=>$hzArr, 'filter_type'=>$filter_type]);
         # {"ps_sel":2,"ps_2":"34689","ps_3":"01257","log_sel":1,"log_1":"05","fixed_pos_hefen_sel":2,"hefen_pos1":"1,2,3","hefen1":"012356789","arise_in_sel":2,"arise_in":"02356","filters":{"playway":"3","start_qihao":"20231226281","lottery_type":"8"}}
         $codes = NumService::getCodesKuaiXuan($hzArr, $plan->playway+1);
 
-        NumCodeService::addBetDescRand($plan->id, $next_qihao, $betDesc); # 添加动态计划下注描述
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc, $filter_type); # 添加动态计划下注描述
         #p(['count'=>count($codes), 'historyKjData'=>$historyKjData, 'codes'=>$codes]);
 
         return $codes;
@@ -2354,13 +2354,13 @@ class NumCodeService extends BaseService
      * @param $desc
      * @return mixed
      */
-    public static function addBetDescRand($planId=0, $qiHao='', $desc='')
+    public static function addBetDescRand($planId=0, $qiHao='', $desc='', $filterType=0)
     {
         try {
             if(empty($desc)){
                 return false;
             }
-            $mKey = CacheKeyService::getBetRandDescKey($planId, $qiHao);
+            $mKey = CacheKeyService::getBetRandDescKey($planId, $qiHao, $filterType);
 
             $r = commonRedis()->sadd($mKey, $desc);
             commonRedis()->expire($mKey, 300);
@@ -2395,15 +2395,15 @@ class NumCodeService extends BaseService
      * 随机合分、对数
      * @param $planId
      * @param $qiHao
-     * @param $type
+     * @param $filterType
      * @return array|mixed
      */
-    public static function getRandCode($planId, $qiHao, $type)
+    public static function getRandCode($planId, $qiHao, $filterType)
     {
-        $mKey = CacheKeyService::getRangeCode($planId, $qiHao, $type);
+        $mKey = CacheKeyService::getRangeCode($planId, $qiHao, $filterType);
         if(!$randData = commonRedis()->get($mKey)){
             $logData = [];
-            if($type == 3){
+            if(in_array($filterType, [3, 4])){
                 $numbers = range(0, 9); // 创建包含 0 到 9 的数组
                 shuffle($numbers); // 打乱数组顺序
 
