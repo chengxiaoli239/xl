@@ -118,9 +118,9 @@ trait LotteryCacheKeyTrait
      * @param string $qiHao
      * @return string
      */
-    public static function getBetRandDescKey(int $planId=0, $qiHao='', $filterType=0): string
+    public static function getBetRandDescKey(int $planId=0, $qiHao=''): string
     {
-        return 'lottery:rand_bet_desc:plan_'.$planId.'_'.$qiHao.'_'.$filterType;
+        return 'lottery:rand_bet_desc:plan_'.$planId.'_'.$qiHao;
     }
 
     /**

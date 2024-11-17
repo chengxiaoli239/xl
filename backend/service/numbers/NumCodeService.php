@@ -2012,7 +2012,7 @@ class NumCodeService extends BaseService
         # {"ps_sel":2,"ps_2":"34689","ps_3":"01257","log_sel":1,"log_1":"05","fixed_pos_hefen_sel":2,"hefen_pos1":"1,2,3","hefen1":"012356789","arise_in_sel":2,"arise_in":"02356","filters":{"playway":"3","start_qihao":"20231226281","lottery_type":"8"}}
         $codes = NumService::getCodesKuaiXuan($hzArr, $plan->playway+1);
 
-        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc, $filter_type); # 添加动态计划下注描述
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
         #p(['count'=>count($codes), 'historyKjData'=>$historyKjData, 'codes'=>$codes]);
 
         return $codes;
@@ -2354,13 +2354,13 @@ class NumCodeService extends BaseService
      * @param $desc
      * @return mixed
      */
-    public static function addBetDescRand($planId=0, $qiHao='', $desc='', $filterType=0)
+    public static function addBetDescRand($planId=0, $qiHao='', $desc='')
     {
         try {
             if(empty($desc)){
                 return false;
             }
-            $mKey = CacheKeyService::getBetRandDescKey($planId, $qiHao, $filterType);
+            $mKey = CacheKeyService::getBetRandDescKey($planId, $qiHao);
 
             $r = commonRedis()->sadd($mKey, $desc);
             commonRedis()->expire($mKey, 300);
