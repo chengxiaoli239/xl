@@ -79,11 +79,12 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        list($code, $hfx) = \backend\service\numbers\NumCodeService::getRandCode($planId=11496, $qiHao='20241103224', $type=4);
+        p([$code, $hfx]);
         $qiHao = LotteryType::getBeforeNQiHao($currentKjQiHao='20241111123', $n=2, $lotteryType=8);
         p([$currentKjQiHao, $qiHao]);
         $currentKjQiHao = KjDataGet::getBeforeQiHaoByQiHao($currentKjiHao='20241111123', $lottery_type=8);
         p([$currentKjQiHao, $lottery_type]);
-        list($code, $hfx, $a) = \backend\service\numbers\NumCodeService::getRandCode($planId=11496, $qiHao='20241103223', $type=3); p([$code, $hfx, $a]);
         $p = '123';
         $pos = str_split($p);
         p($pos);

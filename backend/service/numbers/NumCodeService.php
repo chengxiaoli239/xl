@@ -2411,7 +2411,17 @@ class NumCodeService extends BaseService
                 foreach ($groups as $group){
                     $logData[] = implode('', $group);
                 }
-                $log = $logData[rand(0, 4)];
+                $k = CacheKeyService::getRangeCodeKey($planId, $qiHao);
+                $newLogData = commonRedis()->get($k);
+                if(empty($newLogData)){
+                    $rnt = rand(0, 4);
+                    $log = $logData[$rnt];
+                    unset($logData[$rnt]);
+                    $newLogData = $logData;
+                    commonRedis()->setex($k, 300, $newLogData);
+                }else{
+                    $log = end($newLogData);
+                }
             }else{
                 $log = ['05', '16', '27', '38', '49'][rand(0,4)];
             }
