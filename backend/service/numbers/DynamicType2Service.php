@@ -382,7 +382,7 @@ class DynamicType2Service extends BaseService {
         if(!empty($whereQuery)){
             $query->andwhere($whereQuery);
         }
-        $sql = $query->createCommand()->getRawSql();p($sql);
+        //$sql = $query->createCommand()->getRawSql();p($sql);
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
         //p(count($codes));
