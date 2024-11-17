@@ -382,6 +382,7 @@ class DynamicType2Service extends BaseService {
         if(!empty($whereQuery)){
             $query->andwhere($whereQuery);
         }
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤最近x期开过号码全转', ['plan_id'=>$plan->id, 'currentKjQiHao'=>$currentKjQiHao, 'lottery_type'=>$lotteryType, 'filterDesc'=>$filterDesc, 'sql'=>$sql]);
         //$sql = $query->createCommand()->getRawSql();p($sql);
         $NumTypes = $query->asArray()->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
