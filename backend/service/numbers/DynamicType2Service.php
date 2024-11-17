@@ -319,8 +319,7 @@ class DynamicType2Service extends BaseService {
         $params = $dynamic['params'];
         $qiNum = trim($params['x']); # x位置
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
-        $currentKjQiHao = LotteryType::getBeforeNQiHao($currentKjQiHao, $qiNum);
-        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
+        //$historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
         $positions = [];
         $allPos = NumService::$ALL_POSES;
         $whereQuery = [];
