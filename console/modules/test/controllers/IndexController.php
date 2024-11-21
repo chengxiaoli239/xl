@@ -79,6 +79,9 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $groups = \backend\service\numbers\NumCodeService::getRandNumGroups(0);
+        p($groups);
+
         list($code, $hfx) = \backend\service\numbers\NumCodeService::getRandCode($planId=11496, $qiHao='20241103224', $type=4);
         p([$code, $hfx]);
         $qiHao = LotteryType::getBeforeNQiHao($currentKjQiHao='20241111123', $n=2, $lotteryType=8);

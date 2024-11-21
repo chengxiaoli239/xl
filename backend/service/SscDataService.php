@@ -2255,13 +2255,13 @@ class SscDataService extends BaseService {
                             $single = OperatePlanService::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                         }
                     }else{ # 不中奖
-                        if(in_array($UserSysPlan->plan_type, [9])) { # 遗漏倍投
+                        if($UserSysPlan->plan_type == SscDataService::PLAN_TYPE_YL_BET_SINGLES) { # 9 遗漏倍投
                             $current_miss = (int)($codes_hz['current_miss'] + 1); # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
                             if ($current_miss <= $codes_hz['bet_while_miss']) {
                                 $is_init = 2; # 不中未达到遗漏期数状态 等待状态...
                                 $next_single_key = 0;
                                 $single = $singles[$next_single_key];
-                            } elseif ($current_miss > $codes_hz['bet_while_miss']) {
+                            } else {
                                 $is_init = 3; # 开始投注，正在下注状态
                                 $single = OperatePlanService::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                                 if ($codes_hz['is_init'] == 2) {
@@ -2269,13 +2269,13 @@ class SscDataService extends BaseService {
                                     $single = $singles[$next_single_key];
                                 }
                             }
-                        }elseif(in_array($UserSysPlan->plan_type, [16])){ # 16 plan_type:遗漏倍投2
+                        }elseif($UserSysPlan->plan_type == SscDataService::PLAN_TYPE_YL_BET_SINGLES_2){ # 16 plan_type:遗漏倍投2
                             $current_miss = (int)$codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
                             if ($current_miss <= $codes_hz['bet_while_miss']) {
                                 $is_init = 2; # 不中未达到遗漏期数状态 等待状态...
                                 $next_single_key = 0;
                                 $single = $singles[$next_single_key];
-                            } elseif ($current_miss > $codes_hz['bet_while_miss']) {
+                            } else {
                                 if($current_miss>=($codes_hz['bet_while_miss']+$singles_count)){
                                     # 投完所有倍数不中，则进入等待状态
                                     $is_init = 2; # 不中未达到遗漏期数状态 等待状态...

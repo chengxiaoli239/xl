@@ -2402,22 +2402,16 @@ class NumCodeService extends BaseService
     {
         $mKey = CacheKeyService::getRangeCode($planId, $qiHao, $filterType);
         if(!$randData = commonRedis()->get($mKey)){
-            $logData = [];
             if(in_array($filterType, [3, 4])){
-                $numbers = range(0, 9); // 创建包含 0 到 9 的数组
-                shuffle($numbers); // 打乱数组顺序
+                $randNumbers = self::getRandNumGroups();
 
-                $groups = array_chunk($numbers, 2); // 将数组分成五个组，每组包含5个数字
-                foreach ($groups as $group){
-                    $logData[] = implode('', $group);
-                }
                 $k = CacheKeyService::getRangeCodeKey($planId, $qiHao);
                 $newLogData = commonRedis()->get($k);
                 if(empty($newLogData)){
                     $rnt = rand(0, 4);
-                    $log = $logData[$rnt];
-                    unset($logData[$rnt]);
-                    $newLogData = $logData;
+                    $log = $randNumbers[$rnt];
+                    unset($randNumbers[$rnt]);
+                    $newLogData = $randNumbers;
                     commonRedis()->setex($k, 300, $newLogData);
                 }else{
                     $log = end($newLogData);
@@ -2432,5 +2426,41 @@ class NumCodeService extends BaseService
         }
 
         return $randData;
+    }
+
+    /**
+     * 随机两位号码
+     * @param bool $isRand
+     * @return string[]
+     */
+    public static function getRandNumGroups(bool $isRand=false): array
+    {
+        $randNumbers = [];
+        if($isRand){
+            $numbers = range(0, 9); // 创建包含 0 到 9 的数组
+            shuffle($numbers); // 打乱数组顺序
+
+            $groups = array_chunk($numbers, 2); // 将数组分成五个组，每组包含5个数字
+            foreach ($groups as $group){
+                $randNumbers[] = implode('', $group);
+            }
+        }else{
+            $groupsData = [
+                ['01','02','03','04','06','07','08','09'],
+                ['12','13','14','15','17','18','19'],
+                ['23','24','25','26','28','29'],
+                ['34','35','36','37','39'],
+                ['45','46','47','48'],
+                ['56','57','58','59'],
+                ['67','68','69'],
+                ['78','79'],
+                ['89']
+            ];
+            foreach ($groupsData as $groupsDatum){
+                $randNumbers[] = $groupsDatum[rand(0, count($groupsDatum)-1)];
+            }
+        }
+
+        return $randNumbers;
     }
 }
