@@ -2445,19 +2445,19 @@ class NumCodeService extends BaseService
                 $randNumbers[] = implode('', $group);
             }
         }else{
-            $groupsData = [
-                ['01','02','03','04','06','07','08','09'],
-                ['12','13','14','15','17','18','19'],
-                ['23','24','25','26','28','29'],
-                ['34','35','36','37','39'],
-                ['45','46','47','48'],
-                ['56','57','58','59'],
-                ['67','68','69'],
-                ['78','79'],
-                ['89']
-            ];
-            foreach ($groupsData as $groupsDatum){
-                $randNumbers[] = $groupsDatum[rand(0, count($groupsDatum)-1)];
+            $firsts = [0, 1, 2, 3, 4];
+            shuffle($firsts);
+            $seconds = [5, 6, 7, 8, 9];
+            shuffle($seconds);
+            //p(['firsts'=>$firsts, 'seconds'=>$seconds]);
+            foreach ($firsts as $fk=>$first){
+                foreach ($seconds as $sk=>$second){
+                    if(abs($first - $second) != 5){
+                        $randNumbers[] = $first.$second;
+                        unset($seconds[$sk]);
+                        break;
+                    }
+                }
             }
         }
 
