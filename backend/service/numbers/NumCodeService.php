@@ -2408,7 +2408,7 @@ class NumCodeService extends BaseService
                 $k = CacheKeyService::getRangeCodeKey($planId, $qiHao);
                 $newLogData = commonRedis()->get($k);
                 if(empty($newLogData)){
-                    $rnt = rand(0, 4);
+                    $rnt = rand(0, count($randNumbers) - 1);
                     $log = $randNumbers[$rnt];
                     unset($randNumbers[$rnt]);
                     $newLogData = $randNumbers;
