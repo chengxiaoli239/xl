@@ -2603,4 +2603,56 @@ class Lucky5Service { # 重庆7时彩登陆体系
         return $rstData;
     }
 
+    /**
+     * 获取注单编号
+     * @param Object $TzSystemUsers
+     * @param string $newCookie
+     * @return int|mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public static function getSnId(Object $TzSystemUsers, string $newCookie='')
+    {
+        $client = new \GuzzleHttp\Client();
+        $cookie  = $newCookie ? : $TzSystemUsers->cookie;
+        $_t = microtime(true) * 1000;
+        $url = $TzSystemUsers->ssc_domain.'/Member/GetMemberPrint?_='.$_t;
+        $response = $client->request('GET', $url, [
+            'headers' => [
+                'Accept' => 'application/json, text/javascript, */*; q=0.01',
+                'Accept-Encoding' => 'gzip, deflate, br, zstd',
+                'Accept-Language' => 'zh-CN,zh;q=0.9',
+                'Connection' => 'keep-alive',
+                //'Cookie' => 'robot7=VfCMM/JIT2lLOlnK/mGhcx9Pd1BaMSU77dg0ToPTMcVvD9h4djiL5Kkz9atpaFb7jz2Qb4rNwXAUuXS/Rr8NEA==; ASP.NET_SessionId=ixx5zwntfyzm0isvwk1hiesx; Akamai_Cookie=2836400650.13685.0000; NOTICE_LOGIN_IN=1',
+                'Cookie' => $cookie,
+                'Host' => 'f3.w576yz32.xyz',
+                'Referer' => $TzSystemUsers->ssc_domain.'/App/Index?_='.$_t,
+                'Sec-Ch-UA' => '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+                'Sec-Ch-UA-Mobile' => '?0',
+                'Sec-Ch-UA-Platform' => '"Windows"',
+                'Sec-Fetch-Dest' => 'empty',
+                'Sec-Fetch-Mode' => 'cors',
+                'Sec-Fetch-Site' => 'same-origin',
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+                'X-Requested-With' => 'XMLHttpRequest',
+            ]
+        ]);
+
+        $body = $response->getBody()->getContents();
+
+        if(str_contains($body, '您当前使用的浏览器不支持cookie')){
+            //p($body);
+            $robot_id = Lucky5Service::getRobotIdByStr($body, $url);
+            $cookie = $TzSystemUsers->cookie;
+            preg_match("/robot7=([^\r\n]*); Seven/i", $cookie, $matches);
+            $new_cookie = str_replace('robot7='.$matches[1], $robot_id, $cookie);
+            //p(['data'=>$data, 'old_cookie'=>$cookie, 'matches'=>$matches, 'new_cookie'=>$new_cookie]);
+            $TzSystemUsers->cookie = $new_cookie;
+            $TzSystemUsers->save();
+            var_dump('333');
+            return self::getSnId($TzSystemUsers);
+        }
+        $content = Json::decode($body);
+
+        return [($content['Status'] == 1 and $content['Data']['serial_no']) ? $content['Data']['serial_no'] : 1, $content['Data']['credit_balance']];
+    }
 }

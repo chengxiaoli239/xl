@@ -79,6 +79,8 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $TzSystemsUser = TzSystemsUsers::findOne(41);
+        $snId = Lucky5Service::getSnId($TzSystemsUser); p($snId);
         $groups = \backend\service\numbers\NumCodeService::getRandNumGroups(0);
         p($groups);
 
