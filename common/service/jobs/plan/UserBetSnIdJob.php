@@ -34,7 +34,7 @@ class UserBetSnIdJob extends CommonJob {
             $Bettings = BettingRecords::find()->where($where)->all();
             foreach ($Bettings as $betting){
             }
-            BettingRecords::updateAll(['snid'=>$snId], );
+            //BettingRecords::updateAll(['snid'=>$snId], );
         }catch (\Exception $e){
 
         }

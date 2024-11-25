@@ -645,6 +645,13 @@ abstract class BetService extends BaseBetService {
             }
 
             $task_status = $betRst['task_status'];
+            $snId = '';
+            try {
+                if(isset($betRst['Data']['SerialNo'])){
+                    $snId = $betRst['Data']['SerialNo'];
+                    BettingRecords::updateAll(['snid'=>$snId], ['qihao'=>$qihao, 'plan_id'=>$plan_id]);
+                }
+            }catch (\Exception $e){}
             //p(['class'=>$class, 'model'=>$model]);
             $m = \Yii::$app->cache;
             $mkey = __FUNCTION__.'_'.$plan_id."_".$qihao;
@@ -681,7 +688,7 @@ abstract class BetService extends BaseBetService {
                 }
             }
             $m->set($mkey, 1, 40);
-            Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新计划状态', ['flag'=>$flag, 'lock'=>$lock, 'where'=>$where, 'betRst'=>$betRst, 'lottery_type'=>$lottery_type]);
+            Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '更新计划状态', ['flag'=>$flag, 'lock'=>$lock, 'where'=>$where, 'betRst'=>$betRst, 'snId'=>$snId, 'lottery_type'=>$lottery_type]);
         }catch (\Exception $e){
             return ['status'=>300, 'data'=>[], 'msg'=>$e->getMessage()];
         }
