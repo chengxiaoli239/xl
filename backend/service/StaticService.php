@@ -1843,8 +1843,8 @@ class StaticService extends BaseService {
             foreach ($codeTypeFields as $codeTypeField){
                 $where[$codeTypeField] = 1;
             }
-            $SscKjDatas = SscKjData::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(2000)->all();
-            $staticDatas[str_replace(',', '_', $codeType)]  = count($SscKjDatas);
+            $count = SscKjData::find()->where($where)->orderBy(['id'=>SORT_DESC])->count();
+            $staticDatas[str_replace(',', '_', $codeType)]  = $count;
         }
 
         if($date != date('Y-m-d')){

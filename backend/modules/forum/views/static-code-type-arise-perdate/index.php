@@ -43,7 +43,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         'type_2',
                         'type_3',
                         'type_22',
-                        //'type_2b',
+                        'type_2b',
                         'type_3b',
                         'type_4b',
                         //'type_2_type_2b',
