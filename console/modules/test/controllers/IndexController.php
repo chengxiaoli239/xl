@@ -79,6 +79,15 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        //p(date('Y-m-d', time()-1*86400));
+        $i = 1;
+        for($i=0; $i<60; $i++){
+            $rst = StaticService::staticCodeTypeArisePerData($dates=[
+                date('Y-m-d', time()-$i*86400),
+            ],
+            $lottery_type = 8);
+        }
+        p($rst);
         $statics = StaticService::staticCodeTypeCounts($date=date('Y-m-d'), $lottery_type=8);p($statics);
         $TzSystemsUser = TzSystemsUsers::findOne(41);
         $snId = Lucky5Service::getSnId($TzSystemsUser); p($snId);

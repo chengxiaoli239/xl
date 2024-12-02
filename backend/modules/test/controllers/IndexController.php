@@ -937,8 +937,6 @@ class IndexController extends Controller
         for ($i; $i < 26; $i++) {
             $dates[] = date('Y-m-d', $tmp_date + $i * 86400);
         }
-        $rst = StaticService::staticCodeTypeArisePerData($dates, $lottery_type = 6);
-        p($rst);
         $rst = SscDataService::getPlaywayByCodes();
         p($rst);// 单双遗漏
         $rst = SscDataService::getBetNums();
