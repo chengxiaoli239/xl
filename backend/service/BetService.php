@@ -1038,9 +1038,9 @@ abstract class BetService extends BaseBetService {
         if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了，请稍后'];
 
         $codes_hz = json_decode($UserSysPlans->hz_Arr, true);
-        $codes_hz['current_miss'] = 0; # 当前遗漏
-        $codes_hz['singles_key'] = 0; # 倍数key
-        $codes_hz['is_init'] = 1; # 是否最初
+        //$codes_hz['current_miss'] = 0; # 当前遗漏
+        //$codes_hz['singles_key'] = 0; # 倍数key
+        //$codes_hz['is_init'] = 1; # 是否最初
         if($UserSysPlans->plan_type == 14){
             unset($codes_hz['current_area_profits']);
             unset($codes_hz['start_qihao']);
