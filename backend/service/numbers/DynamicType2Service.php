@@ -287,6 +287,7 @@ class DynamicType2Service extends BaseService {
         $x = trim($params['x']); # x期数
         $qiNums = explode('-', $x);
         $codes = [];
+        $desc = '';
         foreach ($qiNums as $qiNum){
             list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
             $currentKjQiHao = LotteryType::getBeforeNQiHao($currentKjQiHao, $qiNum);
@@ -306,9 +307,10 @@ class DynamicType2Service extends BaseService {
             }
             $codes = array_intersect($codes, $tmpCodes);
 
-            $betDesc = $filterDesc['desc'].'：'."去除上".$qiNum."期同位置号码：千!={$historyKjData['code1']}百!={$historyKjData['code2']}十!={$historyKjData['code3']}个!={$historyKjData['code4']}";
-            NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+            $desc .= "去除上".$qiNum."期同位置号码：千!={$historyKjData['code1']}百!={$historyKjData['code2']}十!={$historyKjData['code3']}个!={$historyKjData['code4']}";
         }
+        $betDesc = $filterDesc['desc'].'：'.$desc;
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
     }
