@@ -79,6 +79,11 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType=8);
+        $currentKjQiHao = LotteryType::getBeforeNQiHao($currentKjQiHao, $qiNum=1);
+        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
+        p($historyKjData);
+
         //p(date('Y-m-d', time()-1*86400));
         $i = 1;
         for($i=0; $i<60; $i++){

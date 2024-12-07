@@ -284,23 +284,31 @@ class DynamicType2Service extends BaseService {
         $lotteryType = $plan->lottery_type;
 
         $params = $dynamic['params'];
-        $qiNum = trim($params['x']); # x位置
-        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
-        $currentKjQiHao = LotteryType::getBeforeNQiHao($currentKjQiHao, $qiNum);
-        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
+        $x = trim($params['x']); # x期数
+        $qiNums = explode('-', $x);
+        $codes = [];
+        foreach ($qiNums as $qiNum){
+            list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+            $currentKjQiHao = LotteryType::getBeforeNQiHao($currentKjQiHao, $qiNum);
+            $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
 
-        $query = Num4Type::find()->select(['code'])
-            ->where(['AND', ['!=', 'code_1', $historyKjData['code1']], ['!=', 'code_2', $historyKjData['code2']], ['!=', 'code_3', $historyKjData['code3']], ['!=', 'code_4', $historyKjData['code4']]])
-            ->andWhere(['=', 'code_type', $playway+1]);
-        $sql = $query->createCommand()->getRawSql();
-        #p($sql);
-        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '去除上期同位置6561组', ['current_kj_qihao'=>$currentKjQiHao, 'lottery_type'=>$lotteryType, 'historyKjData'=>$historyKjData, 'sql'=>$sql]);
-        $NumTypes = $query->asArray()->all();
-        #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
-        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+            $query = Num4Type::find()->select(['code'])
+                ->where(['AND', ['!=', 'code_1', $historyKjData['code1']], ['!=', 'code_2', $historyKjData['code2']], ['!=', 'code_3', $historyKjData['code3']], ['!=', 'code_4', $historyKjData['code4']]])
+                ->andWhere(['=', 'code_type', $playway+1]);
+            $sql = $query->createCommand()->getRawSql();
+            #p($sql);
+            Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '去除上期同位置6561组', ['current_kj_qihao'=>$currentKjQiHao, 'lottery_type'=>$lotteryType, 'historyKjData'=>$historyKjData, 'sql'=>$sql]);
+            $NumTypes = $query->asArray()->all();
+            #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+            $tmpCodes = ArrayHelper::getColumn($NumTypes, 'code');
+            if(empty($codes)){
+                $codes = $tmpCodes;
+            }
+            $codes = array_intersect($codes, $tmpCodes);
 
-        $betDesc = $filterDesc['desc'].'：'."去除上".$qiNum."期同位置号码：千!={$historyKjData['code_1']}百!={$historyKjData['code_2']}十!={$historyKjData['code_3']}个!={$historyKjData['code_4']}";
-        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+            $betDesc = $filterDesc['desc'].'：'."去除上".$qiNum."期同位置号码：千!={$historyKjData['code1']}百!={$historyKjData['code2']}十!={$historyKjData['code3']}个!={$historyKjData['code4']}";
+            NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+        }
 
         return $codes;
     }
