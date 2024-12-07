@@ -285,6 +285,9 @@ class DynamicType2Service extends BaseService {
 
         $params = $dynamic['params'];
         $x = trim($params['x']); # x期数
+        if(!empty($params['y'])){
+            $x .= '-'.trim($params['y']);
+        }
         $qiNums = explode('-', $x);
         $codes = [];
         $desc = '';
