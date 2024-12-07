@@ -287,6 +287,8 @@ class DynamicType2Service extends BaseService {
         $x = trim($params['x']); # x期数
         if(!empty($params['y'])){
             $x .= '-'.trim($params['y']);
+        }else{
+            $x .= '-'.trim($params['x']);
         }
         $qiNums = explode('-', $x);
         $codes = [];
@@ -301,7 +303,7 @@ class DynamicType2Service extends BaseService {
                 ->where(['AND', ['!=', 'code_1', $historyKjData['code1']], ['!=', 'code_2', $historyKjData['code2']], ['!=', 'code_3', $historyKjData['code3']], ['!=', 'code_4', $historyKjData['code4']]])
                 ->andWhere(['=', 'code_type', $playway+1]);
             $sql = $query->createCommand()->getRawSql();
-            #p($sql);
+            //p($sql);
             Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '去除上期同位置6561组', ['current_kj_qihao'=>$currentKjQiHao, 'lottery_type'=>$lotteryType, 'historyKjData'=>$historyKjData, 'sql'=>$sql]);
             $NumTypes = $query->asArray()->all();
             #p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
@@ -309,7 +311,7 @@ class DynamicType2Service extends BaseService {
             if(empty($codes)){
                 $codes = $tmpCodes;
             }
-            $codes = array_intersect($codes, $tmpCodes);
+            $codes = array_merge($codes, $tmpCodes);
             $codes = array_unique($codes);
 
             $desc .= "去除上".$i."期同位置号码：千!={$historyKjData['code1']}百!={$historyKjData['code2']}十!={$historyKjData['code3']}个!={$historyKjData['code4']}";
