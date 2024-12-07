@@ -291,10 +291,12 @@ class DynamicType2Service extends BaseService {
         $qiNums = explode('-', $x);
         $codes = [];
         $desc = '';
-        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
-        foreach ($qiNums as $qiNum){
-            $currentKjQiHao = LotteryType::getBeforeNQiHao($currentKjQiHao, $qiNum);
+        $qiNums = [1, 8];
+        list($currentQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+        for($i=$qiNums[0]; $i<=$qiNums[1]; $i++){
+            $currentKjQiHao = LotteryType::getBeforeNQiHao($currentQiHao, $i);
             $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
+            //print_r(['i'=>'::::'.$i.'_'.$currentKjQiHao, 'historyKjData'=>$historyKjData]);
 
             $query = Num4Type::find()->select(['code'])
                 ->where(['AND', ['!=', 'code_1', $historyKjData['code1']], ['!=', 'code_2', $historyKjData['code2']], ['!=', 'code_3', $historyKjData['code3']], ['!=', 'code_4', $historyKjData['code4']]])
@@ -308,10 +310,10 @@ class DynamicType2Service extends BaseService {
             if(empty($codes)){
                 $codes = $tmpCodes;
             }
-            $codes = array_merge($codes, $tmpCodes);
+            $codes = array_intersect($codes, $tmpCodes);
             $codes = array_unique($codes);
 
-            $desc .= "去除上".$qiNum."期同位置号码：千!={$historyKjData['code1']}百!={$historyKjData['code2']}十!={$historyKjData['code3']}个!={$historyKjData['code4']}";
+            $desc .= "去除上".$i."期同位置号码：千!={$historyKjData['code1']}百!={$historyKjData['code2']}十!={$historyKjData['code3']}个!={$historyKjData['code4']}";
         }
         $betDesc = $filterDesc['desc'].'：'.$desc;
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
