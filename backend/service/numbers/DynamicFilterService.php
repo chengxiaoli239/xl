@@ -56,6 +56,7 @@ class DynamicFilterService extends BaseService {
                     $codes = DynamicType2Service::filter5($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
                 case 6: # 过滤1234前第x期同位置号码(6561)
+                case 8: # 过滤1234前第x-y期同位置号码
                     $codes = DynamicType2Service::filter6($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
                 case 7: # 过滤最近x期开过号码全转

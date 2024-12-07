@@ -291,8 +291,8 @@ class DynamicType2Service extends BaseService {
         $qiNums = explode('-', $x);
         $codes = [];
         $desc = '';
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
         foreach ($qiNums as $qiNum){
-            list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
             $currentKjQiHao = LotteryType::getBeforeNQiHao($currentKjQiHao, $qiNum);
             $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
 

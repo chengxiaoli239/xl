@@ -473,7 +473,8 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
-            $plan = UserSysPlans::findOne(12239);
+            $plan = UserSysPlans::findOne(14351);
+            $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $plan = UserSysPlans::findOne(12240);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
@@ -486,7 +487,6 @@ class IndexController extends Controller
             $areaProfits = SscDataService::getPlanProfits($plan, ['>=', 'qihao', '20241011255'], 1); # 计划当前区间利润
             p($areaProfits);
             $codes = BetService::getCodesByPlan($plan);p(count(explode('@', $codes)));
-            $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $AUTH_ACCESS_TOKENS = TzSystemUsersService::getAuthAccessTokens(2);p($AUTH_ACCESS_TOKENS);
             $rst = OperatePlanService::initPlanPerDate($lottery_type=8, 1);
             p($rst);
