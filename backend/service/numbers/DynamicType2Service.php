@@ -311,7 +311,7 @@ class DynamicType2Service extends BaseService {
             if(empty($codes)){
                 $codes = $tmpCodes;
             }
-            $codes = array_merge($codes, $tmpCodes);
+            $codes = array_intersect($codes, $tmpCodes);
             $codes = array_unique($codes);
 
             $desc .= "去除上".$i."期同位置号码：千!={$historyKjData['code1']}百!={$historyKjData['code2']}十!={$historyKjData['code3']}个!={$historyKjData['code4']}";
