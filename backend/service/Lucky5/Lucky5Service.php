@@ -29,8 +29,9 @@ use common\helpers\LotteryType;
 use common\service\CaptchaCodeService;
 use common\service\proxy\ProxyBaseService;
 use common\tools\KjDataGet;
-use common\tools\RedisLock;
 use common\tools\Tool_Common;
+use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use yii\helpers\ArrayHelper;
 use  yii;
 use yii\helpers\Json;
@@ -823,48 +824,69 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @return mixed
      */
     public static function cancelOrder($id, $tz_system_id){
-        $BettingRecords = BettingRecords::findOne($id);
-        $uid = $BettingRecords->uid;
-        $snid = $BettingRecords->snid;
-        $sn = $BettingRecords->sn;
-        self::__init($uid, $tz_system_id);
+        try {
+            $mkey = 'cancel_order_key_id_'.$id;
+            $BettingRecords = BettingRecords::findOne($id);
+            $uid = $BettingRecords->uid;
+            $snid = $BettingRecords->snid;
+            $sn = $BettingRecords->sn;
+            self::__init($uid, $tz_system_id);
 
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-        $qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
-        //$counts = (int)($BettingRecords->betting_money/$BettingRecords->single);
-        $post_data = [ 'ids'=>$snid, 'period_no' => $qihao];
+            Lucky5Service::userInfo($uid, $tz_system_id);//p($userInfo);
 
-        $_t = round(microtime(true) * 1000);
-        $headers = [
-            'Accept: application/json, text/javascript, */*; q=0.01',
-            'Accept-Encoding: gunzip, deflate',
-            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
-            'Connection: keep-alive',
-            'Content-Length:'.strlen(http_build_query($post_data)),
-            'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
-            'Cookie: '.$TzSystemsUsers->cookie,
-            'Host: '.str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
-            'Origin: '.$TzSystemsUsers->ssc_domain,
-            'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
-            'X-Requested-With: XMLHttpRequest',
-            $TzSystemsUsers->user_agent,
-        ];
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+            $qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
+            //$counts = (int)($BettingRecords->betting_money/$BettingRecords->single);
+            $post_data = [ 'ids'=>"{".$snid."}|".($BettingRecords->betting_money/$BettingRecords->single), 'period_no' => $qihao];
 
-        $url = self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER').'?'.http_build_query($post_data);
+            $_t = round(microtime(true) * 1000);
+            $headers = [
+                'Accept' => 'application/json, text/javascript, */*; q=0.01',
+                'Accept-Encoding' => 'gunzip, deflate',
+                'Accept-Language' => 'zh-CN,zh;q=0.9,en;q=0.8',
+                'Connection' => 'keep-alive',
+                'Content-Length' => strlen(http_build_query($post_data)),
+                'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+                'Cookie' => $TzSystemsUsers->cookie,
+                'Host' => str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
+                'Origin' => $TzSystemsUsers->ssc_domain,
+                'Referer' => $TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+                'X-Requested-With' => 'XMLHttpRequest',
+                //$TzSystemsUsers->user_agent,
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
+            ];
 
-        //$rst = CurlService::postCurl($url, $post_data, $headers);
-        $rst = self::postBetCurl($url,$post_data, $headers, $TzSystemsUsers->uid);
-        if($rst['Status'] == 1 && strpos($rst['Data'], '退码成功')){
-            $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
-            $BettingRecords->cancel_status = 1;
-            $BettingRecords->save();
-            $rst['status'] = 200;
-        }else{
-            //if(isset($rst['Data'])) p($rst['Data'], 0);
-            //sleep(1);
+            $url = self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER').'?'.http_build_query($post_data);
+
+            $options = [
+                RequestOptions::FORM_PARAMS => $post_data,
+                RequestOptions::HEADERS => $headers,
+            ];
+            $response = (new Client())->request('POST', self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER'), $options);
+            $content = $response->getBody()->getContents();
+            $rst = Json::decode($content);
+
+            if($rst['Status'] == 1 && strpos($rst['Data'], '退码成功')){
+                $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
+                $BettingRecords->cancel_status = 1;
+                $BettingRecords->save();
+                $rst['status'] = 200;
+            }else{
+                //if(isset($rst['Data'])) p($rst['Data'], 0);
+                //sleep(1);
+            }
+
+            $logArr = [
+                'url'=>$url,
+                'snid'=>$snid,
+                'headers'=>$headers,
+                'post_data'=>$post_data,
+                'rst'=>$rst,
+                'content' => $content,
+            ];
+            Tool_Common::log('cancelOrder','INFO','撤单记录', $logArr);
+        }catch (\Exception $e){
         }
-        $logArr = ['url'=>$url, 'snid'=>$snid,'headers'=>$headers,'post_data'=>$post_data, 'rst'=>$rst];
-        Tool_Common::log('cancelOrder','INFO','撤单记录', $logArr);
 
         return $rst;
     }

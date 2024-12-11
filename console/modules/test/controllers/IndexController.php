@@ -473,8 +473,12 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
+            // 2611213 //2611225
+            //$userInfo = Lucky5Service::userInfo(50, 9);p($userInfo);
+            $rst = Lucky5Service::cancelOrder($bet_id='2611225', $tz_system_id=9);
+            p($rst);
             $plan = UserSysPlans::findOne(14351);
-            $plan = UserSysPlans::findOne(	14371);
+            $plan = UserSysPlans::findOne(	14351);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $plan = UserSysPlans::findOne(12240);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));

@@ -155,8 +155,11 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                                     return Html::a($str, '#', ['title' => '方案号：'.$model->sn,'alt'=>$model->sn]);;
                                 }
                                 if(!$model->status){
-                                    $str = Html::a('点击撤单', $url1, ['title' => '点击撤单:'.$model->snid,'alt'=>$model->snid]);
-                                    $str .= ' | '.Html::a('点击下注', $url2, ['title' => '点击下注:'.$model->id,'alt'=>$model->id]);
+                                    $str = '';
+                                    if(!empty($model->snid) && $model->snid != \backend\service\BetService::$test_true_snid){
+                                        $str .= Html::a('点击撤单', $url1, ['title' => '点击撤单:'.$model->snid,'alt'=>$model->snid]);
+                                    }
+                                    //$str .= ' | '.Html::a('点击下注', $url2, ['title' => '点击下注:'.$model->id,'alt'=>$model->id]);
                                     if(\Yii::$app->user->id == 1) $str = '<font color="green">等待开奖</font>';
                                     return $str;
                                 }
