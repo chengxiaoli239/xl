@@ -18,7 +18,7 @@ class BettingRecords extends BettingRecordsModel
     public function rules()
     {
         return [
-            [['id', 'lottery_type', 'playway', 'status', 'is_simulate', 'createtime'], 'integer'],
+            [['id', 'lottery_type', 'playway', 'status', 'cancel_status', 'is_simulate', 'createtime'], 'integer'],
             [['codes', 'account', 'plan_id', 'playway_name', 'qihao', 'kj_codes', 'position', 'sn', 'snid', 'lotteryclass', 'create_time'], 'safe'],
             [['betting_money', 'bonus', 'single', 'profits'], 'number'],
         ];
@@ -69,6 +69,7 @@ class BettingRecords extends BettingRecordsModel
             'single' => $this->single,
             'profits' => $this->profits,
             'status' => $this->status,
+            'cancel_status' => $this->cancel_status,
             'lottery_type' => $this->lottery_type,
             'is_simulate' => $this->is_simulate,
             'createtime' => $this->createtime,

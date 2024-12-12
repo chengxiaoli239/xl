@@ -8,6 +8,7 @@
 namespace backend\service\plans;
 
 use backend\models\BetErrorPlansTask;
+use backend\models\SscKjData;
 use backend\models\TzSystemsUsers;
 use backend\service\BaseService;
 use backend\service\BetService;
@@ -24,6 +25,11 @@ class BetErrorPlansTaskService extends BaseService {
         if($r = BetErrorPlansTask::findOne($where)){
             return ['status'=>300, 'msg'=>'记录已存在:'.$uid.'_'.$lottery_type.'_'.$qihao.'_'.$plan_id.'_'.$bet_sort_key];
         }
+
+        if(SscKjData::findOne(['lottery_type'=>$lottery_type, 'qihao'=>$qihao])){
+            return ['status'=>300, 'msg'=>'开机记录已存在:'.$lottery_type.'_'.$qihao];
+        }
+
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
         $where = ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'plan_id'=>$plan_id, 'bet_sort_key'=>$bet_sort_key];
         if(!$BetErrorPlansTask = BetErrorPlansTask::findOne($where)){

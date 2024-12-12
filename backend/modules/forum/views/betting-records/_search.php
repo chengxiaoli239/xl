@@ -9,6 +9,10 @@ use yii\widgets\ActiveForm;
 
 $userId = \Yii::$app->user->id;
 $userNameList = \common\models\AdminModel::find()->select(['username'])->where('id>1 and user_type=1')->indexBy('username')->column();
+$cancelStatus = [
+    0 => '未撤单',
+    1 => '已撤单',
+];
 ?>
 
 <div class="betting-records-search">
@@ -23,12 +27,18 @@ $userNameList = \common\models\AdminModel::find()->select(['username'])->where('
 
     <div class="row">
         <?php if($userId == 1){?>
-        <div class="col-lg-2 col-xs-6">
-            <?= $form->field($model, 'plan_id')->label('计划ID') ?>
-        </div>
-        <div class="col-lg-2 col-xs-6">
-            <?= $form->field($model, 'account')->dropDownList($userNameList)->label('账号名称') ?>
-        </div>
+            <div class="col-lg-2 col-xs-6">
+                <?= $form->field($model, 'plan_id')->label('计划ID') ?>
+            </div>
+            <div class="col-lg-2 col-xs-6">
+                <?= $form->field($model, 'account')->dropDownList($userNameList, ['prompt' => '-选择-'])->label('账号名称') ?>
+            </div>
+            <div class="col-lg-2 col-xs-6">
+                <?= $form->field($model, 'cancel_status')
+                    ->dropDownList(
+                        $cancelStatus, ['prompt' => '-选择-'] // Optional: Add a prompt message
+                )->label('是否撤单') ?>
+            </div>
         <?php }?>
 
         <div class="col-lg-2 col-xs-6 d-flex align-items-center">
