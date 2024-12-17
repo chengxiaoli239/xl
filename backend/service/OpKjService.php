@@ -77,6 +77,7 @@ class OpKjService extends BaseService {
             }
 
             try {
+                Tool_Common::log('/kj_data/'.__FUNCTION__,'INFO','开奖处理-开始', ['record_id'=>$record_id, 'msg'=>'开始处理开奖']);
                 $is_simulate = $BettingRecord->is_simulate;
                 $qihao = $BettingRecord->qihao;
                 $single = $BettingRecord->single;
@@ -105,8 +106,9 @@ class OpKjService extends BaseService {
                 if(!$BettingRecord->save()){
                     throw_info(yii\helpers\Json::encode($BettingRecord->getErrors()));
                 }
+                Tool_Common::log('/kj_data/'.__FUNCTION__,'INFO','开奖处理结束', ['record_id'=>$record_id, 'msg'=>'开始处理开奖']);
             }catch (\Exception $exception){
-                Tool_Common::log('opSscKjData','ERR','投注记录-处理失败', ['record_id'=>$record_id, 'err_msg'=>$exception->getMessage(), 'file'=>$exception->getFile().'_'.$exception->getLine()]);
+                Tool_Common::log('/kj_data/'.__FUNCTION__,'ERR','投注记录-处理失败', ['record_id'=>$record_id, 'err_msg'=>$exception->getMessage(), 'file'=>$exception->getFile().'_'.$exception->getLine()]);
                 $rst = ['status'=>302, 'msg'=>$exception->getMessage(), 'file'=>$exception->getFile().'_'.$exception->getLine()];
             }
         }

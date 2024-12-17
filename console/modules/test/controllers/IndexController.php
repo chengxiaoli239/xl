@@ -473,6 +473,9 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
+            $plan = UserSysPlans::findOne(15016);
+            $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
+            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             // 2611213 //2611225
             //$userInfo = Lucky5Service::userInfo(50, 9);p($userInfo);
             $rst = Lucky5Service::cancelOrder($bet_id='2611225', $tz_system_id=9);
@@ -480,9 +483,7 @@ class IndexController extends Controller
             $plan = UserSysPlans::findOne(14351);
             $plan = UserSysPlans::findOne(	14351);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
-            $plan = UserSysPlans::findOne(12240);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
-            $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             $where = ['uid'=>25, 'plan_id'=>'10892', 'qihao'=>'20241016200', 'lottery_type'=>8];
             $r = BetErrorPlansTask::find()->where($where)->orderBy(['status'=>SORT_ASC])
                 ->orderBy('id DESC')->addOrderBy(['id'=>SORT_DESC])->one()->toArray();

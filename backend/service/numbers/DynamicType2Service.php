@@ -410,6 +410,61 @@ class DynamicType2Service extends BaseService {
         return $codes;
     }
 
+    /**
+     * 过滤类型号码 - 定位x或定位y合分为z
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     */
+    public static function filter9(object $plan, $dynamic=[], $filterDesc = []){
+        $lotteryType = $plan->lottery_type;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
+
+        $params = $dynamic['params'];
+        $pos1 = trim($params['x']); # x位置
+        $pos1s = [];
+        for ($i=0; $i<strlen($pos1); $i++){
+            $pos1s[] = $pos1[$i];
+        }
+        $pos2 = trim($params['y']); # y位置
+        $pos2s = [];
+        for ($i=0; $i<strlen($pos2); $i++){
+            $pos2s[] = $pos2[$i];
+        }
+        $hefen = trim($params['z']); # 合分
+        $filterHfs = [];
+        for($i=0; $i<strlen($hefen); $i++){
+            $filterHf = $hefen[$i];
+            $filterHfs = array_merge($filterHfs, [$filterHf, $filterHf+10, $filterHf+20, $filterHf+30]);
+        }
+
+        $positions = [$pos1s, $pos2s];
+        $where = ["OR"];
+        foreach ($positions as $position){
+            $otherHf = '(code_'.implode('+code_', $position).')';
+
+            $where[] = ['IN', $otherHf, $filterHfs]; # '(`code_1`+`code_2`+`code_3`+`code_4`)'
+        }
+        //p([$sumHz, $historyKjData, $hz, $hz[strlen($hz)-1], strlen($hz), $filterNum]);
+
+        $playway = $plan->playway;
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => $playway+1])
+            ->andWhere($where);
+        //$sql = $query->createCommand()->getRawSql();p($sql);
+
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
+        $betDesc = $filterDesc['desc']."定位x:".implode(',', $pos1s)."或定位y:".implode(',', $pos2s)."合分为z:".$hefen;
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+
+        return $codes;
+    }
 
 
     /**
