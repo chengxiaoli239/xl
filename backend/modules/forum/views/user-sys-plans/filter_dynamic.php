@@ -54,8 +54,12 @@ input:focus {
                 <!-- 添加隐藏的input字段 -->
                 <input type="hidden" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][label]" value="<?= htmlspecialchars($value['label'], ENT_QUOTES) ?>">
                 <?php foreach ($value['params'] as $k2 => $v2): ?>
-                    <input type="number" id="input_<?= $key.'_'.$k2 ?>" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][params][<?= $k2 ?>]" style="width: 45px; margin: -2px 2px;" placeholder="<?= $k2 ?>" value="<?= $v2 ?>">
+                    <input type="number" id="input_<?= $key.'_'.$k2 ?>" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][params][<?= $k2 ?>]" style="width: 60px; margin: -2px 2px;" placeholder="<?= $k2 ?>" value="<?= $v2 ?>">
                 <?php endforeach; ?>
+                <!-- 这里是添加条件显示desc -->
+                <?php if ($value['label'] !== $value['desc']): ?>
+                    <span style="margin-left: 5px; font-size: 12px; color: gray;">如:<?= htmlspecialchars($value['desc'], ENT_QUOTES) ?></span>
+                <?php endif; ?>
             </div>
             <?php endif; ?>
         <?php endforeach; ?>
