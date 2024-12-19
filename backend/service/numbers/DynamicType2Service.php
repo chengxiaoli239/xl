@@ -9,6 +9,7 @@ use common\helpers\Code;
 use common\helpers\LotteryType;
 use common\service\ssc\QihaoService;
 use common\service\ssc\SscKjDataService;
+use common\tools\KjDataGet;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -461,6 +462,66 @@ class DynamicType2Service extends BaseService {
         $codes = ArrayHelper::getColumn($results, 'code');
         //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
         $betDesc = $filterDesc['desc']."定位".implode('', $pos1s)."或定位".implode('', $pos2s)."合分为:".$hefen;
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - x位过滤上上期的y位+上期z位合数
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     */
+    public static function filter11(object $plan, $dynamic=[], $filterDesc = []){
+        $lotteryType = $plan->lottery_type;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+
+        $params = $dynamic['params'];
+        $pos1 = trim($params['x']); # x位
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+
+        $before1pos = trim($params['z']); # 上期z位
+        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
+        $beforeCode = $historyKjData['code'.$before1pos];
+
+        # 上上期
+        $before2pos = trim($params['y']); # 上上期y位
+        $before2KjQiHao = KjDataGet::getBeforeQiHaoByQiHao($currentKjQiHao, $lotteryType);
+        $history2KjData = NumCodeService::getKjData($before2KjQiHao, $lotteryType);
+        $before2Code = $history2KjData['code'.$before2pos];
+
+        # 过滤合分
+        $hf = $before2Code + $beforeCode;
+        $lastCode = substr((string)$hf, -1);
+
+        $logArr = [
+            'before1pos' => $before1pos,
+            'before1code' => $beforeCode,
+            'historyKjData' => $historyKjData,
+            'before2pos' => $before2pos,
+            'before2Code' => $before2Code,
+            'history2KjData' => $history2KjData,
+            'hf' => $hf,
+            'lastCode' => $lastCode,
+        ];
+
+        $where = ['!=', 'code_'.$pos1, $lastCode];
+        $playway = $plan->playway;
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => $playway+1])
+            ->andWhere($where);
+        //$sql = $query->createCommand()->getRawSql();p($sql);
+
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', 'x位过滤上上期的y位+上期z位合数', ['plan_id'=>$plan->id, 'currentKjQiHao'=>$currentKjQiHao, 'lottery_type'=>$lotteryType, 'filterDesc'=>$filterDesc, 'd'=>$logArr/* 'sql'=>$sql*/]);
+
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
+        $betDesc = $filterDesc['desc'].$pos1."位过滤上上期的'.$before2pos.'位+上期'.$before1pos.'位合数".$lastCode;
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
