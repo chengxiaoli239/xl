@@ -19,6 +19,7 @@ class DynamicFilterService extends BaseService {
         ['type'=>7, 'label'=>'过滤1234最近x期开过号码全转', 'params'=>['x'=>''], 'desc'=>'过滤1234最近x期开过号码全转', 'playway'=>[1,2]],
         ['type'=>8, 'label'=>'过滤1234前第x-y期同位置号码', 'params'=>['x'=>'', 'y'=>''], 'desc'=>'过滤1234前第x-y期同位置号码', 'playway'=>[3]],
         ['type'=>9, 'label'=>'定位x或定位y合分为z', 'params'=>['x'=>'', 'y'=>'', 'z'=>''], 'desc'=>'定位(x)12或(y)34合分为(z)01234', 'playway'=>[3]],
+        ['type'=>10, 'label'=>'定位x或定位y合分为z', 'params'=>['x'=>'', 'y'=>'', 'z'=>''], 'desc'=>'定位(x)12或(y)34合分为(z)01234', 'playway'=>[3]],
     ];
     public static int $filterType = 0;
 
@@ -64,6 +65,7 @@ class DynamicFilterService extends BaseService {
                     $codes = DynamicType2Service::filter7($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
                 case 9: # 定位x或定位y合分为z
+                case 10: # 定位x或定位y合分为z
                     $codes = DynamicType2Service::filter9($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
             }
