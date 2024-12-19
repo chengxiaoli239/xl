@@ -521,7 +521,7 @@ class DynamicType2Service extends BaseService {
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
         //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
-        $betDesc = $filterDesc['desc'].$pos1."位过滤上上期的".$before2pos."位+上期".$before1pos."位合数".$lastCode;
+        $betDesc = $filterDesc['desc'].$pos1."位过滤上上期的".$before2pos."位[".$before2Code."]+上期".$before1pos."位[".$beforeCode."]合数".$lastCode;
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
