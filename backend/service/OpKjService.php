@@ -49,8 +49,11 @@ class OpKjService extends BaseService {
                     ->orderBy('id DESC'); //->limit(100)->all();
                 //if(!$bettingRecords) return $rst;
                 foreach ($bettingRecords->each(20) as $BettingRecord){
-                    print_r(['record_id'=>$BettingRecord->id]);
-                    $rst['data'][$BettingRecord->id] = OpKjService::opOneBettingRecord($BettingRecord->id, $BettingRecord);
+                    $kjData = CommonService::getAwardNumberByQihao($BettingRecord->qihao, $lottery_type); // 3,4,5,6,7
+                    //print_r(['record_id'=>$BettingRecord->id, 'isEmpty'=>empty($BettingRecord), 'kjData'=>$kjData]);
+                    if(!empty($kjData)){
+                        $rst['data'][$BettingRecord->id] = OpKjService::opOneBettingRecord($BettingRecord->id, $BettingRecord);
+                    }
                 }
                 break;
         }
@@ -64,7 +67,7 @@ class OpKjService extends BaseService {
      * @param string $record_id
      * @return array
      */
-    public static function opOneBettingRecord($record_id='', $BettingRecord=''){
+    public static function opOneBettingRecord($record_id='', $BettingRecord='', $kjData=[]){
         $rst = ['status'=>200, 'msg'=>'处理成功'];
 
         if(empty($BettingRecord)){
@@ -85,10 +88,12 @@ class OpKjService extends BaseService {
                 $playway = $BettingRecord->playway;
                 $codes = $BettingRecord->codes;
 
-                # 开奖数据
-                $kjData = CommonService::getAwardNumberByQihao($qihao, $BettingRecord->lottery_type); // 3,4,5,6,7
-                if(!$kjData){
-                    return $rst = ['status'=>300, 'msg'=>$qihao.'期未开奖!'];
+                if(empty($kjData)){
+                    # 开奖数据
+                    $kjData = CommonService::getAwardNumberByQihao($qihao, $BettingRecord->lottery_type); // 3,4,5,6,7
+                    if(!$kjData){
+                        return $rst = ['status'=>300, 'msg'=>$qihao.'期未开奖!'];
+                    }
                 }
 
                 $profitsData = self::calcProfits($playway, $codes, $kjData, $single, $BettingRecord->uid);

@@ -221,7 +221,7 @@ class IndexController extends Controller
      * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii data/index/op-kj
      * @return array
      */
-    public function actionOpKj(): array
+    public function actionOpKj($lotteryType='8'): array
     {
         self::_init();
         $time = date("H:i");
@@ -229,8 +229,11 @@ class IndexController extends Controller
             $rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
             return $rst;
         }
-        $lottery_types = StaticService::getLotteryTypes();
-        $lottery_types = [8];
+        if(!empty($lotteryType)){
+            $lottery_types = explode(',', $lotteryType);
+        }else{
+            $lottery_types = StaticService::getLotteryTypes();
+        }
 
         foreach ($lottery_types as $lottery_type) {
             for ($i=0; $i<3; $i++){
