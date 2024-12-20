@@ -230,6 +230,7 @@ class IndexController extends Controller
             return $rst;
         }
         $lottery_types = StaticService::getLotteryTypes();
+        $lottery_types = [8];
 
         foreach ($lottery_types as $lottery_type) {
             for ($i=0; $i<3; $i++){

@@ -49,6 +49,7 @@ class OpKjService extends BaseService {
                     ->orderBy('id DESC'); //->limit(100)->all();
                 //if(!$bettingRecords) return $rst;
                 foreach ($bettingRecords->each(20) as $BettingRecord){
+                    print_r(['record_id'=>$BettingRecord->id]);
                     $rst['data'][$BettingRecord->id] = OpKjService::opOneBettingRecord($BettingRecord->id, $BettingRecord);
                 }
                 break;
