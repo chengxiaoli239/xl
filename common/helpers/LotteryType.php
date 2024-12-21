@@ -75,7 +75,7 @@ class LotteryType
      * @param int $lotteryType
      * @return bool|int|mixed|string
      */
-    public static function getBeforeNQiHao($qiHao, int $beforeNum=1, int $lotteryType=DEFAULT_LOTTERY_TYPE)
+    public static function getBeforeNQiHao($qiHao, $beforeNum=1, $lotteryType=DEFAULT_LOTTERY_TYPE)
     {
         for($i=0; $i<$beforeNum; $i++){
             $qiHao = KjDataGet::getBeforeQiHaoByQiHao($qiHao, $lotteryType);
