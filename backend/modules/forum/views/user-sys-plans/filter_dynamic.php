@@ -26,6 +26,9 @@ input:focus {
     margin-bottom: -9px;
 }
 </style>
+<?
+$dynamics = array_column(\backend\service\numbers\DynamicFilterService::DYNAMIC_FILTER_TYPES, null, 'type');
+?>
 <!--动态过滤-->
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #da4f49;">
     <div class="col-lg-10 col-xs-12">
@@ -60,9 +63,40 @@ input:focus {
                 <?php if ($value['label'] !== $value['desc'] && !empty($value['desc'])): ?>
                     <span style="margin-left: 5px; font-size: 12px; color: gray;">如:<?= htmlspecialchars($value['desc'], ENT_QUOTES) ?></span>
                 <?php endif; ?>
+                <!-- 如果存在图片URL，则显示按钮 -->
+                <?php if (!empty($dynamics[$value['type']]['img'])): ?>
+                    <button
+                        type="button"
+                        class="btn btn-info btn-xs show-modal-btn" style="margin-left: 5px;"
+                        data-desc="<?= '描述：'.$dynamics[$value['type']]['desc'].($value['params']['x']?' ==> [x:'.$value['params']['x'].']':'').($value['params']['y']?'、[y:'.$value['params']['y'].']':'').($value['params']['z']?'、[z:'.$value['params']['z'].']':'').($value['params']['h']?'、[h:'.$value['params']['h'].']':'') ?>"
+                        data-img="<?= htmlspecialchars($dynamics[$value['type']]['img'], ENT_QUOTES) ?>"
+                    >查看</button>
+                <?php endif; ?>
             </div>
             <?php endif; ?>
         <?php endforeach; ?>
+    </div>
+</div>
+
+<!-- 模态框 -->
+<div class="modal fade" id="dynamicModal" tabindex="-1" role="dialog" aria-labelledby="dynamicModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="dynamicModalLabel">详情信息</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 动态填充内容 -->
+                <p id="modalDesc"></p>
+                <img id="modalImage" src="" alt="详情图片" style="max-width: 100%; height: auto; display: none;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -153,4 +187,32 @@ $(function () {
         $('#exampleModal_msg_filter_dynamic_type').modal('show');
     });
 })
+
+// 监听所有 "查看详情" 按钮的点击事件
+document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("dynamicModal");
+    const modalDesc = document.getElementById("modalDesc");
+    const modalImage = document.getElementById("modalImage");
+
+    // 获取所有的按钮
+    document.querySelectorAll(".show-modal-btn").forEach(function (button) {
+        button.addEventListener("click", function () {
+            // 从按钮中获取数据
+            const desc = this.getAttribute("data-desc");
+            const imgUrl = this.getAttribute("data-img");
+
+            // 设置模态框内容
+            modalDesc.textContent = desc;
+            if (imgUrl) {
+                modalImage.src = imgUrl;
+                modalImage.style.display = "block";
+            } else {
+                modalImage.style.display = "none";
+            }
+
+            // 显示模态框
+            $(modal).modal("show");
+        });
+    });
+});
 </script>
