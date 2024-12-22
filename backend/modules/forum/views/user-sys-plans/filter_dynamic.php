@@ -68,7 +68,7 @@ $dynamics = array_column(\backend\service\numbers\DynamicFilterService::DYNAMIC_
                     <button
                         type="button"
                         class="btn btn-info btn-xs show-modal-btn" style="margin-left: 5px;"
-                        data-desc="<?= '描述：'.$dynamics[$value['type']]['desc'].($value['params']['x']?' ==> [x:'.$value['params']['x'].']':'').($value['params']['y']?'、[y:'.$value['params']['y'].']':'').($value['params']['z']?'、[z:'.$value['params']['z'].']':'').($value['params']['h']?'、[h:'.$value['params']['h'].']':'') ?>"
+                        data-desc="<?= '描述：'.$dynamics[$value['type']]['label'].($value['params']['x']?' ==> [x:'.$value['params']['x'].']':'').($value['params']['y']?'、[y:'.$value['params']['y'].']':'').($value['params']['z']?'、[z:'.$value['params']['z'].']':'').($value['params']['h']?'、[h:'.$value['params']['h'].']':'') ?>"
                         data-img="<?= htmlspecialchars($dynamics[$value['type']]['img'], ENT_QUOTES) ?>"
                     >查看</button>
                 <?php endif; ?>
