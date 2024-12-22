@@ -21,6 +21,7 @@ class DynamicFilterService extends BaseService {
         ['type'=>9, 'label'=>'定位x或定位y合分为z', 'params'=>['x'=>'', 'y'=>'', 'z'=>''], 'desc'=>'定位(x)12或(y)34合分为(z)01234', 'playway'=>[3]],
         ['type'=>10, 'label'=>'定位x或定位y合分为z', 'params'=>['x'=>'', 'y'=>'', 'z'=>''], 'desc'=>'定位(x)12或(y)34合分为(z)01234', 'playway'=>[3]],
         ['type'=>11, 'label'=>'x位过滤上上期y位+上期z位合数', 'params'=>['x'=>'', 'y'=>'', 'z'=>''], 'desc'=>'1位过滤上上期3位+上期的4位合数', 'playway'=>[3]],
+        ['type'=>12, 'label'=>'(x位+上期y位)!=(上上期z位+上期h位 合数)', 'params'=>['x'=>'', 'y'=>'', 'z'=>'', 'h'=>''], 'desc'=>'(x位+上期y位)!=(上上期z位+上期h位合数)', 'playway'=>[3]],
     ];
     public static int $filterType = 0;
 
@@ -71,6 +72,9 @@ class DynamicFilterService extends BaseService {
                     break;
                 case 11: # x位过滤上上期的y位+上期z位合数
                     $codes = DynamicType2Service::filter11($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 12: # (x位+上期y位)!=(上上期z位+上期h位 合数)
+                    $codes = DynamicType2Service::filter12($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
             }
             if(empty($codes)){

@@ -29,12 +29,12 @@ input:focus {
 <!--动态过滤-->
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #da4f49;">
     <div class="col-lg-10 col-xs-12">
-        <?= $form->field($model, 'filter_dynamic_types')->checkboxList($filter_dynamic_typesArr)->label('.动态过滤1 <span id="tag_filter_dynamic_type" class="glyphicon glyphicon-comment"></span>') ?>
+        <?= $form->field($model, 'filter_dynamic_types')->checkboxList($filter_dynamic_typesArr)->label('.动态过滤1（1234分别代表：千百十个） <span id="tag_filter_dynamic_type" class="glyphicon glyphicon-comment"></span>') ?>
     </div>
 </div>
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #da4f49;">
     <div class="col-lg-10 col-xs-12">
-        <label>动态过滤2：</label>
+        <label>动态过滤2（1234分别代表：千百十个）：</label>
         <?php foreach ($filter_dynamic_types2 as $key=>$value): ?>
             <?php if(empty($value['playway']) OR in_array($playway, $value['playway'])): ?> <!--这里报错了，没有闭合-->
             <div style="display: flex; align-items: center;">
@@ -54,7 +54,7 @@ input:focus {
                 <!-- 添加隐藏的input字段 -->
                 <input type="hidden" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][label]" value="<?= htmlspecialchars($value['label'], ENT_QUOTES) ?>">
                 <?php foreach ($value['params'] as $k2 => $v2): ?>
-                    <input type="number" id="input_<?= $key.'_'.$k2 ?>" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][params][<?= $k2 ?>]" style="width: 60px; margin: -2px 2px;" placeholder="<?= $k2 ?>" value="<?= $v2 ?>">
+                    <input type="text" id="input_<?= $key.'_'.$k2 ?>" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][params][<?= $k2 ?>]" style="width: 40px; margin: -2px 2px;" placeholder="<?= $k2 ?>" value="<?= $v2 ?>">
                 <?php endforeach; ?>
                 <!-- 这里是添加条件显示desc -->
                 <?php if ($value['label'] !== $value['desc'] && !empty($value['desc'])): ?>

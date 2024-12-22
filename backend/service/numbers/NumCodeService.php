@@ -33,12 +33,16 @@ class NumCodeService extends BaseService
      * @param int $lottery_type
      * @return array|SscKjData|mixed|null
      */
-    public static function getKjData(string $qiHao='', int $lottery_type=DEFAULT_LOTTERY_TYPE)
+    public static function getKjData(string $qiHao='', int $lotteryType=DEFAULT_LOTTERY_TYPE, $before2=false)
     {
-        $mKey = CacheKeyService::lotteryKjInfo($lottery_type, $qiHao);
+        if($before2){
+            # 上上期号码
+            $qiHao = KjDataGet::getBeforeQiHaoByQiHao($qiHao, $lotteryType);
+        }
+        $mKey = CacheKeyService::lotteryKjInfo($lotteryType, $qiHao);
         $kjData = commonRedis()->get($mKey);
         if(empty($kjData)){
-            $historyWhere = ['AND', ['=', 'lottery_type', $lottery_type], ['=', 'qihao', $qiHao]];
+            $historyWhere = ['AND', ['=', 'lottery_type', $lotteryType], ['=', 'qihao', $qiHao]];
             $select = ['code1', 'code2', 'code3', 'code4', 'code5', 'code_str', 'qihao', 'code_str',
                 'type_ds'=>'code_1_2_3_4', 'code_1_2_3_4',
                 'type_4dx'=>'LEFT(type_4dx,4)',
@@ -48,7 +52,7 @@ class NumCodeService extends BaseService
             $historyKjDataQuery = SscKjData::find()->select($select)->where($historyWhere)->limit(1)->orderBy(['id'=>SORT_DESC]);
             $sql = $historyKjDataQuery->createCommand()->getRawSql();//p($sql);
             $kjData = $historyKjDataQuery->asArray()->one();
-            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据', ['lottery_type'=>$lottery_type, 'qiHao'=>$qiHao, 'kjData'=>$kjData]);
+            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '开奖数据', ['lottery_type'=>$lotteryType, 'qiHao'=>$qiHao, 'kjData'=>$kjData]);
             if(empty($kjData['qihao'])){
                 return []; # 开奖数据为空
             }
