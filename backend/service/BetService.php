@@ -2082,6 +2082,7 @@ abstract class BetService extends BaseBetService {
             $user_ids = [];
             foreach ($plansQuery->each(20) as $plan){
                 try {
+                    $t1 = microtime(true);
                     $tz_system_id = $plan->tz_sites;
                     $lottery_type = $plan->lottery_type;
                     $uid = $plan->uid;
@@ -2139,9 +2140,12 @@ abstract class BetService extends BaseBetService {
 
                         $insertRst = $BetService->postBatchBet($activeQiHao, $plan, $codes);
                         $rst['data'][$plan->id] = $insertRst;
-                        $logArr = ['uid'=>$uid, 'account'=>$plan->account, 'plan_id'=>$plan->id, 'activeQiHao'=>$activeQiHao, 'insertRst'=>$insertRst];
+
+                        $t2 = microtime(true);
+                        $time_consume = ($t2-$t1).'s';
+                        $logArr = ['uid'=>$uid, 'account'=>$plan->account, 'plan_id'=>$plan->id, 'activeQiHao'=>$activeQiHao, 'insertRst'=>$insertRst, 'time_consume'=>$time_consume];
                         $user_ids[$uid] = ['user_id'=>$uid];
-                        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入计划-任务-2', $logArr);
+                        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入计划任务结束', $logArr);
                         commonRedis()->setex($insert_mkey, 120, 1);
                     }
                     $rst['data'] = ['activeQiHao'=>$qiHao, 'plan_id'=>$plan->id, 'msg'=>'正常'];

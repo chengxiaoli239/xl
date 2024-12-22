@@ -115,7 +115,7 @@ class OpKjService extends BaseService {
                 }
                 $t2 = microtime(true);
                 $time_consume = ($t2-$t1).'s';
-                Tool_Common::log('/kj_data/'.__FUNCTION__,'INFO','开奖处理结束', ['record_id'=>$record_id, 'time_consume'=>$time_consume.'s']);
+                Tool_Common::log('/kj_data/'.__FUNCTION__,'INFO','开奖处理结束', ['record_id'=>$record_id, 'time_consume'=>$time_consume]);
             }catch (\Exception $exception){
                 Tool_Common::log('/kj_data/'.__FUNCTION__,'ERR','投注记录-处理失败', ['record_id'=>$record_id, 'err_msg'=>$exception->getMessage(), 'file'=>$exception->getFile().'_'.$exception->getLine()]);
                 $rst = ['status'=>302, 'msg'=>$exception->getMessage(), 'file'=>$exception->getFile().'_'.$exception->getLine()];
