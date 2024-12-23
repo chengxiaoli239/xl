@@ -602,7 +602,7 @@ class DynamicType2Service extends BaseService {
     }
 
     /**
-     * 过滤类型号码 - 定位x排除位置的对数
+     * 过滤类型号码 - 定位x分别排除位置的对数
      * @param object $plan
      * @param array $dynamic
      * @param array $filterDesc
@@ -646,7 +646,7 @@ class DynamicType2Service extends BaseService {
         $query = self::getBaseCodesQuery($where, $plan->playway);
         //$sql = $query->createCommand()->getRawSql();p($sql);
 
-        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '定位x排除位置对应对数与对数值合分', ['plan_id'=>$plan->id, 'currentKjQiHao'=>$currentKjQiHao, 'lottery_type'=>$lotteryType, 'filterDesc'=>$filterDesc, 'd'=>$logArr/* 'sql'=>$sql*/]);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '定位x分别排除位置的对数', ['plan_id'=>$plan->id, 'currentKjQiHao'=>$currentKjQiHao, 'lottery_type'=>$lotteryType, 'filterDesc'=>$filterDesc, 'd'=>$logArr/* 'sql'=>$sql*/]);
 
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
@@ -707,7 +707,7 @@ class DynamicType2Service extends BaseService {
         $query = self::getBaseCodesQuery($where, $plan->playway);
         //$sql = $query->createCommand()->getRawSql();p($sql);
 
-        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '定位x排除位置对应对数与对数值合分', ['plan_id'=>$plan->id, 'currentKjQiHao'=>$currentKjQiHao, 'lottery_type'=>$lotteryType, 'filterDesc'=>$filterDesc, 'd'=>$logArr/* 'sql'=>$sql*/]);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '定位x排除对应位置的合分与对数值合分', ['plan_id'=>$plan->id, 'currentKjQiHao'=>$currentKjQiHao, 'lottery_type'=>$lotteryType, 'filterDesc'=>$filterDesc, 'd'=>$logArr/* 'sql'=>$sql*/]);
 
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');

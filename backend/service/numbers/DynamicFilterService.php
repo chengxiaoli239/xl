@@ -86,7 +86,7 @@ class DynamicFilterService extends BaseService {
                 case 14: # (x位+上期y位)!=(上上期z位+上期h位 合数)
                     $codes = DynamicType2Service::filter12($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
-                case 15: # 定位x排除位置的对数
+                case 15: # 定位x分别排除位置的对数
                     $codes = DynamicType2Service::filter15($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
                 case 16: # 定位x排除对应位置的合分与对数值合分
