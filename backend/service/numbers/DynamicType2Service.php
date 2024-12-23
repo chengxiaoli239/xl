@@ -547,7 +547,6 @@ class DynamicType2Service extends BaseService {
         $before1Code = $historyKjData['code'.$before1pos];
 
         # 相加的数
-        $p1Codes = [];
         # 上上期z位
         $before2pos = trim($params['z']); # 上上期z位
         $before2poss = str_split($before2pos);
@@ -596,6 +595,77 @@ class DynamicType2Service extends BaseService {
         $codes = ArrayHelper::getColumn($results, 'code');
         //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
         $betDesc = $filterDesc['desc']."(".$pos1."位[过滤".$xFilterCode."]+上期".$before1pos."位:".$before1Code.")!=(上上期".$before2pos."位:".implode('',$pzCodes)."+上期h".$before1pos2."位".implode('', $phCodes).")=".$hz;
+        //p($betDesc);
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+
+        return $codes;
+    }
+
+    /**
+     * 过滤类型号码 - 定位x排除位置对应对数以及过滤所有位置对数值合分
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     */
+    public static function filter15(object $plan, $dynamic=[], $filterDesc = []){
+        $lotteryType = $plan->lottery_type;
+
+        $params = $dynamic['params'];
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+
+        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType); # 上期号码
+
+        $x = trim($params['x']); # 位置
+        $positions = str_split($x);
+        $filterCodes = [];
+        foreach ($positions as $p){
+            $posCode = $historyKjData['code'.$p] >4 ? ($historyKjData['code'.$p]-5) : ($historyKjData['code'.$p]+5);
+            $filterCodes[$p] = $posCode;
+        }
+
+        $where = ['AND'];
+        foreach ($filterCodes as $pos=>$code){
+            $where[] = ['!=', 'code_'.$pos, $code];
+        }
+        if($plan->playway!=3){
+            $xpos = array_diff(NumService::$ALL_POSES, $positions);
+            foreach ($xpos as $pos1){
+                $where[] = ['=', 'code_'.$pos1, 'X'];
+            }
+        }
+
+        $sumHz = array_sum($filterCodes);
+        $firstHf = substr((string)$sumHz, -1);
+        $secondHf = ($firstHf>4) ? ($firstHf-5) : ($firstHf+5);
+        $hzs = [
+            $firstHf, $firstHf+10, $firstHf+20, $firstHf+30,
+            $secondHf, $secondHf+10, $secondHf+20, $secondHf+30,
+        ];
+
+        $where[] = ['NOT IN', '(code_'.implode('+code_', $positions).')', $hzs];
+
+        $logArr = [
+            'p'=>$positions,
+            'historyKjData'=>$historyKjData,
+            'secondHf'=>$secondHf,
+            'hzs'=>$hzs,
+            'filterCodes'=>$filterCodes,
+            'xpos'=>$xpos,
+            'sumHz'=>$sumHz,
+            'where'=>$where,
+        ];
+        //p($logArr, 0);
+
+        $query = self::getBaseCodesQuery($where, $plan->playway);
+        //$sql = $query->createCommand()->getRawSql();p($sql);
+
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '定位x排除位置对应对数与对数值合分', ['plan_id'=>$plan->id, 'currentKjQiHao'=>$currentKjQiHao, 'lottery_type'=>$lotteryType, 'filterDesc'=>$filterDesc, 'd'=>$logArr/* 'sql'=>$sql*/]);
+
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
+        $betDesc = $filterDesc['desc']."定位".$params['x']."排除位置(".implode('',$filterCodes).")对应对数以及合分:". $firstHf.$secondHf;
         //p($betDesc);
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 

@@ -64,12 +64,20 @@ $dynamics = array_column(\backend\service\numbers\DynamicFilterService::DYNAMIC_
                     <span style="margin-left: 5px; font-size: 12px; color: gray;">如:<?= htmlspecialchars($value['desc'], ENT_QUOTES) ?></span>
                 <?php endif; ?>
                 <!-- 如果存在图片URL，则显示按钮 -->
-                <?php if (!empty($dynamics[$value['type']]['img'])): ?>
+                <?php if (!empty($dynamics[$value['type']]['img']) OR !empty($dynamics[$value['type']]['is_show'])): ?>
                     <button
                         type="button"
                         class="btn btn-info btn-xs show-modal-btn" style="margin-left: 5px;"
-                        data-desc="<?= '描述：'.$dynamics[$value['type']]['label'].($value['params']['x']?' ==> [x:'.$value['params']['x'].']':'').($value['params']['y']?'、[y:'.$value['params']['y'].']':'').($value['params']['z']?'、[z:'.$value['params']['z'].']':'').($value['params']['h']?'、[h:'.$value['params']['h'].']':'') ?>"
-                        data-img="<?= htmlspecialchars($dynamics[$value['type']]['img'], ENT_QUOTES) ?>"
+                        data-label="<?=$dynamics[$value['type']]['label']?>"
+                        data-desc="<?= htmlspecialchars(
+                        '描述：'.($value['params']['x'] ? ' [x:'.$value['params']['x'].']' : '')
+                                .($value['params']['y'] ? '、[y:'.$value['params']['y'].']' : '')
+                                .($value['params']['z'] ? '、[z:'.$value['params']['z'].']' : '')
+                                .($value['params']['h'] ? '、[h:'.$value['params']['h'].']' : '')
+                                .' '.$dynamics[$value['type']]['desc'],
+                                ENT_QUOTES
+                            ) ?>"
+                        "data-img="<?= htmlspecialchars($dynamics[$value['type']]['img'], ENT_QUOTES) ?>"
                     >查看</button>
                 <?php endif; ?>
             </div>
@@ -191,6 +199,7 @@ $(function () {
 // 监听所有 "查看详情" 按钮的点击事件
 document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("dynamicModal");
+    const modalTile = document.getElementById("dynamicModalLabel");
     const modalDesc = document.getElementById("modalDesc");
     const modalImage = document.getElementById("modalImage");
 
@@ -198,11 +207,14 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll(".show-modal-btn").forEach(function (button) {
         button.addEventListener("click", function () {
             // 从按钮中获取数据
+            const title = this.getAttribute("data-label");
             const desc = this.getAttribute("data-desc");
             const imgUrl = this.getAttribute("data-img");
 
+
             // 设置模态框内容
             modalDesc.textContent = desc;
+            modalTile.textContent = title
             if (imgUrl) {
                 modalImage.src = imgUrl;
                 modalImage.style.display = "block";
