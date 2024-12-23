@@ -69,15 +69,8 @@ $dynamics = array_column(\backend\service\numbers\DynamicFilterService::DYNAMIC_
                         type="button"
                         class="btn btn-info btn-xs show-modal-btn" style="margin-left: 5px;"
                         data-label="<?=$dynamics[$value['type']]['label']?>"
-                        data-desc="<?= htmlspecialchars(
-                        '描述：'.($value['params']['x'] ? ' [x:'.$value['params']['x'].']' : '')
-                                .($value['params']['y'] ? '、[y:'.$value['params']['y'].']' : '')
-                                .($value['params']['z'] ? '、[z:'.$value['params']['z'].']' : '')
-                                .($value['params']['h'] ? '、[h:'.$value['params']['h'].']' : '')
-                                .' '.$dynamics[$value['type']]['desc'],
-                                ENT_QUOTES
-                            ) ?>"
-                        "data-img="<?= htmlspecialchars($dynamics[$value['type']]['img'], ENT_QUOTES) ?>"
+                        data-desc="<?= '描述：'.($value['params']['x']?' ==> [x:'.$value['params']['x'].']':'').($value['params']['y']?'、[y:'.$value['params']['y'].']':'').($value['params']['z']?'、[z:'.$value['params']['z'].']':'').($value['params']['h']?'、[h:'.$value['params']['h'].']':'').$dynamics[$value['type']]['label'] ?>"
+                        data-img="<?= htmlspecialchars($dynamics[$value['type']]['img'], ENT_QUOTES) ?>"
                     >查看</button>
                 <?php endif; ?>
             </div>
