@@ -60,16 +60,26 @@ $dynamics = array_column(\backend\service\numbers\DynamicFilterService::DYNAMIC_
                     <input type="text" id="input_<?= $key.'_'.$k2 ?>" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][params][<?= $k2 ?>]" style="width: 40px; margin: -2px 2px;" placeholder="<?= $k2 ?>" value="<?= $v2 ?>">
                 <?php endforeach; ?>
                 <!-- 这里是添加条件显示desc -->
-                <?php if ($value['label'] !== $value['desc'] && !empty($value['desc'])): ?>
+                <!--
+                <?php if (empty($dynamics[$value['type']]['is_show'])): ?>
                     <span style="margin-left: 5px; font-size: 12px; color: gray;">如:<?= htmlspecialchars($value['desc'], ENT_QUOTES) ?></span>
                 <?php endif; ?>
+                -->
                 <!-- 如果存在图片URL，则显示按钮 -->
-                <?php if (!empty($dynamics[$value['type']]['img']) OR !empty($dynamics[$value['type']]['is_show'])): ?>
+                <?php if (true OR !empty($dynamics[$value['type']]['img']) OR !empty($dynamics[$value['type']]['is_show'])): ?>
                     <button
                         type="button"
                         class="btn btn-info btn-xs show-modal-btn" style="margin-left: 5px;"
-                        data-label="<?=$dynamics[$value['type']]['label']?>"
-                        data-desc="<?= '描述：'.($value['params']['x']?' ==> [x:'.$value['params']['x'].']':'').($value['params']['y']?'、[y:'.$value['params']['y'].']':'').($value['params']['z']?'、[z:'.$value['params']['z'].']':'').($value['params']['h']?'、[h:'.$value['params']['h'].']':'').$dynamics[$value['type']]['label'] ?>"
+                        data-label="<?= htmlspecialchars($dynamics[$value['type']]['label'], ENT_QUOTES) ?>"
+                        data-desc="<?= htmlspecialchars(
+                            '描述：'
+                            . ($value['params']['x'] ? ' ==> [x:' . $value['params']['x'] . ']' : '')
+                            . ($value['params']['y'] ? '、[y:' . $value['params']['y'] . ']' : '')
+                            . ($value['params']['z'] ? '、[z:' . $value['params']['z'] . ']' : '')
+                            . ($value['params']['h'] ? '、[h:' . $value['params']['h'] . ']' : '')
+                            . $dynamics[$value['type']]['desc'],
+                            ENT_QUOTES
+                        ) ?>"
                         data-img="<?= htmlspecialchars($dynamics[$value['type']]['img'], ENT_QUOTES) ?>"
                     >查看</button>
                 <?php endif; ?>
@@ -206,7 +216,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             // 设置模态框内容
-            modalDesc.textContent = desc;
+            modalDesc.innerHTML = desc;
             modalTile.textContent = title
             if (imgUrl) {
                 modalImage.src = imgUrl;

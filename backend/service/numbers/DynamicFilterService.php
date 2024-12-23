@@ -26,7 +26,8 @@ class DynamicFilterService extends BaseService {
         ['type'=>12, 'label'=>'(x位+上期y位)!=(上上期z位+上期h位)合数', 'params'=>['x'=>'', 'y'=>'', 'z'=>'', 'h'=>''], 'desc'=>'(x位+上期y位)!=(上上期z位+上期h位)合数', 'playway'=>[3], 'img'=>'/statics/img/dynamic_filter/12.png'],
         ['type'=>14, 'label'=>'(x位+上期y位)!=(上上期z位+上期h位)合数', 'params'=>['x'=>'', 'y'=>'', 'z'=>'', 'h'=>''], 'desc'=>'(x位+上期y位)!=(上上期z位+上期h位)合数', 'playway'=>[3], 'img'=>'/statics/img/dynamic_filter/12.png'],
 
-        ['type'=>15, 'label'=>'定位x排除位置对应对数与对数值合分', 'params'=>['x'=>''], 'desc'=>"定位x排除位置对应对数以及过滤所有位置对数值合分，比如x：123，上期开：7849。1、则1位排除7、2位排除8，3位排除4。 2、123位合分为9(7+8+4=19)，则123位过滤合分：4和9", 'playway'=>[2,3], 'is_show'=>1],
+        ['type'=>15, 'label'=>'定位x排除位置对应对数', 'params'=>['x'=>''], 'desc'=>"定位x排除位置对应对数，比如x：123，上期开：7849。 <br>1、则1位排除2、2位排除3，3位排除9", 'playway'=>[2,3], 'is_show'=>1],
+        ['type'=>16, 'label'=>'定位x排除位置对数与对数值合分', 'params'=>['x'=>''], 'desc'=>"定位x排除位置合分以及对数值合分，比如x：123，上期开：7849。 <br>1、123位合分为9(7+8+4=19)，则123位过滤合分：4和9", 'playway'=>[2,3], 'is_show'=>1],
 
 
     ];
@@ -85,8 +86,11 @@ class DynamicFilterService extends BaseService {
                 case 14: # (x位+上期y位)!=(上上期z位+上期h位 合数)
                     $codes = DynamicType2Service::filter12($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
-                case 15: # 定位x排除位置对应对数与对数值合分
+                case 15: # 定位x排除位置的对数
                     $codes = DynamicType2Service::filter15($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 16: # 定位x排除对应位置的合分与对数值合分
+                    $codes = DynamicType2Service::filter16($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
             }
             if(empty($codes)){
