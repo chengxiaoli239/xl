@@ -131,6 +131,21 @@ class BaseKj extends BaseService {
     }
 
     /**
+     * 输出xml格式
+     * @param $expect
+     * @param $openCode
+     * @param $openTime
+     * @return void
+     */
+    public static function outputXml($expect='', $openCode='', $openTime='')
+    {
+        header("Content-type: application/xml");
+        echo'<?xml version="1.0" encoding="utf-8"?>';
+        echo '<xml><row expect="'."$expect".'" opencode="'."$openCode".'" opentime="'."$openTime".'" /></xml>';
+        ob_end_flush();exit;
+    }
+
+    /**
      * @param $kjData
      * @param $lottery_type
      * @param string $returnType

@@ -73,7 +73,7 @@ $dynamics = array_column(\backend\service\numbers\DynamicFilterService::DYNAMIC_
                         data-label="<?= htmlspecialchars($dynamics[$value['type']]['label'], ENT_QUOTES) ?>"
                         data-desc="<?= htmlspecialchars(
                             '描述：'
-                            . ($value['params']['x'] ? ' ==> [x:' . $value['params']['x'] . ']' : '')
+                            . ($value['params']['x'] ? ' [x:' . $value['params']['x'] . ']' : '')
                             . ($value['params']['y'] ? '、[y:' . $value['params']['y'] . ']' : '')
                             . ($value['params']['z'] ? '、[z:' . $value['params']['z'] . ']' : '')
                             . ($value['params']['h'] ? '、[h:' . $value['params']['h'] . ']' : '')

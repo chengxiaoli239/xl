@@ -52,4 +52,16 @@ class Lucky5Controller extends Controller
         $data = Lucky5::getLotteryShiXunOne($type, $post['is_auto']);
         return $data;
     }
+
+    /**
+     * @desc 幸运五星彩 - 实时资讯网 https://web01.cc138001.com - 新接口
+     * @param string $type
+     * @return array
+     */
+    public function actionShiXunOneNew($type = 'json'){
+        ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
+        $post = \Yii::$app->request->post();
+        $data = Lucky5::getLotteryShiXunOneNew($type, $post['is_auto']);
+        return $data;
+    }
 }

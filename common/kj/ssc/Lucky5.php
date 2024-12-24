@@ -108,20 +108,16 @@ class Lucky5 extends BaseKj {
         }
 
         if($returnType == 'xml'){
-            header("Content-type: application/xml");
-            echo'<?xml version="1.0" encoding="utf-8"?>';
-            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
-            ob_end_flush();exit;
+            self::outputXml($expect, $opencode, $opentime);
         }else{
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
-        $logArr = $rst;
 
         return $rst;
     }
 
     /**
-     * @desc 幸运五星彩 - 实时资讯网 https://cc138001.com 未完
+     * @desc 幸运五星彩 - 实时资讯网 https://cc138001.com 新
      * http://web01.cc138008.com/?url=pc/live/ygxy5#/pc/live/ygxy5
      * @param string $returnType
      * @param int $is_auto 1:自动2手动
@@ -181,10 +177,74 @@ class Lucky5 extends BaseKj {
         self::setKjDataCache(self::$lottery_type, $expect, $kjData);
 
         if($returnType == 'xml'){
-            header("Content-type: application/xml");
-            echo'<?xml version="1.0" encoding="utf-8"?>';
-            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
-            ob_end_flush();exit;
+            self::outputXml($expect, $opencode, $opentime);
+        }else{
+            $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
+        }
+
+        return $rst;
+    }
+
+    /**
+     * @desc 幸运五星彩 - 实时资讯网 https://cc138001.com 新
+     * https://web01.cc138008.com/#/pc/khtj/ygxy5
+     * @param string $returnType
+     * @param int $is_auto 1:自动2手动
+     * @return array|bool
+     */
+    public static function getLotteryShiXunOneNew($returnType = 'json', $is_auto=1){
+        try {
+            $is_remote = 0;
+            $status = KjDataGet::isCanGrab(self::$lottery_type);
+            $checkStatus = (new LotteryBet())->checkLotteryStatus(self::$lottery_type); # 是否封盘, 封盘之时即是抓去之时
+            if(empty($status)){
+                throw_info('非开奖抓取时间节点:'.date('Y-m-d H:i:s'));
+            }
+            $kjData = self::getCurrentKjData(self::$lottery_type, $current_qihao);
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '号码抓取-实讯网01', ['lottery_type'=>self::$lottery_type, 'current_qihao'=>$current_qihao, 'kjData'=>$kjData, 'is_auto'=>$is_auto]);
+            if($is_auto==2 OR empty($kjData)) {
+                $is_remote = 1;
+
+                $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun-one');
+                $url = $domain.'/server/kaihaoview/list?type=ygxy5&start=0'; #当前开奖号码
+                $rst = CurlService::getCurl302($url);
+                //p(['url'=>$url, 'data'=>$rst]);
+                $data = $rst['data']['history'][0];
+
+                if (!isset($rst['data']['history'][0]) OR empty($data)){
+                    throw_info('开奖数据为空：'.yii\helpers\Json::encode($rst, 320));
+                }
+                $newData = $rst['data']['history'][0];
+
+                $opencode = $newData['draw_code'];
+                $mkey = BaseKj::getOpenCodeLtKey(self::$lottery_type, $current_qihao);
+                $num = \Yii::$app->redis->incr($mkey);
+                \Yii::$app->redis->expire($mkey, 8);
+                if($opencode == '0,0,0,0,0' && $num>5){
+                    throw_info('开奖数据为空：'.$opencode);
+                }
+                $kjData = ['expect'=>$newData['issue'], 'opencode'=>$opencode, 'opentime'=>$newData['draw_time']];
+            }
+            if(empty($kjData['opencode'])){
+                throw_info('开奖号码不能为空');
+            }
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '号码抓取-实讯网02', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'is_remote'=>$is_remote, 'checkStatus'=>$checkStatus]);
+        }catch (\Exception $e){
+            $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
+
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '号码抓取异常-实讯网03', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'rst'=>$rst, 'err_msg'=>$e->getMessage(), 'is_remote'=>$is_remote, 'current_proxy_addr'=>$current_proxy_addr, 'checkStatus'=>$checkStatus]);
+            if($e->getCode() != self::SUCCESS_CODE){
+                return false;
+            }
+        }
+        $opencode = $kjData['opencode'];
+        $opentime = $kjData['opentime'];
+        $expect = $kjData['expect'];
+
+        self::setKjDataCache(self::$lottery_type, $expect, $kjData);
+
+        if($returnType == 'xml'){
+            self::outputXml($expect, $opencode, $opentime);
         }else{
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
@@ -234,10 +294,7 @@ class Lucky5 extends BaseKj {
         }
 
         if($returnType == 'xml'){
-            header("Content-type: application/xml");
-            echo'<?xml version="1.0" encoding="utf-8"?>';
-            echo '<xml><row expect="'."$expect".'" opencode="'."$opencode".'" opentime="'."$opentime".'" /></xml>';
-            ob_end_flush();exit;
+            self::outputXml($expect, $opencode, $opentime);
         }else{
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime, 'is_remote'=>$is_remote];
         }
