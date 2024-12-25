@@ -473,8 +473,7 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
-            $data = \common\kj\ssc\Lucky5::getLotteryShiXunOneNew('json', 2);p($data);
-            $plan = UserSysPlans::findOne(15222);
+            $plan = UserSysPlans::findOne(15450);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             // 2611213 //2611225
