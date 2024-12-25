@@ -768,7 +768,7 @@ class DynamicType2Service extends BaseService {
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
         //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
-        $betDesc = $filterDesc['desc']."[上期号码:".$historyKjData['code_str']."],上期y:".$params['y']."位,定位x:".$params['x']."排除合分:". implode('、', $hzs);
+        $betDesc = $filterDesc['desc']."[上期".$historyKjData['qihao']."：".$historyKjData['code_str']."],上期y:".$params['y']."位,定位x:".$params['x']."排除合分:". implode('、', $hzs);
         //p($betDesc);
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
