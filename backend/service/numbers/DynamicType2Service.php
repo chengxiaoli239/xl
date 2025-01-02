@@ -434,6 +434,11 @@ class DynamicType2Service extends BaseService {
         for ($i=0; $i<strlen($pos2); $i++){
             $pos2s[] = $pos2[$i];
         }
+        $pos3 = trim($params['k']); # k位置
+        $pos3s = [];
+        for ($i=0; $i<strlen($pos3); $i++){
+            $pos3s[] = $pos3[$i];
+        }
         $hefen = trim($params['z']); # 合分
         $filterHfs = [];
         for($i=0; $i<strlen($hefen); $i++){
@@ -441,9 +446,10 @@ class DynamicType2Service extends BaseService {
             $filterHfs = array_merge($filterHfs, [$filterHf, $filterHf+10, $filterHf+20, $filterHf+30]);
         }
 
-        $positions = [$pos1s, $pos2s];
+        $positions = [$pos1s, $pos2s, $pos3s];
         $where = ["OR"];
         foreach ($positions as $position){
+            if(empty($position)) continue;
             $otherHf = '(code_'.implode('+code_', $position).')';
 
             $where[] = ['IN', $otherHf, $filterHfs]; # '(`code_1`+`code_2`+`code_3`+`code_4`)'

@@ -615,6 +615,7 @@ class UserController extends BaseController
         if(\Yii::$app->user->id == 1){
             UserService::updateUserTzSystemStatus($id, $status);
         }
+        TzSystemUsersService::getAuthAccessTokens($isAuto=2);
 
         return $this->redirect(['view']);
     }
