@@ -785,6 +785,60 @@ class DynamicType2Service extends BaseService {
         return $codes;
     }
 
+    # 过滤x个配数单双互排除及该位置号码(四定)
+    public static function filter19(object $plan, $dynamic=[], $filterDesc = []): array
+    {
+        $lotteryType = $plan->lottery_type;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+
+        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
+
+        $params = $dynamic['params'];
+        $x = $params['x']; # x个位置
+        if($x == 1){
+            $where = ['OR'];
+            foreach (NumService::$ALL_POSES as $pos){
+                $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
+                $where[] = ['NOT IN', 'code_'.$pos, $filterCode];
+            }
+        }elseif ($x == 2){
+            $where = ['OR'];
+            foreach (NumService::TWO_NUM_POS as $poss){
+                $subWhere = ['AND'];
+                foreach ($poss as $pos){
+                    $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
+                    $subWhere[] = ['IN', 'code_'.$pos, $filterCode];
+                }
+                $where[] = $subWhere;
+            }
+        }elseif ($x == 3){
+            $where = ['OR'];
+            foreach (NumService::THIRD_NUM_POS as $poss){
+                $subWhere = ['AND'];
+                foreach ($poss as $pos){
+                    $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
+                    $subWhere[] = ['IN', 'code_'.$pos, $filterCode];
+                }
+                $where[] = $subWhere;
+            }
+        }elseif ($x == 4){
+            $where = ['AND'];
+            foreach (NumService::$ALL_POSES as $pos){
+                $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
+                $where[] = ['IN', 'code_'.$pos, $filterCode];
+            }
+        }
+        $query = self::getBaseCodesQuery(['NOT', $where], $plan->playway);
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        //p(['params'=>$params, 'where'=>$where, 'count'=>count($codes)]);
+
+        $betDesc = $filterDesc['desc']."[上期".$historyKjData['qihao']."：".$historyKjData['code_str']."]过滤".$x."个配数单双互排除及该位置号码(四定)-组数：".count($codes);
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+
+        return $codes;
+    }
+
     /**
      * 获取查询对象
      * @param $where

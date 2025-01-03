@@ -28,6 +28,7 @@ class NumService extends BaseService {
     const DOUBLE_TYPE_DS = [0, 2, 4, 5, 6, 7, 8, 9];
     # 两数位置
     const TWO_NUM_POS = [[1,2], [1,3], [1,4], [2,3], [2,4], [3,4]];
+    const THIRD_NUM_POS = [[1,2, 3], [1,2,4], [1,3,4], [2,3,4]];
 
     const EXCLUDE = 1; # 除
     const OBTAIN = 2; # 取
