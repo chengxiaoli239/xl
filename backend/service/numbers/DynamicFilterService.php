@@ -33,6 +33,7 @@ class DynamicFilterService extends BaseService {
         ['type'=>19, 'label'=>'定位x或定位y或定位k,合分为z', 'params'=>['x'=>'', 'y'=>'', 'k'=>'', 'z'=>''], 'desc'=>"<br>比如：x:13、y:24、j:34、z:45678 <br>则(第1位+第3位合分)或(第2位+第4位的合分)或(第3位+第4位的合分)，只要有一个合分为：45678就中 <br>x、y、k可以只填其中两个或三个一起填", 'playway'=>[3]],
         ['type'=>20, 'label'=>'定位x或定位y或定位k,合分为z', 'params'=>['x'=>'', 'y'=>'', 'k'=>'', 'z'=>''], 'desc'=>"<br>比如：x:13、y:24、j:34、z:45678 <br>则(第1位+第3位合分)或(第2位+第4位的合分)或(第3位+第4位的合分)，只要有一个合分为：45678就中 <br>x、y、k可以只填其中两个或三个一起填", 'playway'=>[3]],
         ['type'=>21, 'label'=>'过滤同时x个位置配数单双互排除及该位置号码', 'params'=>['x'=>''], 'desc'=>'过滤同时存在x个配数单双互排除及该位置号码', 'playway'=>[3]],
+        ['type'=>22, 'label'=>'x个位置配数单双互排除及该位置号码上奖', 'params'=>['x'=>''], 'desc'=>"同时存在x个位置配数单双互排除及该位置号码则中奖，比如开：2345，x:1，则下一把：<br>第1位开135792<br>第2位开024683<br>第3位开135794<br>第4位开024685<br>以上只要有一个位置中就算中，如x:2，则需要2个位置中才算中，以此类推", 'playway'=>[3]],
     ];
     public static int $filterType = 0;
 
@@ -103,6 +104,9 @@ class DynamicFilterService extends BaseService {
                     break;
                 case 21: # 过滤x个配数单双互排除及该位置号码(四定)
                     $codes = DynamicType2Service::filter19($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 22: # x个位置配数单双互排除及该位置号码中奖
+                    $codes = DynamicType2Service::filter19($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType], $direct=1);
                     break;
             }
             if(empty($codes)){

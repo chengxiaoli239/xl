@@ -786,7 +786,7 @@ class DynamicType2Service extends BaseService {
     }
 
     # 过滤x个配数单双互排除及该位置号码(四定)
-    public static function filter19(object $plan, $dynamic=[], $filterDesc = []): array
+    public static function filter19(object $plan, $dynamic=[], $filterDesc = [], $direct=0): array
     {
         $lotteryType = $plan->lottery_type;
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
@@ -828,12 +828,18 @@ class DynamicType2Service extends BaseService {
                 $where[] = ['IN', 'code_'.$pos, $filterCode];
             }
         }
-        $query = self::getBaseCodesQuery(['NOT', $where], $plan->playway);
+        $txt = '';
+        if($direct==1){
+            $query = self::getBaseCodesQuery($where, $plan->playway);
+            $txt = '-反';
+        }else{
+            $query = self::getBaseCodesQuery(['NOT', $where], $plan->playway);
+        }
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
         //p(['params'=>$params, 'where'=>$where, 'count'=>count($codes)]);
 
-        $betDesc = $filterDesc['desc']."[上期".$historyKjData['qihao']."：".$historyKjData['code_str']."]过滤".$x."个配数单双互排除及该位置号码(四定)-组数：".count($codes);
+        $betDesc = $filterDesc['desc']."[上期".$historyKjData['qihao']."：".$historyKjData['code_str']."]过滤".$x."个配数单双互排除及该位置号码".$txt."(四定)-组数：".count($codes);
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
