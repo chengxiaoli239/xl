@@ -582,6 +582,7 @@ class TzSystemUsersService extends ClientsBaseService{
             $data = [];
             $_t = round(microtime(true) * 1000);
             foreach ($BetErrorPlansTasks as $row){
+                if($row->single<0.1) continue; // 异常倍数不下注
                 $plan_id = $row->plan_id;
                 $account = $row->account;
                 $bet_url = $row->bet_url;
