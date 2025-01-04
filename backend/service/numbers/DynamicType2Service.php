@@ -799,7 +799,11 @@ class DynamicType2Service extends BaseService {
             $where = ['OR'];
             foreach (NumService::$ALL_POSES as $pos){
                 $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
-                $where[] = ['NOT IN', 'code_'.$pos, $filterCode];
+                if($direct){
+                    $where[] = ['IN', 'code_'.$pos, $filterCode];
+                }else{
+                    $where[] = ['NOT IN', 'code_'.$pos, $filterCode];
+                }
             }
         }elseif ($x == 2){
             $where = ['OR'];
