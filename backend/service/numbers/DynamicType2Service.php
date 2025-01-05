@@ -795,9 +795,17 @@ class DynamicType2Service extends BaseService {
 
         $params = $dynamic['params'];
         $x = $params['x']; # x个位置
+        $filterPoss = NumService::$ALL_POSES;
+        if($x==2){
+            $filterPoss = NumService::TWO_NUM_POS;
+        }elseif ($x==3){
+            $filterPoss = NumService::THIRD_NUM_POS;
+        }elseif ($x==4){
+            $filterPoss = NumService::$ALL_POSES;
+        }
         if($x == 1){
             $where = ['OR'];
-            foreach (NumService::$ALL_POSES as $pos){
+            foreach ($filterPoss as $pos){
                 $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
                 if($direct){
                     $where[] = ['IN', 'code_'.$pos, $filterCode];
@@ -807,41 +815,27 @@ class DynamicType2Service extends BaseService {
             }
         }elseif ($x == 2){
             $where = ['OR'];
-            foreach (NumService::TWO_NUM_POS as $poss){
+            foreach ($filterPoss as $poss){
                 $subWhere = ['AND'];
                 foreach ($poss as $pos){
                     $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
                     $subWhere[] = ['IN', 'code_'.$pos, $filterCode];
-                }
-                if(!$direct){
-                    $opPoss = array_diff(NumService::$ALL_POSES, $poss);
-                    foreach ($opPoss as $pos){
-                        $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
-                        $subWhere[] = ['NOT IN', 'code_'.$pos, $filterCode];
-                    }
                 }
                 $where[] = $subWhere;
             }
         }elseif ($x == 3){
             $where = ['OR'];
-            foreach (NumService::THIRD_NUM_POS as $poss){
+            foreach ($filterPoss as $poss){
                 $subWhere = ['AND'];
                 foreach ($poss as $pos){
                     $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
                     $subWhere[] = ['IN', 'code_'.$pos, $filterCode];
                 }
-                if(!$direct) {
-                    $opPoss = array_diff(NumService::$ALL_POSES, $poss);
-                    foreach ($opPoss as $pos) {
-                        $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $pos]), [$historyKjData['code' . $pos]]);
-                        $subWhere[] = ['NOT IN', 'code_' . $pos, $filterCode];
-                    }
-                }
                 $where[] = $subWhere;
             }
         }elseif ($x == 4){
             $where = ['AND'];
-            foreach (NumService::$ALL_POSES as $pos){
+            foreach ($filterPoss as $pos){
                 $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
                 $where[] = ['IN', 'code_'.$pos, $filterCode];
             }

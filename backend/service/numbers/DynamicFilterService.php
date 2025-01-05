@@ -51,7 +51,7 @@ class DynamicFilterService extends BaseService {
         $md5PlanKey = md5($plan->id.'_'.$plan->hz_Arr.'_'.$plan->update_time.'_'.$nextQiHao);
         $cacheKey = CacheKeyService::getPlanCurrentCodeKey($plan->id, $nextQiHao, $md5PlanKey);
         if($data = commonRedis()->get($cacheKey)){
-            return $data;
+            //return $data;
         }
         $playway = $plan->playway;
         $query = Num4Type::find()->select(['code', 'code_type'])->andWhere(['=', 'code_type', $playway+1]);
