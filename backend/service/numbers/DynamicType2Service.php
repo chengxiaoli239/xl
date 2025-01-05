@@ -852,7 +852,7 @@ class DynamicType2Service extends BaseService {
         $sql = $query->createCommand()->getRawSql();
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
-        $logArr = ['plan_id'=>$plan->id, 'direct'=>$direct, 'params'=>$params, 'where'=>$where, 'count'=>count($codes), 'sql'=>$sql];
+        $logArr = ['plan_id'=>$plan->id, 'direct'=>$direct, 'historyKjData'=>$historyKjData, 'params'=>$params, 'where'=>$where, 'count'=>count($codes), 'sql'=>$sql];
         Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '定位x排除对应位置的合分与对数值合分', $logArr);
 
         $betDesc = $filterDesc['desc']."[上期".$historyKjData['qihao']."：".$historyKjData['code_str']."]过滤".$x."个配数单双互排除及该位置号码".$txt."(四定)-组数：".count($codes);
