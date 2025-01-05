@@ -176,4 +176,15 @@ trait LotteryCacheKeyTrait
     {
         return 'lottery:rand_code:lt_key_'.$planId.'_'.$qiHao;
     }
+
+    /**
+     * 获取计划当期的号码缓存key
+     * @param $planId
+     * @param $qiHao
+     * @return string
+     */
+    public static function getPlanCurrentCodeKey($planId, $qiHao, $planMd5Key): string
+    {
+        return 'lottery:plan_code:lt_key_'.$planId.'_'.$qiHao.'_'.$planMd5Key;
+    }
 }

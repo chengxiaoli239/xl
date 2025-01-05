@@ -3,6 +3,8 @@ namespace backend\service\numbers;
 
 use backend\models\Num4Type;
 use backend\service\BaseService;
+use common\service\cache\CacheKeyService;
+use common\service\ssc\QihaoService;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
@@ -45,6 +47,12 @@ class DynamicFilterService extends BaseService {
     public static function getFilterDynamic2(object $plan, $dynamicTypes=[]): array
     {
         $lottery_type = $plan->lottery_type;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+        $md5PlanKey = md5($plan->id.'_'.$plan->hz_Arr.'_'.$plan->update_time.'_'.$nextQiHao);
+        $cacheKey = CacheKeyService::getPlanCurrentCodeKey($plan->id, $nextQiHao, $md5PlanKey);
+        if($data = commonRedis()->get($cacheKey)){
+            return $data;
+        }
         $playway = $plan->playway;
         $query = Num4Type::find()->select(['code', 'code_type'])->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->asArray()->all();
@@ -113,6 +121,9 @@ class DynamicFilterService extends BaseService {
                 $codes = $allCodes;
             }
             $codesArr = array_intersect($codesArr, $codes);
+        }
+        if(!empty($codesArr)){
+            commonRedis()->setex($cacheKey, 30, $codesArr);
         }
         #p(['counts'=>count($codesArr), 'codesArr'=>$codesArr]);
 

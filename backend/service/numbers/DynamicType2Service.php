@@ -813,10 +813,12 @@ class DynamicType2Service extends BaseService {
                     $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
                     $subWhere[] = ['IN', 'code_'.$pos, $filterCode];
                 }
-                $opPoss = array_diff(NumService::$ALL_POSES, $poss);
-                foreach ($opPoss as $pos){
-                    $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
-                    $subWhere[] = ['NOT IN', 'code_'.$pos, $filterCode];
+                if(!$direct){
+                    $opPoss = array_diff(NumService::$ALL_POSES, $poss);
+                    foreach ($opPoss as $pos){
+                        $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
+                        $subWhere[] = ['NOT IN', 'code_'.$pos, $filterCode];
+                    }
                 }
                 $where[] = $subWhere;
             }
@@ -828,10 +830,12 @@ class DynamicType2Service extends BaseService {
                     $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
                     $subWhere[] = ['IN', 'code_'.$pos, $filterCode];
                 }
-                $opPoss = array_diff(NumService::$ALL_POSES, $poss);
-                foreach ($opPoss as $pos){
-                    $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
-                    $subWhere[] = ['NOT IN', 'code_'.$pos, $filterCode];
+                if(!$direct) {
+                    $opPoss = array_diff(NumService::$ALL_POSES, $poss);
+                    foreach ($opPoss as $pos) {
+                        $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $pos]), [$historyKjData['code' . $pos]]);
+                        $subWhere[] = ['NOT IN', 'code_' . $pos, $filterCode];
+                    }
                 }
                 $where[] = $subWhere;
             }
