@@ -859,6 +859,114 @@ class DynamicType2Service extends BaseService {
         return $codes;
     }
 
+    # x位或y位或z位上n配数单双互排及该位置号码，则中或者不中
+    public static function filter20(object $plan, $dynamic=[], $filterDesc = [], $direct=0): array
+    {
+        $lotteryType = $plan->lottery_type;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+
+        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
+
+        $params = $dynamic['params'];
+        $x = trim($params['x']); # x位123、234、23等
+        $y = trim($params['y']); # y位123、234、23等
+        $z = trim($params['z']); # z位123、234、23等
+        $n = $params['n']; # n个
+
+        $filterPossData = [];
+        if(!empty($x)){
+            $filterPossData[] = str_split($x);
+        }
+        if(!empty($y)){
+            $filterPossData[] = str_split($y);
+        }
+        if(!empty($z)){
+            $filterPossData[] = str_split($z);
+        }
+
+        $where = ['OR'];
+        foreach ($filterPossData as $filterPoss){ // $filterPoss = [1,2,3]
+            # [1,2,3] n=1、2
+            $n = min(count($filterPoss), $n);
+            //p([$n, count($filterPoss)]);
+            $subWhere = ['OR'];
+            if($n == 1){
+                foreach ($filterPoss as $pos) {
+                    $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $pos]), [$historyKjData['code' . $pos]]);
+                    $subWhere[] = ['IN', 'code_' . $pos, $filterCode]; # 正
+                }
+            }elseif($n == 2){
+                # 正
+                for($i=0; $i<count($filterPoss); $i++){
+                    for($j=0; $j<count($filterPoss); $j++){
+                        if($i>=$j) continue;
+                        $posI = $filterPoss[$i];
+                        $posJ = $filterPoss[$j];
+
+                        $filterCodeI = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$posI]), [$historyKjData['code'.$posI]]);
+                        $filterCodeJ = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$filterPoss[$j]]), [$historyKjData['code'.$filterPoss[$j]]]);
+                        $subTwoWhere = [
+                            'AND',
+                            ['IN', 'code_' . $posI, $filterCodeI], # 正
+                            ['IN', 'code_' . $posJ, $filterCodeJ], # 正
+                        ];
+                    }
+                    $subWhere[] = $subTwoWhere;
+                }
+            }elseif($n == 3){
+                $subThirdWhere = ['OR'];
+                # 正
+                for ($i = 0; $i < count($filterPoss); $i++) {
+                    for ($j = 0; $j < count($filterPoss); $j++) {
+                        if ($i >= $j) continue;
+                        for ($k = 0; $k < count($filterPoss); $k++) {
+                            if ($i >= $k) continue;
+                            $posI = $filterPoss[$i];
+                            $posJ = $filterPoss[$j];
+                            $posK = $filterPoss[$k];
+
+                            $filterCodeI = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $posI]), [$historyKjData['code' . $posI]]);
+                            $filterCodeJ = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $posJ]), [$historyKjData['code' . $posJ]]);
+                            $filterCodeK = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $posK]), [$historyKjData['code' . $posK]]);
+
+                            $subThirdWhere[] = [
+                                'AND',
+                                ['IN', 'code_' . $posI, $filterCodeI],
+                                ['IN', 'code_' . $posJ, $filterCodeJ],
+                                ['IN', 'code_' . $posK, $filterCodeK],
+                            ];
+                        }
+                    }
+                }
+                $subWhere[] = $subThirdWhere;
+            }elseif($n==4){
+                # 正
+                $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
+                $where[] = ['IN', 'code_'.$pos, $filterCode];
+            }
+            $where[] = $subWhere;
+        }
+        //p(['params'=>$params, 'filterPossData'=>$filterPossData], 0); p(['where'=>$where], 0);
+
+        $txt = '';
+        if($direct==1){
+            $query = self::getBaseCodesQuery($where, $plan->playway);
+            $txt = '-反';
+        }else{
+            $query = self::getBaseCodesQuery(['NOT', $where], $plan->playway);
+        }
+        $sql = $query->createCommand()->getRawSql();
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        $logArr = ['plan_id'=>$plan->id, 'direct'=>$direct, 'historyKjData'=>$historyKjData, 'params'=>$params, 'where'=>$where, 'count'=>count($codes), 'sql'=>$sql];
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', 'x位或y位或z位上n配数单双互排及该位置号码', $logArr);
+
+        $betDesc = $filterDesc['desc']."[上期".$historyKjData['qihao']."：".$historyKjData['code_str']."]过滤".$x."位".($y?"或".$y."位":'').($z?"或".$z."位":'')."上".$n."配数单双互排及该位置上".$n."个号码".$txt."(四定)-组数：".count($codes);
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+
+        return $codes;
+    }
+
     /**
      * 获取查询对象
      * @param $where

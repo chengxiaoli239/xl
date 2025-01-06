@@ -473,7 +473,8 @@ class IndexController extends Controller
      **/
     public function actionDw1(){
         try {
-            $plan = UserSysPlans::findOne(16108);
+            //$plan = UserSysPlans::findOne(16108);
+            $plan = UserSysPlans::findOne(16194);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             // 2611213 //2611225

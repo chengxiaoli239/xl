@@ -34,8 +34,10 @@ class DynamicFilterService extends BaseService {
         ['type'=>18, 'label'=>'x位合数不等于上期y位合数', 'params'=>['x'=>'','y'=>''], 'desc'=>"x位合数不等于上期y位合数，<br>1、比如x：23，y：23，上期开：1478(4+7)=11合数为1，则23位过滤合数：1和11<br>2、其中x、y都可以随意搭配，比如：x:13、y:234或x:13、y:24", 'playway'=>[2,3], 'is_show'=>1, 'img'=>'/statics/img/dynamic_filter/17.png'],
         ['type'=>19, 'label'=>'定位x或定位y或定位k,合分为z', 'params'=>['x'=>'', 'y'=>'', 'k'=>'', 'z'=>''], 'desc'=>"<br>比如：x:13、y:24、j:34、z:45678 <br>则(第1位+第3位合分)或(第2位+第4位的合分)或(第3位+第4位的合分)，只要有一个合分为：45678就中 <br>x、y、k可以只填其中两个或三个一起填", 'playway'=>[3]],
         ['type'=>20, 'label'=>'定位x或定位y或定位k,合分为z', 'params'=>['x'=>'', 'y'=>'', 'k'=>'', 'z'=>''], 'desc'=>"<br>比如：x:13、y:24、j:34、z:45678 <br>则(第1位+第3位合分)或(第2位+第4位的合分)或(第3位+第4位的合分)，只要有一个合分为：45678就中 <br>x、y、k可以只填其中两个或三个一起填", 'playway'=>[3]],
-        ['type'=>21, 'label'=>'过滤同时x个位置配数单双互排除及该位置号码', 'params'=>['x'=>''], 'desc'=>'过滤同时存在x个配数单双互排除及该位置号码', 'playway'=>[3]],
-        ['type'=>22, 'label'=>'x个位置配数单双互排除及该位置号码上奖', 'params'=>['x'=>''], 'desc'=>"同时存在x个位置配数单双互排除及该位置号码则中奖，比如开：2345，x:1，则下一把：<br>第1位开135792<br>第2位开024683<br>第3位开135794<br>第4位开024685<br>以上只要有一个位置中就算中，如x:2，则需要2个位置中才算中，以此类推", 'playway'=>[3]],
+        ['type'=>21, 'label'=>'过滤同时x个位置配数单双互排及该位置号码', 'params'=>['x'=>''], 'desc'=>'过滤同时存在x个配数单双互排除及该位置号码', 'playway'=>[3]],
+        ['type'=>22, 'label'=>'x个位置配数单双互排及该位置号码上奖', 'params'=>['x'=>''], 'desc'=>"同时存在x个位置配数单双互排除及该位置号码则中奖，比如开：2345，x:1，则下一把：<br>第1位开135792<br>第2位开024683<br>第3位开135794<br>第4位开024685<br>以上只要有一个位置中就算中，如x:2，则需要2个位置中才算中，以此类推", 'playway'=>[3]],
+        ['type'=>23, 'label'=>'x位或y位或z位上n配数单双互排及该位置号码则中', 'params'=>['x'=>'', 'y'=>'', 'z'=>'', 'n'=>''], 'desc'=>"配数单双互排及该位置号码，意思是：比如5，则对应的是024685，比如开：2345，x:123、y:234， n：2则下一把：<br>1、第123位或234位，其中只要某个位置组合出现2个对应的号码则中奖<br>2、其中x、y、z可以只填其中一个或多个", 'playway'=>[3]],
+        ['type'=>24, 'label'=>'x位或y位或z位上n配数单双互排及该位置号码则中', 'params'=>['x'=>'', 'y'=>'', 'z'=>'', 'n'=>''], 'desc'=>"配数单双互排及该位置号码，意思是：比如5，则对应的是024685，比如开：2345，x:123、y:234， n：2则下一把：<br>1、第123位或234位，其中只要某个位置组合出现2个对应的号码则中奖<br>2、其中x、y、z可以只填其中一个或多个", 'playway'=>[3]],
     ];
     public static int $filterType = 0;
 
@@ -115,6 +117,12 @@ class DynamicFilterService extends BaseService {
                     break;
                 case 22: # x个位置配数单双互排除及该位置号码中奖
                     $codes = DynamicType2Service::filter19($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType], $direct=1);
+                    break;
+                case 23: # x位或y位或z位上n配数单双互排及该位置号码则中
+                    $codes = DynamicType2Service::filter20($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType], $direct=1);
+                    break;
+                case 24: # x位或y位或z位上n配数单双互排及该位置号码则不中
+                    $codes = DynamicType2Service::filter20($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
             }
             if(empty($codes)){
