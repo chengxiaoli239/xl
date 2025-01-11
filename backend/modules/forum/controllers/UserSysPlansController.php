@@ -75,14 +75,14 @@ class UserSysPlansController extends BaseController
         $tipTxt = '';
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$this->_user_id]);
-        $mkey = 'user_expire_time_'.$this->_user_id;
+        $mkey = 'user_expire_time_x1_'.$this->_user_id;
         if($TzSystemsUsers->expire_time<(time()+1800)){
             $num = commonRedis()->incr($mkey);
             if($num<1){
                 push_queue(UserExpireTimeOperateJob::class, ['user_id'=>$this->_user_id, 'business_id'=>$this->_user_id, 'queue_delay_time'=>1800]);
                 commonRedis()->expire($mkey, 3600*2);
             }
-            $tipTxt = "<div >你账号即将过期，为了不影响使用，请提前续费</font></div>";
+            $tipTxt = "<div >你账号即将过期，为了不影响使用，请提前续费[".date('Y-m-d H:i', $TzSystemsUsers->expire_time)."]</font></div>";
         }
 
         //$view = $this->_user_id !== 1 ? 'index' : 'index_admin';
