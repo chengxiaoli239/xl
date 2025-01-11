@@ -75,7 +75,7 @@ class UserSysPlansController extends BaseController
         $tipTxt = '';
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$this->_user_id]);
-        $mkey = 'user_expire_time'.$this->_user_id;
+        $mkey = 'user_expire_time_'.$this->_user_id;
         if($TzSystemsUsers->expire_time<(time()+1800)){
             $num = commonRedis()->incr($mkey);
             if($num<1){
