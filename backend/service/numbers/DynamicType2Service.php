@@ -910,8 +910,8 @@ class DynamicType2Service extends BaseService {
                             ['IN', 'code_' . $posI, $filterCodeI], # 正
                             ['IN', 'code_' . $posJ, $filterCodeJ], # 正
                         ];
+                        $subWhere[] = $subTwoWhere;
                     }
-                    $subWhere[] = $subTwoWhere;
                 }
             }elseif($n == 3){
                 $subThirdWhere = ['OR'];
@@ -940,6 +940,7 @@ class DynamicType2Service extends BaseService {
                 }
                 $subWhere[] = $subThirdWhere;
             }elseif($n==4){
+                $where = ['AND'];
                 # 正
                 $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
                 $where[] = ['IN', 'code_'.$pos, $filterCode];
