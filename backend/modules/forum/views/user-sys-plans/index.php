@@ -6,6 +6,13 @@
 <script type="text/javascript" src="/statics/js/jquery-2.0.3.js"></script>
 <script type="text/javascript" src="/js/layui/global.js?v={{STATIC_VERSION}}"></script>
 <script type="text/javascript" src="/js/common.js?v={{STATIC_VERSION}}"></script>
+<style>
+    .red-text {
+        color: red;              /* 字体颜色为红色 */
+        font-size: 16px;        /* 字体大小为12号 */
+        background-color: white; /* 背景颜色为白色 */
+    }
+</style>
 <?php
 
 use backend\models\PlanStaticProfits;
@@ -221,6 +228,7 @@ $columns = array_merge(
                 <?= Html::button("批量正", ['class' => 'btn btn-success btn-xs', 'id' => 'batchForward']) ?> &nbsp;
                 <?= Html::button("批量反", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchReverse']) ?> &nbsp;
 
+                <?= Html::a($tipTxt, 'javascript:;', ['class' => 'btn red-text']) ?> &nbsp;
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     #'filterModel' => $searchModel,

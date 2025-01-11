@@ -172,7 +172,7 @@ class UserService extends BaseService {
     /**
      * @description 更新用户表状态
      * @param $id
-     * @param $account
+     * @param $status
      * @return array
      */
     public static function updateUserStatus($id, $status)

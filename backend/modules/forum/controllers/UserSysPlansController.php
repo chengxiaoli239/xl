@@ -14,6 +14,7 @@ use backend\service\TzService;
 use backend\service\UserService;
 use backend\service\UserSysPlansService;
 use common\service\CommonService;
+use common\service\jobs\user\UserExpireTimeOperateJob;
 use common\service\ssc\filterCode\FenLiShu;
 use common\tools\Tool_Common;
 use Yii;
@@ -71,6 +72,18 @@ class UserSysPlansController extends BaseController
         $dataProvider = $searchModel->search($queryParams);
 
         $myTzTypes = UserSysPlansService::getMyTzTypes($this->_user_id, $lottery_type);
+        $tipTxt = '';
+
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$this->_user_id]);
+        $mkey = 'user_expire_time'.$this->_user_id;
+        if($TzSystemsUsers->expire_time<(time()+1800)){
+            $num = commonRedis()->incr($mkey);
+            if($num<1){
+                push_queue(UserExpireTimeOperateJob::class, ['user_id'=>$this->_user_id, 'business_id'=>$this->_user_id, 'queue_delay_time'=>1800]);
+                commonRedis()->expire($mkey, 3600*2);
+            }
+            $tipTxt = "<div >你账号即将过期，为了不影响使用，请提前续费</font></div>";
+        }
 
         //$view = $this->_user_id !== 1 ? 'index' : 'index_admin';
         $data = [
@@ -79,6 +92,7 @@ class UserSysPlansController extends BaseController
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'myTzTypes' => $myTzTypes,
+            'tipTxt' => $tipTxt,
         ];
         return $this->render('index', $data);
     }
