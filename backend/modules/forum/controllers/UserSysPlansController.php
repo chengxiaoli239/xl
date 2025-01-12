@@ -76,7 +76,7 @@ class UserSysPlansController extends BaseController
 
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$this->_user_id]);
         $mkey = 'user_expire_time_x3_'.$this->_user_id;
-        if($TzSystemsUsers->expire_time<(time()+1800)){
+        if($TzSystemsUsers->uid != 1 and $TzSystemsUsers->expire_time<(time()+1800)){
             $num = commonRedis()->incr($mkey);
             if($num<2){
                 push_queue(UserExpireTimeOperateJob::class, ['user_id'=>$this->_user_id, 'business_id'=>$this->_user_id, 'queue_delay_time'=>1800]);
