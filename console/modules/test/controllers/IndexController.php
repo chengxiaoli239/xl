@@ -471,10 +471,10 @@ class IndexController extends Controller
      * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii test/index/dw1
      * @return void
      **/
-    public function actionDw1(){
+    public function actionDw1($id=''){
         try {
             //$plan = UserSysPlans::findOne(16108);
-            $plan = UserSysPlans::findOne(16631);
+            $plan = UserSysPlans::findOne($id);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             // 2611213 //2611225

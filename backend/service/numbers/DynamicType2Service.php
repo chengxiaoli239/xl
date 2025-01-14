@@ -920,7 +920,7 @@ class DynamicType2Service extends BaseService {
                     for ($j = 0; $j < count($filterPoss); $j++) {
                         if ($i >= $j) continue;
                         for ($k = 0; $k < count($filterPoss); $k++) {
-                            if ($i >= $k) continue;
+                            if ($j >= $k) continue;
                             $posI = $filterPoss[$i];
                             $posJ = $filterPoss[$j];
                             $posK = $filterPoss[$k];
