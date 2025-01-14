@@ -39,7 +39,7 @@ class UserSysPlansController extends BaseController
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                    'delete' => ['POST'],
+                    'delete' => ['POST', 'GET'],
                 ],
             ],
         ];
@@ -223,12 +223,19 @@ class UserSysPlansController extends BaseController
      */
     public function actionUpdateDesc()
     {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $model = UserSysPlans::findOne($this->_post['id']);
         if(!empty($model)){
-            $model->desc = $this->_post['desc'];
-            $model->updated_at = time();
-            $model->save();
+            $attrs = [
+                'remark' => $this->_post['remark'],
+                'updated_at' => time(),
+            ];
+            $model->setAttributes($attrs, false);
+            if(!$model->save()){
+                //p($model->getErrors());
+            }
         }
+
         return ['status'=>200, 'msg'=>'操作成功'];
     }
 

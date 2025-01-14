@@ -37,6 +37,7 @@ use Yii;
  * @property string $current_profits 当前盈利
  * @property string $base_codes 基础号码
  * @property string $desc 描述
+ * @property string $remark 备注
  * @property int $plan_type 计划类型:0正常1止盈止损计划
  * @property int $change_per 号码轮换
  * @property int $tz_sort 投注排序:从小到大
@@ -257,7 +258,7 @@ class UserSysPlans extends \common\models\base\BaseModel
             [['single', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
             [['update_time'], 'safe'],
             [['children_plan_id'], 'string', 'max' => 255],
-            [['singles', 'base_codes', 'hz_Arr', 'desc'], 'string'],
+            [['singles', 'base_codes', 'hz_Arr', 'desc', 'remark'], 'string'],
             [['account', 'tz_sites'], 'string', 'max' => 24],
         ];
     }

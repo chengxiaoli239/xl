@@ -9,7 +9,7 @@
 <style>
     .red-text {
         color: red;              /* 字体颜色为红色 */
-        font-size: 16px;        /* 字体大小为12号 */
+        font-size: 14px;        /* 字体大小为12号 */
         background-color: white; /* 背景颜色为白色 */
     }
 </style>
@@ -36,7 +36,7 @@ $columns = array_merge(
                 $playWayArr = [1=>'二字定', 2=>'三字定', 3=>'四字定', 4=>'一字定', 6=>'X字现'];
 
                 $url = '/forum/betting-records/index?BettingRecords[plan_id]='.$model->id;
-                $remark = Html::a('[备注:'.$model->desc.']', 'javascript:;', ['class'=>'set_remark_pop', 'data-id'=>$model->id, 'data-desc'=>$model->desc]);
+                $remark = '<br>'.Html::a($model->remark?'[备:'.$model->remark.']':'[备注]', 'javascript:;', ['class'=>'set_remark_pop', 'id'=>'remark_plan_id_'.$model->id, 'data-id'=>$model->id, 'data-remark'=>$model->remark]);
                 return $playWayArr[$model->playway].'['.Html::a($model->id, $url).']'.$remark;
             }
         ],
@@ -190,6 +190,26 @@ $columns = array_merge(
                 return date('m-d H:i', $model->updated_at);
             }
         ],
+        /*
+        [
+            'class' => 'yii\grid\ActionColumn',
+            'headerOptions' => ['width' => '5%'],
+            'template' => '{update} &nbsp;&nbsp;&nbsp;&nbsp; {delete}',
+            'buttons' => [
+                'update' => function ($url, $model) {
+                    return Html::a('更新', $url, ['class' => 'btn btn-primary btn-xs', 'title' => '更新']);
+                },
+                'delete' => function ($url, $model) {
+                    return '<br><br>' . Html::a('删除', 'javascript:void(0);', [
+                            'class' => 'btn btn-danger btn-xs delete-button',
+                            'title' => '删除',
+                            'data-url' => $url,
+                            'data-confirm' => '确认要删除该项吗?',
+                        ]);
+                },
+            ],
+        ],
+        */
         ['class' => 'yii\grid\ActionColumn','headerOptions'=>['width'=>'5%'],'template'=>'{update}&nbsp;&nbsp;&nbsp;&nbsp;{delete}'],
     ]
 );
@@ -384,25 +404,64 @@ $columns = array_merge(
         }
 
         $(".set_remark_pop").click(function (rst) {
-            content = $(this).data('desc');
             id = $(this).data('id');
-            console.log(id, content)
-            $('#remark_text').html(content)
+            $('#remark_title').html('计划ID：'+id+'，修改备注')
+            $('#remark_text').val($(this).data('remark'))
             $('#operate_id').val(id)
 
             $('#exampleModal_set_remark').modal('show');
         });
 
         $("#confirm_set_remark").click(function (rst) {
-            content = $('#remark_text').val()
+            remark = $('#remark_text').val()
             id = $('#operate_id').val()
-            console.log(content, id)
 
-            $.post('/forum/user-sys-plans/update-desc', {id:id, desc:content}, function (response) {
-                if(response.status == 200){
-                    Ewin.confirm({ message: '修改成功'}).on(function (e) {
+            console.log(id, remark)
+            $.post('/forum/user-sys-plans/update-desc', {id:id, remark:remark}, function (response) {
+                if(response.status === 200){
+                    // 这里使用Layer UI的提示来确认刷新
+                    var remarkId = '#remark_plan_id_' + id;
+                    $(remarkId).html('备:'+$('#remark_text').val())
+                    // 为该元素添加 class，使字体颜色变为红色
+                    $(remarkId).addClass('red-text'); // 为 ID 对应的元素添加类
+
+                    /*
+                    layer.confirm('修改成功，计划ID:'+id+'，备注：' + remark, {
+                        btn: ['是', '否'] //按钮
+                    }, function(){
+                        // 刷新页面
+                        location.reload();
+                    }, function(){
+                        // 如果选“否”，就不做任何事情
+                        layer.closeAll(); // 关闭所有层
                     });
+                     */
                 }
+            });
+        });
+    });
+    $(document).one('click', '.delete-button', function () {
+        var url = $(this).data('url'); // 获取删除的URL
+        var confirmMessage = $(this).data('confirm'); // 获取确认信息
+
+        layui.use('layer', function () {
+            var layer = layui.layer;
+            layer.confirm(confirmMessage, {
+                btn: ['确定', '取消'] //按钮
+            }, function () {
+                // 点击“确定”，执行删除
+                $.post(url, function (data) {
+                    if (data.success) {
+                        // 刷新页面或移除对应的行
+                        location.reload();
+                    } else {
+                        layer.alert('删除失败: ' + data.message);
+                    }
+                }).fail(function() {
+                    layer.alert('删除请求失败，请重试。');
+                });
+            }, function () {
+                // 点击“取消”，什么都不做
             });
         });
     });

@@ -79,7 +79,7 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
-        $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user_sys_plans}}'); d($r);
+        $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user_sys_plans}}'); p($r);
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType=8);
         $currentKjQiHao = LotteryType::getBeforeNQiHao($currentKjQiHao, $qiNum=1);
         $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);

@@ -21,7 +21,7 @@ class UserSysPlans extends UserSysPlansModel
             [['id', 'is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'is_batch_simulate', 'lottery_type', 'plan_type', 'created_at', 'updated_at'], 'integer'],
             [['children_plan_id', 'singles', 'base_codes', 'account', 'tz_sites', 'hz_Arr', 'update_time'], 'safe'],
             [['single', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
-            [['base_codes', 'hz_Arr', 'desc'], 'string'],
+            [['base_codes', 'hz_Arr', 'desc', 'remark'], 'string'],
         ];
     }
 
@@ -88,7 +88,8 @@ class UserSysPlans extends UserSysPlansModel
         $query->andFilterWhere($queryWhere);
 
         $query->andFilterWhere(['like', 'account', $this->account])
-            ->andFilterWhere(['like', 'tz_sites', $this->tz_sites]);
+            ->andFilterWhere(['like', 'tz_sites', $this->tz_sites])
+            ->andFilterWhere(['like', 'desc', $this->desc]);
 
             //->andFilterWhere(['in', 'status', [0, 1]])
             //->andFilterWhere(['like', 'hz_Arr', $this->hz_Arr]);
