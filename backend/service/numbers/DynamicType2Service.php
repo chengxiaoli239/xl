@@ -969,6 +969,62 @@ class DynamicType2Service extends BaseService {
     }
 
     /**
+     * 过滤类型号码 - 取千、百、十、个 最近9个码
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     */
+    public static function filter21(object $plan, $dynamic=[], $filterDesc = []): array
+    {
+        $playway = $plan->playway;
+        $lottery_type = $plan->lottery_type;
+        $lotteryType = $plan->lottery_type;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+
+        $params = $dynamic['params'];
+        $x = $params['x']; # x位
+        $n = $params['n']; # n个码
+
+        $positions = str_split(trim($x));
+        $where = ['OR'];
+        $desc = '';
+        foreach ($positions as $p){
+            $beforeQuery = SscKjData::find()
+                ->select(['code'=>'code'.$p, 'qihao'=>'MAX(qihao)'])
+                ->where(['lottery_type'=>$lottery_type])
+                ->groupBy('code'.$p)
+                ->orderBy(['MAX(qihao)'=>SORT_DESC])
+                ->limit($n);
+            $beforeQuery->andWhere(['<=', 'qihao', $currentKjQiHao]);
+            //$sql = $beforeQuery->createCommand()->getRawSql();p($sql);
+            $currentKjCodes = $beforeQuery->asArray()->all(); # 最新一期
+            $filterCodes = ArrayHelper::getColumn($currentKjCodes, 'code');
+            $where[] = [
+                'AND',
+                ['IN', 'code_1', $filterCodes],
+                ['IN', 'code_2', $filterCodes],
+                ['IN', 'code_3', $filterCodes],
+                ['IN', 'code_4', $filterCodes],
+            ];
+            $desc .= ' '.$p.'位近'.$n.'个码:'.implode($filterCodes);
+        }
+
+
+        $query = Num4Type::find()->select(['code'])
+            ->where(['=', 'code_type', $playway+1])
+            ->andWhere(['NOT', $where]);
+        $sql = $query->createCommand()->getRawSql(); //p($sql);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤x位最近n个码的复试', ['currentKjQiHao'=>$currentKjQiHao, 'lottery_type'=>$lottery_type, 'currentKjCodes'=>$currentKjCodes, 'sql'=>$sql]);
+        $NumTypes = $query->asArray()->all();
+        //p(['count'=>count($NumTypes), 'sql'=>$sql, 'NumTypes'=>$NumTypes]);
+        $betDesc = $filterDesc['desc'].'：过滤'.$desc." 复试，最终组数：".count($NumTypes);
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
+
+        return ArrayHelper::getColumn($NumTypes, 'code');
+    }
+
+    /**
      * 获取查询对象
      * @param $where
      * @param $playway

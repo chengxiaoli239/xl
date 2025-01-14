@@ -218,6 +218,21 @@ class UserSysPlansController extends BaseController
     }
 
     /**
+     * 更新备注
+     * @return
+     */
+    public function actionUpdateDesc()
+    {
+        $model = UserSysPlans::findOne($this->_post['id']);
+        if(!empty($model)){
+            $model->desc = $this->_post['desc'];
+            $model->updated_at = time();
+            $model->save();
+        }
+        return ['status'=>200, 'msg'=>'操作成功'];
+    }
+
+    /**
      * Updates an existing UserSysPlans model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $id

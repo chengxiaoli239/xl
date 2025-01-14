@@ -79,6 +79,7 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user_sys_plans}}'); d($r);
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType=8);
         $currentKjQiHao = LotteryType::getBeforeNQiHao($currentKjQiHao, $qiNum=1);
         $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
@@ -109,7 +110,6 @@ class IndexController extends Controller
         $pos = str_split($p);
         p($pos);
 
-        $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user_sys_plans}}'); d($r);
         for ($i=0; $i<15; $i++){
             $date = date('Y-m-d', strtotime('2024-09-23')+$i*86400);
             if($date>date('Y-m-d')) return false;
@@ -474,7 +474,7 @@ class IndexController extends Controller
     public function actionDw1(){
         try {
             //$plan = UserSysPlans::findOne(16108);
-            $plan = UserSysPlans::findOne(16352);
+            $plan = UserSysPlans::findOne(16631);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             // 2611213 //2611225

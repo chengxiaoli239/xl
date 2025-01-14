@@ -40,6 +40,7 @@ class DynamicFilterService extends BaseService {
         ['type'=>22, 'label'=>'x个位置配数单双互排及该位置号码上奖', 'params'=>['x'=>''], 'desc'=>"同时存在x个位置配数单双互排除及该位置号码则中奖，比如开：2345，x:1，则下一把：<br>第1位开135792<br>第2位开024683<br>第3位开135794<br>第4位开024685<br>以上只要有一个位置中就算中，如x:2，则需要2个位置中才算中，以此类推", 'playway'=>[3]],
         ['type'=>23, 'label'=>'x位或y位或z位上n配数单双互排及该位置号码则中', 'params'=>['x'=>'', 'y'=>'', 'z'=>'', 'n'=>''], 'desc'=>"配数单双互排及该位置号码，意思是：比如5，则对应的是024685，比如开：2345，x:123、y:234， n：2则下一把：<br>1、第123位或234位，其中只要某个位置组合出现2个对应的号码则中奖<br>2、其中x、y、z可以只填其中一个或多个", 'playway'=>[3]],
         ['type'=>24, 'label'=>'x位或y位或z位上n配数单双互排及该位置号码则不中', 'params'=>['x'=>'', 'y'=>'', 'z'=>'', 'n'=>''], 'desc'=>"配数单双互排及该位置号码，意思是：比如5，则对应的是024685，比如开：2345，x:123、y:234， n：2则下一把：<br>1、第123位或234位，其中只要某个位置组合出现2个对应的号码则中奖<br>2、其中x、y、z可以只填其中一个或多个", 'playway'=>[3]],
+        ['type'=>27, 'label'=>'排除x位最近n个码的复试', 'params'=>['x'=>'', 'n'=>''], 'desc'=>"排除x位最近n个码的复试：<br>x:1，n:6，则千位取最近6个号码的复试号码过滤掉<br>x:12，n:6，则千位和百位各取最近6个号码的复试号码过滤掉", 'playway'=>[3]],
     ];
     public static int $filterType = 0;
 
@@ -127,6 +128,9 @@ class DynamicFilterService extends BaseService {
                     break;
                 case 24: # x位或y位或z位上n配数单双互排及该位置号码则不中
                     $codes = DynamicType2Service::filter20($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 27: # x位或y位或z位上n配数单双互排及该位置号码则不中
+                    $codes = DynamicType2Service::filter21($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
             }
             if(empty($codes)){

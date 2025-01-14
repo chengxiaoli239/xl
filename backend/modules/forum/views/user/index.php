@@ -64,7 +64,7 @@ $columns = array_merge(
                     return Html::a('添加/编辑', $url, ['title' => '开通系统权限','alt'=>$model->id]);
                 }
             ],
-            'email',
+            //'email',
             ['attribute'=>'desc',//'headerOptions'=>['width'=>'5%'],// 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
                 'format'=>'raw',
                 'value'=>function($model){

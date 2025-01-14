@@ -36,7 +36,8 @@ $columns = array_merge(
                 $playWayArr = [1=>'二字定', 2=>'三字定', 3=>'四字定', 4=>'一字定', 6=>'X字现'];
 
                 $url = '/forum/betting-records/index?BettingRecords[plan_id]='.$model->id;
-                return $playWayArr[$model->playway].'['.Html::a($model->id, $url).']';
+                $remark = Html::a('[备注:'.$model->desc.']', 'javascript:;', ['class'=>'set_remark_pop', 'data-id'=>$model->id, 'data-desc'=>$model->desc]);
+                return $playWayArr[$model->playway].'['.Html::a($model->id, $url).']'.$remark;
             }
         ],
 
@@ -266,6 +267,30 @@ $columns = array_merge(
         </div>
     </div>
 </div>
+<div class="modal fade " id="exampleModal_set_remark" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
+    <div class="modal-dialog modal-lg" role="document" style="width: 500px;margin: 10px auto;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="remark_title">计划备注：</h4>
+            </div>
+            <div class="modal-body">
+                <form id="tip_form_remark" style="display:block; width:95%;height: 200px;overflow-y: scroll">
+                    <p><label>备注信息:</label><textarea rows="5" class="form-control" id="remark_text" name="remark_text" ></textarea></p>
+                </form>
+            </div>
+            <!--div class="form-group down-reason">
+                <p><label>备注信息:</label><input class="form-control" id="message" name="message" /></p>
+            </div-->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" data-type="" id="confirm_set_remark">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="operate_id" name="operate_id" value="">
 <!--提示框-end-->
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
@@ -357,5 +382,28 @@ $columns = array_merge(
                 }
             }, 'json');
         }
+
+        $(".set_remark_pop").click(function (rst) {
+            content = $(this).data('desc');
+            id = $(this).data('id');
+            console.log(id, content)
+            $('#remark_text').html(content)
+            $('#operate_id').val(id)
+
+            $('#exampleModal_set_remark').modal('show');
+        });
+
+        $("#confirm_set_remark").click(function (rst) {
+            content = $('#remark_text').val()
+            id = $('#operate_id').val()
+            console.log(content, id)
+
+            $.post('/forum/user-sys-plans/update-desc', {id:id, desc:content}, function (response) {
+                if(response.status == 200){
+                    Ewin.confirm({ message: '修改成功'}).on(function (e) {
+                    });
+                }
+            });
+        });
     });
 </script>
