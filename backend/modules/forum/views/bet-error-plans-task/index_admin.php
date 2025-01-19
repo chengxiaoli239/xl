@@ -161,7 +161,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'created_at','label' => '时间',
                             'format'=>'raw',
                             'value' => function($model) {
-                                return date('m-d H:i', $model->created_at);
+                                $formattedDate = date('m-d H:i', $model->created_at);
+                                $fullDate = date('Y-m-d H:i:s', $model->created_at); // 例如，完整时间戳
+                                return "<span title='{$fullDate}'>{$formattedDate}</span>";
                             }
                         ],
 

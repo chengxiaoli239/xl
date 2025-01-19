@@ -80,8 +80,45 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
-        $planId = 16791;
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type=8);
+        $planId = 16791;
+        $where = ['AND', ['=', 'qihaos', $nextQiHao], ['=', 'plan_id', $planId], ['=', 'uid', 50]];
+        if(BettingRecords::find()->where($where)->exists()){
+            throw_info('yx表已记录...');
+        }
+        p('dddd');
+        $where = ['AND', ['=', 'lottery_type', $lottery_type]];
+        if(!empty($accountOrId)){
+            $where[] = [ 'OR', ['=', 'account', $accountOrId], ['=', 'id', $accountOrId]];
+        }else{
+            # is_batch_simulate:0正常1批量模拟历史记录
+            $where  = array_merge($where, [['=', 'status', 1], ['=', 'is_batch_simulate', 0]]);
+        }
+        $rst = [];
+        $plansQuery = UserSysPlans::find()
+            //->select(['id', 'uid', 'status'])
+            ->where($where); // ->all();
+        $t1 = microtime(true);
+        foreach ($plansQuery->each(20) as $plan){
+            try {
+                $planId = $plan->id;
+                $uid = $plan->uid;
+                $status = $plan->status;
+                print_r(['planId'=>$planId, 'uid'=>$uid, 'status'=>$status]);
+                //push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$planId, 'qihao'=>$nextQiHao]);
+                $rst['data'] = ['activeQiHao'=>$nextQiHao, 'plan_id'=>$plan->id, 'msg'=>'正常'];
+            }catch (\Exception $e){
+                if($e->getCode()<40000){
+                    $logArr = ['uid'=>$plan->uid, 'plan_id'=>$planId, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage(), 'errCode'=>$e->getCode(), 'file'=>$e->getFile(), 'line'=>$e->getLine()];
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '插入计划-异常', $logArr);
+                }
+                $rst['data']['plan_id'] = ['plan_id'=>$planId, 'msg'=>$e->getMessage()];
+            }
+        }
+        $t2 = microtime(true);
+        $rst['time_consume'] = ($t2-$t1).'s';
+        p($rst);
+
         push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$planId, 'qiHao'=>$nextQiHao, 'business_id'=>$nextQiHao]);
         p(['planId'=>$planId, 'nextQiHao'=>$nextQiHao]);
         $preInsertLockKey = CacheKeyService::preInsertPlanTaskKey($id=5, $activeQiHao='111');
