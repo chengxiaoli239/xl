@@ -79,7 +79,7 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
-        $rst['data'] = BetService::insertPlansTask($lottery_types=[8], 1,'16790'); p($rst);
+        $rst['data'] = BetService::insertPlansTask($lottery_types=[8], 1,'as06'); p($rst);
         $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%lt_bet_error_plans_task}}'); p($r);
         # is_batch_simulate:0正常1批量模拟历史记录
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType=8);

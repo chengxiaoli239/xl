@@ -2161,7 +2161,7 @@ abstract class BetService extends BaseBetService {
                     }
                     $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>$e->getMessage()];
                 } finally {
-                    commonRedis()->del($preInsertLockKey);
+                    //commonRedis()->del($preInsertLockKey);
                 }
             }
             $err_post_desc = Json::encode(['Status'=>0, 'msg'=>'过期未下单', 'time'=>date('Y-m-d H:i:s')]);
