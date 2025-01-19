@@ -2092,7 +2092,7 @@ abstract class BetService extends BaseBetService {
 
                     list($code, $current_profits) = UserService::updateUserProfits($TzSystemsUsers);
                     if($code>0 OR !$TzSystemsUsers->is_auto_bet){
-                        throw_info('统计盈利异常:'.$code);
+                        //throw_info('统计盈利异常:'.$code);
                     }
                     try {
                         AgentClientsService::checkProfits($TzSystemsUsers);

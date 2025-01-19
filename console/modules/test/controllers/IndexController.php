@@ -81,7 +81,9 @@ class IndexController extends Controller
     public function actionDw(): array
     {
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type=8);
-        $planId = 16791;
+        $planId = 16794;
+        push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$planId, 'qiHao'=>$nextQiHao, 'business_id'=>$nextQiHao]);
+        p(['planId'=>$planId, 'nextQiHao'=>$nextQiHao]);
         $where = ['AND', ['=', 'qihao', $nextQiHao], ['=', 'plan_id', $planId], ['=', 'uid', 50]];
         if(BettingRecords::find()->where($where)->exists()){
             throw_info('yx表已记录...');
@@ -119,8 +121,6 @@ class IndexController extends Controller
         $rst['time_consume'] = ($t2-$t1).'s';
         p($rst);
 
-        push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$planId, 'qiHao'=>$nextQiHao, 'business_id'=>$nextQiHao]);
-        p(['planId'=>$planId, 'nextQiHao'=>$nextQiHao]);
         $preInsertLockKey = CacheKeyService::preInsertPlanTaskKey($id=5, $activeQiHao='111');
         commonRedis()->setex($preInsertLockKey, BetService::getBetCacheTime($lottery_type=8, $activeQiHao), 1);# 投注之后缓存时间
         $r = commonRedis()->del($preInsertLockKey);
