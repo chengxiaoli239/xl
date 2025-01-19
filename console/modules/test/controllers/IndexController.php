@@ -80,7 +80,7 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
-        push_queue_fast(UserPlanBetJob::class, ['plan_id'=>16791, 'qiHao'=>'20250119267']);
+        push_queue_fast(UserPlanBetJob::class, ['plan_id'=>16790, 'qiHao'=>'20250119271']);
         p('dddd');
         $preInsertLockKey = CacheKeyService::preInsertPlanTaskKey($id=5, $activeQiHao='111');
         commonRedis()->setex($preInsertLockKey, BetService::getBetCacheTime($lottery_type=8, $activeQiHao), 1);# 投注之后缓存时间

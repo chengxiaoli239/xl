@@ -2180,9 +2180,13 @@ abstract class BetService extends BaseBetService {
                 throw_info('业务处理中，请稍后...');
             }
             $plan = UserSysPlans::findOne($planId);
-            $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId], ['=', 'uid', $planId]];
+            $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId], ['=', 'uid', $plan->uid]];
             if(BettingRecords::find()->select(['id'])->where($where)->limit(1)->one()){
                 throw_info('yx表已记录...');
+            }
+            $where = ['uid'=>$plan->uid, 'lottery_type'=>$plan->lottery_type, 'qihao'=>$qiHao, 'plan_id'=>$planId];
+            if(BetErrorPlansTask::find()->where($where)->exists()){
+                throw_info('任务表已记录...');
             }
 
             $lottery_type = $plan->lottery_type;
