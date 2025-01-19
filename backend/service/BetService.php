@@ -2079,8 +2079,21 @@ abstract class BetService extends BaseBetService {
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>'没有开启的计划']);
                 continue;
             }
+
+            $TzSystemsUsersData = TzSystemsUsers::find()->where(['status'=>1])->indexBy('uid')->all();
+            $TzSystemsUsers = $TzSystemsUsersData[$plan->uid]??[];
             foreach ($plansQuery->each(20) as $plan){
                 try {
+                    list($code, $current_profits) = UserService::updateUserProfits($TzSystemsUsers);
+                    if($code>0 OR !$TzSystemsUsers->is_auto_bet){
+                        throw_info('统计盈利异常:'.$code);
+                    }
+                    try {
+                        AgentClientsService::checkProfits($TzSystemsUsers);
+                    }catch (\Exception $e){
+                        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入真实计划任务-止盈止损', ['plan_id'=>$plan->id, 'user_id'=>$plan->uid]);
+                        throw_info($e->getMessage());
+                    }
                     $planId = $plan->id;
                     $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId], ['=', 'uid', $plan->uid]];
                     if(BettingRecords::find()->where($where)->exists()){
@@ -2148,17 +2161,6 @@ abstract class BetService extends BaseBetService {
             }else{
                 $logArr = ['plan_id'=>$plan->id, 'is_auto_bet'=>$TzSystemsUsers->is_auto_bet, 'lottery_type'=>$lottery_type, 'uid'=>$plan->uid];
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入真实计划任务-1', $logArr);
-
-                list($code, $current_profits) = UserService::updateUserProfits($TzSystemsUsers);
-                if($code>0 OR !$TzSystemsUsers->is_auto_bet){
-                    throw_info('统计盈利异常');
-                }
-                try {
-                    AgentClientsService::checkProfits($TzSystemsUsers);
-                }catch (\Exception $e){
-                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入真实计划任务-止盈止损', ['plan_id'=>$plan->id, 'user_id'=>$plan->uid]);
-                    throw_info($e->getMessage());
-                }
 
                 $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
                 $insertRst = $BetService->postBatchBet($qiHao, $plan, $codes);
