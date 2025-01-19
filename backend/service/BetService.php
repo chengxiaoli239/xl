@@ -2237,7 +2237,7 @@ abstract class BetService extends BaseBetService {
             $time_consume = ($t2-$t1).'s';
             $logArr = ['planId'=>$planId, 'activeQiHao'=>$qiHao, 'err_msg'=>$e->getMessage(), 'time_consume'=>$time_consume];
             Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入计划任务-异常', $logArr);
-            throw_info(Json::encode($logArr));
+            return Json::encode($logArr);
         }
 
         return '计划操作完成';
