@@ -118,6 +118,74 @@ class Redis extends Connection
         return $result;
     }
 
+    /**
+     * redis 锁
+     * @return bool
+     */
+    public static function lock($cacheKey, $time = 5, $isThrowException = true)
+    {
+        $now = time();
+        $expireTime = $now + $time;
+        $setResult = (new Redis)->setnx($cacheKey, $expireTime);
+        if ($setResult) {
+            (new Redis)->expire($cacheKey, $time);
+        }
+        $result = false;
+        if ($setResult || ((new Redis)->get($cacheKey) < $now && (new Redis)->getset($cacheKey, $expireTime) < $now)) {
+            $result = true;
+        }
+
+        if (! $result && $isThrowException) {
+            throw_info('业务处理中，请稍后再试...', 10001);
+        }
+
+        return $result;
+    }
+
+    /**
+     * 锁是否存在.
+     * @param string $cacheKey 键
+     * @return bool
+     */
+    public static function exists($cacheKey)
+    {
+        $exTime = (new Redis)->get($cacheKey);
+        if (empty($exTime) || $exTime < time()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 释放锁
+     * @param mixed $cacheKey
+     */
+    public static function clearLock($cacheKey)
+    {
+        (new Redis)->del($cacheKey);
+    }
+
+    public static function lockAndWait($cacheKey, $isThrowException = true, $timeout = 5)
+    {
+        $count = 0;
+        if (!Redis::lock($cacheKey, $isThrowException, $timeout)) {
+            while (true) {
+                if ($count > $timeout + 2) {
+                    return false;
+                }
+                if (Redis::exists($cacheKey)) {
+                    ++$count;
+                    sleep(1);
+                    continue;
+                }
+                break;
+            }
+        }
+
+        return true;
+    }
+
     private function checkKey($key): bool
     {
         return true;
