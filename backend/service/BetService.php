@@ -2046,7 +2046,7 @@ abstract class BetService extends BaseBetService {
      * @desc 批量填插入用户计划任务
      * @return array
      */
-    public static function insertPlansTask($lottery_types = [], $isAuto=1){
+    public static function insertPlansTask($lottery_types = [], $isAuto=1, $accountOrId=''){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $lottery_types = $lottery_types ? : array_merge(StaticService::getLotteryTypes(), [8]);
         $lottery_types = array_unique($lottery_types);
@@ -2065,8 +2065,13 @@ abstract class BetService extends BaseBetService {
                 continue;
             }
 
-            # is_batch_simulate:0正常1批量模拟历史记录
-            $where = ['AND', ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
+            $where = ['AND', ['=', 'lottery_type', $lottery_type]];
+            if(!empty($accountOrId)){
+                $where[] = [ 'OR', ['=', 'account', $accountOrId], ['=', 'id', $accountOrId]];
+            }else{
+                # is_batch_simulate:0正常1批量模拟历史记录
+                $where  = array_merge($where, [['=', 'status', 1], ['=', 'is_batch_simulate', 0]]);
+            }
             //$where[] = ['=', 'uid', 17]; # 测试
 
             $plansQuery = UserSysPlans::find()->where($where); // ->all();
@@ -2088,7 +2093,7 @@ abstract class BetService extends BaseBetService {
                     $uid = $plan->uid;
                     //$TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
                     $TzSystemsUsers = $TzSystemsUsersData[$uid]??[];
-                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'currentKjQiHao'=>$currentKjQiHao, 'qiHao'=>$qiHao]);
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '计划开始-0', ['uid'=>$uid, 'plan_id'=>$plan->id, 'account'=>$TzSystemsUsers->username, 'lottery_type'=>$lottery_type, 'currentKjQiHao'=>$currentKjQiHao, 'qiHao'=>$qiHao]);
 
                     $insert_mkey = CacheKeyService::insertPlanTaskKey($lottery_type, $qiHao, $plan->id);
                     if(commonRedis()->get($insert_mkey)){
@@ -2111,6 +2116,7 @@ abstract class BetService extends BaseBetService {
                         }
                     }else{
                         $activeQiHao = $qiHao;
+                        $preInsertLockKey = CacheKeyService::preInsertPlanTaskKey($plan->id, $activeQiHao);
                         $logArr = ['plan_id'=>$plan->id, 'is_auto_bet'=>$TzSystemsUsers->is_auto_bet, 'lottery_type'=>$lottery_type, 'uid'=>$uid];
                         Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入真实计划任务-1', $logArr);
 
@@ -2132,7 +2138,6 @@ abstract class BetService extends BaseBetService {
                             throw new \yii\base\Exception('账号过期提示-2');
                         }
 
-                        $preInsertLockKey = CacheKeyService::preInsertPlanTaskKey($plan->id, $activeQiHao);
                         if(commonRedis()->get($preInsertLockKey)){
                             throw new \yii\base\Exception('已经被锁:'.$preInsertLockKey);
                         }
@@ -2151,10 +2156,12 @@ abstract class BetService extends BaseBetService {
                     $rst['data'] = ['activeQiHao'=>$qiHao, 'plan_id'=>$plan->id, 'msg'=>'正常'];
                 }catch (\Exception $e){
                     if($e->getCode()<40000){
-                        $logArr = ['uid'=>$uid, 'plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage(), 'errCode'=>$e->getCode(), 'file'=>$e->getFile(), 'line'=>$e->getLine()];
+                        $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage(), 'errCode'=>$e->getCode(), 'file'=>$e->getFile(), 'line'=>$e->getLine()];
                         Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '插入计划-异常', $logArr);
                     }
                     $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>$e->getMessage()];
+                } finally {
+                    commonRedis()->del($preInsertLockKey);
                 }
             }
             $err_post_desc = Json::encode(['Status'=>0, 'msg'=>'过期未下单', 'time'=>date('Y-m-d H:i:s')]);

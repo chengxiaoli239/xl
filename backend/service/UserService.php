@@ -175,7 +175,7 @@ class UserService extends BaseService {
      * @param $status
      * @return array
      */
-    public static function updateUserStatus($id, $status)
+    public static function updateUserStatus($id, $status, $field='status')
     {
         if(!$id) return ['status'=>300, 'msg'=>'id为空'];
         $m = \Yii::$app->cache;
@@ -183,9 +183,9 @@ class UserService extends BaseService {
         if($rst = $m->get($mkey)) return false;
 
         $data = AdminModel::findOne($id);
-        $data->status = (int)$status;
+        $data->{$field} = (int)$status;
 
-        $m->set($mkey, 1, 10);
+        $m->set($mkey, 1, 3);
 
         $rst = $data->save(false);
         $TzSystemsUsers = TzSystemsUsers::findAll(['uid'=>$id]);
@@ -193,6 +193,7 @@ class UserService extends BaseService {
             $TzSystemsUser->status = $status == 1 ? 0 : 1;
             $TzSystemsUser->save();
         }
+        TzSystemUsersService::getAuthAccessTokens(2); // 更新用户缓存
 
         return $rst;
     }

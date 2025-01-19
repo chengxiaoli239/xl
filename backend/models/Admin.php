@@ -15,6 +15,7 @@ use Yii;
  * @property string $email
  * @property string $pay_time 缴费日期
  * @property int $user_type 用户类型
+ * @property int $is_can_op_bet 是否可以开启反向下注
  * @property string $desc 描述
  * @property int $status
  * @property int $created_at
@@ -38,7 +39,7 @@ class Admin extends \common\models\base\BaseModel
         return [
             [['username', 'auth_key', 'password_hash', 'email', 'created_at', 'updated_at'], 'required'],
             [['pay_time'], 'safe'],
-            [['status', 'user_type', 'created_at', 'updated_at'], 'integer'],
+            [['status', 'user_type', 'is_can_op_bet', 'created_at', 'updated_at'], 'integer'],
             [['username', 'auth_key'], 'string', 'max' => 32],
             [['password_hash', 'password_reset_token', 'email', 'desc'], 'string', 'max' => 255],
         ];
@@ -58,6 +59,7 @@ class Admin extends \common\models\base\BaseModel
             'email' => 'Email',
             'pay_time' => '缴费日期',
             'user_type' => '用户类型',
+            'is_can_op_bet' => '反向下',
             'desc' => '描述',
             'status' => 'Status',
             'created_at' => 'Created At',

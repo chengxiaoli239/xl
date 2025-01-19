@@ -27,6 +27,7 @@ use Yii;
  * @property string $snid 订单号，用于撤单
  * @property int $plan_id 计划id
  * @property int $is_local_bet 是否本地下注
+ * @property int $bet_direct 下方向
  * @property int $tz_system_id 投注系统tz_systems.id
  * @property string $lotteryclass 彩种
  * @property int $lottery_type 彩种类型
@@ -54,7 +55,7 @@ class BetErrorPlansTask extends \common\models\base\BaseModel
     {
         return [
             [['codes', 'bet_headers', 'post_datas', 'post_desc', 'error_desc'], 'string'],
-            [['uid', 'agent_id', 'playway', 'tz_type', 'status', 'plan_id', 'is_local_bet', 'tz_system_id', 'lottery_type', 'bet_sort_key', 'updated_at', 'created_at'], 'integer'],
+            [['uid', 'agent_id', 'playway', 'tz_type', 'status', 'plan_id', 'is_local_bet', 'bet_direct', 'tz_system_id', 'lottery_type', 'bet_sort_key', 'updated_at', 'created_at'], 'integer'],
             [['bet_money', 'single'], 'number'],
             [['updated_time'], 'safe'],
             [['account', 'kj_codes'], 'string', 'max' => 24],
@@ -92,6 +93,7 @@ class BetErrorPlansTask extends \common\models\base\BaseModel
             'snid' => Yii::t('app', '订单号，用于撤单'),
             'plan_id' => Yii::t('app', '计划id'),
             'is_local_bet' => Yii::t('app', '是否本地下'),
+            'bet_direct' => Yii::t('app', '下方向'),
             'tz_system_id' => Yii::t('app', '投注系统tz_systems.id'),
             'lotteryclass' => Yii::t('app', '彩种'),
             'lottery_type' => Yii::t('app', '彩种类型'),

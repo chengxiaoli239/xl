@@ -18,6 +18,7 @@ use Yii;
  * @property string $singles 翻倍梯度
  * @property int $tz_type 投注类型:1大小单双三字定2大小三字定3单双三字定
  * @property int $buy_type 购买方向:0反买1正买
+ * @property int $bet_direct 下方向:1正2反
  * @property string $tz_sites 计划投注站点，lt_tz_systems.id
  * @property string $hz_Arr 扩展【部分投注】
  * @property int $nums 默认投注注数
@@ -234,9 +235,17 @@ class UserSysPlans extends \common\models\base\BaseModel
     ####################### 合数与差分-开始 #####################
     public $hsAndCf_twoFone; # 两合上1
     ####################### 合数与差分-结束 #####################
+    //public $bet_direct = self::BET_DIRECT_Z;
 
     const IS_INIT_PERDATE_N = 1;
     const IS_INIT_PERDATE_Y = 2;
+
+    const BET_DIRECT_Z = 1;
+    const BET_DIRECT_F = 2;
+    const BET_DIRECT_OPTION = [
+        self::BET_DIRECT_Z => '正',
+        self::BET_DIRECT_F => '反',
+    ];
 
 
     /**
@@ -253,7 +262,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['is_parent', 'uid', 'playway', 'status', 'tz_type', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'is_batch_simulate', 'is_init_perdate', 'lottery_type', 'plan_type', 'tz_sort', 'created_at', 'updated_at'], 'integer'],
+            [['is_parent', 'uid', 'playway', 'status', 'tz_type', 'bet_direct', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'is_batch_simulate', 'is_init_perdate', 'lottery_type', 'plan_type', 'tz_sort', 'created_at', 'updated_at'], 'integer'],
             [['uid', 'account', 'single', 'created_at', 'updated_at'], 'required'],
             [['single', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
             [['update_time'], 'safe'],
@@ -280,6 +289,7 @@ class UserSysPlans extends \common\models\base\BaseModel
             'single' => '投注倍数(元/注)',
             'singles' => '翻倍梯度',
             'tz_type' => '投注类型:1大小单双三字定2大小三字定3单双三字定',
+            'bet_direct' => '下注方向：1正向2反向',
             'buy_type' => '购买方向:0反买1正买',
             'tz_sites' => '计划投注站点，lt_tz_systems.id',
             'hz_Arr' => '扩展【部分投注】',

@@ -99,6 +99,14 @@ class UserSysPlansService extends BaseService {
         }
         unset($UserSysPlans['is_init_perdate']);
 
+        # 切换下方向
+        if($UserSysPlans['bet_direct'] && count($UserSysPlans['bet_direct']) == 1){
+            $post['UserSysPlans']['bet_direct'] = (int)$UserSysPlans['bet_direct'][0];
+        }else{
+            $post['UserSysPlans']['bet_direct'] = UserSysPlans::BET_DIRECT_Z;
+        }
+        unset($UserSysPlans['bet_direct']);
+
         # 定位置：千、百、十、个
         if($UserSysPlans['fixed_pos_sel'] && count($UserSysPlans['fixed_pos_sel']) == 1){
             $tmpFilter['fixed_pos_sel'] = (int)$UserSysPlans['fixed_pos_sel'][0];

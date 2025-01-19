@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+$user = \Yii::$app->user;
 
 /* @var $this yii\web\View */
 /* @var $model backend\models\UserSysPlans */
@@ -32,6 +33,27 @@ use yii\widgets\ActiveForm;
             ]
         )->label('每天初始化(翻倍计划)') ?>
     </div>
+
+    <?php if($user->identity->is_can_op_bet == \backend\models\UserSysPlans::BET_DIRECT_F){ ?>
+    <div class="col-lg-3 col-xs-6">
+        <?= $form->field($model, 'bet_direct')->checkboxList(
+            \backend\models\UserSysPlans::BET_DIRECT_OPTION,
+            [
+                //'value' => [1],
+                'item' => function ($index, $label, $name, $checked, $value) {
+                    $options = [
+                        'class' => 'checkbox-item',
+                        'label' => $label,
+                        'value' => $value,
+                        'checked' => $checked,
+                    ];
+
+                    return Html::checkbox($name, $checked, $options);
+                }
+            ]
+        )->label('切换下方向') ?>
+    </div>
+    <?}?>
 
     <?php if($model->playway==1){ ?>
     <div class="col-lg-2 col-xs-6">

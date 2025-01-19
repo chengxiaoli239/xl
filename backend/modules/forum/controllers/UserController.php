@@ -485,10 +485,10 @@ class UserController extends BaseController
      * @param $status
      * @return \yii\web\Response
      */
-    public function actionSwitchStatus($id,$status){
+    public function actionSwitchStatus($id, $status, $field='status'){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if(\Yii::$app->user->id == 1){
-            UserService::updateUserStatus($id, $status);
+            UserService::updateUserStatus($id, $status, $field);
         }
 
         return $this->redirect(['index']);

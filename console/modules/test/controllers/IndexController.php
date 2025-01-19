@@ -79,7 +79,9 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
-        $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%user_sys_plans}}'); p($r);
+        $rst['data'] = BetService::insertPlansTask($lottery_types=[8], 1,'16790'); p($rst);
+        $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%lt_bet_error_plans_task}}'); p($r);
+        # is_batch_simulate:0正常1批量模拟历史记录
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType=8);
         $currentKjQiHao = LotteryType::getBeforeNQiHao($currentKjQiHao, $qiNum=1);
         $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lotteryType);
@@ -238,9 +240,6 @@ class IndexController extends Controller
         $rst = TzService::operateSystemBetPlans($lottery_type=8, $qihao='20240902131', $ignore=0); p($rst);# 处理系统投注计划，更新统计数据、
         list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lotteryType=8);
         p([$currentKjQiHao, $qiHao]);
-        $rst['data'] = BetService::insertPlansTask($lottery_types=[8]);
-        p($rst);
-        # is_batch_simulate:0正常1批量模拟历史记录
         $lottery_type = 8;
         $where = ['AND', ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
         //$where[] = ['=', 'uid', 17]; # 测试

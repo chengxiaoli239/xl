@@ -45,6 +45,22 @@ $columns = array_merge(
                     return Html::a($txt, $url, ['title' => '开通系统权限','alt'=>$alt]);
                 }
             ],
+            ['attribute' => 'is_can_op_bet','label'=>'反向下', # 'headerOptions'=>['width'=>'5%'],
+                'format'=>'raw',
+                'value' => function($model) {
+                    if($model->is_can_op_bet == 1){
+                        $txt = '<font color="red">已关闭</font>';
+                        $alt = '点击开启';
+                        $val = 2;
+                    }else{
+                        $txt = '<font color="green">已开启</font>';
+                        $val = 1;
+                        $alt = '点击关闭';
+                    }
+                    $url = "/forum/user/switch-status?id=".$model->id.'&field=is_can_op_bet'."&status=".$val; #
+                    return Html::a($txt, $url, ['title' => '开通反向','alt'=>$alt]);
+                }
+            ],
         ],
         $user->id!=1?[
             [

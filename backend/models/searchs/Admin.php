@@ -18,7 +18,7 @@ class Admin extends AdminModel
     public function rules()
     {
         return [
-            [['id', 'status', 'user_type', 'created_at', 'updated_at'], 'integer'],
+            [['id', 'status', 'user_type', 'is_can_op_bet', 'created_at', 'updated_at'], 'integer'],
             [['username', 'auth_key', 'password_hash', 'password_reset_token', 'email', 'pay_time', 'desc'], 'safe'],
         ];
     }
