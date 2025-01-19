@@ -80,13 +80,14 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $rst['data'] = BetService::insertPlansTask($lottery_types=[8], 1,'16795'); p($rst);
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type=8);
-        $planId = 16794;
+        $planId = 16742;
         push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$planId, 'qiHao'=>$nextQiHao, 'business_id'=>$nextQiHao]);
         p(['planId'=>$planId, 'nextQiHao'=>$nextQiHao]);
         $where = ['AND', ['=', 'qihao', $nextQiHao], ['=', 'plan_id', $planId], ['=', 'uid', 50]];
         if(BettingRecords::find()->where($where)->exists()){
-            throw_info('yx表已记录...');
+            throw_info('yx表已记录1...');
         }
         p('dddd');
         $where = ['AND', ['=', 'lottery_type', $lottery_type]];
@@ -125,7 +126,6 @@ class IndexController extends Controller
         commonRedis()->setex($preInsertLockKey, BetService::getBetCacheTime($lottery_type=8, $activeQiHao), 1);# 投注之后缓存时间
         $r = commonRedis()->del($preInsertLockKey);
         p([$r]);
-        $rst['data'] = BetService::insertPlansTask($lottery_types=[8], 1,'as06'); p($rst);
         $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%lt_bet_error_plans_task}}'); p($r);
         # is_batch_simulate:0正常1批量模拟历史记录
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType=8);

@@ -7,6 +7,7 @@
 
 namespace backend\modules\api\controllers;
 
+use backend\models\UserSysPlans;
 use backend\service\BaseService;
 use backend\service\BetService;
 use backend\service\clients\TzSystemUsersService;
@@ -177,7 +178,7 @@ class TzSystemUsersController extends Controller
             return ['status'=>301, 'msg'=>'缺少access_token参数'];
         }
 
-        $rst = TzSystemUsersService::getActivePlanTasks($post['access_token'], $post['current_qihao'], $post['lottery_type']);
+        $rst = TzSystemUsersService::getActivePlanTasks($post['access_token'], $post['current_qihao'], $post['direct']??0, $post['lottery_type']);
         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取激活任务', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;

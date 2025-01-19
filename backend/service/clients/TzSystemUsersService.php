@@ -514,11 +514,14 @@ class TzSystemUsersService extends ClientsBaseService{
      * @param int $lottery_type
      * @return array
      */
-    public static function getActivePlanTasksWhere($uid='', $current_qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function getActivePlanTasksWhere($uid='', $current_qihao='', $direct=0, $lottery_type=DEFAULT_LOTTERY_TYPE){
         $RedisLock = new RedisLock();
         $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1异常可重复处理2推送成功3推送失败不可重推
         if($uid){
             $where = array_merge($where, [['=', 'uid', $uid]]);
+        }
+        if($direct){
+            $where[] = ['=', 'bet_direct', $direct];
         }
         if(!empty($current_qihao)){
             $incr_qihao_key = 'incr_qihao_key_'.$lottery_type.'_'.$uid.'_'.$current_qihao;
@@ -538,7 +541,7 @@ class TzSystemUsersService extends ClientsBaseService{
      * @param string $access_token
      * @return mixed|string
      */
-    public static function getActivePlanTasks($access_token='', $current_qihao='', $lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function getActivePlanTasks($access_token='', $current_qihao='', $direct=0, $lottery_type=DEFAULT_LOTTERY_TYPE){
 
         try {
             list($code, $TzSystemsUsers) = TzSystemUsersService::validateAccount($access_token);
@@ -569,7 +572,7 @@ class TzSystemUsersService extends ClientsBaseService{
                 throw_info('早盘开始晚一分钟下注');
             }
 
-            $where = TzSystemUsersService::getActivePlanTasksWhere($uid, $current_qihao, $lottery_type);
+            $where = TzSystemUsersService::getActivePlanTasksWhere($uid, $current_qihao, $direct, $lottery_type);
             $BetErrorPlansTasksQuery = BetErrorPlansTask::find()->where($where);
             $BetErrorPlansTasks = $BetErrorPlansTasksQuery->orderBy(['id'=>SORT_DESC])->limit(20)->all();
             $sql = $BetErrorPlansTasksQuery->createCommand()->getRawSql();

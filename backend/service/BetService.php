@@ -2102,7 +2102,7 @@ abstract class BetService extends BaseBetService {
                     }
                     $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId], ['=', 'uid', $plan->uid]];
                     if(BettingRecords::find()->where($where)->exists()){
-                        throw_info('yx表已记录...');
+                        throw_info('yx表已记录2...', 40001);
                     }
                     push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$planId, 'qiHao'=>$qiHao, 'business_id'=>$qiHao]);
                     $rst['data'] = ['activeQiHao'=>$qiHao, 'plan_id'=>$plan->id, 'msg'=>'正常'];
@@ -2135,11 +2135,11 @@ abstract class BetService extends BaseBetService {
             $plan = UserSysPlans::findOne($planId);
             $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId], ['=', 'uid', $plan->uid]];
             if($isAuto == 1 && BettingRecords::find()->where($where)->exists()){
-                throw_info('yx表已记录...');
+                throw_info('yx表已记录3...');
             }
             $where = ['uid'=>$plan->uid, 'lottery_type'=>$plan->lottery_type, 'qihao'=>$qiHao, 'plan_id'=>$planId];
             if(BetErrorPlansTask::find()->where($where)->exists()){
-                throw_info('任务表已记录...');
+                throw_info('任务表已记录2...');
             }
 
             $lottery_type = $plan->lottery_type;
