@@ -2084,6 +2084,12 @@ abstract class BetService extends BaseBetService {
             $TzSystemsUsers = $TzSystemsUsersData[$plan->uid]??[];
             foreach ($plansQuery->each(20) as $plan){
                 try {
+                    $planId = $plan->id;
+                    $preInsertLockKey = CacheKeyService::preInsertPlanTaskKey($planId, $qiHao);
+                    if(!(Redis::lock($preInsertLockKey))){
+                        throw_info('业务处理中，请稍后...');
+                    }
+
                     list($code, $current_profits) = UserService::updateUserProfits($TzSystemsUsers);
                     if($code>0 OR !$TzSystemsUsers->is_auto_bet){
                         throw_info('统计盈利异常:'.$code);
@@ -2094,7 +2100,6 @@ abstract class BetService extends BaseBetService {
                         Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入真实计划任务-止盈止损', ['plan_id'=>$plan->id, 'user_id'=>$plan->uid]);
                         throw_info($e->getMessage());
                     }
-                    $planId = $plan->id;
                     $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId], ['=', 'uid', $plan->uid]];
                     if(BettingRecords::find()->where($where)->exists()){
                         throw_info('yx表已记录...');
@@ -2126,11 +2131,7 @@ abstract class BetService extends BaseBetService {
     {
         try {
             $t1 = microtime(true);
-            $preInsertLockKey = CacheKeyService::preInsertPlanTaskKey($planId, $qiHao);
 
-            if(!(Redis::lock($preInsertLockKey))){
-                throw_info('业务处理中，请稍后...');
-            }
             $plan = UserSysPlans::findOne($planId);
             $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId], ['=', 'uid', $plan->uid]];
             if($isAuto == 1 && BettingRecords::find()->where($where)->exists()){
