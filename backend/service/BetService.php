@@ -2087,7 +2087,7 @@ abstract class BetService extends BaseBetService {
                     $planId = $plan->id;
                     $preInsertLockKey = CacheKeyService::preInsertPlanTaskKey($planId, $qiHao);
                     if(!(Redis::lock($preInsertLockKey))){
-                        throw_info('业务处理中，请稍后...');
+                        throw_info('业务处理中，请稍后...', 40001);
                     }
 
                     list($code, $current_profits) = UserService::updateUserProfits($TzSystemsUsers);
