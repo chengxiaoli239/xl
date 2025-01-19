@@ -82,7 +82,7 @@ class IndexController extends Controller
     {
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type=8);
         $planId = 16791;
-        $where = ['AND', ['=', 'qihaos', $nextQiHao], ['=', 'plan_id', $planId], ['=', 'uid', 50]];
+        $where = ['AND', ['=', 'qihao', $nextQiHao], ['=', 'plan_id', $planId], ['=', 'uid', 50]];
         if(BettingRecords::find()->where($where)->exists()){
             throw_info('yx表已记录...');
         }
