@@ -64,6 +64,7 @@ class BetErrorPlansTask extends BetErrorPlansTaskModel
             'playway' => $this->playway,
             'tz_type' => $this->tz_type,
             'bet_money' => $this->bet_money,
+            'account' => $this->account,
             'single' => $this->single,
             'status' => $this->status,
             'plan_id' => $this->plan_id,
@@ -82,7 +83,6 @@ class BetErrorPlansTask extends BetErrorPlansTaskModel
         $query->andFilterWhere($filterWhere);
 
         $query->andFilterWhere(['like', 'codes', $this->codes])
-            ->andFilterWhere(['like', 'account', $this->account])
             ->andFilterWhere(['like', 'bet_url', $this->bet_url])
             ->andFilterWhere(['like', 'bet_headers', $this->bet_headers])
             ->andFilterWhere(['like', 'post_datas', $this->post_datas])

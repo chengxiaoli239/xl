@@ -79,6 +79,10 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $preInsertLockKey = CacheKeyService::preInsertPlanTaskKey($id=5, $activeQiHao='111');
+        commonRedis()->setex($preInsertLockKey, BetService::getBetCacheTime($lottery_type=8, $activeQiHao), 1);# 投注之后缓存时间
+        $r = commonRedis()->del($preInsertLockKey);
+        p([$r]);
         $rst['data'] = BetService::insertPlansTask($lottery_types=[8], 1,'as06'); p($rst);
         $r = \Yii::$app->db->getSchema()->refreshTableSchema('{{%lt_bet_error_plans_task}}'); p($r);
         # is_batch_simulate:0正常1批量模拟历史记录

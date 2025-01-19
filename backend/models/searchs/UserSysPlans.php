@@ -69,6 +69,7 @@ class UserSysPlans extends UserSysPlansModel
             'single' => $this->single,
             'tz_type' => $this->tz_type,
             'buy_type' => $this->buy_type,
+            'account' => $this->account,
             'nums' => $this->nums,
             'sel_same' => $this->sel_same,
             'is_custom' => $this->is_custom,
@@ -87,8 +88,7 @@ class UserSysPlans extends UserSysPlansModel
         // grid filtering conditions
         $query->andFilterWhere($queryWhere);
 
-        $query->andFilterWhere(['like', 'account', $this->account])
-            ->andFilterWhere(['like', 'tz_sites', $this->tz_sites])
+        $query->andFilterWhere(['like', 'tz_sites', $this->tz_sites])
             ->andFilterWhere(['like', 'desc', $this->desc]);
 
             //->andFilterWhere(['in', 'status', [0, 1]])

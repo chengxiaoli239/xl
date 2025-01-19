@@ -2087,6 +2087,8 @@ abstract class BetService extends BaseBetService {
             $user_ids = [];
             foreach ($plansQuery->each(20) as $plan){
                 try {
+                    $activeQiHao = $qiHao;
+                    $preInsertLockKey = CacheKeyService::preInsertPlanTaskKey($plan->id, $activeQiHao);
                     $t1 = microtime(true);
                     $tz_system_id = $plan->tz_sites;
                     $lottery_type = $plan->lottery_type;
@@ -2115,8 +2117,6 @@ abstract class BetService extends BaseBetService {
                             commonRedis()->setex($insert_mkey, 300, 1);
                         }
                     }else{
-                        $activeQiHao = $qiHao;
-                        $preInsertLockKey = CacheKeyService::preInsertPlanTaskKey($plan->id, $activeQiHao);
                         $logArr = ['plan_id'=>$plan->id, 'is_auto_bet'=>$TzSystemsUsers->is_auto_bet, 'lottery_type'=>$lottery_type, 'uid'=>$uid];
                         Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入真实计划任务-1', $logArr);
 
@@ -2161,7 +2161,7 @@ abstract class BetService extends BaseBetService {
                     }
                     $rst['data']['plan_id'] = ['plan_id'=>$plan->id, 'msg'=>$e->getMessage()];
                 } finally {
-                    //commonRedis()->del($preInsertLockKey);
+                    commonRedis()->del($preInsertLockKey);
                 }
             }
             $err_post_desc = Json::encode(['Status'=>0, 'msg'=>'过期未下单', 'time'=>date('Y-m-d H:i:s')]);
