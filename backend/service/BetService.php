@@ -2181,7 +2181,7 @@ abstract class BetService extends BaseBetService {
             }
             $plan = UserSysPlans::findOne($planId);
             $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId], ['=', 'uid', $plan->uid]];
-            if(BettingRecords::find()->select(['id'])->where($where)->limit(1)->one()){
+            if($isAuto == 1 && BettingRecords::find()->select(['id'])->where($where)->limit(1)->one()){
                 throw_info('yx表已记录...');
             }
             $where = ['uid'=>$plan->uid, 'lottery_type'=>$plan->lottery_type, 'qihao'=>$qiHao, 'plan_id'=>$planId];
