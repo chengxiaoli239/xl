@@ -768,14 +768,6 @@ class IndexController extends Controller
         $qihao_1 = HN0898Service::getCurrentQihao($lottery_type);
         $qihao_2 = HN0898Service::getQihao($lottery_type);
         p([$qihao_1, $qihao_2]);
-        $lottery_types = [8];
-        foreach ($lottery_types as $lottery_type) {
-            /* 处理系统投注计划 add 2019-01-21 */
-            $rst[$lottery_type] = KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
-            $rst['TzService'] = TzService::operateSystemBetPlans($lottery_type, '', $istest = 1);
-            p($rst);// 定制化投注计划
-            /* 处理系统投注计划 add 2019-01-21 */
-        }
         p($rst);
         preg_match("/robot7=([^\r\n]*); Seven/i", $cookie, $matches);
         $new_cookie = str_replace($matches[1], $roboot_id, $cookie);

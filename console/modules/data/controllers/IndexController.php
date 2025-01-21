@@ -170,10 +170,10 @@ class IndexController extends Controller
         #$post = \Yii::$app->request->post();
         $lottery_types = [1, 8, 17];
 
-        for ($i=0; $i<7; $i++){
+        for ($i=0; $i<3; $i++){
             $rst['data'] = BetService::insertPlansTask($lottery_types);
             //$rst['batch_simulate_data'] = BetService::batchSimulateBet($post['lottery_types']);
-            sleep(7);
+            sleep(18);
         }
 
         return $rst;
