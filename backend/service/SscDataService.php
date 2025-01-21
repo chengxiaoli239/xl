@@ -2251,7 +2251,7 @@ class SscDataService extends BaseService {
                         if(in_array($UserSysPlan->plan_type, [9, 16])){ # plan_type:遗漏倍投
                             $current_miss = 0;
                             $is_init = 1; # 等待状态
-                        }elseif(in_array($UserSysPlan->plan_type, [10])) { # plan_type:中则倍投，不中则回第一个倍数
+                        }elseif($UserSysPlan->plan_type == 10) { # plan_type:中则倍投，不中则回第一个倍数
                             $single = OperatePlanService::getPlanNextSingle($UserSysPlan->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                         }
                     }else{ # 不中奖
@@ -2291,7 +2291,7 @@ class SscDataService extends BaseService {
                                     }
                                 }
                             }
-                        }elseif(in_array($UserSysPlan->plan_type, [10])){ # plan_type:中则倍投，不中则回第一个倍数
+                        }elseif($UserSysPlan->plan_type == 10){ # plan_type:中则倍投，不中则回第一个倍数
                             $next_single_key = 0;
                             $single = $singles[$next_single_key];
                         }else{
@@ -2705,14 +2705,15 @@ class SscDataService extends BaseService {
     public static function isZjBefore($plan_id = 0, &$recordData = ''){
         if(empty($plan_id)) return false;
         # flag 是否中奖金，中的计划回0.1、不中的计划翻倍
-        $BettingRecords = BettingRecords::find()->select(['id', 'profits', 'status'])
-            ->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
+        $BettingRecords = BettingRecords::find()->select(['id', 'profits', 'qihao', 'status'])
+            ->where(['plan_id'=>$plan_id])->andWhere(['status'=>1])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
 
         $recordData = [
             'record_id' => $BettingRecords['id'],
             'profits' => $BettingRecords['profits'],
             'status' => $BettingRecords['status'],
         ];
+        Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '是否中奖', ['plan_id'=>$plan_id, 'bettingRecord'=>$BettingRecords]);
 
         if(empty($BettingRecords)) return -1;
 
