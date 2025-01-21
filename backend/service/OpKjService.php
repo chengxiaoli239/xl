@@ -12,12 +12,14 @@ use backend\models\BettingRecords;
 use backend\models\SscKjData;
 use backend\models\User;
 use backend\models\UserFollowData;
+use common\framework\Redis;
+use common\service\cache\CacheKeyService;
 use common\service\CommonService;
+use common\service\jobs\plan\OperateUserPlanKjJob;
 use common\service\jobs\statics_3d\UserDayStaticsJobs;
 use common\service\lottery\aozhou5\AoZhou5Service;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\OperateLotteryService;
-use common\service\wechat\WechatUserService;
 use common\tools\Tool_Common;
 use  yii;
 
@@ -54,6 +56,8 @@ class OpKjService extends BaseService {
                     if(!empty($kjData)){
                         $rst['data'][$BettingRecord->id] = OpKjService::opOneBettingRecord($BettingRecord->id, $BettingRecord);
                     }
+                    //$params = ['business_id'=>$BettingRecord->qihao, 'lottery_type'=>$lottery_type, 'bet_id'=>$BettingRecord->id];
+                    //push_queue_open(OperateUserPlanKjJob::class, $params);
                 }
                 break;
         }
@@ -82,7 +86,13 @@ class OpKjService extends BaseService {
 
             try {
                 $t1 = microtime(true);
-                Tool_Common::log('/kj_data/'.__FUNCTION__,'INFO','开奖处理-开始', ['record_id'=>$record_id, 'msg'=>'开始处理开奖']);
+                $md5Key = CacheKeyService::getPlanKjKey($BettingRecord->plan_id, $BettingRecord->qihao);
+                $isLock = 0;
+                if(!Redis::lock($md5Key)){
+                    $isLock = 1;
+                    //return ['status'=>305, 'msg'=>'开奖计划频繁处理'];
+                }
+                Tool_Common::log('/kj_data/'.__FUNCTION__,'INFO','开奖处理-开始', ['record_id'=>$record_id, 'isLock'=>$isLock, 'msg'=>'开始处理开奖']);
                 $is_simulate = $BettingRecord->is_simulate;
                 $qihao = $BettingRecord->qihao;
                 $single = $BettingRecord->single;

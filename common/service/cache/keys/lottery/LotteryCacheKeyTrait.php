@@ -113,6 +113,17 @@ trait LotteryCacheKeyTrait
     }
 
     /**
+     * 获取计划开奖ley
+     * @param int $planId
+     * @param string $qiHao
+     * @return string
+     */
+    public static function getPlanKjKey(int $planId=0, $qiHao=''): string
+    {
+        return 'lottery:plan_kj:plan_'.$planId.'_'.$qiHao;
+    }
+
+    /**
      * 随机下注的描述
      * @param int $planId
      * @param string $qiHao
