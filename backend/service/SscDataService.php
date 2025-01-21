@@ -2709,7 +2709,7 @@ class SscDataService extends BaseService {
             ->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
 
         if(!empty($BettingRecords) && $BettingRecords['status'] != 1){
-            throw_info('未开奖暂不处理');
+            //throw_info('未开奖暂不处理');
         }
         $recordData = [
             'record_id' => $BettingRecords['id'],

@@ -46,6 +46,18 @@ class OpKjService extends BaseService {
                 AoZhou5Service::afterKj();
                 break;
             default:
+                $bettingRecords = BettingRecords::find()
+                    ->where(['status'=>0, 'lottery_type'=>$lottery_type, 'is_batch_simulate'=>0])
+                    ->orderBy('id DESC'); //->limit(100)->all();
+                //if(!$bettingRecords) return $rst;
+                foreach ($bettingRecords->each(20) as $BettingRecord){
+                    $kjData = CommonService::getAwardNumberByQihao($BettingRecord->qihao, $lottery_type); // 3,4,5,6,7
+                    //print_r(['record_id'=>$BettingRecord->id, 'isEmpty'=>empty($BettingRecord), 'kjData'=>$kjData]);
+                    if(!empty($kjData)){
+                        $rst['data'][$BettingRecord->id] = OpKjService::opOneBettingRecord($BettingRecord->id, $BettingRecord);
+                    }
+                }
+                /*
                 $bettingRecords = BettingRecords::find()->select(['id', 'qihao', 'status'])
                     ->where(['status'=>0, 'lottery_type'=>$lottery_type, 'is_batch_simulate'=>0])
                     ->orderBy('id DESC'); //->limit(100)->all();
@@ -57,6 +69,7 @@ class OpKjService extends BaseService {
                     $params = ['business_id'=>$BettingRecord->qihao, 'lottery_type'=>$lottery_type, 'bet_id'=>$BettingRecord->id, 'kj_data'=>$kjData];
                     push_queue_open(OperateUserPlanKjJob::class, $params);
                 }
+                */
                 break;
         }
         Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据-5x', ['lottery_type'=>$lottery_type, 'rst'=>$rst]);

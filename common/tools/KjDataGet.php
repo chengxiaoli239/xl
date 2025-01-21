@@ -365,7 +365,7 @@ class KjDataGet
                 push_queue_fast(PushKjDataToOutSiteJob::class, ['lottery_type'=>$lottery_type, 'business_id'=>$lottery_type]);
                 $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
                 # 1、队列处理下注数据
-                push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>CommonBaseService::LOTTERY_TYPE_AOZHOU5, 'lottery_name'=>$lottery_name, 'business_id'=>$qihao]);
+                push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>CommonBaseService::LOTTERY_TYPE_AOZHOU5, 'lottery_name'=>$lottery_name, 'qihao'=>$qihao, 'business_id'=>$qihao]);
                 # 2、群里发开奖信息
                 (new AoZhouKjService())->operateSendKjData($qihao);
                 $mKey = CacheKeyService::lotteryOpenSwitch($lottery_type);
@@ -375,7 +375,7 @@ class KjDataGet
                 push_queue_fast(PushKjDataToOutSiteJob::class, ['lottery_type'=>$lottery_type, 'business_id'=>$lottery_type]);
                 $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
                 # 1、队列处理下注数据
-                push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>CommonBaseService::LOTTERY_TYPE_LUCKY5, 'lottery_name'=>$lottery_name, 'business_id'=>$qihao]);
+                push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>CommonBaseService::LOTTERY_TYPE_LUCKY5, 'lottery_name'=>$lottery_name, 'qihao'=>$qihao, 'business_id'=>$qihao]);
 
                 # 2、数据统计处理  底下的统计有待于添加开关控制
                 push_queue(PeiShuProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>5]);

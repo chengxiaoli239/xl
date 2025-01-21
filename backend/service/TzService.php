@@ -94,7 +94,7 @@ class TzService extends BaseService {
             $qihao = $qihao?:HN0898Service::getCurrentQihao($lottery_type);
             $statusRst = self::beforeRunSysPlans($qihao, $lottery_type);
             if($statusRst['status'] != 200){
-                //return $statusRst;
+                return $statusRst;
             }
             if(!$ignore && !$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opSystemBetPlans')){
                 throw new \Exception('不可操作统计数据，还没到开奖时间');
@@ -154,8 +154,8 @@ class TzService extends BaseService {
             $rst['isCanOpStaticStatus'] = $isCanOpStaticStatus;
             Tool_Common::log('/static/'.__FUNCTION__,'INFO','处理系统投注计划', ['rst'=>$rst, 'rstLog'=>$rstLog]);
             StaticService::afterOpStatic($lottery_type, 'opSystemBetPlans');
-            push_queue(\common\service\jobs\kj_data\AfterRunSysPlansJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'business_id'=>$qihao]);
             #$rst['afterRunSysPlans'] = TzService::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
+            push_queue(\common\service\jobs\kj_data\AfterRunSysPlansJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'business_id'=>$qihao]);
         }catch (\Exception $e){
             StaticService::afterOpStatic($lottery_type, 'opSystemBetPlans');
             Tool_Common::log('/static/'.__FUNCTION__, 'INFO', '数据统计异常', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
