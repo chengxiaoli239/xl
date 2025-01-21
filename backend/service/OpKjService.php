@@ -51,6 +51,9 @@ class OpKjService extends BaseService {
                     ->orderBy('id DESC'); //->limit(100)->all();
                 foreach ($bettingRecords->each(20) as $BettingRecord){
                     $kjData = CommonService::getAwardNumberByQihao($BettingRecord->qihao, $lottery_type); // 3,4,5,6,7
+                    if(!$kjData){
+                        return ['status'=>300, 'msg'=>$BettingRecord->qihao.'期未开奖!'];
+                    }
                     $params = ['business_id'=>$BettingRecord->qihao, 'lottery_type'=>$lottery_type, 'bet_id'=>$BettingRecord->id, 'kj_data'=>$kjData];
                     push_queue_open(OperateUserPlanKjJob::class, $params);
                 }
@@ -96,7 +99,7 @@ class OpKjService extends BaseService {
                     # 开奖数据
                     $kjData = CommonService::getAwardNumberByQihao($qihao, $BettingRecord->lottery_type); // 3,4,5,6,7
                     if(!$kjData){
-                        return $rst = ['status'=>300, 'msg'=>$qihao.'期未开奖!'];
+                        return ['status'=>300, 'msg'=>$qihao.'期未开奖!'];
                     }
                 }
 
