@@ -236,10 +236,10 @@ class IndexController extends Controller
         }
 
         foreach ($lottery_types as $lottery_type) {
-            for ($i=0; $i<3; $i++){
+            for ($i=0; $i<2; $i++){
                 $rst = OpKjService::opSscKjData($lottery_type); # 在抓取完开奖数据已经调用 KjDataGet::grabOne
 
-                sleep(15);
+                sleep(25);
             }
         }
 
