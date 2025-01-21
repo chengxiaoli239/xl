@@ -2706,8 +2706,11 @@ class SscDataService extends BaseService {
         if(empty($plan_id)) return false;
         # flag 是否中奖金，中的计划回0.1、不中的计划翻倍
         $BettingRecords = BettingRecords::find()->select(['id', 'profits', 'qihao', 'status'])
-            ->where(['plan_id'=>$plan_id])->andWhere(['status'=>1])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
+            ->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
 
+        if(!empty($BettingRecords) && $BettingRecords['status'] != 1){
+            throw_info('未开奖暂不处理');
+        }
         $recordData = [
             'record_id' => $BettingRecords['id'],
             'profits' => $BettingRecords['profits'],

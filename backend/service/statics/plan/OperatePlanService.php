@@ -98,7 +98,7 @@ class OperatePlanService extends BaseService
             $RedisLock = new RedisLock();
             $Rkey = __FUNCTION__.'_redis_op_plan_6_10_'.$lottery_type.'_'.$UserSysPlans->id;
             \Yii::$app->redis->expire($Rkey, 120);
-            if(!$RedisLock->lock($Rkey, 30)){
+            if(!$RedisLock->lock($Rkey, 10)){
                 throw_info('并发处理失败');
             }
             //$current_miss = ($codes_hz['is_init'] == 1) ? 0 : $codes_hz['current_miss'] + 1; # 获取当前计划从统计开始到现在的遗漏，如果is_init = 0
@@ -1037,7 +1037,7 @@ class OperatePlanService extends BaseService
         $UserSysPlans = UserSysPlans::findOne($plan_id);
         $singles = $UserSysPlans->singles;
         $singlesArr = explode(',', str_replace('-', ',', $singles));
-        if($BettingRecords = BettingRecords::find()->select(['id', 'qihao'])->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->limit(1)->one()){
+        if($BettingRecords = BettingRecords::find()->select(['id', 'qihao','status'])->where(['plan_id'=>$plan_id, 'status'=>1])->orderBy(['id'=>SORT_DESC])->limit(1)->one()){
             $mkey = 'getPlanNextSingle_1_'.$plan_id.'_'.$BettingRecords->qihao;
             if(!$next_single_key = $m->get($mkey)){
                 //$key = array_search($single, $singlesArr);
@@ -1051,7 +1051,7 @@ class OperatePlanService extends BaseService
         }
         $nextSingle = $singlesArr[$next_single_key];
         $time = 7*86400;
-        $logArr = ['plan_id'=>$plan_id, 'single_key'=>$singles_key, 'next_single_key'=>$next_single_key, 'time'=>$time, 'lottery_type'=>$lottery_type];
+        $logArr = ['plan_id'=>$plan_id, 'single_key'=>$singles_key, 'qihao'=>$BettingRecords->qihao, 'next_single_key'=>$next_single_key, 'time'=>$time, 'lottery_type'=>$lottery_type];
         Tool_Common::log('getPlanNextSingle', 'INFO', '倍数获取', $logArr);
         $m->set($mkey, $next_single_key, $time);
 
