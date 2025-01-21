@@ -42,6 +42,7 @@ use common\models\wechat\WechatUser;
 use common\service\cache\CacheKeyService;
 use common\service\CommonService;
 use common\service\helpers\ThirdD;
+use common\service\jobs\plan\OperateUserPlanKjJob;
 use common\service\jobs\plan\UserPlanBetJob;
 use common\service\lottery\aozhou5\AoZhou5BetService;
 use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
@@ -80,6 +81,11 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $BettingRecord = BettingRecords::findOne(['plan_id'=>16798]);
+        $lottery_type = 8;
+        $params = ['business_id'=>$BettingRecord->qihao, 'lottery_type'=>$lottery_type, 'bet_id'=>$BettingRecord->id];
+        push_queue_open(OperateUserPlanKjJob::class, $params);
+        p('dddddd');
         $rst['data'] = BetService::insertPlansTask($lottery_types=[8], 1,'16795'); p($rst);
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type=8);
         $planId = 16742;

@@ -17,8 +17,9 @@ class OperateUserPlanKjJob extends CommonJob {
 
     public static function handle($params){
         $betId = $params['bet_id'];
+        $kjData = $params['kj_data'];
 
-        return OpKjService::opOneBettingRecord($betId);
+        return OpKjService::opOneBettingRecord($betId, '', $kjData);
     }
 
 }
