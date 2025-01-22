@@ -860,7 +860,7 @@ class DynamicType2Service extends BaseService {
     }
 
     # x位或y位或z位上n配数单双互排及该位置号码，则中或者不中
-    public static function filter20(object $plan, $dynamic=[], $filterDesc = [], $direct=0): array
+    public static function filter20(object $plan, $dynamic=[], $filterDesc = [], $direct=0, $type='type_ds'): array
     {
         $lotteryType = $plan->lottery_type;
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
@@ -892,7 +892,11 @@ class DynamicType2Service extends BaseService {
             $subWhere = ['OR'];
             if($n == 1){
                 foreach ($filterPoss as $pos) {
-                    $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $pos]), [$historyKjData['code' . $pos]]);
+                    if($type == 'type_dx'){
+                        $filterCode = array_merge(NumService::getDxTypeFanByCode($historyKjData['code' . $pos]), [$historyKjData['code' . $pos]]);
+                    }else{
+                        $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $pos]), [$historyKjData['code' . $pos]]);
+                    }
                     $subWhere[] = ['IN', 'code_' . $pos, $filterCode]; # 正
                 }
             }elseif($n == 2){
@@ -903,8 +907,16 @@ class DynamicType2Service extends BaseService {
                         $posI = $filterPoss[$i];
                         $posJ = $filterPoss[$j];
 
-                        $filterCodeI = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$posI]), [$historyKjData['code'.$posI]]);
-                        $filterCodeJ = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$filterPoss[$j]]), [$historyKjData['code'.$filterPoss[$j]]]);
+                        if($type == 'type_dx') {
+                            $filterCodeI = array_merge(NumService::getDxTypeFanByCode($historyKjData['code' . $posI]), [$historyKjData['code' . $posI]]);
+                        }else{
+                            $filterCodeI = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $posI]), [$historyKjData['code' . $posI]]);
+                        }
+                        if($type == 'type_dx') {
+                            $filterCodeJ = array_merge(NumService::getDxTypeFanByCode($historyKjData['code' . $filterPoss[$j]]), [$historyKjData['code' . $filterPoss[$j]]]);
+                        }else{
+                            $filterCodeJ = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $filterPoss[$j]]), [$historyKjData['code' . $filterPoss[$j]]]);
+                        }
                         $subTwoWhere = [
                             'AND',
                             ['IN', 'code_' . $posI, $filterCodeI], # 正
@@ -925,9 +937,21 @@ class DynamicType2Service extends BaseService {
                             $posJ = $filterPoss[$j];
                             $posK = $filterPoss[$k];
 
-                            $filterCodeI = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $posI]), [$historyKjData['code' . $posI]]);
-                            $filterCodeJ = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $posJ]), [$historyKjData['code' . $posJ]]);
-                            $filterCodeK = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $posK]), [$historyKjData['code' . $posK]]);
+                            if($type == 'type_dx') {
+                                $filterCodeI = array_merge(NumService::getDxTypeFanByCode($historyKjData['code' . $posI]), [$historyKjData['code' . $posI]]);
+                            }else{
+                                $filterCodeI = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $posI]), [$historyKjData['code' . $posI]]);
+                            }
+                            if($type == 'type_dx') {
+                                $filterCodeJ = array_merge(NumService::getDxTypeFanByCode($historyKjData['code' . $posJ]), [$historyKjData['code' . $posJ]]);
+                            }else{
+                                $filterCodeJ = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $posJ]), [$historyKjData['code' . $posJ]]);
+                            }
+                            if($type == 'type_dx') {
+                                $filterCodeK = array_merge(NumService::getDxTypeFanByCode($historyKjData['code' . $posK]), [$historyKjData['code' . $posK]]);
+                            }else{
+                                $filterCodeK = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $posK]), [$historyKjData['code' . $posK]]);
+                            }
 
                             $subThirdWhere[] = [
                                 'AND',
@@ -942,7 +966,11 @@ class DynamicType2Service extends BaseService {
             }elseif($n==4){
                 $where = ['AND'];
                 # 正
-                $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code'.$pos]), [$historyKjData['code'.$pos]]);
+                if($type == 'type_dx') {
+                    $filterCode = array_merge(NumService::getDxTypeFanByCode($historyKjData['code' . $pos]), [$historyKjData['code' . $pos]]);
+                }else{
+                    $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $pos]), [$historyKjData['code' . $pos]]);
+                }
                 $where[] = ['IN', 'code_'.$pos, $filterCode];
             }
             $where[] = $subWhere;
