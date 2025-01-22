@@ -966,12 +966,14 @@ class DynamicType2Service extends BaseService {
             }elseif($n==4){
                 $where = ['AND'];
                 # 正
-                if($type == 'type_dx') {
-                    $filterCode = array_merge(NumService::getDxTypeFanByCode($historyKjData['code' . $pos]), [$historyKjData['code' . $pos]]);
-                }else{
-                    $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $pos]), [$historyKjData['code' . $pos]]);
+                foreach ($filterPoss as $pos) {
+                    if ($type == 'type_dx') {
+                        $filterCode = array_merge(NumService::getDxTypeFanByCode($historyKjData['code' . $pos]), [$historyKjData['code' . $pos]]);
+                    } else {
+                        $filterCode = array_merge(NumService::getDsTypeFanByCode($historyKjData['code' . $pos]), [$historyKjData['code' . $pos]]);
+                    }
+                    $where[] = ['IN', 'code_'.$pos, $filterCode];
                 }
-                $where[] = ['IN', 'code_'.$pos, $filterCode];
             }
             $where[] = $subWhere;
         }
