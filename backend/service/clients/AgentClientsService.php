@@ -79,11 +79,11 @@ class AgentClientsService extends ClientsBaseService{
                     \Yii::$app->redis->expire($mcKey, 10);
                     if($num>2) continue;
                     if($e->getCode()<40000){
-                        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '代理日志记录-异常', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>$e->getMessage()]);
+                        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '代理日志记录-异常', ['account'=>$logData['account'], 'record_id'=>$record_id, 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>$e->getMessage()]);
                     }elseif($e->getCode() == self::BET_WARING_CODE){
-                        Tool_Common::log('/client_xy/'.__FUNCTION__.'_warn', 'INFO', '代理日志记录-警告', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, 'logData'=>$logData, 'err_msg'=>$e->getMessage()]);
+                        Tool_Common::log('/client_xy/'.__FUNCTION__.'_warn', 'INFO', '代理日志记录-警告', ['account'=>$logData['account'], 'record_id'=>$record_id, 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, 'logData'=>$logData, 'err_msg'=>$e->getMessage()]);
                     }else{
-                        Tool_Common::log('/client_xy/'.__FUNCTION__.'_invalid', 'INFO', '代理日志记录-无效', ['account'=>$logData['account'], 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>$e->getMessage()]);
+                        Tool_Common::log('/client_xy/'.__FUNCTION__.'_invalid', 'INFO', '代理日志记录-无效', ['account'=>$logData['account'], 'record_id'=>$record_id, 'flow_wp_accounts'=>$flow_wp_accounts, 'flow_op_accounts'=>$flow_op_accounts, /*'logData'=>$logData,*/ 'err_msg'=>$e->getMessage()]);
                     }
                 }
             }

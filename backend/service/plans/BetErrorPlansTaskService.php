@@ -42,7 +42,7 @@ class BetErrorPlansTaskService extends BaseService {
             'uid' => $uid,
             'account' => $account,
             'plan_id' => $plan_id,
-            'bet_direct' => $plan->bet_direct,
+            'bet_direct' => $plan->bet_direct??1,
             'is_local_bet' => (int)$TzSystemsUsers->is_local_bet,
             'bet_sort_key' => $bet_sort_key,
             'qihao' => (string)$qihao,
