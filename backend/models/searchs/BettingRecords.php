@@ -63,6 +63,7 @@ class BettingRecords extends BettingRecordsModel
         $filterWhere = [
             'id' => $this->id,
             'playway' => $this->playway,
+            'account' => $this->account,
             'betting_money' => $this->betting_money,
             'bonus' => $this->bonus,
             'plan_id' => $this->plan_id,
@@ -79,7 +80,7 @@ class BettingRecords extends BettingRecordsModel
         $query->andFilterWhere($filterWhere);
 
         $query->andFilterWhere(['like', 'codes', $this->codes])
-            ->andFilterWhere(['like', 'account', $this->account])
+            //->andFilterWhere(['like', 'account', $this->account])
             ->andFilterWhere(['like', 'playway_name', $this->playway_name])
             ->andFilterWhere(['like', 'qihao', $this->qihao])
             ->andFilterWhere(['like', 'kj_codes', $this->kj_codes])
