@@ -361,7 +361,7 @@ class KjDataGet
             case in_array($lottery_type, CommonBaseService::THIRDD_LOTTERY_TYPES):
                 OperateLotteryService::operate($lottery_type);  # 3D 处理3D下注记录
                 break;
-            case $lottery_type == CommonBaseService::LOTTERY_TYPE_AOZHOU5:
+            case $lottery_type == CommonBaseService::LOTTERY_TYPE_AOZHOU5: // 龟盘
                 push_queue_fast(PushKjDataToOutSiteJob::class, ['lottery_type'=>$lottery_type, 'business_id'=>$lottery_type]);
                 $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
                 # 1、队列处理下注数据
@@ -371,7 +371,7 @@ class KjDataGet
                 $mKey = CacheKeyService::lotteryOpenSwitch($lottery_type);
                 commonRedis()->setex($mKey, 10, 1);
                 break;
-            case $lottery_type == CommonBaseService::LOTTERY_TYPE_LUCKY5:
+            case $lottery_type == CommonBaseService::LOTTERY_TYPE_LUCKY5: // 幸运五
                 push_queue_fast(PushKjDataToOutSiteJob::class, ['lottery_type'=>$lottery_type, 'business_id'=>$lottery_type]);
                 $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
                 # 1、队列处理下注数据

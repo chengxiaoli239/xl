@@ -58,6 +58,12 @@ class SscDataService extends BaseService {
     public static $fb_plan_types = [2, 3, 4, 5, 9, 10, 16]; # 翻倍计划类型
     public static $zzt_plan_types = [6, 8]; # 中则投计划类型
     public static $zzt_else_fanmai_types = [7]; # 中则投否则反卖
+    const TEST_NO = 0;
+    const TEST_YES = 1;
+    const TEST_TYPE_OPTIONS = [
+        self::TEST_NO => '真实',
+        self::TEST_YES => '模拟',
+    ];
 
     public static array $dealDataStatusFields = [
         'status' => '全局状态',

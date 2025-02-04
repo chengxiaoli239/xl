@@ -39,6 +39,9 @@ $cancelStatus = [
                         $cancelStatus, ['prompt' => '-选择-'] // Optional: Add a prompt message
                 )->label('是否撤单') ?>
             </div>
+            <div class="col-lg-2 col-xs-6">
+                <?= $form->field($model, 'is_simulate')->dropDownList(\backend\models\BettingRecords::IS_SIMULATE_OPTION, ['prompt' => '-请选择-'])->label('计划类型') ?>
+            </div>
         <?php }?>
 
         <div class="col-lg-2 col-xs-6 d-flex align-items-center">

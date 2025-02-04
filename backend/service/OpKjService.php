@@ -58,16 +58,22 @@ class OpKjService extends BaseService {
                     }
                 }
                 /*
+                $paramsData = [];
                 $bettingRecords = BettingRecords::find()->select(['id', 'qihao', 'status'])
                     ->where(['status'=>0, 'lottery_type'=>$lottery_type, 'is_batch_simulate'=>0])
                     ->orderBy('id DESC'); //->limit(100)->all();
                 foreach ($bettingRecords->each(20) as $BettingRecord){
                     $kjData = CommonService::getAwardNumberByQihao($BettingRecord->qihao, $lottery_type); // 3,4,5,6,7
                     if(!$kjData){
-                        return ['status'=>300, 'msg'=>$BettingRecord->qihao.'期未开奖!'];
+                        //return ['status'=>300, 'msg'=>$BettingRecord->qihao.'期未开奖!'];
+                        continue;
                     }
-                    $params = ['business_id'=>$BettingRecord->qihao, 'lottery_type'=>$lottery_type, 'bet_id'=>$BettingRecord->id, 'kj_data'=>$kjData];
-                    push_queue_open(OperateUserPlanKjJob::class, $params);
+                    $paramsData[] = ['business_id'=>$BettingRecord->qihao, 'lottery_type'=>$lottery_type, 'bet_id'=>$BettingRecord->id, 'kj_data'=>$kjData];
+                }
+                if(!empty($paramsData)){
+                    foreach ($paramsData as $params){
+                        push_queue_open(OperateUserPlanKjJob::class, $params);
+                    }
                 }
                 */
                 break;

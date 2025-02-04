@@ -32,6 +32,9 @@ $userNameList = \common\models\AdminModel::find()->select(['username'])->where('
         <div class="col-lg-2 col-xs-6">
             <?= $form->field($model, 'plan_type')->dropDownList(SscDataService::PLAN_TYPE_OPTIONS, ['prompt' => '-请选择-'])->label('类型') ?>
         </div>
+        <div class="col-lg-2 col-xs-6">
+            <?= $form->field($model, 'is_test')->dropDownList(SscDataService::TEST_TYPE_OPTIONS, ['prompt' => '-请选择-'])->label('计划类型') ?>
+        </div>
         <div class="col-lg-2 col-xs-6 d-flex align-items-center">
             <div class="form-group mb-0" style="margin-top: 20px">
                 <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-default']) ?>

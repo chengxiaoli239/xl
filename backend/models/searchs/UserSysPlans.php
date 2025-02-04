@@ -69,6 +69,7 @@ class UserSysPlans extends UserSysPlansModel
             'single' => $this->single,
             'tz_type' => $this->tz_type,
             'buy_type' => $this->buy_type,
+            'is_test' => $this->is_test,
             'account' => $this->account,
             'nums' => $this->nums,
             'sel_same' => $this->sel_same,

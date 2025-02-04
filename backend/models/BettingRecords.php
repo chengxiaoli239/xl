@@ -44,6 +44,12 @@ use Yii;
  */
 class BettingRecords extends \common\models\base\BaseModel
 {
+    const IS_SIMULATE_NO = 0;
+    const IS_SIMULATE_YES = 1;
+    const IS_SIMULATE_OPTION = [
+        self::IS_SIMULATE_YES => '模拟',
+        self::IS_SIMULATE_NO => '真实',
+    ];
     /**
      * @inheritdoc
      */
