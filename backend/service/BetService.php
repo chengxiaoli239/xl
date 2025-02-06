@@ -911,6 +911,12 @@ abstract class BetService extends BaseBetService {
             }
         }
 
+        $before_count=count($codesArr);
+        # 反买号码获取
+        if($buy_type==0 && !in_array($tz_type, [22])){ # 22 四定单双
+            $codesArr = self::getInverseCodes($codesArr, $code_type);
+        }
+
         //p(['buy_type'=>$buy_type, 'before_count'=>$before_count, 'after_count'=>count($codesArr), 'codesArr'=>$codesArr]);
         //p($codes_hz_data);
 
@@ -921,11 +927,6 @@ abstract class BetService extends BaseBetService {
             Tool_Common::log('/codes/'.__FUNCTION__, 'INFO', '过滤号码', ['plan_id'=>$plan_id, 'tz_type'=>$tz_type, 'filters'=>$codes_hz_data['filters'], 'codesArr'=>$codesArr, 'get_counts'=>count($codesArr), 'filter_codes'=>$filter_codes, 'filter_counts'=>count($filter_codes)]);
             //p(['codesArrCount'=>count($codesArr), 'codesArr'=>$codesArr, 'filter_codes_count'=>count($filter_codes),  'filter_codes'=>$filter_codes]);
             $codesArr = array_diff($codesArr, $filter_codes); # 返回$codes在$filter_codes中没有的号码
-        }
-        $before_count=count($codesArr);
-        # 反买号码获取
-        if($buy_type==0 && !in_array($tz_type, [22])){ # 22 四定单双
-            $codesArr = self::getInverseCodes($codesArr, $code_type);
         }
 
         $codes = implode('@', $codesArr);
