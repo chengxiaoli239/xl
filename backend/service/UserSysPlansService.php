@@ -853,7 +853,7 @@ class UserSysPlansService extends BaseService {
         try {
             foreach ($codes as $key=>$code){
                 $code = trim($code);
-                if(empty($cooe)){
+                if(!$code){
                     continue;
                 }
                 if($change_per==1 && strpos($key, 'arise') !== false){

@@ -252,9 +252,9 @@ class UserSysPlansController extends BaseController
 
         UserSysPlansService::preOpData($this->_post, $this->_user_id, $id);
         $this->_post['update_time'] = date('Y-m-d H:i:s');
-        //p([$model->load($this->_post), $model->attributes, $model->save()]);
+        //p([$this->_post, $model->load($this->_post), $model->attributes, $model->save()]);
         if ($model->load($this->_post) && $model->save()) {
-            //p([$this->_post, $model->load($this->_post), $model->attributes]);
+            //p([$this->_post, $model->load($this->_post), \Yii::$app->params['IMPORT_CODES_TYPES'], $model->attributes], 0);
             if(in_array($this->_post['UserSysPlans']['tz_type'], \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
                 UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)$this->_post['UserSysPlans']['change_per'][0], $this->_user_id);
             }
@@ -350,7 +350,7 @@ class UserSysPlansController extends BaseController
             $model->change_per = [];
             //$codes = ImportPlanCodes::findAll($where)->codes;
             $ImportPlanCodes = ImportPlanCodes::find()->where($where)->asArray()->all();
-            //p($ImportPlanCodes,0);
+            //p($ImportPlanCodes);
             if(!empty($ImportPlanCodes)){
                 //$codes = ArrayHelper::getColumn($ImportPlanCodes, 'codes');
                 foreach ($ImportPlanCodes as $k=>$ImportPlanCodesData){
