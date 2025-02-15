@@ -1733,7 +1733,7 @@ class StaticService extends BaseService {
 
     /**
      * @desc 每月三字现出现次数
-     * @param string $date
+     * @param string $month
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
      * @return array
      */
@@ -1746,7 +1746,7 @@ class StaticService extends BaseService {
 
         if(!$SscKjDatas) return ['status'=>300, 'msg'=>'无统计数据'];
         $staticDatas = [];
-        foreach ($SscKjDatas as $key=>$SscKjData){
+        foreach ($SscKjDatas as $SscKjData){
             $code_3ns = explode(',', $SscKjData['code_3n']);
             foreach ($code_3ns as $code_3n){
                 if(!isset($staticDatas[$code_3n])) $staticDatas[$code_3n] = 0;
@@ -2303,7 +2303,7 @@ class StaticService extends BaseService {
            $lottery_types = self::getLotteryTypes();
        }
        foreach ($lottery_types as $lottery_type){
-           if($status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllStaticProfits')){
+           if(StaticService::isCanOpStatic($lottery_type, $mkey = 'opAllStaticProfits')){
                $t1 = microtime(true);
                Tool_Common::log('/data/'.__FUNCTION__, "INFO", '处理统计数据-开始', ['lottery_type'=>$lottery_type, 't1'=>$t1]);
                #$rst['opStaticProfits'] = StaticService::opStaticProfits($lottery_type); # 暂停统计利润

@@ -847,13 +847,13 @@ class UserSysPlansService extends BaseService {
         $setData = [];
 
         $flag = false;
-        if(empty($plan_id)) return $flag;
-        $isolationLevel = \yii\db\Transaction::REPEATABLE_READ;
-        $transaction = Yii::$app->db->beginTransaction($isolationLevel);
+        if(empty($plan_id)) return false;
         try {
+            $transaction = Yii::$app->db->beginTransaction();
             foreach ($codes as $key=>$code){
                 $code = trim($code);
                 if(!$code){
+                    ImportPlanCodes::deleteRecord(['uid'=>$uid, 'plan_id'=>$plan_id, 'plan_id_sort_key' => $key]);
                     continue;
                 }
                 if($change_per==1 && strpos($key, 'arise') !== false){
@@ -863,7 +863,7 @@ class UserSysPlansService extends BaseService {
                 $status = ($key == 0 OR $change_per == 1) ? 1 : 0;
                 $status = empty($code) ? 0 : $status;
 
-                if(!$ImportPlanCodes = ImportPlanCodes::find()->where(['uid'=>$uid, 'plan_id'=>$plan_id, 'plan_id_sort_key'=>$key])->one()){
+                if(!$ImportPlanCodes = ImportPlanCodes::find()->where(['uid'=>$uid, 'plan_id'=>$plan_id, 'plan_id_sort_key' => $key])->limit(1)->one()){
                     $ImportPlanCodes = new ImportPlanCodes();
                     $setData = array_merge($setData, [
                         'created_at' => time(),
@@ -872,6 +872,7 @@ class UserSysPlansService extends BaseService {
                         'plan_id_sort_key' => $key,
                     ]);
                 }
+
                 $codesData = $code;
                 $codesData = preg_replace( '#\s+#', ' ', $codesData); # 多个空格替换成单个空格
                 $codesData = str_replace(' ', ',', $codesData);
@@ -900,13 +901,13 @@ class UserSysPlansService extends BaseService {
                     return false;
                 }
             }
+            $transaction->commit();
         }catch (\Exception $exception){
             $transaction->rollBack();
             $msg = $exception->getMessage();
             Tool_Common::log('/error/'.__FUNCTION__, 'ERR', '保存导入方案号码', ['plan_id'=>$plan_id, 'msg'=>$msg]);
             return false;
         }
-        $transaction->commit();
 
         return $flag;
     }
@@ -921,14 +922,14 @@ class UserSysPlansService extends BaseService {
         $plan = UserSysPlans::findOne($plan_id);
         $hzArr = json_decode($plan->hz_Arr, true);
         $key = ($hzArr['change_per']==0 OR $hzArr['turn_key']==0) ? 0 : $hzArr['turn_key'];
-        $data = ImportPlanCodes::find()->where(['plan_id'=>$plan_id, 'plan_id_sort_key'=>$key])->one();
+        $data = ImportPlanCodes::find()->where(['plan_id'=>$plan_id, 'plan_id_sort_key'=>$key, 'status'=>1])->one();
 
         $code_types = [1=>2, 2=>3, 3=>4]; # playway:code_type
         $codes = explode('@',$data->codes);
         if(
-            (isset($hzArr['filters']) && isset($hzArr['filters']['is_filter']) && $hzArr['filters']['is_filter']==1) OR # 1、排除前x期
-            (isset($hzArr['filter_dates']) && isset($hzArr['filter_dates']['is_filter_date']) && $hzArr['filter_dates']['is_filter_date']==1) OR # 2、排除前x天同期
-            (isset($hzArr['filter_qihaos']) && isset($hzArr['filter_qihaos']['is_filter_qihao']) && $hzArr['filter_qihaos']['is_filter_qihao']==1) # 3、排除期号定位
+            (isset($hzArr['filters']['is_filter']) && $hzArr['filters']['is_filter'] == 1) OR # 1、排除前x期
+            (isset($hzArr['filter_dates']['is_filter_date']) && $hzArr['filter_dates']['is_filter_date'] == 1) OR # 2、排除前x天同期
+            (isset($hzArr['filter_qihaos']['is_filter_qihao']) && $hzArr['filter_qihaos']['is_filter_qihao'] == 1) # 3、排除期号定位
         ){
             $codes = NumService::getCodesKuaiXuan($hzArr, $code_types[$plan->playway], $codes, $plan->lottery_type);
         }
