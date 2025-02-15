@@ -285,7 +285,7 @@ class UserSysPlansController extends BaseController
             $model->hz_Arr = $hz_Arr_Data['codes'];
         }elseif (in_array($model->tz_type, [18, 19, 20, 25, 27, 28, 29, 30, 31, 32, 33, 34])){
             $hz_Arr_Data = json_decode($model->hz_Arr, true);
-            $where = ['plan_id'=>$model->id];
+            $where = ['plan_id'=>$model->id, 'status'=>1];
             if($this->_user_id != 1){
                 $where['uid'] = $this->_user_id;
             }
