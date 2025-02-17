@@ -17,27 +17,30 @@ class OneNumYl extends BaseService
         for ($pos=1; $pos<=5; $pos++){
             $data = [];
             $ylData = self::onePositionYl($pos, $lotteryType);
-            p($ylData,0);
+            //p($ylData,0);
+            $t1 = microtime(true);
             //list($pos, $todayCurrent, $maxIndexId, $currentMiss, $weekMiss, $monthMiss) = $data;
             for ($code=0; $code<=9; $code++){
                 //p([$ylData['maxIndexId'], $ylData['currentIndexIds'][$code]],0);
                 $data[] = [
                     'position' => $pos,
                     'code' => $code,
-                    # ½ñÈÕ³öÏÖ
+                    # ä»Šæ—¥å‡ºç°
                     'today_current' => $ylData['todayCurrent'][$code]??0,
-                    # µ±Ç°ÒÅÂ©
+                    # å½“å‰é—æ¼
                     'current_miss' => $ylData['maxIndexId'] - $ylData['currentIndexIds'][$code],
-                    # ½ñÈÕÒÅÂ©
+                    # ä»Šæ—¥é—æ¼
                     'today_miss' => $ylData['todayAllCount'] - ($ylData['todayMiss'][$code]??0),
-                    # ±¾ÖÜÒÅÂ©
+                    # æœ¬å‘¨é—æ¼
                     'week_miss' => $ylData['thisWeekAllCount'] - ($ylData['thisWeekMiss'][$code]??0),
-                    # ±¾ÔÂÒÅÂ©
+                    # æœ¬æœˆé—æ¼
                     'month_miss' => $ylData['thisMonthAllCount'] - ($ylData['thisMonthMiss'][$code]??0),
                     'lottery_type' => $lotteryType,
                     'created_at' => time(),
                 ];
             }
+            $t2 = microtime(true);
+            var_dump('ä½ç½®'.$pos.'è€—æ—¶ï¼š'.($t2-$t1).'s');
             $columnKeys = array_keys($data[0]);
             Ssc1numsYl::deleteRecord(['lottery_type'=>$lotteryType, 'position'=>$pos]);
             Ssc1numsYl::find()->createCommand()->batchInsert(Ssc1numsYl::tableName(), $columnKeys, $data)->execute();
@@ -46,60 +49,60 @@ class OneNumYl extends BaseService
         return true;
     }
 
-    private static function onePositionYl($pos, $lotteryType=DEFAULT_LOTTERY_TYPE): array
+    public static function onePositionYl($pos, $lotteryType=DEFAULT_LOTTERY_TYPE): array
     {
         $field = 'code'.$pos;
         $where = ['lottery_type'=>$lotteryType];
-        list($start, $end) = Timer::todayTime();//p([date('Y-m-d H:i:s', $start), date('Y-m-d H:i:s', $end)]); # ½ñÈÕÊ±¼ä
+        list($start, $end) = Timer::todayTime();//p([date('Y-m-d H:i:s', $start), date('Y-m-d H:i:s', $end)]); # ä»Šæ—¥æ—¶é—´
 
-        # ½ñÈÕ³öÏÖ
+        # ä»Šæ—¥å‡ºç°
         $todayCurrent = SscKjData::find()->select([$field, 'count'=>'COUNT(id)'])->where($where)->andWhere([
             'AND',
-            ['>=', 'created_at', $start+180], # Ç°ÒÆ3·ÖÖÓ±ÜÃâ×îºóÒ»ÆÚºÍµÚÒ»ÆÚÊ±¼äÊÇ¿çÌìµÄÇé¿ö
-            ['<=', 'created_at', $end+180], # Ç°ÒÆ3·ÖÖÓ±ÜÃâ×îºóÒ»ÆÚºÍµÚÒ»ÆÚÊ±¼äÊÇ¿çÌìµÄÇé¿ö
+            ['>=', 'created_at', $start+180], # å‰ç§»3åˆ†é’Ÿé¿å…æœ€åä¸€æœŸå’Œç¬¬ä¸€æœŸæ—¶é—´æ˜¯è·¨å¤©çš„æƒ…å†µ
+            ['<=', 'created_at', $end+180], # å‰ç§»3åˆ†é’Ÿé¿å…æœ€åä¸€æœŸå’Œç¬¬ä¸€æœŸæ—¶é—´æ˜¯è·¨å¤©çš„æƒ…å†µ
         ])->asArray()->groupBy($field)->all();
-        $todayCurrent = ArrayHelper::getColumn($todayCurrent,'count', $field); # ½ñÈÕ$posÎ»ÖÃ0-9³öÏÖ´ÎÊı
+        $todayCurrent = ArrayHelper::getColumn($todayCurrent,'count', $field); # ä»Šæ—¥$posä½ç½®0-9å‡ºç°æ¬¡æ•°
         //p(['lotteryType'=>$lotteryType, 'todayCurrent'=>$todayCurrent]);
 
-        # µ±Ç°ÒÅÂ©
+        # å½“å‰é—æ¼
         $currentMiss = SscKjData::find()->select([$field, 'index_id'=>'MAX(index_id)'])->where($where)
-            ->asArray()->groupBy([$field])->indexBy($field)->orderBy('MAX(index_id) DESC')->all();
+            ->asArray()->groupBy([$field])->indexBy($field)->orderBy('MAX(index_id) DESC')->limit(1000)->all();
         $maxIndexId = current($currentMiss)['index_id'];
         //p([$currentMiss, $maxIndexId]);
-        // ÖØ¹¹Êı×é
+        // é‡æ„æ•°ç»„
         $currentIndexIds = array_map(function($item) {
             return $item['index_id'];
         }, $currentMiss);
-        //p($currentIndexIds);
+        //p(['$currentIndexIds'=>$currentIndexIds]);
 
-        # ½ñÈÕÒÅÂ©
+        # ä»Šæ—¥é—æ¼
         list($start, $end) = Timer::todayTime();//p([date('Y-m-d H:i:s', $start), date('Y-m-d H:i:s', $end)]);
         list($todayMiss, $todayAllCount) = self::getZoneCodeYlInfo($field, $start, $end, $where);
         //p(['todayMiss'=>$todayMiss, 'todayAllCount'=>$todayAllCount]);
 
-        # ±¾ÖÜÊ±¼ä
-        list($start, $end) = Timer::thisWeekTime();//p([date('Y-m-d H:i:s', $start), date('Y-m-d H:i:s', $end)]); # ±¾ÖÜÊ±¼ä
+        # æœ¬å‘¨æ—¶é—´
+        list($start, $end) = Timer::thisWeekTime();//p([date('Y-m-d H:i:s', $start), date('Y-m-d H:i:s', $end)]); # æœ¬å‘¨æ—¶é—´
         list($thisWeekMiss, $thisWeekAllCount) = self::getZoneCodeYlInfo($field, $start, $end, $where);
-        # ±¾ÔÂÊ±¼ä
-        list($start, $end) = Timer::thisMonthTime();//p([date('Y-m-d H:i:s', $start), date('Y-m-d H:i:s', $end)]); # ±¾ÔÂÊ±¼ä
+        # æœ¬æœˆæ—¶é—´
+        list($start, $end) = Timer::thisMonthTime();//p([date('Y-m-d H:i:s', $start), date('Y-m-d H:i:s', $end)]); # æœ¬æœˆæ—¶é—´
         list($thisMonthMiss, $thisMonthAllCount) = self::getZoneCodeYlInfo($field, $start, $end, $where);
 
         return [
-            'pos' => $pos, # Î»ÖÃ
-            'todayCurrent' => $todayCurrent, # ½ñÈÕ³öÏÖ´ÎÊı
-            'maxIndexId' => $maxIndexId, # ×îĞÂµÄindex_id ÓÃÓÚ¼ÆËãÒÅÂ©
-            'currentIndexIds' => $currentIndexIds, # 0-9×îĞÂµÄindex_id£¬ÓÃÓÚ¼ÆËãºÅÂëµÄ£ºµ±Ç°ÒÅÂ©
-            'todayMiss' => $todayMiss, # ½ñÈÕÎ´³ö´ÎÊı£¬Ò²¾ÍÊÇ£º½ñÈÕÒÅÂ©
-            'todayAllCount' => $todayAllCount, # ½ñÈÕ×Ü¹²´ÎÊı£¬Ò²¿ÉÒÔÀí½âÎª×ÜÆÚÊı
-            'thisWeekMiss' => $thisWeekMiss, # ±¾ÖÜÒÅÂ©´ÎÊı
-            'thisWeekAllCount' => $thisWeekAllCount, # ±¾ÖÜ×Ü´ÎÊı£¬Ò²¿ÉÒÔÀí½âÎª£º±¾ÖÜ×ÜÆÚÊı
-            'thisMonthMiss' => $thisMonthMiss, # ±¾ÔÂÒÅÂ©´ÎÊı
-            'thisMonthAllCount' => $thisMonthAllCount, # ±¾ÔÂ×Ü´ÎÊı£¬Ò²¿ÉÒÔÀí½âÎª£º±¾ÔÂ×ÜÆÚÊı
+            'pos' => $pos, # ä½ç½®
+            'todayCurrent' => $todayCurrent, # ä»Šæ—¥å‡ºç°æ¬¡æ•°
+            'maxIndexId' => $maxIndexId, # æœ€æ–°çš„index_id ç”¨äºè®¡ç®—é—æ¼
+            'currentIndexIds' => $currentIndexIds, # 0-9æœ€æ–°çš„index_idï¼Œç”¨äºè®¡ç®—å·ç çš„ï¼šå½“å‰é—æ¼
+            'todayMiss' => $todayMiss, # ä»Šæ—¥æœªå‡ºæ¬¡æ•°ï¼Œä¹Ÿå°±æ˜¯ï¼šä»Šæ—¥é—æ¼
+            'todayAllCount' => $todayAllCount, # ä»Šæ—¥æ€»å…±æ¬¡æ•°ï¼Œä¹Ÿå¯ä»¥ç†è§£ä¸ºæ€»æœŸæ•°
+            'thisWeekMiss' => $thisWeekMiss, # æœ¬å‘¨é—æ¼æ¬¡æ•°
+            'thisWeekAllCount' => $thisWeekAllCount, # æœ¬å‘¨æ€»æ¬¡æ•°ï¼Œä¹Ÿå¯ä»¥ç†è§£ä¸ºï¼šæœ¬å‘¨æ€»æœŸæ•°
+            'thisMonthMiss' => $thisMonthMiss, # æœ¬æœˆé—æ¼æ¬¡æ•°
+            'thisMonthAllCount' => $thisMonthAllCount, # æœ¬æœˆæ€»æ¬¡æ•°ï¼Œä¹Ÿå¯ä»¥ç†è§£ä¸ºï¼šæœ¬æœˆæ€»æœŸæ•°
         ];
     }
 
     /**
-     * »ñÈ¡Ä³¸öÊ±¼äÇø¼äµÄ¿ª½±×ÜÆÚÊı£¬ÒÅÂ©×ÜÆÚÊı
+     * è·å–æŸä¸ªæ—¶é—´åŒºé—´çš„å¼€å¥–æ€»æœŸæ•°ï¼Œé—æ¼æ€»æœŸæ•°
      * @param $field
      * @param $start
      * @param $end
@@ -115,7 +118,7 @@ class OneNumYl extends BaseService
         ]);
         $allCount = $missQuery->select(['count'=>'COUNT(id)'])->scalar();
         $miss = $missQuery->select([$field, 'count'=>'COUNT(id)'])->indexBy($field)->groupBy($field)->asArray()->all();
-        // ÖØ¹¹Êı×é
+        // é‡æ„æ•°ç»„
         $counts = array_map(function($item) {
             return $item['count'];
         }, $miss);

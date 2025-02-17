@@ -743,8 +743,8 @@ class StaticService extends BaseService {
 
     /**
      * @desc 每月四定单双利润
-     * @param string $date
-     * @param $code 利润：2112
+     * @param string $Month
+     * @param int $lottery_type
      * @return array
      */
     public static function staticAllSdProfitsMonth($Month = '2019-07', $lottery_type = DEFAULT_LOTTERY_TYPE){
@@ -754,15 +754,13 @@ class StaticService extends BaseService {
         $m = \Yii::$app->cache;
         if($data = $m->get($key)) return $data;
 
-        $where = ['AND', ['LIKE', 'LEFT(date,7)',$Month], ['=', 'lottery_type', $lottery_type]];
-        $SscKjDatas  = SscKjData::find()->where($where)->all();
-        $tmpCodeCounts = [];
-        foreach ($SscKjDatas as $SscKjData){
-            if(!$tmpCodeCounts[$SscKjData->code_1_2_3_4]){
-                $tmpCodeCounts[$SscKjData->code_1_2_3_4] = 0;
-            }
-            $tmpCodeCounts[$SscKjData->code_1_2_3_4] = $tmpCodeCounts[$SscKjData->code_1_2_3_4] + 1;
-        }
+        $tmpCodeCounts = SscKjData::find()
+            ->select(['COUNT(*) AS count'])
+            ->where(['AND', ['LIKE', 'LEFT(date,7)', $Month], ['=', 'lottery_type', $lottery_type]])
+            ->groupBy('code_1_2_3_4')
+            ->indexBy('code_1_2_3_4')
+            ->asArray()
+            ->column();
         $allDs = explode(',',\Yii::$app->params['ALL_DS']);
         foreach ($allDs as $ds){
             if(!isset($tmpCodeCounts[$ds])) $tmpCodeCounts[$ds] = 0;
@@ -1094,7 +1092,11 @@ class StaticService extends BaseService {
      */
     public static function allMonthSdHzStaticProfits($lottery_type = DEFAULT_LOTTERY_TYPE){
         $months = [];
-        for ($i=2; $i>=0; $i--){
+        $n = 1;
+        if(date('d') == '01' && ('00:01'<date('H:i') && date('H:i')<'00:08')){
+            $n = 2;
+        }
+        for ($i=$n; $i>=0; $i--){
             $months[] = date('Y-m', strtotime('-'.$i.' months'));
         }
         $allStatic = [];
@@ -1423,7 +1425,7 @@ class StaticService extends BaseService {
                 }
                 */
             }else{
-                $i = 5;
+                $i = 2;
                 $time = $time + 24 * 3600;
             }
 

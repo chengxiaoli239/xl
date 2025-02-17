@@ -81,6 +81,12 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+
+        $statics = StaticService::staticAllSdProfitsMonth($month='2025-02', $lottery_type=8);
+        p($statics);
+
+        $result = BetService::insertRecord($plan_id=17227, '', $isAuto=1);
+        p($result);
         $BettingRecord = BettingRecords::findOne(['plan_id'=>16798]);
         $lottery_type = 8;
         $params = ['business_id'=>$BettingRecord->qihao, 'lottery_type'=>$lottery_type, 'bet_id'=>$BettingRecord->id];
@@ -409,7 +415,6 @@ class IndexController extends Controller
             $groups = PlatformGroup::getGroups($userId=21);p($groups);
             $model = PlatformRobot::findOne(['platform_robot_id'=>'6744049574']);
             $rst = PlatformRobotService::getUpdates($model); p($rst);# 添加之后立马获取群聊消息，记录群ID
-            $r = OneNumYl::yl($lotteryType=8);p($r);
             $tzSystemUser = TzSystemsUsers::findOne(68);
             #$r = (new ActionBaseService())->login($tzSystemUser);p($r);
             $rst = AgentUsersService::userFlowsCheck(['id'=>16791, 'status'=>1], 21, '管理员消息回复处理');p($rst);
