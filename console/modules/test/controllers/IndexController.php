@@ -81,6 +81,26 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $rst = OneNumYl::yl($lotteryType=8);p($rst);
+        $where = ['lottery_type'=>8];
+        $field = 'code1';
+        $t1 = microtime(true);
+        # 本周时间
+        list($start, $end) = Timer::thisWeekTime();//p([date('Y-m-d H:i:s', $start), date('Y-m-d H:i:s', $end)]); # 本周时间
+        list($thisWeekMiss, $thisWeekAllCount) = OneNumYl::getZoneCodeYlInfo($field, $start, $end, $where);
+        $t2 = microtime(true);
+        # 本月时间
+        list($start, $end) = Timer::thisMonthTime();//p([date('Y-m-d H:i:s', $start), date('Y-m-d H:i:s', $end)]); # 本月时间
+        list($thisMonthMiss, $thisMonthAllCount) = OneNumYl::getZoneCodeYlInfo($field, $start, $end, $where);
+        $t3 = microtime(true);
+        p([
+            'thisWeekMiss' => $thisWeekMiss,
+            'thisWeekAllCount' => $thisWeekAllCount,
+            'thisMonthMiss'=>$thisMonthMiss,
+            'thisMonthAllCount'=>$thisMonthAllCount,
+            'c1'=>($t2-$t1).'s',
+            'c2'=>($t3-$t2).'s',
+        ]);
 
         $statics = StaticService::staticAllSdProfitsMonth($month='2025-02', $lottery_type=8);
         p($statics);

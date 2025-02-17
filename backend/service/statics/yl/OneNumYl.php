@@ -109,7 +109,7 @@ class OneNumYl extends BaseService
      * @param $where
      * @return array
      */
-    private static function getZoneCodeYlInfo($field, $start, $end, $where): array
+    public static function getZoneCodeYlInfo($field, $start, $end, $where): array
     {
         $missQuery = SscKjData::find()->where($where)->andWhere([
             'AND',
