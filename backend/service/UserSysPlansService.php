@@ -882,7 +882,10 @@ class UserSysPlansService extends BaseService {
                     if(strlen($tmpCodes) == 5){
                         $insertCodes[] = trim(strtoupper($tmpCodes[0]).','.strtoupper($tmpCodes[1]).','.strtoupper($tmpCodes[2]).','.strtoupper($tmpCodes[3]).','.strtoupper($tmpCodes[4]));
                     }else{
-                        $insertCodes[] = trim(strtoupper($tmpCodes[0]).','.strtoupper($tmpCodes[1]).','.strtoupper($tmpCodes[2]).','.strtoupper($tmpCodes[3]));
+                        $codesStr = trim(strtoupper($tmpCodes[0]).','.strtoupper($tmpCodes[1]).','.strtoupper($tmpCodes[2]).','.strtoupper($tmpCodes[3]));
+                        $codesStr = trim($codesStr, '"');
+                        $codesStr = trim($codesStr, ',');
+                        $insertCodes[] = $codesStr;
                     }
                 }
 
@@ -923,6 +926,7 @@ class UserSysPlansService extends BaseService {
         $hzArr = json_decode($plan->hz_Arr, true);
         $key = ($hzArr['change_per']==0 OR $hzArr['turn_key']==0) ? 0 : $hzArr['turn_key'];
         $data = ImportPlanCodes::find()->where(['plan_id'=>$plan_id, 'plan_id_sort_key'=>$key, 'status'=>1])->one();
+        //p(['plan_id'=>$plan_id, 'plan_id_sort_key'=>$key, 'status'=>1, $data]);
 
         $code_types = [1=>2, 2=>3, 3=>4]; # playway:code_type
         $codes = explode('@',$data->codes);

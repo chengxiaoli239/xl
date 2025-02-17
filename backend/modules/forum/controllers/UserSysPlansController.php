@@ -131,7 +131,7 @@ class UserSysPlansController extends BaseController
         UserSysPlansService::preOpData($this->_post, $this->_user_id);
         if ($model->load($this->_post) && $model->save()) {
             if(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
-                UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)$this->_post['change_per'][0], $this->_user_id);
+                UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)$this->_post['UserSysPlans']['change_per'][0], $this->_user_id);
             }
             return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$queryParams['lottery_type']]);
         }
@@ -440,7 +440,7 @@ class UserSysPlansController extends BaseController
         UserSysPlansService::preopdata($this->_post, $this->_user_id);
         if ($model->load($this->_post) && $model->save()) {
             if(in_array($tz_type, \yii::$app->params['import_codes_types']) && $model->id){ # 导入号码保存
-                UserSysPlansService::saveimportcodestxt($model->id, $this->_post['usersysplans']['import_codes_txts'], (int)$this->_post['change_per'][0], $this->_user_id);
+                UserSysPlansService::saveimportcodestxt($model->id, $this->_post['usersysplans']['import_codes_txts'], (int)$this->_post['UserSysPlans']['change_per'][0], $this->_user_id);
             }
             return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$queryParams['lottery_type']]);
         }
