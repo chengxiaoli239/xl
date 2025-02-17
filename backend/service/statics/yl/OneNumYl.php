@@ -7,6 +7,7 @@ use backend\models\SscKjData;
 use backend\service\BaseService;
 use common\models\statics\Ssc1numsYl;
 use common\tools\Timer;
+use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
@@ -44,6 +45,10 @@ class OneNumYl extends BaseService
             $columnKeys = array_keys($data[0]);
             Ssc1numsYl::deleteRecord(['lottery_type'=>$lotteryType, 'position'=>$pos]);
             Ssc1numsYl::find()->createCommand()->batchInsert(Ssc1numsYl::tableName(), $columnKeys, $data)->execute();
+            Tool_Common::log('/statics/'.__FUNCTION__, 'INFO', '一字遗漏', [
+                '位置' =>$pos,
+                '耗时' => ($t2-$t1).'s',
+            ]);
         }
 
         return true;
