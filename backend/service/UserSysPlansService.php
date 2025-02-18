@@ -848,8 +848,10 @@ class UserSysPlansService extends BaseService {
 
         $flag = false;
         if(empty($plan_id)) return false;
+        $isDeleteBefore = true;
         try {
             $transaction = Yii::$app->db->beginTransaction();
+            $isDeleteBefore && ImportPlanCodes::deleteRecord(['uid'=>$uid, 'plan_id'=>$plan_id]);
             foreach ($codes as $key=>$code){
                 $code = trim($code);
                 if(!$code){
@@ -863,7 +865,7 @@ class UserSysPlansService extends BaseService {
                 $status = ($key == 0 OR $change_per == 1) ? 1 : 0;
                 $status = empty($code) ? 0 : $status;
 
-                if(!$ImportPlanCodes = ImportPlanCodes::find()->where(['uid'=>$uid, 'plan_id'=>$plan_id, 'plan_id_sort_key' => $key])->limit(1)->one()){
+                if($isDeleteBefore OR !$ImportPlanCodes = ImportPlanCodes::find()->where(['uid'=>$uid, 'plan_id'=>$plan_id, 'plan_id_sort_key' => $key])->limit(1)->one()){
                     $ImportPlanCodes = new ImportPlanCodes();
                     $setData = array_merge($setData, [
                         'created_at' => time(),
