@@ -2082,26 +2082,41 @@ abstract class BetService extends BaseBetService {
             }
 
             $TzSystemsUsersData = TzSystemsUsers::find()->where(['status'=>1])->indexBy('uid')->all();
-            $TzSystemsUsers = $TzSystemsUsersData[$plan->uid]??[];
+            $isCanBetUids = [];
+            foreach ($TzSystemsUsersData as $uid=>$TzSystemsUsers){
+                list($code, $current_profits) = UserService::updateUserProfits($TzSystemsUsers);
+                try {
+                    AgentClientsService::checkProfits($TzSystemsUsers);
+                    $isCanBetUids[$uid] = true;
+                }catch (\Exception $e){
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入真实计划任务-止盈止损', [
+                        'user_id' => $uid,
+                        'err_msg' => $e->getMessage(),
+                    ]);
+                    $isCanBetUids[$uid] = false;
+                    //throw_info($e->getMessage());
+                }
+            }
             foreach ($plansQuery->each(20) as $plan){
                 try {
+                    $isCanBet = $isCanBetUids[$plan->uid]??1;
+                    if(!$isCanBet){
+                        throw_info('当前情况不能下注');
+                    }
                     $planId = $plan->id;
                     $preInsertLockKey = CacheKeyService::preInsertPlanTaskKey($planId, $qiHao);
                     if(!(Redis::lock($preInsertLockKey))){
                         throw_info('业务处理中，请稍后...', 40001);
                     }
 
+                    /*
                     list($code, $current_profits) = UserService::updateUserProfits($TzSystemsUsers);
                     if($code>0 OR !$TzSystemsUsers->is_auto_bet){
                         //throw_info('统计盈利异常:'.$code);
                     }
-                    try {
-                        AgentClientsService::checkProfits($TzSystemsUsers);
-                    }catch (\Exception $e){
-                        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入真实计划任务-止盈止损', ['plan_id'=>$plan->id, 'user_id'=>$plan->uid]);
-                        throw_info($e->getMessage());
-                    }
-                    $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId], ['=', 'uid', $plan->uid]];
+                    */
+
+                    $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId]];
                     if(BettingRecords::find()->where($where)->exists()){
                         throw_info('yx表已记录2...', 40001);
                     }
