@@ -2450,8 +2450,21 @@ class SscDataService extends BaseService {
                     if(isset($hzArr['change_per']) && $hzArr['change_per'] == 1){ # 每期轮换
                         $turn_key = \Yii::$app->params['IMPORT_CODES_TURN'] - 1;
                         if (isset($hzArr['change_turn_pos']) && $hzArr['change_turn_pos']>0){
-                            if($flag == 1 && $hzArr['change_turn_pos'] == 6){
-                                $turn_key = 0; # 中回0组
+                            if($hzArr['change_turn_pos'] == 6){
+                                if($flag == 1){
+                                    $turn_key = 0; # 中回0组
+                                }else{
+                                    $imports = ImportPlanCodes::find()->select(['uid', 'plan_id', 'plan_id_sort_key'])->where([
+                                        'AND',
+                                        ['=', 'plan_id', $UserSysPlan->id],
+                                        ['!=', 'codes', ''],
+                                        ['=','status', 1]
+                                    ])->asArray()->all();
+                                    $sortKeys = yii\helpers\ArrayHelper::getColumn($imports, 'plan_id_sort_key');
+                                    $current_key = array_search($hzArr['turn_key'], $sortKeys);
+                                    $next_key = ($current_key+1>count($sortKeys)) ? 0 : $current_key+1;
+                                    $turn_key = $sortKeys[$next_key];
+                                }
                             }else{
                                 # 指定位置号码数字，决定号码组数
                                 //$newKjCodesStr = SscKjData::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one()['code_str'];
