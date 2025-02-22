@@ -6,7 +6,7 @@
         <?= $form->field($model, 'turn_key')->textInput()->label('开始组') ?>
     </div>
     <div class="col-lg-4 col-xs-6">
-        <?= $form->field($model, 'change_turn_pos')->checkboxList([1=>'千', 2=>'百', 3=>'十', 4=>'个', 5=>'五'])->label('位置号码指定组数(比如说勾“千”，千位开2下期则投第2组)') ?>
+        <?= $form->field($model, 'change_turn_pos')->checkboxList(\backend\service\NumService::$pos_to_desc)->label('位置号码指定组数(比如说勾“千”，千位开2下期则投第2组)') ?>
     </div>
 </div>
 <?php $turn_key = \Yii::$app->params['IMPORT_CODES_TURN']; for($i=1; $i<$turn_key; $i++){?>

@@ -33,6 +33,7 @@ use backend\models\SystemConfig;
 use backend\models\ThreeNum;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
+use backend\service\numbers\NumCodeService;
 use backend\service\statics\plan\OperatePlanService;
 use backend\service\statics\statics_base\BaseDataService;
 use backend\service\statics\statics_base\DealDataService;
@@ -2441,16 +2442,22 @@ class SscDataService extends BaseService {
                     }
                     \Yii::$app->redis->expire($Rkey, 120);
                     $hzArr = json_decode($UserSysPlan->hz_Arr, true);
+                    $flag = SscDataService::isZjBefore($UserSysPlan->id);
                     if(isset($hzArr['filters'])){
                         $hzArr['filters']['current_kj_qihao'] = $current_kj_qihao;
                     }
                     if(isset($hzArr['change_per']) && $hzArr['change_per'] == 1){ # 每期轮换
                         $turn_key = \Yii::$app->params['IMPORT_CODES_TURN'] - 1;
                         if (isset($hzArr['change_turn_pos']) && $hzArr['change_turn_pos']>0){
-                            # 指定位置号码数字，决定号码组数
-                            $newKjCodesStr = SscKjData::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one()['code_str'];
-                            $newKjCodes = explode(',', $newKjCodesStr);
-                            $turn_key = $newKjCodes[$hzArr['change_turn_pos']-1];
+                            if($flag == 1 && $hzArr['change_turn_pos'] == 6){
+                                $turn_key = 0; # 中回0组
+                            }else{
+                                # 指定位置号码数字，决定号码组数
+                                //$newKjCodesStr = SscKjData::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one()['code_str'];
+                                $historyKjData = NumCodeService::getKjData('', $lottery_type);
+                                $newKjCodes = explode(',', $historyKjData['code_str']);
+                                $turn_key = $newKjCodes[$hzArr['change_turn_pos']-1];
+                            }
                             Tool_Common::log('/plans/'.__FUNCTION__, 'INFO', '计划位置组', ['newKjCodes'=>$newKjCodes, 'turn_key'=>$turn_key, 'pos'=>$hzArr['change_turn_pos']-1]);
                         }elseif($hzArr['turn_key']>=$turn_key) {
                             $turn_key = 0;#非轮换0，轮换:turn_key+1

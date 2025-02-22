@@ -94,7 +94,7 @@ class NumService extends BaseService {
     # 三个位置一直过滤期数
     const BEFORE_3X_QS = 100;
 
-    public static $pos_to_desc = [1=>'千', 2=>'百', 3=>'十', 4=>'个'];
+    public static $pos_to_desc = [1=>'千', 2=>'百', 3=>'十', 4=>'个',5=>'五', 6=>'中回0组'];
     public static $pos_to_desc1 = [1=>'千', 2=>'百', 3=>'十', 4=>'个', 5=>'五'];
     public static $filter_dynamic_types = [
         1=>'1小1大，剔除前期号码至少2个上奖',
