@@ -94,7 +94,7 @@ class BaseKj extends BaseService {
     {
         $set_time = ($set_time OR $set_time<300) ? 300 : $set_time;
         $mKey = CacheKeyService::lotteryOpenDataKey($lottery_type, $qihao);
-        Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '设置开奖缓存', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'kjData'=>$kjData, 'set_time'=>$set_time]);
+        //Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '设置开奖缓存', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'kjData'=>$kjData, 'set_time'=>$set_time]);
         if($kjData['opencode']){
             commonRedis()->setex($mKey, $set_time, $kjData);
         }

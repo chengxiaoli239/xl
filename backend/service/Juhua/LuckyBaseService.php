@@ -1824,7 +1824,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>self::$headers, 'bigFlag'=>1, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
+        Tool_Common::log('bet','INFO','菊花批量插入记录-真实投注', $logArr);
 
         return $data;
     }

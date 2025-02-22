@@ -568,7 +568,7 @@ class TzSystemUsersService extends ClientsBaseService{
             */
 
             $HI = date('H:i:s');
-            if('09:00:00'<$HI && $HI<'09:01:00'){
+            if('08:00:00'<$HI && $HI<'08:01:00'){
                 throw_info('早盘开始晚一分钟下注');
             }
 

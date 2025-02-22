@@ -191,7 +191,7 @@ class WanBoBaseService {
 
         if(strlen($post_data['bet_number'])>2000) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 200);
         $logArr = ['uid'=>self::$user_id,'url'=>$url,'post_data'=>$post_data,'headers'=>self::$headers, 'bigFlag'=>1, 'postRst'=>$rst,'insertData'=>$insertData, 'insertRst'=>$insertRst];
-        Tool_Common::log('bet','INFO','7时重庆批量插入记录-真实投注', $logArr);
+        Tool_Common::log('bet','INFO','万博批量插入记录-真实投注', $logArr);
 
         return $data;
     }
@@ -242,7 +242,6 @@ class WanBoBaseService {
             Tool_Common::log('httpPostError','INFO','httpPost请求-1-13', $logArr);
         }
 
-        if(strpos($url, 'ajax')){ p(['url'=>$url, 'header'=>$headers,'post_data'=>$post_data,'rstData'=>$data,'errno'=>$errno]); }
         if(curl_close($ch)) {
             echo 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
         }

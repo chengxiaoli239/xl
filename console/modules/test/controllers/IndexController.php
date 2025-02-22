@@ -145,7 +145,7 @@ class IndexController extends Controller
             }catch (\Exception $e){
                 if($e->getCode()<40000){
                     $logArr = ['uid'=>$plan->uid, 'plan_id'=>$planId, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage(), 'errCode'=>$e->getCode(), 'file'=>$e->getFile(), 'line'=>$e->getLine()];
-                    Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '插入计划-异常', $logArr);
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '插入计划2-异常', $logArr);
                 }
                 $rst['data']['plan_id'] = ['plan_id'=>$planId, 'msg'=>$e->getMessage()];
             }

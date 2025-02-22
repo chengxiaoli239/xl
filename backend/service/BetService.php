@@ -2044,7 +2044,7 @@ abstract class BetService extends BaseBetService {
      * @desc 批量填插入用户计划任务
      * @return array
      */
-    public static function insertPlansTask($lottery_types = [], $isAuto=1, $accountOrId=''){
+    public static function insertPlansTask($lottery_types = [], $isJob=0, $accountOrId=''){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $lottery_types = $lottery_types ? : array_merge(StaticService::getLotteryTypes(), [8]);
         $lottery_types = array_unique($lottery_types);
@@ -2124,7 +2124,16 @@ abstract class BetService extends BaseBetService {
                     $rst['data'] = ['activeQiHao'=>$qiHao, 'plan_id'=>$plan->id, 'msg'=>'正常'];
                 }catch (\Exception $e){
                     if($e->getCode()<40000){
-                        $logArr = ['uid'=>$plan->uid, 'plan_id'=>$planId, 'lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage(), 'errCode'=>$e->getCode(), 'file'=>$e->getFile(), 'line'=>$e->getLine()];
+                        $logArr = [
+                            'uid'=>$plan->uid,
+                            'plan_id'=>$planId,
+                            'isJob'=>$isJob,
+                            'lottery_type'=>$lottery_type,
+                            'err_msg'=>$e->getMessage(),
+                            'errCode'=>$e->getCode(),
+                            'file'=>$e->getFile(),
+                            'line'=>$e->getLine()
+                        ];
                         Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '插入计划-异常', $logArr);
                     }
                     $rst['data']['plan_id'] = ['plan_id'=>$planId, 'msg'=>$e->getMessage()];
