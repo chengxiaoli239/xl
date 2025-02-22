@@ -2432,6 +2432,7 @@ class SscDataService extends BaseService {
             $logArr = [];
             $where = ['AND', ['IN', 'tz_type', \Yii::$app->params['IMPORT_CODES_TYPES']], ['=', 'status', 1], ['=', 'is_batch_simulate', 0], ['=', 'lottery_type', $lottery_type]];
             $UserSysPlans = UserSysPlans::find()->where($where);
+            $historyKjData = NumCodeService::getKjData($current_kj_qihao, $lottery_type);
             foreach ($UserSysPlans->each(10) as $UserSysPlan){
                 try {
                     $Rkey = __FUNCTION__.'_redis_op_plan_'.implode('_', \Yii::$app->params['IMPORT_CODES_TYPES']).'_'.$lottery_type.'_'.$UserSysPlan->id;
@@ -2454,7 +2455,6 @@ class SscDataService extends BaseService {
                             }else{
                                 # 指定位置号码数字，决定号码组数
                                 //$newKjCodesStr = SscKjData::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one()['code_str'];
-                                $historyKjData = NumCodeService::getKjData($current_kj_qihao, $lottery_type);
                                 $newKjCodes = explode(',', $historyKjData['code_str']);
                                 $turn_key = $newKjCodes[$hzArr['change_turn_pos']-1];
                             }
