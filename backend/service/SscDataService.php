@@ -2454,11 +2454,11 @@ class SscDataService extends BaseService {
                             }else{
                                 # 指定位置号码数字，决定号码组数
                                 //$newKjCodesStr = SscKjData::find()->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one()['code_str'];
-                                $historyKjData = NumCodeService::getKjData('', $lottery_type);
+                                $historyKjData = NumCodeService::getKjData($current_kj_qihao, $lottery_type);
                                 $newKjCodes = explode(',', $historyKjData['code_str']);
                                 $turn_key = $newKjCodes[$hzArr['change_turn_pos']-1];
                             }
-                            Tool_Common::log('/plans/'.__FUNCTION__, 'INFO', '计划位置组', ['newKjCodes'=>$newKjCodes, 'turn_key'=>$turn_key, 'pos'=>$hzArr['change_turn_pos']-1]);
+                            Tool_Common::log('/plans/'.__FUNCTION__, 'INFO', '计划位置组', ['planId'=>$UserSysPlan->id, 'newKjCodes'=>$newKjCodes, 'turn_key'=>$turn_key, 'pos'=>$hzArr['change_turn_pos']-1]);
                         }elseif($hzArr['turn_key']>=$turn_key) {
                             $turn_key = 0;#非轮换0，轮换:turn_key+1
                         }else{
