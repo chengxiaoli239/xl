@@ -25,6 +25,17 @@ class Tools
     }
 
     /**
+     * 支持同时检索多个拆分成数组
+     */
+    public static function getQuerySplit( $value )
+    {
+        $values = preg_replace('/\s+/','#',$value);
+        $values = str_replace(array("\r\n", "\r", "\n",",",'，'), "#", $values);
+
+        return explode('#',$values);
+    }
+
+    /**
      * @description 获取下一天的日期
      * @param $date 2018-01-01 或者 20180101
      * @param string $split 日期分隔符 ：-或/或''

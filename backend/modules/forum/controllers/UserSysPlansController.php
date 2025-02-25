@@ -92,6 +92,7 @@ class UserSysPlansController extends BaseController
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'myTzTypes' => $myTzTypes,
+            'ids' => $queryParams['UserSysPlans']['ids']??'',
             'tipTxt' => $tipTxt,
         ];
         return $this->render('index', $data);

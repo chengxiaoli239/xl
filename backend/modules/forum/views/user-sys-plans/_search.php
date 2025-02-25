@@ -18,10 +18,10 @@ $userNameList = \common\models\AdminModel::find()->select(['username'])->where('
         'method' => 'get',
     ]); ?>
     <div class="row">
-        <?php if($userId == 1){?>
         <div class="col-lg-2 col-xs-6">
-            <?= $form->field($model, 'id')->label('计划ID') ?>
+            <?= $form->field($model, 'ids')->label('计划ID') ?>
         </div>
+        <?php if($userId == 1){?>
         <div class="col-lg-2 col-xs-6">
             <?= $form->field($model, 'account')->dropDownList($userNameList, ['prompt' => '-请选择-'])->label('账号名称') ?>
         </div>

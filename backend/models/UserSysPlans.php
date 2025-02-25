@@ -49,6 +49,7 @@ use Yii;
 class UserSysPlans extends \common\models\base\BaseModel
 {
 
+    public $ids;
     public $type_2; # 双重
     public $type_3; # 三重
     public $type_4; # 四重
@@ -267,7 +268,7 @@ class UserSysPlans extends \common\models\base\BaseModel
             [['single', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
             [['update_time'], 'safe'],
             [['children_plan_id'], 'string', 'max' => 255],
-            [['singles', 'base_codes', 'hz_Arr', 'desc', 'remark'], 'string'],
+            [['singles', 'ids', 'base_codes', 'hz_Arr', 'desc', 'remark'], 'string'],
             [['account', 'tz_sites'], 'string', 'max' => 24],
         ];
     }

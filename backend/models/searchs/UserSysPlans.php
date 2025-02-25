@@ -2,6 +2,7 @@
 
 namespace backend\models\searchs;
 
+use common\tools\Tools;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -85,6 +86,10 @@ class UserSysPlans extends UserSysPlansModel
         if($this->uid !== 1){
             $queryWhere['uid'] = $params['UserSysPlans']['uid'];
         }
+        if(!empty($params['UserSysPlans']['ids'])){
+            $ids = Tools::getQuerySplit($params['UserSysPlans']['ids']);
+            $query->andWhere(['IN', 'id', $ids]);
+        }
         //p($queryWhere);
         // grid filtering conditions
         $query->andFilterWhere($queryWhere);
@@ -92,8 +97,10 @@ class UserSysPlans extends UserSysPlansModel
         $query->andFilterWhere(['like', 'tz_sites', $this->tz_sites])
             ->andFilterWhere(['like', 'desc', $this->desc]);
 
-            //->andFilterWhere(['in', 'status', [0, 1]])
-            //->andFilterWhere(['like', 'hz_Arr', $this->hz_Arr]);
+        //$sql = $query->createCommand()->getRawSql();
+        //p(['params'=>$params, 'sql'=>$sql]);
+        //->andFilterWhere(['in', 'status', [0, 1]])
+        //->andFilterWhere(['like', 'hz_Arr', $this->hz_Arr]);
 
         return $dataProvider;
     }
