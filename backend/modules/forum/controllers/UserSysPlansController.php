@@ -3,6 +3,7 @@
 namespace backend\modules\forum\controllers;
 
 use backend\models\ImportPlanCodes;
+use backend\models\PlanStaticProfits;
 use backend\models\TzSystemsAuth;
 use backend\models\TzSystemsUsers;
 use backend\service\BetService;
@@ -55,6 +56,7 @@ class UserSysPlansController extends BaseController
         $queryParams = Yii::$app->request->queryParams;
 
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+
         /*
         if(!$queryParams['UserSysPlans']['lottery_type']){
             $lottery_type = $lottery_types[0]['lottery_type'];
@@ -62,6 +64,7 @@ class UserSysPlansController extends BaseController
             $lottery_type = $queryParams['UserSysPlans']['lottery_type'];
         }
         */
+
         $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
 
         $queryParams['UserSysPlans']['lottery_type'] = $lottery_type;
@@ -70,6 +73,17 @@ class UserSysPlansController extends BaseController
             $queryParams['UserSysPlans']['uid'] = $this->_user_id;
         }
         $dataProvider = $searchModel->search($queryParams);
+
+        // Calculate total profits
+        $totalProfits = 0;
+        foreach ($dataProvider->models as $model) {
+            // Get profits from PlanStaticProfits table
+            $currentProfits = PlanStaticProfits::find()
+                ->select(['cut_profits'])
+                ->where(['plan_id' => $model->id])
+                ->scalar() ?: 0.00;
+            $totalProfits += $currentProfits;
+        }
 
         $myTzTypes = UserSysPlansService::getMyTzTypes($this->_user_id, $lottery_type);
         $tipTxt = '';
@@ -92,9 +106,11 @@ class UserSysPlansController extends BaseController
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'myTzTypes' => $myTzTypes,
+            'all_profits' => $totalProfits, // Pass total profits to view
             'ids' => $queryParams['UserSysPlans']['ids']??'',
             'tipTxt' => $tipTxt,
         ];
+
         return $this->render('index', $data);
     }
 

@@ -12,14 +12,13 @@ $userNameList = \common\models\AdminModel::find()->select(['username'])->where('
 ?>
 
 <div class="user-sys-plans-search">
-
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
         'method' => 'get',
     ]); ?>
     <div class="row">
         <div class="col-lg-2 col-xs-6">
-            <?= $form->field($model, 'ids')->label('计划ID') ?>
+            <?= $form->field($model, 'ids')->textInput(['placeholder' => '请输入ID', 'value'=>$ids])->label('计划ID'); ?>
         </div>
         <?php if($userId == 1){?>
         <div class="col-lg-2 col-xs-6">

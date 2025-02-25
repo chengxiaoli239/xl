@@ -240,16 +240,28 @@ $columns = array_merge(
                 </div>
 
                 <?php echo $this->render('_search', ['model' => $searchModel]); ?>
+                <div class="operation-row" style="margin-bottom: 15px;">
+                    <div class="btn-group">
+                        <?= Html::button("批量关闭", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchClose']) ?> &nbsp;
+                        <?= Html::button("批量开启", ['class' => 'btn btn-success btn-xs', 'id' => 'batchOpen']) ?> &nbsp;
+                        <?= Html::button("批量删除", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchDelete']) ?> &nbsp;
+                        <?= Html::button("批量真实", ['class' => 'btn btn-success btn-xs', 'id' => 'batchTrue']) ?> &nbsp;
+                        <?= Html::button("批量模拟", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchSimulate']) ?> &nbsp;
+                        <?= Html::button("批量正", ['class' => 'btn btn-success btn-xs', 'id' => 'batchForward']) ?> &nbsp;
+                        <?= Html::button("批量反", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchReverse']) ?>
+                    </div>
+                    <div class="pull-right">
+                        <?= Html::a($tipTxt, 'javascript:;', ['class' => 'btn red-text']) ?>
+                        <?= Html::tag('span', '总盈利: ' . number_format($all_profits, 2), [
+                            'class' => 'btn', 
+                            'style' => 'color:' . ($all_profits > 0 ? 'green' : ($all_profits < 0 ? 'red' : 'black')) . 
+                                      ';font-weight:bold;margin-left:10px;'
+                        ]) ?>
+                    </div>
+                </div>
 
-                <?= Html::button("批量关闭", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchClose']) ?> &nbsp;
-                <?= Html::button("批量开启", ['class' => 'btn btn-success btn-xs', 'id' => 'batchOpen']) ?> &nbsp;
-                <?= Html::button("批量删除", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchDelete']) ?> &nbsp;
-                <?= Html::button("批量真实", ['class' => 'btn btn-success btn-xs', 'id' => 'batchTrue']) ?> &nbsp;
-                <?= Html::button("批量模拟", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchSimulate']) ?> &nbsp;
-                <?= Html::button("批量正", ['class' => 'btn btn-success btn-xs', 'id' => 'batchForward']) ?> &nbsp;
-                <?= Html::button("批量反", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchReverse']) ?> &nbsp;
+                <div style="clear:both;"></div>
 
-                <?= Html::a($tipTxt, 'javascript:;', ['class' => 'btn red-text']) ?> &nbsp;
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     #'filterModel' => $searchModel,
