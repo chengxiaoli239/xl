@@ -378,14 +378,14 @@ class KjDataGet
                 push_queue(\common\service\jobs\kj_data\OperateBetPlans::class, ['lottery_type'=>CommonBaseService::LOTTERY_TYPE_LUCKY5, 'lottery_name'=>$lottery_name, 'qihao'=>$qihao, 'business_id'=>$qihao]);
 
                 # 2、数据统计处理  底下的统计有待于添加开关控制
-                push_queue(Update1NumYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>10]);
-                push_queue(PeiShuProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>5]);
-                push_queue(CommonDataStaticsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'date'=>$tmpDate, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>5]);
-                push_queue(StaticAll2NumsYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>10]);
-                push_queue(StaticHzProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>15]);
+                push_queue(Update1NumYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>60]);
+                push_queue(PeiShuProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>65]);
+                push_queue(CommonDataStaticsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'date'=>$tmpDate, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>75]);
+                push_queue(StaticAll2NumsYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>70]);
+                push_queue(StaticHzProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>75]);
                 push_queue(StaticPeiShuTrueFalseJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>20]);
-                push_queue(StaticSdProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>25]);
-                push_queue(UpdateCodeTypeYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>30]);
+                push_queue(StaticSdProfitsJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>75]);
+                push_queue(UpdateCodeTypeYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao, 'queue_delay_time'=>70]);
                 break;
         }
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '统计数据入列', ['qiHao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'msg'=>'数据入列成功']);
