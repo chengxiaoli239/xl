@@ -2158,6 +2158,9 @@ abstract class BetService extends BaseBetService {
             $t1 = microtime(true);
 
             $plan = UserSysPlans::findOne($planId);
+            if($plan->status != 1){
+                throw_info('计划未开启...');
+            }
             $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId], ['=', 'uid', $plan->uid]];
             if($isAuto == 1 && BettingRecords::find()->where($where)->exists()){
                 throw_info('yx表已记录3...');

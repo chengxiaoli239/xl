@@ -78,7 +78,6 @@ class OpKjService extends BaseService {
                 */
                 break;
         }
-        Tool_Common::log('/data_kj/'.__FUNCTION__, 'INFO', '开奖后计算用户数据-5x', ['lottery_type'=>$lottery_type, 'rst'=>$rst]);
 
         return $rst;
     }

@@ -24,8 +24,9 @@ use backend\service\statics\statics_base\BaseDataService;
 use backend\tools\Tools;
 use common\kj\qxc\QxcTcw;
 use common\models\AdminModel;
+use common\service\jobs\plan\UserPlanBetJob;
+use common\service\ssc\QihaoService;
 use common\tools\Tool_Common;
-use yii\helpers\ArrayHelper;
 use yii;
 
 class HN0898Service extends BaseTZService {
@@ -720,6 +721,10 @@ class HN0898Service extends BaseTZService {
         $m->set($mkey, 1, 10);
 
         $rst = $UserSysPlans->save(false);
+        if($status == 1){
+            list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($UserSysPlans->lottery_type); # 期号数据
+            push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$UserSysPlans->id, 'qiHao'=>$qiHao, 'business_id'=>$UserSysPlans->id]);
+        }
 
         $rstData = ['rst'=>$rst, 'lottery_type'=>$UserSysPlans->lottery_type];
 
