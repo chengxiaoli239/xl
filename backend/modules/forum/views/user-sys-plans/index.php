@@ -13,6 +13,7 @@
     font-size: 14px;        /* 字体大小为12号 */
     background-color: white; /* 背景颜色为白色 */
 }
+/* 悬浮方块按钮 */
 .chat-trigger {
     position: fixed;
     right: 20px;
@@ -27,42 +28,42 @@
     cursor: move;
     box-shadow: 0 2px 12px rgba(0,0,0,0.15);
     z-index: 1000;
-    touch-action: none;
-    user-select: none;
+    transition: transform 0.2s, opacity 0.3s;
 }
 
+.chat-trigger i {
+    color: #fff;
+    font-size: 24px;
+}
+
+.chat-trigger.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 聊天窗口样式优化 */
 .deepseek-chat {
-    position: fixed;
+     position: fixed;
     display: none;
-    left: 50%;
+    opacity: 0;
+    right: 20px;
     top: 50%;
-    transform: translate(-50%, -50%);
-    width: 450px;
-    height: 70vh;
-    max-height: 700px;
+    transform: translateY(-50%);
+    width: 400px; /* PC端更宽的聊天窗口 */
+    height: 70vh; /* 适应屏幕高度 */
+    max-height: 800px;
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
     z-index: 1001;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s;
 }
+
+
 
 .deepseek-chat.active {
+    right: 0;
     display: block;
-    opacity: 1;
-}
-
-.chat-trigger.hidden {
-    display: none;
-}
-
-@media (max-width: 768px) {
-    .deepseek-chat {
-        width: 90%;
-        height: 80vh;
-        max-height: none;
-    }
 }
 
 .chat-header {
@@ -104,8 +105,8 @@
     .deepseek-chat {
         width: 90%;
         height: 80vh;
-        left: 5%;
         right: 5%;
+        left: 5%;
     }
 }
 
@@ -424,9 +425,11 @@ $columns = array_merge(
     </section>
     <!-- page end-->
     <!-- 悬浮方块按钮 -->
+    <!--
     <div class="chat-trigger" onclick="toggleChat()">
         <i class="layui-icon layui-icon-dialogue"></i>
     </div>
+    -->
 
     <!-- 聊天窗口 -->
     <div class="deepseek-chat" id="deepseekChat">
@@ -510,7 +513,7 @@ $columns = array_merge(
                         <div class="col-md-12">
                             <div class="form-horizontal">
                                 <div class="form-group" style="margin-bottom: 15px;">
-                                    <label class="col-sm-3 control-label">计划类型：</label>
+                                    <label class="col-sm-3 control-label">修改计划类型：</label>
                                     <div class="col-sm-9">
                                         <select class="form-control" id="newPlanType" name="newPlanType" style="width: 200px; display: inline-block;">
                                             <?php foreach (SscDataService::PLAN_TYPE_OPTIONS as $key => $value): ?>
@@ -520,7 +523,7 @@ $columns = array_merge(
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <label class="col-sm-3 control-label">计划ID：</label>
+                                    <label class="col-sm-3 control-label">修改的计划ID：</label>
                                     <div class="col-sm-9">
                                         <div id="selectedPlanIds" class="form-control-static" style="word-break: break-all; padding-top: 7px;">
                                         </div>
@@ -742,145 +745,129 @@ $columns = array_merge(
         });
     });
 
+    // 修改拖拽功能的实现
     function makeDraggable(element) {
-        let startX, startY, initialX, initialY;
-        let active = false;
-        let lastTap = 0;
+        let pos = { left: 20, top: window.innerHeight / 2 };
+        let isDragging = false;
+        let startPos = { x: 0, y: 0 };
 
-        function init() {
-            element.addEventListener('mousedown', startDragging);
-            element.addEventListener('touchstart', startDragging, { passive: false });
-            document.addEventListener('mousemove', drag);
-            document.addEventListener('touchmove', drag, { passive: false });
-            document.addEventListener('mouseup', stopDragging);
-            document.addEventListener('touchend', stopDragging);
-        }
+        element.addEventListener('mousedown', onMouseDown);
+        element.addEventListener('touchstart', onTouchStart, { passive: false });
 
-        function startDragging(e) {
-            if (e.type === 'mousedown') {
-                initialX = e.clientX - element.offsetLeft;
-                initialY = e.clientY - element.offsetTop;
-            } else {
-                initialX = e.touches[0].clientX - element.offsetLeft;
-                initialY = e.touches[0].clientY - element.offsetTop;
-            }
-
-            if (e.target === element) {
-                active = true;
-                startX = e.type === 'mousedown' ? e.clientX : e.touches[0].clientX;
-                startY = e.type === 'mousedown' ? e.clientY : e.touches[0].clientY;
-            }
-
+        function onMouseDown(e) {
+            isDragging = true;
+            startPos = {
+                x: e.clientX - pos.left,
+                y: e.clientY - pos.top
+            };
+            
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
             e.preventDefault();
         }
 
-        function drag(e) {
-            if (!active) return;
-
+        function onTouchStart(e) {
+            isDragging = true;
+            startPos = {
+                x: e.touches[0].clientX - pos.left,
+                y: e.touches[0].clientY - pos.top
+            };
+            
+            document.addEventListener('touchmove', onTouchMove, { passive: false });
+            document.addEventListener('touchend', onTouchEnd);
             e.preventDefault();
-
-            let currentX = e.type === 'mousemove' ? e.clientX : e.touches[0].clientX;
-            let currentY = e.type === 'mousemove' ? e.clientY : e.touches[0].clientY;
-
-            let deltaX = currentX - initialX;
-            let deltaY = currentY - initialY;
-
-            // 限制在视窗范围内
-            const maxX = window.innerWidth - element.offsetWidth;
-            const maxY = window.innerHeight - element.offsetHeight;
-            deltaX = Math.min(Math.max(0, deltaX), maxX);
-            deltaY = Math.min(Math.max(0, deltaY), maxY);
-
-            element.style.left = `${deltaX}px`;
-            element.style.top = `${deltaY}px`;
         }
 
-        function stopDragging(e) {
-            if (!active) return;
+        function moveElement(clientX, clientY) {
+            pos.left = clientX - startPos.x;
+            pos.top = clientY - startPos.y;
 
-            let currentX = e.type === 'mouseup' ? e.clientX : e.changedTouches[0].clientX;
-            let currentY = e.type === 'mouseup' ? e.clientY : e.changedTouches[0].clientY;
+            // 限制范围
+            pos.left = Math.min(Math.max(0, pos.left), window.innerWidth - element.offsetWidth);
+            pos.top = Math.min(Math.max(0, pos.top), window.innerHeight - element.offsetHeight);
 
-            let moved = Math.abs(currentX - startX) > 5 || Math.abs(currentY - startY) > 5;
-
-            if (!moved) {
-                // 如果没有移动，则触发点击
-                toggleChat(e);
-            }
-
-            active = false;
+            element.style.transform = `translate3d(${pos.left}px, ${pos.top}px, 0)`;
         }
 
-        init();
+        function onMouseMove(e) {
+            if (!isDragging) return;
+            moveElement(e.clientX, e.clientY);
+        }
+
+        function onTouchMove(e) {
+            if (!isDragging) return;
+            moveElement(e.touches[0].clientX, e.touches[0].clientY);
+            e.preventDefault();
+        }
+
+        function onMouseUp() {
+            isDragging = false;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        }
+
+        function onTouchEnd() {
+            isDragging = false;
+            document.removeEventListener('touchmove', onTouchMove);
+            document.removeEventListener('touchend', onTouchEnd);
+        }
     }
 
+        // 优化聊天窗口显示/隐藏逻辑
     function toggleChat(event) {
         if (event) {
             event.preventDefault();
             event.stopPropagation();
         }
-
+        console.log('dddddd')
+        
         const chatWindow = document.getElementById('deepseekChat');
         const chatTrigger = document.querySelector('.chat-trigger');
-
-        if (!chatWindow.classList.contains('active')) {
-            // 显示聊天窗口
+        const isVisible = chatWindow.style.display === 'block';
+        
+        if (!isVisible) {
+            // 显示聊天窗口，隐藏触发按钮
             chatWindow.style.display = 'block';
+            chatTrigger.classList.add('hidden');
+            
             setTimeout(() => {
-                chatWindow.classList.add('active');
-                chatTrigger.classList.add('hidden');
+                chatWindow.style.opacity = '1';
             }, 10);
-
-            // 添加点击外部关闭功能
-            document.addEventListener('click', closeOnClickOutside);
         } else {
-            closeChat();
+            // 隐藏聊天窗口，显示触发按钮
+            chatWindow.style.opacity = '0';
+            setTimeout(() => {
+                chatWindow.style.display = 'none';
+                chatTrigger.classList.remove('hidden');
+            }, 300);
         }
     }
 
-    function closeChat() {
-        const chatWindow = document.getElementById('deepseekChat');
-        const chatTrigger = document.querySelector('.chat-trigger');
-
-        chatWindow.classList.remove('active');
-        setTimeout(() => {
-            chatWindow.style.display = 'none';
-            chatTrigger.classList.remove('hidden');
-        }, 300);
-
-        document.removeEventListener('click', closeOnClickOutside);
-    }
-
-    function closeOnClickOutside(e) {
-        const chatWindow = document.getElementById('deepseekChat');
-        const chatTrigger = document.querySelector('.chat-trigger');
-
-        if (!chatWindow.contains(e.target) && !chatTrigger.contains(e.target)) {
-            closeChat();
-        }
-    }
-
-    // 初始化layer
-    layui.use(['layer'], function(){
-        var layer = layui.layer;
-    });
-
+    // 初始化
     document.addEventListener('DOMContentLoaded', function() {
         const chatTrigger = document.querySelector('.chat-trigger');
-        if (chatTrigger) {
-            // 设置初始位置
-            chatTrigger.style.position = 'fixed';
-            chatTrigger.style.left = 'auto';
-            chatTrigger.style.right = '20px';
-            chatTrigger.style.top = '50%';
+        const chatWindow = document.getElementById('deepseekChat');
+        
+        makeDraggable(chatTrigger);
 
-            makeDraggable(chatTrigger);
-        }
+        // 点击聊天框外部关闭
+        document.addEventListener('click', function(event) {
+            if (chatWindow.style.display === 'block' && 
+                !chatWindow.contains(event.target) && 
+                !chatTrigger.contains(event.target)) {
+                toggleChat();
+            }
+        });
 
-        // 添加 ESC 键关闭功能
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeChat();
+        // 防止点击聊天框内部触发关闭
+        chatWindow.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+
+        // ESC键关闭聊天窗口
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && chatWindow.style.display === 'block') {
+                toggleChat();
             }
         });
     });
@@ -954,3 +941,71 @@ $columns = array_merge(
         });
     }
 </script>
+<style>
+.deepseek-chat {
+    position: fixed;
+    display: none;
+    opacity: 0;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 400px; /* PC端更宽的聊天窗口 */
+    height: 70vh; /* 适应屏幕高度 */
+    max-height: 800px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 1001;
+    transition: opacity 0.3s;
+}
+
+.chat-header {
+     padding: 15px 20px;
+    background: #1E9FFF; /* 深色背景 */
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-body {
+    height: calc(100% - 50px);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.chat-input {
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.message {
+    margin: 5px 0;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.user-message {
+    background: #e3f2fd;
+    margin-left: 20px;
+}
+
+.bot-message {
+    background: #f5f5f5;
+    margin-right: 20px;
+}
+
+.plan-suggestion {
+    background: #e8f5e9;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    cursor: pointer;
+}
+</style>
