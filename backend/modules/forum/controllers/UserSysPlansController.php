@@ -451,6 +451,33 @@ class UserSysPlansController extends BaseController
     }
 
     /**
+     * 批量更新计划类型
+     * @return array
+     */
+    public function actionBatchUpdatePlanType()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = Yii::$app->request->post();
+
+        try {
+            $ids = $post['ids'];
+            $newPlanType = $post['newPlanType'];
+
+            foreach ($ids as $id) {
+                $model = UserSysPlans::findOne($id);
+                if ($model) {
+                    $model->plan_type = $newPlanType;
+                    $model->save();
+                }
+            }
+
+            return ['status' => 200, 'message' => '操作成功'];
+        } catch (\Exception $e) {
+            return ['status' => 500, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
      * @desc
      * @return string
      */
