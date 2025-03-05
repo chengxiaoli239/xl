@@ -27,6 +27,7 @@ use backend\controllers\BaseController;
 use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * UserSysPlansController implements the CRUD actions for UserSysPlans model.
@@ -713,5 +714,35 @@ class UserSysPlansController extends BaseController
         }
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+    }
+
+    public function actionCreateFromSuggestion()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        
+        try {
+            $suggestion = Yii::$app->request->post();
+            
+            $model = new UserSysPlans();
+            $model->attributes = $suggestion;
+            $model->uid = Yii::$app->user->id;
+            
+            if ($model->save()) {
+                return [
+                    'status' => 200,
+                    'message' => '计划创建成功'
+                ];
+            }
+            
+            return [
+                'status' => 400,
+                'message' => '计划创建失败：' . implode(', ', $model->getErrorSummary(true))
+            ];
+        } catch (\Exception $e) {
+            return [
+                'status' => 500,
+                'message' => $e->getMessage()
+            ];
+        }
     }
 }

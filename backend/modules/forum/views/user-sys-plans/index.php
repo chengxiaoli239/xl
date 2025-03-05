@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="/vendors/layui/2.5.4/css/layui.css?v=2020">
 <link rel="stylesheet" href="/css/layui/global.css?v={{STATIC_VERSION}}">
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1529192_39xhl8um9u9.css">
 <script type="text/javascript" src="/vendors/layui-layer/3.1.1/layer.js"></script>
 <script type="text/javascript" src="/vendors/layui/2.4.5/layui.js"></script>
 <script type="text/javascript" src="/vendors/atrtemplate/4.13.2/template-web.js"></script>
@@ -7,11 +8,159 @@
 <script type="text/javascript" src="/js/layui/global.js?v={{STATIC_VERSION}}"></script>
 <script type="text/javascript" src="/js/common.js?v={{STATIC_VERSION}}"></script>
 <style>
-    .red-text {
-        color: red;              /* 字体颜色为红色 */
-        font-size: 14px;        /* 字体大小为12号 */
-        background-color: white; /* 背景颜色为白色 */
+.red-text {
+    color: red;              /* 字体颜色为红色 */
+    font-size: 14px;        /* 字体大小为12号 */
+    background-color: white; /* 背景颜色为白色 */
+}
+/* 悬浮方块按钮 */
+.chat-trigger {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    width: 50px;
+    height: 50px;
+    background: #1E9FFF;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: move;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    transition: transform 0.2s, opacity 0.3s;
+}
+
+.chat-trigger i {
+    color: #fff;
+    font-size: 24px;
+}
+
+.chat-trigger.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 聊天窗口样式优化 */
+.deepseek-chat {
+     position: fixed;
+    display: none;
+    opacity: 0;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 400px; /* PC端更宽的聊天窗口 */
+    height: 70vh; /* 适应屏幕高度 */
+    max-height: 800px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 1001;
+    transition: opacity 0.3s;
+}
+
+
+
+.deepseek-chat.active {
+    right: 0;
+    display: block;
+}
+
+.chat-header {
+    padding: 15px 20px;
+    background: #1E9FFF; /* 深色背景 */
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header span {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.chat-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.chat-close:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+    .deepseek-chat {
+        width: 90%;
+        height: 80vh;
+        right: 5%;
+        left: 5%;
     }
+}
+
+
+.chat-body {
+    height: calc(100% - 65px);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #f8f9fa;
+}
+
+.chat-input-container {
+    padding: 15px;
+    border-top: 1px solid #eee;
+    background: #fff;
+    border-radius: 0 0 8px 8px;
+}
+
+.chat-input-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
+#userInput {
+    flex: 1;
+    height: 40px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: none;
+    font-size: 14px;
+}
+
+.send-button {
+    width: 80px;
+    height: 40px;
+    background: #1E9FFF;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.send-button:hover {
+    background: #0d8aff;
+}
 </style>
 <?php
 
@@ -264,6 +413,8 @@ $columns = array_merge(
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
+                    'options' => ['class' => 'grid-view table-responsive'],
+                    'tableOptions' => ['class' => 'table table-striped table-bordered'],
                     #'filterModel' => $searchModel,
                     'columns' => $columns,
                 ]); ?>
@@ -271,6 +422,29 @@ $columns = array_merge(
         </div>
     </section>
     <!-- page end-->
+    <!-- 悬浮方块按钮 -->
+    <div class="chat-trigger" onclick="toggleChat()">
+        <i class="layui-icon layui-icon-dialogue"></i>
+    </div>
+
+    <!-- 聊天窗口 -->
+    <div class="deepseek-chat" id="deepseekChat">
+        <div class="chat-header">
+            <span>智能投注助手</span>
+            <button class="chat-close" onclick="toggleChat()">×</button>
+        </div>
+        <div class="chat-body">
+            <div class="chat-messages" id="chatMessages">
+                <!-- 消息会动态添加到这里 -->
+            </div>
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <textarea id="userInput" placeholder="请描述您的投注需求..."></textarea>
+                    <button class="send-button" onclick="sendMessage()">发送</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 <!--提示框-start-->
 <div class="modal fade " id="exampleModal_msg" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
@@ -477,4 +651,267 @@ $columns = array_merge(
             });
         });
     });
+
+    // 修改拖拽功能的实现
+    function makeDraggable(element) {
+        let pos = { left: 20, top: window.innerHeight / 2 };
+        let isDragging = false;
+        let startPos = { x: 0, y: 0 };
+
+        element.addEventListener('mousedown', onMouseDown);
+        element.addEventListener('touchstart', onTouchStart, { passive: false });
+
+        function onMouseDown(e) {
+            isDragging = true;
+            startPos = {
+                x: e.clientX - pos.left,
+                y: e.clientY - pos.top
+            };
+            
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+            e.preventDefault();
+        }
+
+        function onTouchStart(e) {
+            isDragging = true;
+            startPos = {
+                x: e.touches[0].clientX - pos.left,
+                y: e.touches[0].clientY - pos.top
+            };
+            
+            document.addEventListener('touchmove', onTouchMove, { passive: false });
+            document.addEventListener('touchend', onTouchEnd);
+            e.preventDefault();
+        }
+
+        function moveElement(clientX, clientY) {
+            pos.left = clientX - startPos.x;
+            pos.top = clientY - startPos.y;
+
+            // 限制范围
+            pos.left = Math.min(Math.max(0, pos.left), window.innerWidth - element.offsetWidth);
+            pos.top = Math.min(Math.max(0, pos.top), window.innerHeight - element.offsetHeight);
+
+            element.style.transform = `translate3d(${pos.left}px, ${pos.top}px, 0)`;
+        }
+
+        function onMouseMove(e) {
+            if (!isDragging) return;
+            moveElement(e.clientX, e.clientY);
+        }
+
+        function onTouchMove(e) {
+            if (!isDragging) return;
+            moveElement(e.touches[0].clientX, e.touches[0].clientY);
+            e.preventDefault();
+        }
+
+        function onMouseUp() {
+            isDragging = false;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        }
+
+        function onTouchEnd() {
+            isDragging = false;
+            document.removeEventListener('touchmove', onTouchMove);
+            document.removeEventListener('touchend', onTouchEnd);
+        }
+    }
+
+        // 优化聊天窗口显示/隐藏逻辑
+    function toggleChat(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        
+        const chatWindow = document.getElementById('deepseekChat');
+        const chatTrigger = document.querySelector('.chat-trigger');
+        const isVisible = chatWindow.style.display === 'block';
+        
+        if (!isVisible) {
+            // 显示聊天窗口，隐藏触发按钮
+            chatWindow.style.display = 'block';
+            chatTrigger.classList.add('hidden');
+            
+            setTimeout(() => {
+                chatWindow.style.opacity = '1';
+            }, 10);
+        } else {
+            // 隐藏聊天窗口，显示触发按钮
+            chatWindow.style.opacity = '0';
+            setTimeout(() => {
+                chatWindow.style.display = 'none';
+                chatTrigger.classList.remove('hidden');
+            }, 300);
+        }
+    }
+
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatTrigger = document.querySelector('.chat-trigger');
+        const chatWindow = document.getElementById('deepseekChat');
+        
+        makeDraggable(chatTrigger);
+
+        // 点击聊天框外部关闭
+        document.addEventListener('click', function(event) {
+            if (chatWindow.style.display === 'block' && 
+                !chatWindow.contains(event.target) && 
+                !chatTrigger.contains(event.target)) {
+                toggleChat();
+            }
+        });
+
+        // 防止点击聊天框内部触发关闭
+        chatWindow.addEventListener('click', function(event) {
+            event.stopPropagation();
+        });
+
+        // ESC键关闭聊天窗口
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && chatWindow.style.display === 'block') {
+                toggleChat();
+            }
+        });
+    });
+
+    async function sendMessage() {
+        const userInput = document.getElementById('userInput');
+        const message = userInput.value.trim();
+        if (!message) return;
+
+        // 添加用户消息
+        addMessage(message, 'user');
+        userInput.value = '';
+
+        try {
+            // 调用后端API
+            const response = await fetch('/forum/deepseek/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message })
+            });
+
+            const data = await response.json();
+            
+            // 添加机器人回复
+            addMessage(data.message, 'bot');
+
+            // 如果有投注建议，显示可点击的建议
+            if (data.suggestions) {
+                data.suggestions.forEach(suggestion => {
+                    addSuggestion(suggestion);
+                });
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            addMessage('抱歉，服务出现错误，请稍后重试。', 'bot');
+        }
+    }
+
+    function addMessage(message, type) {
+        const chatMessages = document.getElementById('chatMessages');
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}-message`;
+        messageDiv.textContent = message;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addSuggestion(suggestion) {
+        const chatMessages = document.getElementById('chatMessages');
+        const suggestionDiv = document.createElement('div');
+        suggestionDiv.className = 'plan-suggestion';
+        suggestionDiv.innerHTML = `
+            推荐方案: ${suggestion.name}<br>
+            胜率: ${suggestion.winRate}%<br>
+            <button onclick="addToPlan(${JSON.stringify(suggestion)})">添加到计划</button>
+        `;
+        chatMessages.appendChild(suggestionDiv);
+    }
+
+    function addToPlan(suggestion) {
+        // 调用创建计划的接口
+        $.post('/forum/user-sys-plans/create-from-suggestion', suggestion, function(response) {
+            if (response.status === 200) {
+                layer.msg('计划添加成功');
+                location.reload();
+            } else {
+                layer.msg('计划添加失败：' + response.message);
+            }
+        });
+    }
 </script>
+<style>
+.deepseek-chat {
+    position: fixed;
+    display: none;
+    opacity: 0;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 400px; /* PC端更宽的聊天窗口 */
+    height: 70vh; /* 适应屏幕高度 */
+    max-height: 800px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    z-index: 1001;
+    transition: opacity 0.3s;
+}
+
+.chat-header {
+     padding: 15px 20px;
+    background: #1E9FFF; /* 深色背景 */
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-body {
+    height: calc(100% - 50px);
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.chat-input {
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
+
+.message {
+    margin: 5px 0;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.user-message {
+    background: #e3f2fd;
+    margin-left: 20px;
+}
+
+.bot-message {
+    background: #f5f5f5;
+    margin-right: 20px;
+}
+
+.plan-suggestion {
+    background: #e8f5e9;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    cursor: pointer;
+}
+</style>
