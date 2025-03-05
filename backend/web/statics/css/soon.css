@@ -1,3 +1,4 @@
+
 /******************************************************************************************************************************
 HEADER
 *******************************************************************************************************************************/
@@ -89,90 +90,6 @@ RESPONSIVE
     #layer{display: none;}
     .timer_box h1{ font-size: 28px;}
     h1{ font-size: 36px;}
-}
-/* 响应式表格样式 */
-@media screen and (max-width: 768px) {
-    .table-responsive {
-        border: none;
-        margin-bottom: 0;
-    }
-    
-    .grid-view {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    .grid-view .table {
-        min-width: 100%;
-        width: auto;
-    }
-    
-    /* 收缩表格单元格 */
-    .grid-view .table > thead > tr > th,
-    .grid-view .table > tbody > tr > td {
-        white-space: nowrap;
-        padding: 8px 4px;
-        font-size: 12px;
-    }
-    
-    /* 隐藏不重要的列 */
-    .grid-view .table .hidden-xs {
-        display: none;
-    }
-    
-    /* 调整操作按钮大小 */
-    .grid-view .btn-xs {
-        padding: 1px 5px;
-        font-size: 11px;
-    }
-}
-
-/* 修复div溢出问题 */
-.panel-body {
-    padding: 15px;
-    overflow-x: hidden;
-    flex: 1;
-    min-width: 0; /* 防止flex子项溢出 */
-}
-
-.adv-table {
-    width: 100%;
-    overflow-x: auto;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-}
-
-/* Flexbox布局支持 */
-.panel {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-/* 操作按钮响应式布局 */
-.operation-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-bottom: 15px;
-}
-
-@media screen and (max-width: 768px) {
-    .operation-row {
-        flex-direction: column;
-    }
-    
-    .btn-group {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 5px;
-    }
-    
-    .pull-right {
-        float: none !important;
-        margin-top: 10px;
-    }
 }
 /******************************************************************************************************************************
 ANIMATIONS
