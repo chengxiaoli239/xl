@@ -1407,7 +1407,7 @@ abstract class BetService extends BaseBetService {
                 }
             }
             if($codes_hz['filters']['filter_type'] == 2){
-                $BettingRecords = BettingRecords::find()->where(['plan_id'=>$plan->id])->limit(1)->orderBy(['id'=>SORT_DESC])->one();
+                $BettingRecords = BettingRecords::find()->select(['id', 'kj_codes', 'qihao'])->where(['plan_id'=>$plan->id])->limit(1)->orderBy(['id'=>SORT_DESC])->one();
                 $kj_codes = $BettingRecords->kj_codes;
                 $codesArr = explode(',', $kj_codes);
                 $end_num = array_pop($codesArr); # 以太坊去掉最后一个0
@@ -1552,8 +1552,7 @@ abstract class BetService extends BaseBetService {
             ];
             //if($data['tz_type'] == 20) $insertData['codes'] = md5($insertData['codes']);
             $where = ['AND', ['=', 'qihao', $data['qihao']], ['=', 'plan_id', $data['plan_id']], ['=', 'uid', $data['uid']]];
-            $flag = BettingRecords::find()->where($where)->limit(1)->one();
-            if($flag){
+            if(BettingRecords::find()->where($where)->limit(1)->exists()){
                 throw_info('记录已经存在plan_id:'.$data['plan_id'].'_uid:'.$data['uid']);
             }
 
@@ -2178,6 +2177,8 @@ abstract class BetService extends BaseBetService {
             $TzSystemsUsers = $TzSystemsUsersData[$plan->uid]??[];
             # 4、投注号码 codes
             $codes = BetService::getCodesByPlan($plan);
+            $t2 = microtime(true);
+            $time_consume1 = ($t2-$t1).'s';
 
             $is_test = $plan->is_test;
             list($sn, $snid) = BetService::getBetSnId($plan, $plan->plan_type, $is_test, $isAuto);
@@ -2195,9 +2196,9 @@ abstract class BetService extends BaseBetService {
                 $insertRst = $BetService->postBatchBet($qiHao, $plan, $codes);
                 $rst['data'][$plan->id] = $insertRst;
 
-                $t2 = microtime(true);
-                $time_consume = ($t2-$t1).'s';
-                $logArr = ['uid'=>$plan->uid, 'account'=>$plan->account, 'plan_id'=>$plan->id, 'activeQiHao'=>$qiHao, 'insertRst'=>$insertRst, 'time_consume'=>$time_consume];
+                $t3 = microtime(true);
+                $time_consume2 = ($t3-$t2).'s';
+                $logArr = ['uid'=>$plan->uid, 'account'=>$plan->account, 'plan_id'=>$plan->id, 'activeQiHao'=>$qiHao, 'insertRst'=>$insertRst, 'time_consume1'=>$time_consume1, 'time_consume2'=>$time_consume2];
                 $user_ids[$plan->uid] = ['user_id'=>$plan->uid];
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入计划任务结束', $logArr);
                 commonRedis()->setex($insert_mkey, 120, 1);

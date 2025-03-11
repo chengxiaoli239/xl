@@ -81,6 +81,13 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $plan_id = 17447;
+        $uid = 25;
+        $where = ['AND', ['=', 'qihao', '20250311194'], ['=', 'plan_id', $plan_id], ['=', 'uid', $uid]];
+        if(BettingRecords::find()->where($where)->limit(1)->exists()){
+            throw_info('记录已经存在plan_id:'.$plan_id.'_uid:'.$uid);
+        }
+        p($flag);
         $rst = OneNumYl::yl($lotteryType=8);p($rst);
         $where = ['lottery_type'=>8];
         $field = 'code1';
