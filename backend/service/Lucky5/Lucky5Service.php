@@ -10,6 +10,7 @@ namespace backend\service\Lucky5;
 use backend\models\AgentUserBetLogs;
 use backend\models\BetErrorPlansTask;
 use backend\models\BettingRecords;
+use backend\models\Num4Type;
 use backend\models\SscKjData;
 use backend\models\SystemConfig;
 use backend\models\TzSystemsUsers;
@@ -2078,8 +2079,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
     /**
      * @desc 批量号码拆解下注
      * @param $qihao
-     * @param $plan_id
+     * @param $plan
      * @param $codes - 1,2,3,4@2,3,4,5@5,6,7,8
+     * @param int $is_task
      * @return array
      */
     public function postBatchBet($qihao, $plan, $codes, $is_task=1){
@@ -2095,14 +2097,60 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $codesArr = explode('@', $tmpCodes);
         }
 
+        $playway = $plan->playway ?: 3;
+        $single = $plan->single ?: 0.1;
         # 组数
         $count = count($codesArr);
+        //p(['codesArr'=>$codesArr,'count'=>$count, 'codeHz'=>Json::decode($plan->hz_Arr)], 0);
+        $hzArr = Json::decode($plan->hz_Arr);
+        if($hzArr['bet_op_to_wp'] == UserSysPlans::BET_DIRECT_F){
+            # 反向打盘口
+            $query = Num4Type::find()->where(['NOT IN', 'code_n', $codesArr])->select('code_n');
+            if($playway == 3){
+                $query->andWhere(['code_type'=>4]);
+            }else{
+                if($playway == 1) { # 两字定
+                    $query->andWhere(['code_type' => 2]);
+                }elseif ($playway == 2){ # 三字定
+                    $query->andWhere(['code_type' => 3]);
+                }elseif ($playway == 4){ # 一字定
+                    $query->andWhere(['code_type' => 1]);
+                }
+                $firstCodes = $codesArr[0];
+                for ($i=0; $i<strlen($firstCodes); $i++){
+                    if($firstCodes[$i] == 'X'){
+                        $query->andWhere(['code_'.($i+1)=>'X']);
+                    }
+                }
+            }
+            $opWpSingles = explode('-', $hzArr['bet_op_to_wp_singles']);
+            if(empty($opWpSingles)){
+                $opWpSingle = 1;
+            }else{
+                $opWpSingle = $opWpSingles[0];
+            }
+            $codesArr = $query->column();
+            $opSingle = $single * $opWpSingle;
+
+            $bet_single = floor($opSingle * 10)/10;  # bet_single 向下保留一位小数
+            if(in_array($playway, [2, 3]) && $bet_single<0.1){
+                $bet_single = 0.1;
+            }
+            if($playway == 1){
+                if($bet_single<1){
+                    $bet_single = 1;
+                }else{
+                    $bet_single = (int)$bet_single;
+                }
+            }
+            //p(['count1'=>$count, 'count2'=>count($codesArr)]);
+            $single = $bet_single;
+        }
+        //p(['count1'=>$count, 'count2'=>count($codesArr)]);
 
         $betNums = self::getBetNumsPer();
         $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
 
-        $playway = $plan->playway ? $plan->playway : 3;
-        $single = $plan->single ? $plan->single : 0.1;
         $single = floatval($single);
         $tz_type = $plan->tz_type ? $plan->tz_type : 0;
         $lottery_type = $plan->lottery_type;

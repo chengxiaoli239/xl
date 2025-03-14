@@ -38,7 +38,7 @@ class BetErrorPlansTaskService extends BaseService {
             $BetErrorPlansTask = new BetErrorPlansTask();
         }
         $isUnusual = BetErrorPlansTaskService::getStatusIsUnusual($playway, $single);
-        $setDatas = [
+        $setData = [
             'uid' => $uid,
             'account' => $account,
             'plan_id' => $plan_id,
@@ -63,11 +63,11 @@ class BetErrorPlansTaskService extends BaseService {
             'created_at' => time(),
         ];
 
-        $BetErrorPlansTask->setAttributes($setDatas);
+        $BetErrorPlansTask->setAttributes($setData);
         $flag = $BetErrorPlansTask->save();
         if(!$flag){
             $err_msg = json_encode($BetErrorPlansTask->getErrors(), 320);
-            $logArr = ['setDatas'=>$setDatas, 'error'=>$err_msg];
+            $logArr = ['setData'=>$setData, 'error'=>$err_msg];
             Tool_Common::log('/bet_errors/recordPlanTask', 'ERR', '下注失败记录异常', $logArr);
             $rst = ['status'=>300, 'msg'=>$err_msg];
         }

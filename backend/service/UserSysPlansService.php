@@ -300,11 +300,18 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['type_22b']);
 
+        # 反向打盘口
+        if($UserSysPlans['bet_op_to_wp'] && count($UserSysPlans['bet_op_to_wp']) == 1){
+            $tmpFilter['bet_op_to_wp'] = $UserSysPlans['bet_op_to_wp'][0];
+            $tmpFilter['bet_op_to_wp_singles'] = $UserSysPlans['bet_op_to_wp_singles']??0.1;
+        }
+        unset($post['UserSysPlans']['bet_op_to_wp']);
+
         # 18、两合上1
         if($UserSysPlans['hsAndCf_twoFone']){
             $tmpFilter['hsAndCf_twoFone'] = $UserSysPlans['hsAndCf_twoFone'];
         }
-        unset($post['UserSysPlans']['type_22b']);
+        unset($post['UserSysPlans']['hsAndCf_twoFone']);
 
         # 排除前xx期号码
         if($UserSysPlans['is_filter_history'] && count($UserSysPlans['is_filter_history']) == 1){

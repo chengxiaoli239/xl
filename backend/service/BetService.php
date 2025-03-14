@@ -2157,7 +2157,7 @@ abstract class BetService extends BaseBetService {
             $t1 = microtime(true);
 
             $plan = UserSysPlans::findOne($planId);
-            if($plan->status != 1){
+            if($isAuto == 1 && $plan->status != 1){
                 throw_info('计划未开启...');
             }
             $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId], ['=', 'uid', $plan->uid]];
@@ -2179,6 +2179,7 @@ abstract class BetService extends BaseBetService {
             $codes = BetService::getCodesByPlan($plan);
             $t2 = microtime(true);
             $time_consume1 = ($t2-$t1).'s';
+            //p(['codes'=>count(explode('@', $codes)), 'time_consume1'=>$time_consume1, 'hz_Arr'=>Json::decode($plan->hz_Arr)]);
 
             $is_test = $plan->is_test;
             list($sn, $snid) = BetService::getBetSnId($plan, $plan->plan_type, $is_test, $isAuto);

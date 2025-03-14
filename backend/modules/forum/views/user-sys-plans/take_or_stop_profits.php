@@ -1,3 +1,25 @@
+<?php
+
+use yii\helpers\Html;
+$this->registerJs("
+    $(document).ready(function() {
+        function toggleBetOpToWpSingles() {
+            if ($('input[name=\"UserSysPlans[bet_op_to_wp][]\"][value=\"2\"]').is(':checked')) {
+                $('#bet-op-to-wp-singles').show();
+            } else {
+                $('#bet-op-to-wp-singles').hide();
+            }
+        }
+
+        toggleBetOpToWpSingles();
+
+        $('input[name=\"UserSysPlans[bet_op_to_wp][]\"]').change(function() {
+            toggleBetOpToWpSingles();
+        });
+    });
+");
+
+?>
 <!--?= $form->field($model, 'singles')->textInput()->label('倍数梯度[元],如:0.1-0.3-0.7-1.5-3.1-6.2-12.5-25.1') ?-->
 <div class="row">
     <div class="col-lg-12 col-xs-12">
@@ -8,6 +30,27 @@
     </div>
     <div class="col-lg-3 col-xs-6">
         <?= $form->field($model, 'stop_loss')->textInput()->label('止损点(例：4000)') ?>
+    </div>
+    <div class="col-lg-3 col-xs-6">
+        <?= $form->field($model, 'bet_op_to_wp')->checkboxList(
+            \backend\models\UserSysPlans::BET_DIRECT_OPTION,
+            [
+                //'value' => [1],
+                'item' => function ($index, $label, $name, $checked, $value) {
+                    $options = [
+                        'class' => 'checkbox-item',
+                        'label' => $label,
+                        'value' => $value,
+                        'checked' => $checked,
+                    ];
+
+                    return Html::checkbox($name, $checked, $options);
+                }
+            ]
+        )->label('打盘口方向') ?>
+    </div>
+    <div class="col-lg-3 col-xs-6" id="bet-op-to-wp-singles" style="display: none;">
+        <?= $form->field($model, 'bet_op_to_wp_singles')->textInput()->label('反向倍数：乘倍数为真实打的倍数,例：0.5') ?>
     </div>
 </div>
 

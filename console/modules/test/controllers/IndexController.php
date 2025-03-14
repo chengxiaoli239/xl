@@ -81,6 +81,10 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lottery_type=8); # 期号数据
+        $result = BetService::insertRecord($plan_id=17712, $qiHao, $isAuto=2);
+        //$result = BetService::insertRecord($plan_id=17718, '', $isAuto=2);
+        p($result);
         $plan_id = 17447;
         $uid = 25;
         $where = ['AND', ['=', 'qihao', '20250311194'], ['=', 'plan_id', $plan_id], ['=', 'uid', $uid]];
@@ -112,8 +116,6 @@ class IndexController extends Controller
         $statics = StaticService::staticAllSdProfitsMonth($month='2025-02', $lottery_type=8);
         p($statics);
 
-        $result = BetService::insertRecord($plan_id=17227, '', $isAuto=1);
-        p($result);
         $BettingRecord = BettingRecords::findOne(['plan_id'=>16798]);
         $lottery_type = 8;
         $params = ['business_id'=>$BettingRecord->qihao, 'lottery_type'=>$lottery_type, 'bet_id'=>$BettingRecord->id];

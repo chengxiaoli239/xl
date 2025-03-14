@@ -29,66 +29,65 @@ input:focus {
 <?
 $dynamics = array_column(\backend\service\numbers\DynamicFilterService::DYNAMIC_FILTER_TYPES, null, 'type');
 ?>
-<!--动态过滤-->
+<!-- 动态过滤1 -->
 <div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #da4f49;">
     <div class="col-lg-10 col-xs-12">
-        <?= $form->field($model, 'filter_dynamic_types')->checkboxList($filter_dynamic_typesArr)->label('.动态过滤1（1234分别代表：千百十个） <span id="tag_filter_dynamic_type" class="glyphicon glyphicon-comment"></span>') ?>
-    </div>
-</div>
-<div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #da4f49;">
-    <div class="col-lg-10 col-xs-12">
-        <label>动态过滤2（1234分别代表：千百十个）：</label>
-        <?php foreach ($filter_dynamic_types2 as $key=>$value): ?>
-            <?php if(empty($value['playway']) OR in_array($playway, $value['playway'])): ?> <!--这里报错了，没有闭合-->
-            <div style="display: flex; align-items: center;">
-                <div style="margin-right: 2px;padding-top: 3px">
-                    <?= $form->field($model, "filter_dynamic_types2[".$key."][type]")->checkbox([
-                        'value'=>$value['type'],
-                        'label' => $value['label'],
-                        'labelOptions' => [
-                            'style' => 'display:inline;',
-                            'title' => $value['desc'],
-                        ],
-                        'title' => $value['desc'],
-                        'alt' => $value['desc'],
-                    ])->label(false) ?>
-                </div>
-                <div class="tooltip" style="display:none; position:absolute; background-color:yellow; padding:5px; border:1px solid #ccc;"><?=$value['desc']?></div>
-                <!-- 添加隐藏的input字段 -->
-                <input type="hidden" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][label]" value="<?= htmlspecialchars($value['label'], ENT_QUOTES) ?>">
-                <?php foreach ($value['params'] as $k2 => $v2): ?>
-                    <input type="text" id="input_<?= $key.'_'.$k2 ?>" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][params][<?= $k2 ?>]" style="width: 40px; margin: -2px 2px;" placeholder="<?= $k2 ?>" value="<?= $v2 ?>">
-                <?php endforeach; ?>
-                <!-- 这里是添加条件显示desc -->
-                <!--
-                <?php if (empty($dynamics[$value['type']]['is_show'])): ?>
-                    <span style="margin-left: 5px; font-size: 12px; color: gray;">如:<?= htmlspecialchars($value['desc'], ENT_QUOTES) ?></span>
-                <?php endif; ?>
-                -->
-                <!-- 如果存在图片URL，则显示按钮 -->
-                <?php if (true OR !empty($dynamics[$value['type']]['img']) OR !empty($dynamics[$value['type']]['is_show'])): ?>
-                    <button
-                        type="button"
-                        class="btn btn-info btn-xs show-modal-btn" style="margin-left: 5px;"
-                        data-label="<?= htmlspecialchars($dynamics[$value['type']]['label'], ENT_QUOTES) ?>"
-                        data-desc="<?= htmlspecialchars(
-                            '描述：'
-                            . ($value['params']['x'] ? ' [x:' . $value['params']['x'] . ']' : '')
-                            . ($value['params']['y'] ? '、[y:' . $value['params']['y'] . ']' : '')
-                            . ($value['params']['z'] ? '、[z:' . $value['params']['z'] . ']' : '')
-                            . ($value['params']['h'] ? '、[h:' . $value['params']['h'] . ']' : '')
-                            . $dynamics[$value['type']]['desc'],
-                            ENT_QUOTES
-                        ) ?>"
-                        data-img="<?= htmlspecialchars($dynamics[$value['type']]['img'], ENT_QUOTES) ?>"
-                    >查看</button>
-                <?php endif; ?>
-            </div>
-            <?php endif; ?>
-        <?php endforeach; ?>
+        <button type="button" class="btn btn-default" id="toggleFilterDynamic1">动态过滤1 <span class="glyphicon glyphicon-chevron-down"></span></button>
+        <div id="filterDynamic1Content" style="display: none;">
+            <?= $form->field($model, 'filter_dynamic_types')->checkboxList($filter_dynamic_typesArr)->label('动态过滤1（1234分别代表：千百十个） <span id="tag_filter_dynamic_type" class="glyphicon glyphicon-comment"></span>') ?>
+        </div>
     </div>
 </div>
 
+<!-- 动态过滤2 -->
+<div class="row" style="border-width:2px;margin-top:3px;border-style:solid;border-color: #da4f49;">
+    <div class="col-lg-10 col-xs-12">
+        <button type="button" class="btn btn-default" id="toggleFilterDynamic2">动态过滤2 <span class="glyphicon glyphicon-chevron-down"></span></button>
+        <div id="filterDynamic2Content" style="display: none;">
+            <label>动态过滤2（1234分别代表：千百十个）：</label>
+            <?php foreach ($filter_dynamic_types2 as $key=>$value): ?>
+                <?php if(empty($value['playway']) OR in_array($playway, $value['playway'])): ?>
+                    <div style="display: flex; align-items: center;">
+                        <div style="margin-right: 2px;padding-top: 3px">
+                            <?= $form->field($model, "filter_dynamic_types2[".$key."][type]")->checkbox([
+                                'value'=>$value['type'],
+                                'label' => $value['label'],
+                                'labelOptions' => [
+                                    'style' => 'display:inline;',
+                                    'title' => $value['desc'],
+                                ],
+                                'title' => $value['desc'],
+                                'alt' => $value['desc'],
+                            ])->label(false) ?>
+                        </div>
+                        <div class="tooltip" style="display:none; position:absolute; background-color:yellow; padding:5px; border:1px solid #ccc;"><?=$value['desc']?></div>
+                        <input type="hidden" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][label]" value="<?= htmlspecialchars($value['label'], ENT_QUOTES) ?>">
+                        <?php foreach ($value['params'] as $k2 => $v2): ?>
+                            <input type="text" id="input_<?= $key.'_'.$k2 ?>" name="UserSysPlans[filter_dynamic_types2][<?= $key ?>][params][<?= $k2 ?>]" style="width: 40px; margin: -2px 2px;" placeholder="<?= $k2 ?>" value="<?= $v2 ?>">
+                        <?php endforeach; ?>
+                        <?php if (true OR !empty($dynamics[$value['type']]['img']) OR !empty($dynamics[$value['type']]['is_show'])): ?>
+                            <button
+                                    type="button"
+                                    class="btn btn-info btn-xs show-modal-btn" style="margin-left: 5px;"
+                                    data-label="<?= htmlspecialchars($dynamics[$value['type']]['label'], ENT_QUOTES) ?>"
+                                    data-desc="<?= htmlspecialchars(
+                                        '描述：'
+                                        . ($value['params']['x'] ? ' [x:' . $value['params']['x'] . ']' : '')
+                                        . ($value['params']['y'] ? '、[y:' . $value['params']['y'] . ']' : '')
+                                        . ($value['params']['z'] ? '、[z:' . $value['params']['z'] . ']' : '')
+                                        . ($value['params']['h'] ? '、[h:' . $value['params']['h'] . ']' : '')
+                                        . $dynamics[$value['type']]['desc'],
+                                        ENT_QUOTES
+                                    ) ?>"
+                                    data-img="<?= htmlspecialchars($dynamics[$value['type']]['img'], ENT_QUOTES) ?>"
+                            >查看</button>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
 <!-- 模态框 -->
 <div class="modal fade" id="dynamicModal" tabindex="-1" role="dialog" aria-labelledby="dynamicModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -180,6 +179,37 @@ $dynamics = array_column(\backend\service\numbers\DynamicFilterService::DYNAMIC_
     </div>
 </div>
 <script>
+$(document).ready(function() {
+    // Toggle dynamic filter 1
+    $('#toggleFilterDynamic1').click(function() {
+        $('#filterDynamic1Content').toggle();
+        $(this).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+    });
+
+    // Toggle dynamic filter 2
+    $('#toggleFilterDynamic2').click(function() {
+        $('#filterDynamic2Content').toggle();
+        $(this).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+    });
+
+    // Show/hide dynamic filter 1 content based on checkbox selection
+    $('input[name="UserSysPlans[filter_dynamic_types][]"]').change(function() {
+        if ($('input[name="UserSysPlans[filter_dynamic_types][]"]:checked').length > 0) {
+            $('#filterDynamic1Content').show();
+        } else {
+            $('#filterDynamic1Content').hide();
+        }
+    }).trigger('change');
+
+    // Show/hide dynamic filter 2 content based on checkbox selection
+    $('input[name^="UserSysPlans[filter_dynamic_types2]"]').change(function() {
+        if ($('input[name^="UserSysPlans[filter_dynamic_types2]"]:checked').length > 0) {
+            $('#filterDynamic2Content').show();
+        } else {
+            $('#filterDynamic2Content').hide();
+        }
+    }).trigger('change');
+});
 // 监听动态过滤2中的复选框点击事件
 $('input[type="checkbox"][name^="UserSysPlans[filter_dynamic_types2]"]').click(function() {
     // 获取提示框

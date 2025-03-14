@@ -237,6 +237,8 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $hsAndCf_twoFone; # 两合上1
     ####################### 合数与差分-结束 #####################
     //public $bet_direct = self::BET_DIRECT_Z;
+    public $bet_op_to_wp = self::BET_DIRECT_Z;
+    public $bet_op_to_wp_singles = 1; # 投盘口倍数的倍数
 
     const IS_INIT_PERDATE_N = 1;
     const IS_INIT_PERDATE_Y = 2;
