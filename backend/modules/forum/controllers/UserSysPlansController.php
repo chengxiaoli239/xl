@@ -25,6 +25,7 @@ use backend\models\UserSysPlans;
 use backend\models\searchs\UserSysPlans as UserSysPlansSearch;
 use backend\controllers\BaseController;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
@@ -467,8 +468,15 @@ class UserSysPlansController extends BaseController
             foreach ($ids as $id) {
                 $model = UserSysPlans::findOne($id);
                 if ($model) {
+                    $codeHz = Json::decode($model->hz_Arr);
+                    if($post['betOpToWp'] == UserSysPlans::BET_DIRECT_F){
+                        $codeHz['bet_op_to_wp'] = UserSysPlans::BET_DIRECT_F;
+                    }else{
+                        $codeHz['bet_op_to_wp'] = UserSysPlans::BET_DIRECT_Z;
+                    }
                     $model->plan_type = $newPlanType;
                     $model->singles = $newSingles;
+                    $model->hz_Arr = Json::encode($codeHz);
                     $model->save();
                 }
             }

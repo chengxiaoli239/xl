@@ -524,9 +524,21 @@ $columns = array_merge(
                                 </div>
                                 <div class="form-group" style="margin-bottom: 15px;">
                                     <label class="col-sm-3 control-label">倍数梯度：</label>
-                                        <div class="col-sm-8">
-                                            <input type="text" class="form-control" id="newSingles" name="newSingles" placeholder="请输入倍数梯度[元],如:0.1-0.3-0.7-1.5-3.1">
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="newSingles" name="newSingles" placeholder="请输入倍数梯度[元],如:0.1-0.3-0.7-1.5-3.1">
+                                    </div>
+                                </div>
+                                <div class="form-group" style="margin-bottom: 15px;">
+                                    <label class="col-sm-3 control-label">打盘口方向：</label>
+                                    <div class="col-sm-9">
+                                        <div id="betOpToWpCheckboxes">
+                                            <?php foreach (\backend\models\UserSysPlans::BET_DIRECT_OPTION as $value => $label): ?>
+                                                <label class="checkbox-inline">
+                                                    <input type="checkbox" class="checkbox-item" name="bet_op_to_wp[]" value="<?= $value ?>"> <?= $label ?>
+                                                </label>
+                                            <?php endforeach; ?>
                                         </div>
+                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">修改的计划ID：</label>
@@ -551,6 +563,11 @@ $columns = array_merge(
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
     $(document).ready(function() {
+        // 多选框变单选效果
+        $('.checkbox-item').click(function() {
+            const name = $(this).attr('name');
+            $('input[name="' + name + '"]').not(this).prop('checked', false);
+        });
         $('#batchUpdatePlanType').click(function() {
             var selectedIds = $('input[name="selection[]"]:checked').map(function() {
                 return this.value;
@@ -572,6 +589,9 @@ $columns = array_merge(
                 return this.value;
             }).get();
             const newPlanType = $('#newPlanType').val();
+            const selectedCheckboxes = $('input[name="bet_op_to_wp[]"]:checked').map(function() {
+                return this.value;
+            }).get();
 
             if (selectedIds.length <= 0) {
                 alert('至少选择一项');
@@ -579,14 +599,18 @@ $columns = array_merge(
             }
             const planTypeName = $('#newPlanType option:selected').text();
 
-
             // 添加更详细的确认对话框
             layer.confirm(`确认类型修改为：${planTypeName}`, {
                 btn: ['确认修改','取消']
             }, function(){
                 // 用户点击确认
                 $.post('/forum/user-sys-plans/batch-update-plan-type',
-                    { ids: selectedIds, newPlanType: newPlanType, newSingles: $('#newSingles').val() },
+                    {
+                        ids: selectedIds,
+                        newPlanType: newPlanType,
+                        newSingles: $('#newSingles').val(),
+                        betOpToWp: selectedCheckboxes[0]
+                    },
                     function(response) {
                         if (response.status === 200) {
                             layer.msg('修改成功');
