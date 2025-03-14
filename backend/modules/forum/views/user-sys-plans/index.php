@@ -522,6 +522,12 @@ $columns = array_merge(
                                         </select>
                                     </div>
                                 </div>
+                                <div class="form-group" style="margin-bottom: 15px;">
+                                    <label class="col-sm-3 control-label">倍数梯度：</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="newSingles" name="newSingles" placeholder="请输入倍数梯度[元],如:0.1-0.3-0.7-1.5-3.1">
+                                        </div>
+                                </div>
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">修改的计划ID：</label>
                                     <div class="col-sm-9">
@@ -580,7 +586,7 @@ $columns = array_merge(
             }, function(){
                 // 用户点击确认
                 $.post('/forum/user-sys-plans/batch-update-plan-type',
-                    { ids: selectedIds, newPlanType: newPlanType },
+                    { ids: selectedIds, newPlanType: newPlanType, newSingles: $('#newSingles').val() },
                     function(response) {
                         if (response.status === 200) {
                             layer.msg('修改成功');

@@ -462,11 +462,13 @@ class UserSysPlansController extends BaseController
         try {
             $ids = $post['ids'];
             $newPlanType = $post['newPlanType'];
+            $newSingles = $post['newSingles'];
 
             foreach ($ids as $id) {
                 $model = UserSysPlans::findOne($id);
                 if ($model) {
                     $model->plan_type = $newPlanType;
+                    $model->singles = $newSingles;
                     $model->save();
                 }
             }
