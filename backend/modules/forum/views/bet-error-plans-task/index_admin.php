@@ -120,7 +120,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'data-content' => $model->post_datas,
                                     'data-error' => $model->post_desc,
                                 ];
-                                return Html::a($txt, 'javascript:;', $opions);
+                                return Html::a((!$model->status)?'<strong><font color="#696969">等待推送</font></strong>':$txt, 'javascript:;', $opions);
                             }
                         ],
                         //'kj_codes',
