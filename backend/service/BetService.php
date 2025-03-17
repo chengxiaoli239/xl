@@ -2207,7 +2207,7 @@ abstract class BetService extends BaseBetService {
         }catch (\Exception $e){
             $t2 = microtime(true);
             $time_consume = ($t2-$t1).'s';
-            $logArr = ['planId'=>$planId, 'activeQiHao'=>$qiHao, 'err_msg'=>$e->getMessage(), 'time_consume'=>$time_consume];
+            $logArr = ['planId'=>$planId, 'activeQiHao'=>$qiHao, 'err_msg'=>$e->getMessage(), 'file'=>$e->getFile().'_'.$e->getLine(), 'time_consume'=>$time_consume];
             Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入计划任务-异常', $logArr);
             return $logArr;
         }
