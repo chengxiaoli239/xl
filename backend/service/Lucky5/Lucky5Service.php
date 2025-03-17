@@ -2124,7 +2124,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 }
             }
             $opWpSingles = explode('-', $hzArr['bet_op_to_wp_singles']);
-            if(empty($opWpSingles)){
+            if(empty($opWpSingles[0])){
                 $opWpSingle = 1;
             }else{
                 $opWpSingle = $opWpSingles[0];
