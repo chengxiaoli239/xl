@@ -558,11 +558,11 @@ class IndexController extends Controller
      **/
     public function actionDw1($id=''){
         try {
+            $plan = UserSysPlans::findOne(17778);
+            $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $plan = UserSysPlans::findOne(	17255);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             $plan = UserSysPlans::findOne(16879);
-            //$plan = UserSysPlans::findOne($id);
-            $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $codes = \backend\service\NumService::getBeforeKjCodesDynamic($plan);p(count($codes));
             // 2611213 //2611225
             //$userInfo = Lucky5Service::userInfo(50, 9);p($userInfo);

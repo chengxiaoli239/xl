@@ -1015,6 +1015,7 @@ class DynamicType2Service extends BaseService {
         $params = $dynamic['params'];
         $x = $params['x']; # x位
         $n = $params['n']; # n个码
+        $k = $params['k']; # 0不除双重，1除双重
 
         $positions = str_split(trim($x));
         $where = ['OR'];
@@ -1030,13 +1031,23 @@ class DynamicType2Service extends BaseService {
             //$sql = $beforeQuery->createCommand()->getRawSql();p($sql);
             $currentKjCodes = $beforeQuery->asArray()->all(); # 最新一期
             $filterCodes = ArrayHelper::getColumn($currentKjCodes, 'code');
-            $where[] = [
-                'AND',
-                ['IN', 'code_1', $filterCodes],
-                ['IN', 'code_2', $filterCodes],
-                ['IN', 'code_3', $filterCodes],
-                ['IN', 'code_4', $filterCodes],
-            ];
+            if($k){
+                $where[] = [
+                    'AND',
+                    ['AND', ['IN', 'code_1', $filterCodes], ['<>', 'type_2', 1]],
+                    ['AND', ['IN', 'code_2', $filterCodes], ['<>', 'type_2', 2]],
+                    ['AND', ['IN', 'code_3', $filterCodes], ['<>', 'type_2', 3]],
+                    ['AND', ['IN', 'code_4', $filterCodes], ['<>', 'type_2', 4]],
+                ];
+            }else{
+                $where[] = [
+                    'AND',
+                    ['IN', 'code_1', $filterCodes],
+                    ['IN', 'code_2', $filterCodes],
+                    ['IN', 'code_3', $filterCodes],
+                    ['IN', 'code_4', $filterCodes],
+                ];
+            }
             $desc .= ' '.$p.'位近'.$n.'个码:'.implode($filterCodes);
         }
 
