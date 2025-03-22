@@ -505,6 +505,26 @@ class UserSysPlansService extends BaseService {
         unset($post['UserSysPlans']['fenli_shu_code']);
 
         ################### 公共参数 - 结束 #########################
+        # 16.3、两数不定位合分:位置
+        if($UserSysPlans['no_fix_hefen_pos_2'] && count($UserSysPlans['no_fix_hefen_pos_2']) == 1){
+            $tmpFilter['no_fix_hefen_pos_2'] = implode(',', $post['UserSysPlans']['no_fix_hefen_pos_2']); # 合分位置
+        }
+        unset($post['UserSysPlans']['no_fix_hefen_pos_2']);
+        # 16.3、两数不定位合分:值
+        if(isset($post['UserSysPlans']['no_fix_hefen2']) && $post['UserSysPlans']['no_fix_hefen2']){
+            $tmpFilter['no_fix_hefen2'] = trim($post['UserSysPlans']['no_fix_hefen2']); # 合分
+        }
+        unset($post['UserSysPlans']['no_fix_hefen2']);
+        # 16.4、三数不定位合分:位置
+        if($UserSysPlans['no_fix_hefen_pos_3'] && count($UserSysPlans['no_fix_hefen_pos_3']) == 1){
+            $tmpFilter['no_fix_hefen_pos_3'] = implode(',', $post['UserSysPlans']['no_fix_hefen_pos_3']); # 合分位置
+        }
+        unset($post['UserSysPlans']['no_fix_hefen_pos_3']);
+        # 16.4、三数不定位合分:值
+        if(isset($post['UserSysPlans']['no_fix_hefen3']) && $post['UserSysPlans']['no_fix_hefen3']){
+            $tmpFilter['no_fix_hefen3'] = trim($post['UserSysPlans']['no_fix_hefen3']); # 合分
+        }
+        unset($post['UserSysPlans']['no_fix_hefen3']);
 
         if($playway == 6) {
             $tmpFilter['codes'] = str_replace('，', ',', $post['UserSysPlans']['hz_Arr']);

@@ -66,13 +66,49 @@ use yii\widgets\ActiveForm;
                     <div class="col-lg-2 col-xs-6">
                         <?= $form->field($model, 'arise_in')->textInput()->label('2.三字定含')?>
                     </div>
-                    <div class="col-lg-2 col-xs-6">
-                        <!--两数合、三数合-->
-                    <?= $form->field($model, 'no_fix_hefen_pos')->checkboxList([1=>'两数',2=>'三数'])->label('3.不定位合分') ?>
+                    <div class="col-lg-2 col-xs-4">
+                        <!--两数合-->
+                        <?= $form->field($model, 'no_fix_hefen_pos_2')->checkboxList(
+                            [1=>'两数'],
+                            [
+                                'item' => function ($index, $label, $name, $checked, $value) {
+                                    $options = [
+                                        'class' => 'checkbox-item',
+                                        'label' => $label,
+                                        'value' => $value,
+                                        'checked' => $checked,
+                                    ];
+
+                                    return Html::checkbox($name, $checked, $options);
+                                }
+                            ]
+                        )->label('2.不定位合分') ?>
                     </div>
                     <div class="col-lg-2 col-xs-6">
-                    <!--位置合分：合分-->
-                    <?= $form->field($model, 'no_fix_hefen')->textInput()->label('3.不定位合分:值')?>
+                        <!--位置合分：合分-->
+                        <?= $form->field($model, 'no_fix_hefen2')->textInput()->label('2.两数不定位合分:值')?>
+                    </div>
+                    <div class="col-lg-2 col-xs-4">
+                        <!--三数合-->
+                        <?= $form->field($model, 'no_fix_hefen_pos_3')->checkboxList(
+                            [2=>'三数'],
+                            [
+                                'item' => function ($index, $label, $name, $checked, $value) {
+                                    $options = [
+                                        'class' => 'checkbox-item',
+                                        'label' => $label,
+                                        'value' => $value,
+                                        'checked' => $checked,
+                                    ];
+
+                                    return Html::checkbox($name, $checked, $options);
+                                }
+                            ]
+                        )->label('3.不定位合分') ?>
+                    </div>
+                    <div class="col-lg-2 col-xs-6">
+                        <!--位置合分：合分-->
+                        <?= $form->field($model, 'no_fix_hefen3')->textInput()->label('3.三数不定位合分:值')?>
                     </div>
                 </div>
 

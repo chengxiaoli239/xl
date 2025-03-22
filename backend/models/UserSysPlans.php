@@ -97,6 +97,10 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $hefen_pos3; #  定位合分位置3
     public $hefen4; #  定位合分值4
     public $hefen_pos4; #  定位合分位置4
+    public $no_fix_hefen2;
+    public $no_fix_hefen_pos_2;
+    public $no_fix_hefen3;
+    public $no_fix_hefen_pos_3;
 
     public $change_per; #  导入方式每期轮换号码
     public $change_turn_pos; #  号码轮换位置，指定号码数字轮换指定组
