@@ -2991,6 +2991,12 @@ class NumService extends BaseService {
                 $desc .= ' 两不定合:'.$hz_Arr['no_fix_hefen'];
             }
         }
+        if($hz_Arr['no_fix_hefen_pos_2']==1 && $hz_Arr['no_fix_hefen2']){
+            $desc .= ' 两不定合:'.$hz_Arr['no_fix_hefen2'];
+        }
+        if($hz_Arr['no_fix_hefen_pos_3']==2 && $hz_Arr['no_fix_hefen3']){
+            $desc .= ' 三不定合:'.$hz_Arr['no_fix_hefen3'];
+        }
 
         if(!empty($filter8)){
             if(isset($hz_Arr['hefen_pos'])){

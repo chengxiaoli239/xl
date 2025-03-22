@@ -391,7 +391,11 @@ class UserSysPlansController extends BaseController
             }
             foreach ($hz_Arr_Data as $key=>$val){
                 switch (true){
-                    case in_array($key, ['hefen_pos1', 'hefen_pos2', 'hefen_pos3', 'hefen_pos4', 'no_fix_henfen_pos', 'fixed_sel_pos', 'arise_in_sel', 'odd_pos', 'even_pos', 'big_pos', 'small_pos']):
+                    case in_array($key, [
+                        'hefen_pos1', 'hefen_pos2', 'hefen_pos3', 'hefen_pos4',
+                        'no_fix_henfen_pos', 'fixed_sel_pos',
+                        'arise_in_sel', 'odd_pos', 'even_pos', 'big_pos', 'small_pos'
+                    ]):
                         $model->$key = explode(',', $val);
                         break;
                     case $key == 'fenli_shu': # 分离数
