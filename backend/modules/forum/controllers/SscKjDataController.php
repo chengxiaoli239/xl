@@ -4,6 +4,7 @@ namespace backend\modules\forum\controllers;
 
 use backend\service\UserSysPlansService;
 use common\service\CommonService;
+use common\tools\Tool_Common;
 use Yii;
 use backend\models\SscKjData;
 use backend\models\searchs\SscKjData as SscKjDataSearch;
@@ -75,6 +76,7 @@ class SscKjDataController extends BaseController
 
     public function actionExport()
     {
+        Tool_Common::log('/forum/'.__FUNCTION__, 'INFO', '导出开奖数据', ['user_id'=>$this->_user_id]);
         // Set unlimited execution time and memory
         set_time_limit(0);
         ini_set('memory_limit', '1024M');
