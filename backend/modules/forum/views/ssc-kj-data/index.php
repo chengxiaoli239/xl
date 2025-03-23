@@ -9,24 +9,36 @@ use yii\widgets\Pjax;
 
 $this->title = Yii::t('app', 'Ssc Kj Datas');
 $this->params['breadcrumbs'][] = $this->title;
+$js = <<<JS
+$(document).ready(function() {
+    $('#export-btn').click(function(e) {
+        e.preventDefault();
+        if (confirm('确认要导出数据吗？')) {
+            window.location.href = $(this).attr('href');
+        }
+    });
+});
+JS;
+$this->registerJs($js);
 ?>
 <section class="ssc-kj-data-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title) ?>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <?= Html::encode($this->title) ?>
+                <div class="btn-group">
+                    <?= Html::a('导出', ['export'], [
+                        'class' => 'btn btn-info',
+                        'id' => 'export-btn',
+                        'onclick' => 'return false;'
+                    ]) ?>
+                </div>
+            </div>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
-                <!--div class="clearfix">
-                    <div class="btn-group">
-                        <?= Html::a(Yii::t('app', 'Create Ssc Kj Data'), ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-                    </div>
-                </div-->
-
-                <?php
-                include(dirname(__FILE__).'/index_tab.php');
-                ?>
+                <?php include(dirname(__FILE__).'/index_tab.php'); ?>
 
     <?php Pjax::begin(); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>

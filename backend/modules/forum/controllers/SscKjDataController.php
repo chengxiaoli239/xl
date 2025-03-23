@@ -73,6 +73,64 @@ class SscKjDataController extends BaseController
         ]);
     }
 
+    public function actionExport()
+    {
+        // Set unlimited execution time and memory
+        set_time_limit(0);
+        ini_set('memory_limit', '1024M');
+
+        $searchModel = new SscKjDataSearch();
+        $queryParams = Yii::$app->request->queryParams;
+        $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
+        $queryParams['SscKjData']['lottery_type'] = $lottery_type;
+
+        try {
+            $query = $searchModel->search($queryParams)->query;
+            $filename = '开奖数据_' . date('Ymd'). '_'. rand(1000, 9999) . '.csv';
+
+            // Create a temporary file
+            $tempFile = tempnam(sys_get_temp_dir(), 'csv_');
+            $fp = fopen($tempFile, 'w');
+
+            // 写入CSV头
+            fputcsv($fp, ['序号', '期号', '号码', '号码', '和值', '千', '百', '十', '个', '五', '时间']);
+
+            // Process in batches
+            foreach ($query->batch(100) as $models) {
+                foreach ($models as $model) {
+                    $typeArr = [1=>'四单', 2=>'四双', 3=>'两单两双', 4=>'一单三双', 5=>'一双三单'];
+                    fputcsv($fp, [
+                        $model->index_id,
+                        $model->qihao,
+                        $model->code_str,
+                        $model->code_4n_str,
+                        $model->codes_4nums_hz,
+                        $model->code1,
+                        $model->code2,
+                        $model->code3,
+                        $model->code4,
+                        $model->code5,
+                        date('Y-m-d H:i', $model->created_at)
+                    ]);
+                }
+            }
+
+            fclose($fp);
+
+            // Send file using Yii2's response
+            return Yii::$app->response->sendFile($tempFile, $filename, [
+                'mimeType' => 'text/csv',
+                'inline' => false
+            ])->on(yii\web\Response::EVENT_AFTER_SEND, function($event) use ($tempFile) {
+                unlink($tempFile); // Delete temporary file
+            });
+
+        } catch (\Exception $e) {
+            Yii::error("Export failed: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
     /**
      * Displays a single SscKjData model.
      * @param string $id
