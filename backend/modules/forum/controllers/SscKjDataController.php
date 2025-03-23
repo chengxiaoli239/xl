@@ -98,7 +98,7 @@ class SscKjDataController extends BaseController
             fputcsv($fp, ['序号', '期号', '号码', '号码', '和值', '千', '百', '十', '个', '五', '时间']);
 
             // Process in batches
-            foreach ($query->batch(100) as $models) {
+            foreach ($query->batch(2000) as $models) {
                 foreach ($models as $model) {
                     $typeArr = [1=>'四单', 2=>'四双', 3=>'两单两双', 4=>'一单三双', 5=>'一双三单'];
                     fputcsv($fp, [
