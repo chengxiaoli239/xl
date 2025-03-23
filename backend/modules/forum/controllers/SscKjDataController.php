@@ -128,6 +128,7 @@ class SscKjDataController extends BaseController
             });
 
         } catch (\Exception $e) {
+            Tool_Common::log('/forum/'.__FUNCTION__, 'INFO', '导出开奖数据', ['user_id'=>$this->_user_id, 'err_msg'=>$e->getMessage()]);
             Yii::error("Export failed: " . $e->getMessage());
             throw $e;
         }
