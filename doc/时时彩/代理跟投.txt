@@ -56,3 +56,6 @@ scheme https
 host b9.wk33j572.xyz:8443
 filename /Log/GetMemberQuickSelectTable
 返回数据：{"Status":1,"Data":{"PageSize":40,"PageIndex":1,"RecordCount":1,"PageCount":1,"Rows":[{"log_member_quick_select_id":"12990276","member_id":"10323","account":"nAA1111aa","nickname":"","fix_num":"0","bet_count":"8","bet_money":"0.8","operation_content":"四定位千12百34十23个23除三兄弟=0.1","operation_datetime":"05-10 23:28:21","time_value":"2024/5/10 23:28:21","operation_ip":"112.120.*.*","ip_value":"112.120.7.91","operation_ip_extension":"112.120.7.91","is_package":"0","log_type":"108"}],"Extra":[]}}
+
+# 群投：
+http://482255.69212.cn/c?u=1904858581946138625&sum=95d86b09d9fb310a40167583ad46c39b
