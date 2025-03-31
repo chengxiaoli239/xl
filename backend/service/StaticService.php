@@ -2493,7 +2493,7 @@ class StaticService extends BaseService {
      * @param $tz_type - 一字定倍数切换方案
      * @return int|array
      */
-    public static function getYlByCodes($codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $tz_type = 18){
+    public static function getYlByCodes($codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $tz_type = 18, $staticAll=0){
         $tzTypes = TzTypes::findOne(['type'=>$tz_type]);
         $playway = $tzTypes->playway;
 
@@ -2504,6 +2504,10 @@ class StaticService extends BaseService {
         $lastIndexId7 = SscDataService::getLastIndexId($lottery_type, 7);
         $dateNum = ($playway == 3) ? 30 : 10;
         $lastIndexId30 = SscDataService::getLastIndexId($lottery_type, $dateNum);
+        if($staticAll){
+            $lastIndexId30 = 0;
+            ini_set('memory_limit', '10240M');
+        }
         switch ($playway){
             case 1: # 二字定
                 break;
@@ -2527,12 +2531,18 @@ class StaticService extends BaseService {
                 $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', $concatStr, $codes], ['>=', 'index_id', $lastIndexId30]];
                 $query = SscKjData::find()->select(['id', 'index_id', 'qihao', 'code_4n_str'])->where($where);
                 //p($query->createCommand()->getRawSql());
-                $SscKjData = $query->asArray()->orderBy('id DESC')->limit(20000)->all();
+                if(!$staticAll){
+                    $query->limit(20000);
+                }
+                $SscKjData = $query->asArray()->orderBy('id DESC')->all();
                 break;
             case 3: # 四字定
                 $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'code_4n_str', $codes], ['>=', 'index_id', $lastIndexId30]];
                 $query = SscKjData::find()->select(['id', 'index_id', 'qihao', 'code_4n_str'])->where($where);
-                $SscKjData = $query->asArray()->orderBy('id DESC')->limit(20000)->all();
+                if(!$staticAll){
+                    $query->limit(20000);
+                }
+                $SscKjData = $query->asArray()->orderBy('id DESC')->all();
                 break;
             case 4: # 一字定
             case 10:
@@ -2616,6 +2626,12 @@ class StaticService extends BaseService {
         if(empty($maxWeekYlSet)){
             $maxWeekYlSet = $maxMonthYlSet ? : [1];
         }
+
+        $ylCount = explode('-', $yl_str);
+        if($staticAll) {
+            p([$ylCount, count($ylCount)]);
+        }
+
         //p([/*max($maxWeekYlSet), max($maxMonthYlSet), */'maxWeekYlSet'=>$maxWeekYlSet, 'maxMonthYlSet'=>$maxMonthYlSet, 'yl_str'=>$yl_str]);
         if(!empty($maxWeekYlSet)){
             $yl_str = str_replace('-'.max($maxWeekYlSet).'-', '-<strong><font color="red">'.max($maxWeekYlSet).'</font></strong>-', $yl_str).'-';
@@ -2633,6 +2649,7 @@ class StaticService extends BaseService {
         $maxWeekHit = $maxWeekHitSet ? max($maxWeekHitSet) : []; # 周最大连中
         $maxWeekHitArr = $maxWeekHit ? array_fill(0, $maxWeekHit, 0) : [];
         $yl_str = str_replace('-'.implode('-', $maxWeekHitArr).'-', '-<strong><font color="#8b008b">'.implode('-', $maxWeekHitArr).'</font></strong>-', $yl_str);
+        $ylCountData = array_count_values($ylCount); // 遗漏统计 //p($ylCountData);
 
         //p(['maxMonthYlSet'=>$maxMonthYlSet, 'maxWeekYlSet'=>$maxWeekYlSet]);
         return [
