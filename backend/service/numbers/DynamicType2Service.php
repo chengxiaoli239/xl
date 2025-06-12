@@ -1213,4 +1213,75 @@ class DynamicType2Service extends BaseService {
         return $query->all();
     }
 
+    /**
+     * 过滤x位最新y期直码
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     */
+    public static function filter30(object $plan, $dynamic=[], $filterDesc = []): array
+    {
+        $lottery_type = $plan->lottery_type;
+        $playway = $plan->playway;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+
+        $params = $dynamic['params'];
+        $positions = str_split($params['x']); // 将位置字符串转换为数组
+        $periods = (int)$params['y']; // 要过滤的期数
+
+        // 获取最近y期的开奖数据
+        $recentDraws = SscKjData::find()
+            ->where(['lottery_type' => $lottery_type])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->limit($periods)
+            ->asArray()
+            ->all();
+
+        // 构建要过滤的号码数组
+        $filterCodes = [];
+        foreach ($recentDraws as $draw) {
+            $codeParts = [];
+            foreach ($positions as $pos) {
+                $codeParts[] = $draw['code'.$pos];
+            }
+            $filterCodes[] = implode(',', $codeParts); // 使用逗号连接数字
+        }
+
+        // 构建查询条件
+        $where = ['NOT IN', 'code', $filterCodes];
+
+        // 根据玩法类型构建查询
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => $playway+1]);
+
+        // 如果是定位玩法，需要特殊处理
+        if ($playway == 1 || $playway == 2) {
+            $where = ['OR'];
+            foreach ($filterCodes as $code) {
+                $codeParts = explode(',', $code);
+                $condition = ['AND'];
+                foreach ($positions as $index => $pos) {
+                    $condition[] = ['=', 'code_'.$pos, $codeParts[$index]];
+                }
+                $where[] = $condition;
+            }
+            $query->andWhere(['NOT', $where]);
+        } else {
+            $query->andWhere($where);
+        }
+
+        // 执行查询
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+
+        // 添加下注描述
+        $betDesc = $filterDesc['desc'].":过滤第".$params['x']."位最近".$periods."期直码";
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+
+        return $codes;
+    }
+
 }

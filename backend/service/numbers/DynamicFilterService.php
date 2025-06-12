@@ -42,7 +42,8 @@ class DynamicFilterService extends BaseService {
         ['type'=>24, 'label'=>'x位或y位或z位上n配数单双互排及该位置号码则不中', 'params'=>['x'=>'', 'y'=>'', 'z'=>'', 'n'=>''], 'desc'=>"配数单双互排及该位置号码，意思是：比如5，则对应的是024685，比如开：2345，x:123、y:234， n：2则下一把：<br>1、第123位或234位，其中只要某个位置组合出现2个对应的号码则中奖<br>2、其中x、y、z可以只填其中一个或多个", 'playway'=>[3]],
         ['type'=>28, 'label'=>'x位或y位或z位上n配数大小互排及该位置号码则中', 'params'=>['x'=>'', 'y'=>'', 'z'=>'', 'n'=>''], 'desc'=>"配数大小互排及该位置号码，意思是：比如3，则对应的是567893，比如开：2345，x:123、y:234， n：2则下一把：<br>1、第123位或234位，其中只要某个位置组合出现2个对应的号码则中奖<br>2、其中x、y、z可以只填其中一个或多个", 'playway'=>[3]],
         ['type'=>29, 'label'=>'x位或y位或z位上n配数大小互排及该位置号码则不中', 'params'=>['x'=>'', 'y'=>'', 'z'=>'', 'n'=>''], 'desc'=>"配数大小互排及该位置号码，意思是：比如3，则对应的是567893，比如开：2345，x:123、y:234， n：2则下一把：<br>1、第123位或234位，其中只要某个位置组合出现2个对应的号码则中奖<br>2、其中x、y、z可以只填其中一个或多个", 'playway'=>[3]],
-        ['type'=>27, 'label'=>'排除x位最近n个码的复试且k(1除0不除)双重', 'params'=>['x'=>'', 'n'=>'', 'k'=>''], 'desc'=>"排除x位最近n个码的复试：<br>x:1，n:6，则千位取最近6个号码的复试号码过滤掉<br>x:12，n:6，则千位和百位各取最近6个号码的复试号码过滤掉<br>k:0不除双重1除双重", 'playway'=>[3]],
+        ['type'=>27, 'label'=>'排除x位最近n个码的复试', 'params'=>['x'=>'', 'n'=>''], 'desc'=>"排除x位最近n个码的复试：<br>x:1，n:6，则千位取最近6个号码的复试号码过滤掉<br>x:12，n:6，则千位和百位各取最近6个号码的复试号码过滤掉", 'playway'=>[3]],
+        ['type'=>30, 'label'=>'过滤x位最新y期直码', 'params'=>['x'=>'', 'y'=>''], 'desc'=>"过滤指定位置最新y期的直码：<br>1、x可以灵活组合位置，如：1234、2345、1345等四位组合，或123、234等三位组合<br>2、y表示要过滤的期数，如y:5表示过滤最近5期的直码<br>3、比如x:123，y:3，则过滤第1、2、3位最近3期开过的直码", 'playway'=>[1, 2, 3]],
     ];
     public static int $filterType = 0;
 
@@ -137,6 +138,9 @@ class DynamicFilterService extends BaseService {
                     break;
                 case 27: # x位或y位或z位上n配数单双互排及该位置号码则不中
                     $codes = DynamicType2Service::filter21($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 30: # 过滤x位最新y期直码
+                    $codes = DynamicType2Service::filter30($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
             }
             if(empty($codes)){

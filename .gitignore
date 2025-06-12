@@ -12,6 +12,8 @@ nbproject
 .project
 .settings
 
+.vscode
+
 # windows thumbnail cache
 Thumbs.db
 
