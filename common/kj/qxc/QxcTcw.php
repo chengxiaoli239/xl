@@ -219,7 +219,7 @@ class QxcTcw extends BaseKj{
         $gameNo = self::$tcwTypes[$lottery_type];
 
         $running_status_key = 'QixingCaiBatch_status';
-        if($lottery_type==17) $running_status_key = $running_status_key.'_1_'.$lottery_type;
+        if($lottery_type==17) $running_status_key = $running_status_key.'_2_'.$lottery_type;
         if($status = $m->get($running_status_key)) return ['status'=>300, 'msg'=>'有在执行的任务，请稍后'];
         $m->set($running_status_key, 1, 180);
 
