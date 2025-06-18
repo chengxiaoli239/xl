@@ -2069,9 +2069,16 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @desc 获取每次下注号码量
      * @return int|string
      */
-    public static function getBetNumsPer(){
-        $nums = SystemConfig::findOne(['key'=>'tz_nums_per'])->value;
-        if(!$nums) $nums = 1650;
+    public static function getBetNumsPer($uid=0){
+        $splitCodeUids = SystemConfig::findOne(['key'=>'need_split_code_uids'])->value;
+        $nums = 10000;
+        if(!empty($splitCodeUids)){
+            $splitCodeUids = explode(',', str_replace('，', ',', $splitCodeUids));
+            if(in_array($uid, $splitCodeUids)){
+                $nums = SystemConfig::findOne(['key'=>'tz_nums_per'])->value;
+            }
+            //if(!$nums) $nums = 1650;
+        }
 
         return $nums;
     }
@@ -2148,7 +2155,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }
         //p(['count1'=>$count, 'count2'=>count($codesArr)]);
 
-        $betNums = self::getBetNumsPer();
+        $betNums = self::getBetNumsPer($plan->uid);
         $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
 
         $single = floatval($single);
@@ -2331,7 +2338,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         # 组数
         $count = count($codesArr);
 
-        $betNums = self::getBetNumsPer();
+        $betNums = self::getBetNumsPer($uid);
         $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
 
         if(!self::$user_id) return ['status'=>400,'msg'=>'账号为空，不能识别用户'];
