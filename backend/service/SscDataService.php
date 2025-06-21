@@ -2134,8 +2134,9 @@ class SscDataService extends BaseService {
                                 throw_info('已经统计过');
                             }
                             $beforeProfits = $planStaticProfits->cut_profits;
+                            $afterProfits = $beforeProfits + $currentQiProfits;
                             PlanStaticProfits::updateAll([
-                                'cut_profits'=>(new Expression("`cut_profits`+".$currentQiProfits)),
+                                'cut_profits'=>$afterProfits,
                                 'current_qihao' => $current_kj_qihao,
                                 'uid' => $UserSysPlan->uid,
                                 'updated_at' => $nowTime,

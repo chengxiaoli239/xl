@@ -87,6 +87,12 @@ class UserSysPlansController extends BaseController
                 ->where(['plan_id' => $model->id])
                 ->scalar() ?: 0.00;
             $totalProfits += $currentProfits;
+            Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '计划统计利润', [
+                'uid'=>$this->_user_id,
+                'plan_id'=>$model->id,
+                'currentProfits'=>$currentProfits,
+                'totalProfits'=>$totalProfits,
+            ]);
         }
 
         $myTzTypes = UserSysPlansService::getMyTzTypes($this->_user_id, $lottery_type);
