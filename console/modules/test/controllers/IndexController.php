@@ -55,6 +55,7 @@ use common\service\open\telegram\AoZhouKjService;
 use common\service\open\telegram\MessageOperateService;
 use common\service\ssc\QihaoService;
 use common\service\ssc\SscKjDataService;
+use common\service\ssc\SscPlanService;
 use common\service\thirdD\match\MatchCodeService;
 use common\service\thirdD\MethodMatchService;
 use common\service\thirdD\OperateLotteryService;
@@ -81,6 +82,8 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $result = SscPlanService::copyOnePlan($userId=34, $planId=17447); p($result);
+
         list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lottery_type=8); # 期号数据
         $result = BetService::insertRecord($plan_id=17712, $qiHao, $isAuto=2);
         //$result = BetService::insertRecord($plan_id=17718, '', $isAuto=2);
@@ -91,7 +94,6 @@ class IndexController extends Controller
         if(BettingRecords::find()->where($where)->limit(1)->exists()){
             throw_info('记录已经存在plan_id:'.$plan_id.'_uid:'.$uid);
         }
-        p($flag);
         $rst = OneNumYl::yl($lotteryType=8);p($rst);
         $where = ['lottery_type'=>8];
         $field = 'code1';
