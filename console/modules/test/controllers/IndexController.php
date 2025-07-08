@@ -560,9 +560,9 @@ class IndexController extends Controller
      **/
     public function actionDw1($id=''){
         try {
-            $r = \backend\service\Lucky5\Lucky5Service::getBetNumsPer($uid=50); p($r);
-            $plan = UserSysPlans::findOne(18096);
+            $plan = UserSysPlans::findOne(18252);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
+            $r = \backend\service\Lucky5\Lucky5Service::getBetNumsPer($uid=50); p($r);
             $plan = UserSysPlans::findOne(	17255);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));
             $plan = UserSysPlans::findOne(16879);

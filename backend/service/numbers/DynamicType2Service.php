@@ -1284,4 +1284,199 @@ class DynamicType2Service extends BaseService {
         return $codes;
     }
 
+    /**
+     * 上期开奖号码对数全倒
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     */
+    public static function filter31(object $plan, $dynamic=[], $filterDesc = []): array
+    {
+        $lottery_type = $plan->lottery_type;
+        $playway = $plan->playway;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+        $x = $dynamic['params']['x']??1; // 1取2除
+
+        // 获取上期开奖数据
+        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lottery_type);
+        /*
+        print_r($historyKjData);
+        # 测试数据
+        $historyKjData = [
+            'code1' => 1,
+            'code2' => 2,
+            'code3' => 2,
+            'code4' => 2,
+            'code5' => 5,
+        ];
+        */
+        if (empty($historyKjData)) {
+            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '上期开奖数据为空', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'currentKjQiHao'=>$currentKjQiHao]);
+            return [];
+        }
+
+        // 上期开奖号码
+        $lastCodes = [
+            1 => $historyKjData['code1'],
+            2 => $historyKjData['code2'], 
+            3 => $historyKjData['code3'],
+            4 => $historyKjData['code4']
+        ];
+
+        // 对数映射：0-5 1-6 2-7 3-8 4-9（相减为5）
+        $duiShuMap = [
+            0 => 5, 1 => 6, 2 => 7, 3 => 8, 4 => 9,
+            5 => 0, 6 => 1, 7 => 2, 8 => 3, 9 => 4
+        ];
+
+        // 生成所有可能的对数组合
+        $allCombinations = [];
+        
+        // 对每个位置生成对数
+        for ($pos = 1; $pos <= 4; $pos++) {
+            $originalCode = $lastCodes[$pos];
+            $duiShuCode = $duiShuMap[$originalCode];
+            
+            // 创建新的号码组合，只改变当前位置
+            $newCombination = $lastCodes;
+            $newCombination[$pos] = $duiShuCode;
+
+            // 生成全倒组合
+            $quanDaoCombinations = self::generateQuandaoCombinations($newCombination, $playway);
+            //p(['quanDaoCombinations单次'=>$quanDaoCombinations, 'count'=>count($quanDaoCombinations)], 0);
+            $allCombinations = array_merge($allCombinations, $quanDaoCombinations);
+            //p(['allCombinations累计'=>$allCombinations, 'count'=>count($allCombinations)], 0);
+        }
+
+        //p(['去重之前'=>$allCombinations, '去重前数量'=>count($allCombinations)], 0);
+        // 去重
+        $allCombinations = array_unique($allCombinations);
+        //p(['allCombinations'=>$allCombinations, '总数量'=>count($allCombinations)]);
+
+        // 构建查询条件，排除这些号码
+        if($x == 1){
+            $where = ['IN', 'code', $allCombinations];
+        }else{
+            $where = ['NOT IN', 'code', $allCombinations];
+        }
+
+        // 根据玩法类型构建查询
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => $playway+1]);
+
+        // 如果是定位玩法，需要特殊处理
+        if ($playway == 1 || $playway == 2) {
+            $where = ['OR'];
+            foreach ($allCombinations as $code) {
+                $codeParts = explode(',', $code);
+                $condition = ['AND'];
+                foreach ($codeParts as $index => $part) {
+                    $condition[] = ['=', 'code_'.($index+1), $part];
+                }
+                $where[] = $condition;
+            }
+            $query->andWhere(['NOT', $where]);
+        } else {
+            $query->andWhere($where);
+        }
+
+        // 执行查询
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+
+        // 添加下注描述
+        $lastCodeStr = implode('', array_values($lastCodes));
+        $betDesc = $filterDesc['desc'].":上期开奖".$lastCodeStr."对数全倒过滤";
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '上期开奖号码对数全倒过滤', [
+            'plan_id'=>$plan->id,
+            'lottery_type'=>$lottery_type,
+            'last_codes'=>$lastCodes,
+            'filter_combinations_count'=>count($allCombinations),
+            'result_codes_count'=>count($codes)
+        ]);
+
+        return $codes;
+    }
+
+    /**
+     * 生成全倒组合
+     * @param array $combination 号码组合
+     * @param int $playway 玩法类型
+     * @return array
+     */
+    private static function generateQuandaoCombinations(array $combination, int $playway): array
+    {
+        $combinations = [];
+        
+        if ($playway == 3) {
+            // 四定：生成所有排列组合
+            $codes = array_values($combination);
+            $permutations = self::generatePermutations($codes);
+            foreach ($permutations as $perm) {
+                $combinations[] = implode(',', $perm);
+            }
+        } elseif ($playway == 2) {
+            // 三定：选择3个位置的所有组合
+            $positions = [
+                [1, 2, 3], [1, 2, 4], [1, 3, 4], [2, 3, 4]
+            ];
+            foreach ($positions as $pos) {
+                $codes = [];
+                foreach ($pos as $p) {
+                    $codes[] = $combination[$p];
+                }
+                $permutations = self::generatePermutations($codes);
+                foreach ($permutations as $perm) {
+                    $combinations[] = implode(',', $perm);
+                }
+            }
+        } elseif ($playway == 1) {
+            // 二定：选择2个位置的所有组合
+            $positions = [
+                [1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4]
+            ];
+            foreach ($positions as $pos) {
+                $codes = [];
+                foreach ($pos as $p) {
+                    $codes[] = $combination[$p];
+                }
+                $permutations = self::generatePermutations($codes);
+                foreach ($permutations as $perm) {
+                    $combinations[] = implode(',', $perm);
+                }
+            }
+        }
+        
+        return $combinations;
+    }
+
+    /**
+     * 生成排列组合
+     * @param array $codes
+     * @return array
+     */
+    private static function generatePermutations(array $codes): array
+    {
+        if (count($codes) <= 1) {
+            return [$codes];
+        }
+        
+        $permutations = [];
+        for ($i = 0; $i < count($codes); $i++) {
+            $current = $codes[$i];
+            $remaining = array_merge(array_slice($codes, 0, $i), array_slice($codes, $i + 1));
+            
+            foreach (self::generatePermutations($remaining) as $perm) {
+                $permutations[] = array_merge([$current], $perm);
+            }
+        }
+        
+        return $permutations;
+    }
+
 }
