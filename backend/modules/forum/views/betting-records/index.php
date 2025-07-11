@@ -47,7 +47,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
 
                 <?php include(dirname(__FILE__).'/index_tab.php'); ?>
             <?php //Pjax::begin(); ?>
-                <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+                <?php echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
