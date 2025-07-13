@@ -7,6 +7,7 @@ use common\models\AdminModel;
 use common\models\base\BaseModel;
 use common\service\CommonService;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 class SscPlanService extends CommonService
 {
@@ -39,8 +40,11 @@ class SscPlanService extends CommonService
             // 3. 复制计划
             $newPlan = new UserSysPlans();
             $newPlan->setAttributes($plan->attributes);
-            
+
+            $hzArr = Json::decode($plan->hz_Arr, 1);
+            $hzArr['singles_key'] = 0;
             // 修改需要变动的字段
+            $newPlan->hz_Arr = Json::encode($hzArr);
             $newPlan->id = null; // 让数据库自动生成新ID
             $newPlan->uid = $userId; // 目标用户ID
             $newPlan->account = $targetUser->username; // 目标用户账号名称

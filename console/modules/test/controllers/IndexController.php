@@ -82,7 +82,12 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
-        $result = SscPlanService::copyOnePlan($userId=34, $planId=17447); p($result);
+        $plans = UserSysPlans::find()->where(['uid'=>25, 'status'=>[1,0]])->orderBy(['id'=>SORT_ASC])->all();
+        $planIds =[];
+        foreach ($plans as $plan){
+            $planIds[$plan->id] = SscPlanService::copyOnePlan($userId=34, $planId=$plan->id);
+        };
+        p(['planIds'=>$planIds, 'count'=>count($planIds)]);
 
         list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lottery_type=8); # 期号数据
         $result = BetService::insertRecord($plan_id=17712, $qiHao, $isAuto=2);

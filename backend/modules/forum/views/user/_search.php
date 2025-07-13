@@ -21,7 +21,6 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'id') ?>
 
     <?= $form->field($model, 'admin_id') ?>
-
     <?= $form->field($model, 'username') ?>
 
     <?= $form->field($model, 'account') ?>
