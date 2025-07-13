@@ -18,14 +18,9 @@ use yii\widgets\ActiveForm;
         ],
     ]); ?>
 
-    <?= $form->field($model, 'id') ?>
-
-    <?= $form->field($model, 'admin_id') ?>
     <?= $form->field($model, 'username') ?>
 
     <?= $form->field($model, 'account') ?>
-
-    <?= $form->field($model, 'balance') ?>
 
     <?php // echo $form->field($model, 'simulate_balance') ?>
 
