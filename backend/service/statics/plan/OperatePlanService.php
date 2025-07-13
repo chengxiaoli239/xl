@@ -44,6 +44,7 @@ class OperatePlanService extends BaseService
                     if (empty($singles)) $singles = [$UserSysPlan->single];
                     $codes_hz['current_miss'] = 0;
                     $codes_hz['singles_key'] = 0;
+                    $codes_hz['turn_key'] = 0;
                     $codes_hz['has_bet_nums'] = 0;
                     $codes_hz['betStatus'] = SscDataService::PLAN_BET_STATUS_INIT;
 
