@@ -136,13 +136,17 @@ class LotteryBet
         if(empty($currentTime)){
             $currentTime = date('Y-m-d H:i:s');
         }
+        if (!isset($this->schedule[$lotteryType])) {
+            throw_info("彩种时间配置不存在:".$lotteryType);
+        }
+        $lotterySchedule = $this->schedule[$lotteryType];
 
         $now = strtotime($currentTime);
         $currentMSeconds = strtotime(date('Y-m-d H:i', $now));
         $currentMinute = date('i', $now);
         $currentSecond = date('s', $now);
         $totalSeconds = $currentMinute * 60 + $currentSecond;
-        $cycleStart = $totalSeconds - ($totalSeconds % (5 * 60)); // 当前周期(每小时为周期)开始的秒数
+        $cycleStart = $totalSeconds - ($totalSeconds % ($lotterySchedule['minute'] * 60)); // 当前周期(每小时为周期)开始的秒数
 
         /*
         p([
@@ -164,19 +168,12 @@ class LotteryBet
             }
         }
 
-        if (!isset($this->schedule[$lotteryType])) {
-            throw_info("彩种时间配置不存在");
-        }
-
-        $lotterySchedule = $this->schedule[$lotteryType];
-
         $currentCycleStart = strtotime(date('Y-m-d H:00', $now)) + $cycleStart + $lotterySchedule['draw'];
         $closeStart = date('Y-m-d H:i:s', $currentCycleStart + $lotterySchedule['closeOffset']); # 下注封盘开始时间
         $drawStart = date('Y-m-d H:i:s', $currentCycleStart);
         $closeEnd = date('Y-m-d H:i:s', $currentCycleStart + $lotterySchedule['open']); # 下注封盘结束时间
         $closeNextStart = date('Y-m-d H:i:s', $currentCycleStart + $lotterySchedule['closeOffset'] + $lotterySchedule['minute']*60); # 下注封盘开始时间
         $closeNextEnd = date('Y-m-d H:i:s', $currentCycleStart + $lotterySchedule['open'] + $lotterySchedule['minute']*60); # 下注封盘结束时间
-        /*
         p([
             'lotteryType'=>$lotteryType,
             'currentCycleStart' => date('Y-m-d H:i:s', $currentCycleStart),
@@ -187,6 +184,7 @@ class LotteryBet
             'closeNextStart'=>$closeNextStart,
             'closeNextEnd'=>$closeNextEnd,
         ], 0);
+        /*
         */
 
         $txt = $lotteryType.'_'.$currentTime;
