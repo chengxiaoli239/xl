@@ -117,7 +117,7 @@ class OperatePlanService extends BaseService
             $singles_count = count($singles);
             
             // 中则波推倍投的遗漏条件处理
-            if($UserSysPlans->plan_type == SscDataService::PLAN_TYPE_BT_SINGLES_BET){
+            if($UserSysPlans->plan_type == SscDataService::PLAN_TYPE_BT_SINGLES_BET && $codes_hz['bet_while_miss']>0){
                 // 获取遗漏条件，默认为1
                 $miss_condition = isset($codes_hz['bet_while_miss']) ? (int)$codes_hz['bet_while_miss'] : 1;
                 
@@ -153,7 +153,7 @@ class OperatePlanService extends BaseService
                         $next_single_key = 0;
                         $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                     }else{
-                        if($codes_hz['betStatus'] == 1){
+                        if($codes_hz['betStatus'] == SscDataService::PLAN_BET_STATUS_BETTING){
                             #$has_bet_nums = $codes_hz['singles_key'] + 1;
                             $has_bet_nums = $codes_hz['singles_key'];
                         }else{
@@ -167,6 +167,15 @@ class OperatePlanService extends BaseService
                             $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                             OperatePlanService::getPlanNextSingle($UserSysPlans->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                         }
+                    }
+                }else if($flag && $codes_hz['bet_while_miss']>0){
+                    $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
+                    $has_bet_nums = $codes_hz['has_bet_nums'] + 1;
+                    $next_single_key = $codes_hz['singles_key'] + 1;
+                    if($has_bet_nums>count($singles)){
+                        $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
+                        $next_single_key = 0;
+                        $codes_hz['current_miss'] = 0;
                     }
                 }else{
                     $has_bet_nums = 0;
@@ -182,6 +191,11 @@ class OperatePlanService extends BaseService
                         $next_single_key = 0;
 
                         #$afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;  #
+                        if($UserSysPlans->plan_type == SscDataService::PLAN_TYPE_SINGLES_BET_WIN){
+                            if($can_bet){
+                                $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
+                            }
+                        }
                     }
 
                 }
