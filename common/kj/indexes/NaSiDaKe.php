@@ -95,7 +95,9 @@ class NaSiDaKe extends BaseKj{
         $setTime = 300;
         try {
             $setTime = (new LotteryBet)->schedule[$lottery_type]['minute']*60 - 30;
-        }catch (\Exception $e){}
+        }catch (\Exception $e){
+            Tool_Common::log('grab_ki_codes', 'INFO', '号码抓取-'.$type_name, ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
+        }
 
         self::setKjDataCache($lottery_type, $expect, $kjData, $setTime);
 
