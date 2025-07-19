@@ -3121,6 +3121,45 @@ class NumService extends BaseService {
             }
             $desc = rtrim($desc, '、');
         }
+        
+        # 动态过滤2
+        if(!empty($hz_Arr['filter_dynamic_types2'])){
+            $desc .= "动态过滤2:";
+            foreach ($hz_Arr['filter_dynamic_types2'] as $filter_dynamic_type2){
+                if(isset($filter_dynamic_type2['type']) && isset($filter_dynamic_type2['params'])){
+                    $filterType = $filter_dynamic_type2['type'];
+                    $params = $filter_dynamic_type2['params'];
+                    
+                    // 获取过滤类型描述
+                    $filterDesc = '';
+                    $dynamicFilterTypes = \backend\service\numbers\DynamicFilterService::DYNAMIC_FILTER_TYPES;
+                    foreach ($dynamicFilterTypes as $type) {
+                        if ($type['type'] == $filterType) {
+                            $filterDesc = $type['label'];
+                            break;
+                        }
+                    }
+                    
+                    if ($filterDesc) {
+                        $desc .= $filterDesc;
+                        // 添加参数信息
+                        if (!empty($params)) {
+                            $paramStr = [];
+                            foreach ($params as $key => $value) {
+                                if ($value !== '' && $value !== null) {
+                                    $paramStr[] = $key . ':' . $value;
+                                }
+                            }
+                            if (!empty($paramStr)) {
+                                $desc .= '(' . implode(',', $paramStr) . ')';
+                            }
+                        }
+                        $desc .= '、';
+                    }
+                }
+            }
+            $desc = rtrim($desc, '、');
+        }
         if(!empty($UserSysPlans) && $UserSysPlans->buy_type == 0){
             $desc .= ' 【反买】';
         }
