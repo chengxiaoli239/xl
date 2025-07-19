@@ -96,7 +96,7 @@ class TzService extends BaseService {
             if($statusRst['status'] != 200){
                 return $statusRst;
             }
-            if(!$ignore && !$status = StaticService::isCanOpStatic($lottery_type, $mkey = 'opSystemBetPlans')){
+            if(!$ignore && !StaticService::isCanOpStatic($lottery_type, 'opSystemBetPlans')){
                 throw new \Exception('不可操作统计数据，还没到开奖时间');
             }
             $rst['qihao'] = $qihao;
