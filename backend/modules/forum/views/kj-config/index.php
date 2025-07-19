@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
-                    'filterModel' => $searchModel,
+                    //'filterModel' => $searchModel,
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
 
@@ -84,7 +84,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'lottery_type',
 
                         //'created_at',
-                        'updated_at',
+                        ['attribute'=>'updated_at', 'label'=>'更新时间',#'headerOptions'=>['width'=>'5%'],
+                            'value'=>function($model){
+                                return date('Y-m-d H:i:s', $model->updated_at);
+                            }
+                        ],
 
                         ['class' => 'yii\grid\ActionColumn'],
                     ],
