@@ -45,6 +45,8 @@ class DynamicFilterService extends BaseService {
         ['type'=>27, 'label'=>'排除x位最近n个码的复试', 'params'=>['x'=>'', 'n'=>''], 'desc'=>"排除x位最近n个码的复试：<br>x:1，n:6，则千位取最近6个号码的复试号码过滤掉<br>x:12，n:6，则千位和百位各取最近6个号码的复试号码过滤掉", 'playway'=>[3]],
         ['type'=>30, 'label'=>'过滤x位最新y期直码', 'params'=>['x'=>'', 'y'=>''], 'desc'=>"过滤指定位置最新y期的直码：<br>1、x可以灵活组合位置，如：1234、2345、1345等四位组合，或123、234等三位组合<br>2、y表示要过滤的期数，如y:5表示过滤最近5期的直码<br>3、比如x:123，y:3，则过滤第1、2、3位最近3期开过的直码", 'playway'=>[1, 2, 3]],
         ['type'=>31, 'label'=>'x上期开奖号码每个位置对数的全倒', 'params'=>['x'=>''], 'desc'=>"[x:1取2除]上期开奖的号码每个位置变成对数后全倒：<br>1、对数为：0-5 1-6 2-7 3-8 4-9（相减为5）<br>2、例如上期开：1234，则生成：6234、1734、1284、1239的全倒组合<br>3、最终去重后得到过滤号码", 'playway'=>[1, 2, 3]],
+        ['type'=>32, 'label'=>'相邻两个相加合分有且只有x个相等', 'params'=>['x'=>''], 'desc'=>"相邻位置相加的合分与上期相邻位置相加的合分比较，有且只有x个相等<br>1、合分计算：如4+8=12，合分为2和12（个位数和十位数）<br>2、x范围：0~3，表示相等的个数", 'playway'=>[1, 2, 3]],
+        ['type'=>33, 'label'=>'相邻两个相加合分至少只有x个相等', 'params'=>['x'=>''], 'desc'=>"相邻位置相加的合分与上期相邻位置相加的合分比较，至少有x个相等<br>1、合分计算：如4+8=12，合分为2和12（个位数和十位数）<br>2、x范围：0~3，表示至少相等的个数", 'playway'=>[1, 2, 3]],
     ];
     public static int $filterType = 0;
 
@@ -145,6 +147,12 @@ class DynamicFilterService extends BaseService {
                     break;
                 case 31: # 上期开奖号码对数全倒
                     $codes = DynamicType2Service::filter31($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 32: # 相邻两个相加合分有且只有x个相等
+                    $codes = DynamicType2Service::filter32($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 33: # 相邻两个相加合分至少只有x个相等
+                    $codes = DynamicType2Service::filter33($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
             }
             if(empty($codes)){

@@ -85,7 +85,7 @@ class IndexController extends Controller
         $plans = UserSysPlans::find()->where(['uid'=>25, 'status'=>[1,0]])->orderBy(['id'=>SORT_ASC])->all();
         $planIds =[];
         foreach ($plans as $plan){
-            $planIds[$plan->id] = SscPlanService::copyOnePlan($userId=34, $planId=$plan->id);
+            //$planIds[$plan->id] = SscPlanService::copyOnePlan($userId=34, $planId=$plan->id);
         };
         p(['planIds'=>$planIds, 'count'=>count($planIds)]);
 
@@ -565,7 +565,7 @@ class IndexController extends Controller
      **/
     public function actionDw1($id=''){
         try {
-            $plan = UserSysPlans::findOne(18252);
+            $plan = UserSysPlans::findOne(18325);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $r = \backend\service\Lucky5\Lucky5Service::getBetNumsPer($uid=50); p($r);
             $plan = UserSysPlans::findOne(	17255);
