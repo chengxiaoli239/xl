@@ -333,6 +333,13 @@ class KjDataGet
             if ('00:00:00' < $date_time && $date_time < '21:00:00') {
                 //$isCanGrab = $flag = false;
             }
+        }elseif(in_array($lottery_type, [23, 24])){ # 以太坊3分、10分
+            // 使用LotteryBet类的时间控制逻辑
+            $lotteryBet = new \common\helpers\lottery\LotteryBet();
+            $status = $lotteryBet->checkLotteryStatus($lottery_type);
+            if($status != \common\helpers\lottery\LotteryBet::STATUS_DRAW){
+                $isCanGrab = $flag = false;
+            }
         }
 
         return $flag;

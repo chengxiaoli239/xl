@@ -10,6 +10,8 @@ class LotteryType
     const LUCKY_5 = 8;
     const PL_5 = 17;
     const JS_SEVEN = 25;
+    const ETH_3M = 23;
+    const ETH_10M = 24;
     const FC_3D = 26;
     const PL_3D = 27;
     const AZ_LUCKY_5 = 28;
@@ -45,6 +47,8 @@ class LotteryType
     const LOTTERY_TIME_CONFIG = [
         self::LUCKY_5 => [4*60+30, 5*60+30, 5*60+50], # 封盘偏移时间:betsCloseOffset、开始抓取时间:grabOffset、开盘偏移时间:betsOpenOffset
         self::AZ_LUCKY_5 => [3*60+30, 4*60, 4*60+20], # 封盘偏移时间:betsCloseOffset、开始抓取时间:grabOffset、开盘偏移时间:betsOpenOffset
+        self::ETH_3M => [2*60+30, 3*60-10, 3*60+50], # 以太坊3分：封盘偏移时间、开始抓取时间、开盘偏移时间
+        self::ETH_10M => [9*60+30, 10*60-30, 10*60+80], # 以太坊10分：封盘偏移时间、开始抓取时间、开盘偏移时间
     ];
 
     public static function getName($lottery_type=DEFAULT_LOTTERY_TYPE): string
