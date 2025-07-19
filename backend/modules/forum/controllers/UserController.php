@@ -110,7 +110,7 @@ class UserController extends BaseController
                     \common\service\thirdD\Odds3dService::addUserOdds($uid, $TzSystems->system_type_id); # 3d 用户添加赔率
                 }
             }
-            $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id, $useCache=0);
+            UserSysPlansService::getMyLotteryTypes($uid, $useCache=0);
             return $this->redirect(['index']);
         }
 
