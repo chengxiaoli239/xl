@@ -94,7 +94,7 @@ class NaSiDaKe extends BaseKj{
 
         $setTime = 300;
         try {
-            $setTime = (new LotteryBet)->schedule[$lottery_type]['minute']*60;
+            $setTime = (new LotteryBet)->schedule[$lottery_type]['minute']*60 - 30;
         }catch (\Exception $e){}
 
         self::setKjDataCache($lottery_type, $expect, $kjData, $setTime);
