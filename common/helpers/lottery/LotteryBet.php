@@ -16,22 +16,26 @@ class LotteryBet
     ];
 
     public array $schedule = [
-        8 => [
+        LotteryType::LUCKY_5 => [
+            'minute' => 5,
             'draw' => 30,       // 抓取开奖号码开始时间，例如每5分钟整
             'closeOffset' => -30, // 封盘时间是第5分钟的前30秒，例如 4分30秒
             'open' => 65,  // 开盘时间是开奖后的50秒
         ],
-        28 => [
+        LotteryType::AZ_LUCKY_5 => [
+            'minute' => 5,
             'draw' => 4 * 60,       // 抓取开奖号码时间，例如每4分钟整
             'closeOffset' => -50, // 封盘时间是第4分钟的前30秒，例如 3分30秒
             'open' => 35,  // 开盘时间是开奖后的50秒
         ],
-        23 => [
+        LotteryType::ETH_3M => [
+            'minute' => 3,
             'draw' => 10,       // 抓取开奖号码开始时间，每3分钟整
             'closeOffset' => -15, // 封盘时间是第3分钟的前30秒，例如 2分30秒
             'open' => 60,  // 开盘时间是开奖后的30秒
         ],
-        24 => [
+        LotteryType::ETH_10M => [
+            'minute' => 10,
             'draw' => 30,      // 抓取开奖号码开始时间，每10分钟整
             'closeOffset' => -50, // 封盘时间是第10分钟的前30秒，例如 9分30秒
             'open' => 80,  // 开盘时间是开奖后的80秒
@@ -171,8 +175,8 @@ class LotteryBet
         $closeStart = date('Y-m-d H:i:s', $currentCycleStart + $lotterySchedule['closeOffset']); # 下注封盘开始时间
         $drawStart = date('Y-m-d H:i:s', $currentCycleStart);
         $closeEnd = date('Y-m-d H:i:s', $currentCycleStart + $lotterySchedule['open']); # 下注封盘结束时间
-        $closeNextStart = date('Y-m-d H:i:s', $currentCycleStart + $lotterySchedule['closeOffset'] + 5*60); # 下注封盘开始时间
-        $closeNextEnd = date('Y-m-d H:i:s', $currentCycleStart + $lotterySchedule['open'] + 5*60); # 下注封盘结束时间
+        $closeNextStart = date('Y-m-d H:i:s', $currentCycleStart + $lotterySchedule['closeOffset'] + $lotterySchedule['minute']*60); # 下注封盘开始时间
+        $closeNextEnd = date('Y-m-d H:i:s', $currentCycleStart + $lotterySchedule['open'] + $lotterySchedule['minute']*60); # 下注封盘结束时间
         /*
         p([
             'lotteryType'=>$lotteryType,
