@@ -29,7 +29,7 @@ class LotteryBet
         23 => [
             'draw' => 10,       // 抓取开奖号码开始时间，每3分钟整
             'closeOffset' => -15, // 封盘时间是第3分钟的前30秒，例如 2分30秒
-            'open' => 30,  // 开盘时间是开奖后的30秒
+            'open' => 60,  // 开盘时间是开奖后的30秒
         ],
         24 => [
             'draw' => 30,      // 抓取开奖号码开始时间，每10分钟整
@@ -175,6 +175,7 @@ class LotteryBet
         $closeNextEnd = date('Y-m-d H:i:s', $currentCycleStart + $lotterySchedule['open'] + 5*60); # 下注封盘结束时间
         /*
         p([
+            'lotteryType'=>$lotteryType,
             'currentCycleStart' => date('Y-m-d H:i:s', $currentCycleStart),
             'currentTime'=>$currentTime,
             'closeStart'=>$closeStart,
