@@ -96,6 +96,9 @@ class NaSiDaKe extends BaseKj{
         $setTime = 300;
         try {
             $setTime = (new LotteryBet)->schedule[$lottery_type]['minute']*60 - 30;
+            if($lottery_type == LotteryType::ETH_3M && (time() - $datas['openTime']/1000)<30){
+                $setTime = 2;
+            }
         }catch (\Exception $e){
             Tool_Common::log('grab_ki_codes', 'INFO', '号码抓取-'.$type_name, ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
         }
@@ -111,7 +114,7 @@ class NaSiDaKe extends BaseKj{
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('grab_ki_codes', 'INFO', '号码抓取-'.$type_name, array_merge($logArr, ['lottery_type'=>$lottery_type, 'isCache'=>$isCache]));
+        Tool_Common::log('grab_ki_codes', 'INFO', '号码抓取-'.$type_name, array_merge($logArr, ['lottery_type'=>$lottery_type, 'isCache'=>$isCache, 'setTime'=>$setTime]));
 
         return $rst;
     }
