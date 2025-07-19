@@ -96,7 +96,7 @@ class NaSiDaKe extends BaseKj{
         $setTime = 300;
         try {
             $setTime = (new LotteryBet)->schedule[$lottery_type]['minute']*60 - 30;
-            if($lottery_type == LotteryType::ETH_3M && (time() - $datas['openTime']/1000)<30){
+            if($lottery_type == LotteryType::ETH_3M && (time() - $datas['openTime']/1000)>30){
                 $setTime = 2;
             }
         }catch (\Exception $e){
