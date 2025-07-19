@@ -81,7 +81,6 @@ class LotteryBet
 
         // 获取当前小时的第0分钟的时间戳
         $hourStart = (clone $now)->setTime($now->format('H'), 0, 0);
-        p($hourStart);
 
         // 计算当前时间与小时开始时间的差异（秒）
         $secondsSinceHourStart = $now->getTimestamp() - $hourStart->getTimestamp();
