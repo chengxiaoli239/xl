@@ -380,6 +380,7 @@ class KjDataGet
                 break;
             case $lottery_type == CommonBaseService::LOTTERY_TYPE_LUCKY5: // 幸运五
             case $lottery_type == LotteryType::ETH_3M: // 以太3分
+            case $lottery_type == LotteryType::ETH_10M: // 以太10分
                 push_queue_fast(PushKjDataToOutSiteJob::class, ['lottery_type'=>$lottery_type, 'business_id'=>$lottery_type]);
                 $rst['OpKjService'] = OpKjService::opSscKjData($lottery_type); # 处理投注数据
                 # 1、队列处理下注数据
