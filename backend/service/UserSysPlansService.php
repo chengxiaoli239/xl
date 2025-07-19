@@ -1073,10 +1073,10 @@ class UserSysPlansService extends BaseService {
      * @param $uid
      * @return array|mixed
      */
-    public static function getMyLotteryTypes($uid=0){
+    public static function getMyLotteryTypes($uid=0, $useCache=true){
 
         $mkey = CacheKeyService::userLotteryTypes($uid);
-        if($typeDatas = commonRedis()->get($mkey)){
+        if($useCache && $typeDatas = commonRedis()->get($mkey)){
             return $typeDatas;
         }
         if($uid>1){

@@ -7,6 +7,7 @@ use backend\service\SscDataService;
 use backend\service\statics\statics_base\DealDataService;
 use backend\service\StaticService;
 use backend\service\SystemService;
+use backend\service\UserSysPlansService;
 use Yii;
 use backend\models\LotteryType;
 use backend\models\searchs\LotteryType as LotteryTypeSearch;
@@ -40,6 +41,7 @@ class LotteryTypeController extends BaseController
      */
     public function actionIndex()
     {
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id, 0);
         $searchModel = new LotteryTypeSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -116,6 +118,7 @@ class LotteryTypeController extends BaseController
         $post = Yii::$app->request->post();
         if ($model->load($post) && $model->save()) {
             $lottery_type = $post['LotteryType']['lottery_type'];
+            UserSysPlansService::getMyLotteryTypes(\Yii::$app->user->id, $useCache=0);
             DealDataService::insertLotteryDealDataStatus($lottery_type);
             return $this->redirect(['index']);
         }
@@ -170,6 +173,7 @@ class LotteryTypeController extends BaseController
 
         $post = Yii::$app->request->post();
         if ($model->load($post) && $model->save()) {
+            UserSysPlansService::getMyLotteryTypes(\Yii::$app->user->id, $useCache=0);
             $lottery_type = $post['LotteryType']['lottery_type'];
             DealDataService::insertLotteryDealDataStatus($lottery_type);
             return $this->redirect(['index']);
@@ -189,7 +193,7 @@ class LotteryTypeController extends BaseController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        LotteryType::deleteRecord(['id'=>$id]);
 
         return $this->redirect(['index']);
     }
