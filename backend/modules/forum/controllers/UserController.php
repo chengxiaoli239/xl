@@ -12,6 +12,7 @@ use backend\service\BetService;
 use backend\service\clients\TzSystemUsersService;
 use backend\service\PoxyIPService;
 use backend\service\UserService;
+use backend\service\UserSysPlansService;
 use common\models\AdminModel;
 use common\service\CommonService;
 use common\tools\Util;
@@ -109,6 +110,7 @@ class UserController extends BaseController
                     \common\service\thirdD\Odds3dService::addUserOdds($uid, $TzSystems->system_type_id); # 3d 用户添加赔率
                 }
             }
+            $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id, $useCache=0);
             return $this->redirect(['index']);
         }
 
