@@ -23,9 +23,10 @@ class NaSiDaKe extends BaseKj{
     ];
 
     public static function getLotteryNo($returnType = 'json', $is_auto=1, $lottery_type=19){
-
+        $isCache = 1;
         $type_name = self::$lottery_types[$lottery_type];
         if($is_auto==2 OR !$kjData = self::getCurrentKjData($lottery_type)) {
+            $isCache = 0;
             $domain = BaseKj::getApiHostByRoute('/kj/indexes/ytf3m');
 
             $limit = 5;
@@ -110,7 +111,7 @@ class NaSiDaKe extends BaseKj{
             $rst = ['expect'=>$expect, 'opencode'=>$opencode, 'opentime'=>$opentime];
         }
         $logArr = $rst;
-        Tool_Common::log('grab_ki_codes', 'INFO', '号码抓取-'.$type_name, array_merge($logArr, ['lottery_type'=>$lottery_type]));
+        Tool_Common::log('grab_ki_codes', 'INFO', '号码抓取-'.$type_name, array_merge($logArr, ['lottery_type'=>$lottery_type, 'isCache'=>$isCache]));
 
         return $rst;
     }
