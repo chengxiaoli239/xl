@@ -4,6 +4,8 @@ namespace common\kj\indexes;
 use backend\models\KjConfig;
 use backend\service\BingDao\BingDaoService;
 use backend\service\CurlService;
+use common\helpers\lottery\LotteryBet;
+use common\helpers\LotteryType;
 use common\kj\BaseKj;
 use common\tools\Tool_Common;
 use  yii;
@@ -43,7 +45,7 @@ class NaSiDaKe extends BaseKj{
 
             if($rst['code'] != 200) return false;
             $datas = $rst['data']['list'][0];
-            if(in_array($lottery_type, [23, 24])) {
+            if(in_array($lottery_type, [LotteryType::ETH_3M, LotteryType::ETH_10M])) {
                 $data = [];
                 $lotteryNum = $rst['data']['list'][0]['lotteryNum'];
 
@@ -90,7 +92,12 @@ class NaSiDaKe extends BaseKj{
         $opentime = $kjData['opentime'];
         $expect = $kjData['expect'];
 
-        self::setKjDataCache($lottery_type, $expect, $kjData);
+        $setTime = 300;
+        try {
+            $setTime = (new LotteryBet)->schedule[$lottery_type]['minute']*60;
+        }catch (\Exception $e){}
+
+        self::setKjDataCache($lottery_type, $expect, $kjData, $setTime);
 
         if($returnType == 'xml'){
             header("Content-type: application/xml");
