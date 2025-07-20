@@ -195,6 +195,10 @@ class OperatePlanService extends BaseService
                             if($can_bet){
                                 $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                             }
+                            if($codes_hz['bet_while_miss']>0 && !$flag && $codes_hz['betStatus']==SscDataService::PLAN_BET_STATUS_BETTING){
+                                $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
+                                $codes_hz['current_miss'] = 1;
+                            }
                         }
                     }
 
