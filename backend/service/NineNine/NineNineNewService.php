@@ -1397,8 +1397,9 @@ class NineNineNewService extends BaseTZService {
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
 
         foreach ($orderNos as $key=>$orderNo) {
+            $orderNoArr = explode($orderNo, ';');
             $xCsrf = NineNineNewService::getXcsrfToken($uid, $tz_system_id);
-            $url = $urlArr['baseUrl'] . '/cloud-lottery-service-server/gameInfo/userlottery/cancel/' . $orderNo;
+            $url = $urlArr['baseUrl'] . '/cloud-lottery-service-server/gameInfo/userlottery/cancel/' . $orderNoArr[1];
             $headers = [
                 "Accept: application/json, text/plain, */*",
                 "Accept-Encoding: gzip, deflate, br",
