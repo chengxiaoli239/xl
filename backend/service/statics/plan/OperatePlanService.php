@@ -169,9 +169,16 @@ class OperatePlanService extends BaseService
                         }
                     }
                 }else if($flag && $codes_hz['bet_while_miss']>0){
-                    $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
-                    $has_bet_nums = $codes_hz['has_bet_nums'] + 1;
-                    $next_single_key = $codes_hz['singles_key'] + 1;
+                    $afterBetStatus = $codes_hz['betStatus'];
+                    if($afterBetStatus==SscDataService::PLAN_BET_STATUS_BETTING){
+                        $codes_hz['current_miss'] = 0;
+                        $has_bet_nums = $codes_hz['has_bet_nums'] + 1;
+                        $next_single_key = $codes_hz['singles_key'] + 1;
+                    }else{
+                        $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
+                        $next_single_key = 0;
+                        $has_bet_nums = 0;
+                    }
                     if($has_bet_nums>count($singles)){
                         $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
                         $next_single_key = 0;
