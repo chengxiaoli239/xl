@@ -115,45 +115,18 @@ class OperatePlanService extends BaseService
             }
             $single = $UserSysPlans->single;
             $singles_count = count($singles);
-            
-            // 中则波推倍投的遗漏条件处理
-            if($UserSysPlans->plan_type == SscDataService::PLAN_TYPE_BT_SINGLES_BET && $codes_hz['bet_while_miss']>0){
-                // 获取遗漏条件，默认为1
-                $miss_condition = isset($codes_hz['bet_while_miss']) ? (int)$codes_hz['bet_while_miss'] : 1;
-                
-                // 初始化当前遗漏计数
-                if(!isset($codes_hz['current_miss'])){
-                    $codes_hz['current_miss'] = 0;
-                }
-                
-                // 根据中奖情况更新遗漏计数
-                if($flag == 1){
-                    // 中奖，遗漏归零
-                    $codes_hz['current_miss'] = 0;
-                }else{
-                    // 不中，遗漏+1
-                    $codes_hz['current_miss'] = (int)$codes_hz['current_miss'] + 1;
-                }
-                
-                // 判断是否满足遗漏条件
-                $can_bet = ($codes_hz['current_miss'] >= $miss_condition);
-            }else{
-                // 非中则波推倍投，保持原有逻辑
-                $can_bet = true;
-            }
-            
             if(!empty($UserSysPlans->singles)){
                 $has_bet_nums = 0;
                 if($flag == '-1'){
                     $next_single_key = 0;
                     $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
-                }else if($flag && $can_bet){
+                }else if($flag){
                     # 中则投的倍投
                     if(!isset($codes_hz['betStatus']) OR in_array($codes_hz['betStatus'], [SscDataService::PLAN_BET_STATUS_INIT, SscDataService::PLAN_BET_STATUS_WAIT])){
                         $next_single_key = 0;
                         $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                     }else{
-                        if($codes_hz['betStatus'] == SscDataService::PLAN_BET_STATUS_BETTING){
+                        if($codes_hz['betStatus'] == 1){
                             #$has_bet_nums = $codes_hz['singles_key'] + 1;
                             $has_bet_nums = $codes_hz['singles_key'];
                         }else{
@@ -167,22 +140,6 @@ class OperatePlanService extends BaseService
                             $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                             OperatePlanService::getPlanNextSingle($UserSysPlans->id, $codes_hz['singles_key'], $next_single_key, $lottery_type);
                         }
-                    }
-                }else if($flag && $codes_hz['bet_while_miss']>0){
-                    $afterBetStatus = $codes_hz['betStatus'];
-                    if($afterBetStatus==SscDataService::PLAN_BET_STATUS_BETTING){
-                        $codes_hz['current_miss'] = 0;
-                        $has_bet_nums = $codes_hz['has_bet_nums'] + 1;
-                        $next_single_key = $codes_hz['singles_key'] + 1;
-                    }else{
-                        $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
-                        $next_single_key = 0;
-                        $has_bet_nums = 0;
-                    }
-                    if($has_bet_nums>count($singles)){
-                        $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
-                        $next_single_key = 0;
-                        $codes_hz['current_miss'] = 0;
                     }
                 }else{
                     $has_bet_nums = 0;
@@ -198,15 +155,6 @@ class OperatePlanService extends BaseService
                         $next_single_key = 0;
 
                         #$afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;  #
-                        if($UserSysPlans->plan_type == SscDataService::PLAN_TYPE_SINGLES_BET_WIN){
-                            if($can_bet){
-                                $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
-                            }
-                            if($codes_hz['bet_while_miss']>0 && !$flag && $codes_hz['betStatus']==SscDataService::PLAN_BET_STATUS_BETTING){
-                                $afterBetStatus = SscDataService::PLAN_BET_STATUS_WAIT;
-                                $codes_hz['current_miss'] = 1;
-                            }
-                        }
                     }
 
                 }
@@ -216,7 +164,7 @@ class OperatePlanService extends BaseService
                 $codes_hz['has_bet_nums'] = $has_bet_nums; # 已经下注的期数
             }else{
                 # 中则投，无倍投
-                if($flag == 1 && $can_bet){ # plan_type:8、9 遗漏xx期投、遗漏x期倍投
+                if($flag == 1){ # plan_type:8、9 遗漏xx期投、遗漏x期倍投
                     $afterBetStatus = SscDataService::PLAN_BET_STATUS_BETTING;
                 }else{
                     $afterBetStatus = SscDataService::PLAN_BET_STATUS_INIT;
@@ -225,7 +173,7 @@ class OperatePlanService extends BaseService
 
             $codes_hz['betStatus'] = $afterBetStatus;
             $updateData = ['hz_Arr'=>json_encode($codes_hz, 320), 'single'=>$single];
-            $logArr = ['plan_id'=>$UserSysPlans->id, 'isZjBefore'=>$flag, 'recordDatas'=>$recordDatas, 'before_codes_hz' => $before_codes_hz, 'after_code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type, 'miss_condition'=>$miss_condition ?? null, 'current_miss'=>$codes_hz['current_miss'] ?? null];
+            $logArr = ['plan_id'=>$UserSysPlans->id, 'isZjBefore'=>$flag, 'recordDatas'=>$recordDatas, 'before_codes_hz' => $before_codes_hz, 'after_code_hz'=>$codes_hz, 'single'=>$single, 'lottery_type'=>$lottery_type];
             Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '中则投倍投', $logArr);
             $whereUpdate = ['id'=>$UserSysPlans->id]; # 更新条件
             $rst = UserSysPlans::updateAll($updateData, $whereUpdate);
