@@ -272,7 +272,7 @@ abstract class BetService extends BaseBetService {
         # 4、下注
         $lottery_types = UserSysPlansService::getMyLotteryTypes($uid);
         foreach ($lottery_types as $data){
-            if(in_array($data['lottery_type'], [8, 18, 23])) { # 8、幸运五 18台湾快五
+            if(in_array($data['lottery_type'], [\common\helpers\LotteryType::LUCKY_5, \common\helpers\LotteryType::ETH_3M, \common\helpers\LotteryType::ETH_10M])) { # 8、幸运五 18台湾快五
                 $rst = BetService::betByUserUidTask([$data['lottery_type']], $uid);
             }else{
                 $rst = BetService::betByUidNew($uid, $data['lottery_type']);
@@ -414,11 +414,8 @@ abstract class BetService extends BaseBetService {
      * @desc 用户计划下注脚本
      * @param array $lottery_types
      */
-    public static function betByUserUidTask($lottery_types = [], $uid = ''){
-
+    public static function betByUserUidTask(array $lottery_types = [], $uid = ''){
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
-
-        $m = \Yii::$app->cache;
         foreach ($lottery_types as $lottery_type){
             # status可重推的状态0:未推送1推送失败可重推，不可重推:3  is_local_bet:1客户本地0云服务器
             $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]], ['=', 'is_local_bet', BetsBackend::BET_TYPE_SERVER_API]];

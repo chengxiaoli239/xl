@@ -100,28 +100,6 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 多线程跑用户计划
-     * @return mixed
-     */
-    public static function actionBetByUid(){
-        $tzStatus = SystemConfig::findOne(['key'=>'tz_status'])->value;
-        if(!$tzStatus) return ['status'=>300, 'msg'=>'投注开关未开启'];
-        self::_init();
-        set_time_limit(0);
-        $post = \Yii::$app->request->post();
-        $uid = $post['uid'];
-        $for_times = 8;
-        $sleep_time = rand(4, 8);
-        for($i=0; $i<$for_times; $i++){
-            sleep($sleep_time);
-            $rst[$i]['rst'] = BetService::lotteryBet($uid);
-            $rst[$i]['sleep_time'] = $sleep_time;
-        }
-
-        return $rst;
-    }
-
-    /**
      * @desc 访问首页
      * @return mixed
      */
