@@ -1666,7 +1666,7 @@ class DynamicType2Service extends BaseService {
         }
         
         $params = $dynamic['params'];
-        $x = (int)$params['x']; // 期数，x=1则过滤上期，x=2则过滤上上期
+        $x = (int)$params['x']??1; // 期数，x=1则过滤上期，x=2则过滤上上期
         
         if ($x < 1) {
             throw_info('参数x必须大于等于1');
@@ -1674,30 +1674,18 @@ class DynamicType2Service extends BaseService {
         
         // 获取指定期数的开奖数据
         $targetQiHao = '';
-        if ($x == 1) {
-            // 获取上期期号
-            $targetQiHao = QihaoService::getLastQiHao($lottery_type, $currentKjQiHao);
-        } else {
-            // 获取上x期期号
-            $targetQiHao = QihaoService::getLastQiHao($lottery_type, $currentKjQiHao, $x);
-        }
-        
+        // 获取上x期期号
+        $targetQiHao = QihaoService::getLastQiHao($lottery_type, $nextQiHao, $x);
+
         if (empty($targetQiHao)) {
             throw_info('无法获取上' . $x . '期开奖数据');
         }
-        
-        // 获取指定期数的开奖数据
-        $targetKjData = SscKjData::find()
-            ->select(['codes_4nums_hz'])
-            ->where(['qihao' => $targetQiHao, 'lottery_type' => $lottery_type])
-            ->asArray()
-            ->one();
-        
-        if (empty($targetKjData) || empty($targetKjData['codes_4nums_hz'])) {
+        $targetKjData = NumCodeService::getKjData($targetQiHao, $lottery_type);
+        if (empty($targetKjData) || empty($targetKjData['codes_hz'])) {
             throw_info('上' . $x . '期开奖数据和值数据不存在');
         }
         
-        $targetSum = (int)$targetKjData['codes_4nums_hz']; // 目标期数的和值
+        $targetSum = (int)$targetKjData['codes_hz']; // 目标期数的和值
         
         // 过滤掉和值等于目标期数和值的号码
         $query = (new \yii\db\Query())
