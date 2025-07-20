@@ -1646,4 +1646,82 @@ class DynamicType2Service extends BaseService {
         
         return $codes;
     }
+
+    /**
+     * 过滤上x期的和值
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     */
+    public static function filter34(object $plan, $dynamic=[], $filterDesc = []): array
+    {
+        $lottery_type = $plan->lottery_type;
+        $playway = $plan->playway;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+        
+        // 只支持四定类型
+        if ($playway != 3) {
+            throw_info('过滤上x期的和值只支持四定类型（playway:3）');
+        }
+        
+        $params = $dynamic['params'];
+        $x = (int)$params['x']; // 期数，x=1则过滤上期，x=2则过滤上上期
+        
+        if ($x < 1) {
+            throw_info('参数x必须大于等于1');
+        }
+        
+        // 获取指定期数的开奖数据
+        $targetQiHao = '';
+        if ($x == 1) {
+            // 获取上期期号
+            $targetQiHao = QihaoService::getLastQiHao($lottery_type, $currentKjQiHao);
+        } else {
+            // 获取上x期期号
+            $targetQiHao = QihaoService::getLastQiHao($lottery_type, $currentKjQiHao, $x);
+        }
+        
+        if (empty($targetQiHao)) {
+            throw_info('无法获取上' . $x . '期开奖数据');
+        }
+        
+        // 获取指定期数的开奖数据
+        $targetKjData = SscKjData::find()
+            ->select(['codes_4nums_hz'])
+            ->where(['qihao' => $targetQiHao, 'lottery_type' => $lottery_type])
+            ->asArray()
+            ->one();
+        
+        if (empty($targetKjData) || empty($targetKjData['codes_4nums_hz'])) {
+            throw_info('上' . $x . '期开奖数据和值数据不存在');
+        }
+        
+        $targetSum = (int)$targetKjData['codes_4nums_hz']; // 目标期数的和值
+        
+        // 过滤掉和值等于目标期数和值的号码
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => $playway + 1])
+            ->andWhere(['!=', 'codes_hz', $targetSum]);
+
+        //p($query->createCommand()->getRawSql());
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+
+        $betDesc = $filterDesc['desc'] . ":过滤上" . $x . "期和值" . $targetSum . "，期号" . $targetQiHao;
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+        
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤上x期的和值', [
+            'plan_id' => $plan->id,
+            'lottery_type' => $lottery_type,
+            'current_kj_qihao' => $currentKjQiHao,
+            'target_qihao' => $targetQiHao,
+            'target_sum' => $targetSum,
+            'filtered_count' => count($codes)
+        ]);
+        
+        return $codes;
+    }
 }

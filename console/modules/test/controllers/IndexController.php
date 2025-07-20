@@ -568,9 +568,9 @@ class IndexController extends Controller
      **/
     public function actionDw1($id=''){
         try {
-            $result = StaticService::isCanOpStatic($lottery_type=23, 'opSystemBetPlans');p(['result'=>$result]);
-            $plan = UserSysPlans::findOne(18325);
+            $plan = UserSysPlans::findOne(18341);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
+            $result = StaticService::isCanOpStatic($lottery_type=23, 'opSystemBetPlans');p(['result'=>$result]);
             $r = \backend\service\Lucky5\Lucky5Service::getBetNumsPer($uid=50); p($r);
             $plan = UserSysPlans::findOne(	17255);
             $codes = BetService::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $plan->id);p(count(explode('@', $codes)));

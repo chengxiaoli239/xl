@@ -70,4 +70,31 @@ class QihaoService extends CommonService
 
         return $next_qihao;
     }
+
+    /**
+     * 获取指定期数的上一期期号
+     * @param int $lottery_type 彩种类型
+     * @param string $currentQiHao 当前期号
+     * @param int $count 往前推几期，默认1期
+     * @return string|false
+     */
+    public static function getLastQiHao(int $lottery_type, string $currentQiHao, int $count = 1)
+    {
+        if ($count < 1) {
+            return false;
+        }
+        
+        $targetQiHao = $currentQiHao;
+        
+        for ($i = 0; $i < $count; $i++) {
+            // 获取上一期期号
+            $targetQiHao = KjDataGet::getBeforeQiHaoByQiHao($targetQiHao, $lottery_type);
+            
+            if (empty($targetQiHao)) {
+                return false;
+            }
+        }
+        
+        return $targetQiHao;
+    }
 }

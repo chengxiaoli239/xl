@@ -47,6 +47,8 @@ class DynamicFilterService extends BaseService {
         ['type'=>31, 'label'=>'x上期开奖号码每个位置对数的全倒', 'params'=>['x'=>''], 'desc'=>"[x:1取2除]上期开奖的号码每个位置变成对数后全倒：<br>1、对数为：0-5 1-6 2-7 3-8 4-9（相减为5）<br>2、例如上期开：1234，则生成：6234、1734、1284、1239的全倒组合<br>3、最终去重后得到过滤号码", 'playway'=>[1, 2, 3]],
         ['type'=>32, 'label'=>'相邻两个相加合分有且只有x个相等', 'params'=>['x'=>''], 'desc'=>"相邻位置相加的合分与上期相邻位置相加的合分比较，有且只有x个相等<br>1、合分计算：如4+8=12，合分为2和12（个位数和十位数）<br>2、x范围：0~3，表示相等的个数", 'playway'=>[1, 2, 3]],
         ['type'=>33, 'label'=>'相邻两个相加合分至少只有x个相等', 'params'=>['x'=>''], 'desc'=>"相邻位置相加的合分与上期相邻位置相加的合分比较，至少有x个相等<br>1、合分计算：如4+8=12，合分为2和12（个位数和十位数）<br>2、x范围：0~3，表示至少相等的个数", 'playway'=>[1, 2, 3]],
+        ['type'=>34, 'label'=>'过滤上x期的和值', 'params'=>['x'=>''], 'desc'=>"过滤上x期的和值，其中x=1则过滤上期的和值，x=2则过滤上上期的和值<br>例如：x=1，上期和值为15，则过滤掉所有和值为15的四定号码", 'playway'=>[3]],
+
     ];
     public static int $filterType = 0;
 
@@ -153,6 +155,9 @@ class DynamicFilterService extends BaseService {
                     break;
                 case 33: # 相邻两个相加合分至少只有x个相等
                     $codes = DynamicType2Service::filter33($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 34: # 过滤上x期的和值
+                    $codes = DynamicType2Service::filter34($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
             }
             if(empty($codes)){
