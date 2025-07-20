@@ -718,8 +718,6 @@ class IndexController extends Controller
         p($data);
         $data = NaSiDaKe::getLotteryNo($type);
         p($data);
-        $rst = NineNineNewService::getSnidBySn($uid = 11, $tz_system_id = 12, $lottery_type = 1);
-        p($rst);
         $rst['updateDsYL'] = SscDataService::updateDsYL($lottery_type = 17);
         p($rst);// 更新单双遗漏
         $rst = BaseDataService::insertDsTypeDatas($lottery_type = 17);

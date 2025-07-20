@@ -384,10 +384,10 @@ class NineNineNewService extends BaseTZService {
                     $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
                     $m->set($xCsrf_key, $xCsrf, 120);
                 }
-                $snRst = NineNineNewService::getSnidBySn($uid, $tz_system_id, $row->lottery_type);
-                if(isset($snRst['list'][0]['orderNo'])){
-                    $data['bet_rst']['snid'] = $snRst['list'][0]['orderNo']; // 获取方案内容
-                }
+            }
+            $snRst = NineNineNewService::getSnidBySn($uid, $tz_system_id, $row->lottery_type);
+            if(isset($snRst['list'][0]['orderNo'])){
+                $data['bet_rst']['snid'] = $snRst['list'][0]['orderNo']; // 获取方案内容
             }
             $tmpRst['bet_time'] = date('Y-m-d H:i:s');
             $status = ($tmpRst['rstData']['code'] == 200) ? 2 : 3;

@@ -21,6 +21,7 @@ use backend\service\clients\AgentClientsService;
 use backend\service\clients\TzSystemUsersService;
 use backend\service\HN0898Service;
 use backend\service\Lucky5\Lucky5Service;
+use backend\service\NineNine\NineNineNewService;
 use backend\service\numbers\DynamicFilterService;
 use backend\service\numbers\NumCodeService;
 use backend\service\NumService;
@@ -82,6 +83,8 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $rst = NineNineNewService::getSnidBySn($uid = 74, $tz_system_id = 12, $lottery_type = 24);
+        p($rst);
         $plans = UserSysPlans::find()->where(['uid'=>25, 'status'=>[1,0]])->orderBy(['id'=>SORT_ASC])->all();
         $planIds =[];
         foreach ($plans as $plan){
