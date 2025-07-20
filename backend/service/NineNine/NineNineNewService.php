@@ -1316,7 +1316,7 @@ class NineNineNewService extends BaseTZService {
         Tool_Common::log('getSnidBySn','INFO','0898获取订单号3', $logArr);
         //p(['$matches'=>$matches[2], 'user_id'=>self::$user_id, 'tz_system_id'=>self::$tz_system_id, 'content'=>$content],0);
 
-        return $rstData;
+        return $rstData['data']??[];
     }
 
     /**
