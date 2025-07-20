@@ -1608,11 +1608,7 @@ abstract class BetService extends BaseBetService {
             if($lottery_type == 3) { # 希腊网 5分彩
             }
         }elseif(in_array($tz_system_id, [12])){ # 九九网
-            if($lottery_type == 6){ # 新疆
-                $rst = NineNineNewService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
-            }else{
-                $rst = NineNineNewService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
-            }
+            $rst = NineNineNewService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
         }elseif(in_array($tz_system_id, [13])){ # 冰岛
             $rst = \backend\service\BingDao\BingDaoService::cancelOrder($bet_id, $BettingRecords->tz_system_id);
         }elseif(in_array($tz_system_id, [11])){ # 菊花网
