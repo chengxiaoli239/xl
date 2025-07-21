@@ -133,10 +133,21 @@ use yii\widgets\ActiveForm;
 </div>
 <script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
 <script>
-    $(function () {
-        $('.checkbox-item').click(function() {
-            var name = $(this).attr('name');
-            $('input[name="' + name + '"]').not(this).prop('checked', false);
-        });
+$(function () {
+    $('.checkbox-item').click(function() {
+        var name = $(this).attr('name');
+        $('input[name="' + name + '"]').not(this).prop('checked', false);
     });
+    // Toggle dynamic filter 1
+    $('#toggleFilterDynamic1').click(function() {
+        $('#filterDynamic1Content').toggle();
+        $(this).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+    });
+
+    // Toggle dynamic filter 2
+    $('#toggleFilterDynamic2').click(function() {
+        $('#filterDynamic2Content').toggle();
+        $(this).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+    });
+});
 </script>

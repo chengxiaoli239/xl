@@ -83,12 +83,13 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $result = SscPlanService::copyOnePlan($userId=37, $planId=17926);p($result);
         $rst = NineNineNewService::getSnidBySn($uid = 74, $tz_system_id = 12, $lottery_type = 24);
         p($rst);
         $plans = UserSysPlans::find()->where(['uid'=>25, 'status'=>[1,0]])->orderBy(['id'=>SORT_ASC])->all();
         $planIds =[];
         foreach ($plans as $plan){
-            //$planIds[$plan->id] = SscPlanService::copyOnePlan($userId=34, $planId=$plan->id);
+            $planIds[$plan->id] = SscPlanService::copyOnePlan($userId=34, $planId=$plan->id);
         };
         p(['planIds'=>$planIds, 'count'=>count($planIds)]);
 
