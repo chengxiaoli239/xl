@@ -1507,20 +1507,9 @@ class DynamicType2Service extends BaseService {
         $lastSum34 = $historyKjData['code3'] + $historyKjData['code4']; // 3,4位
         
         // 生成上期各位置合分的个位数和十位数
-        $lastSum12Types = [$lastSum12 % 10]; // 个位数
-        if ($lastSum12 >= 10) {
-            $lastSum12Types[] = intval($lastSum12 / 10); // 十位数
-        }
-        
-        $lastSum23Types = [$lastSum23 % 10]; // 个位数
-        if ($lastSum23 >= 10) {
-            $lastSum23Types[] = intval($lastSum23 / 10); // 十位数
-        }
-        
-        $lastSum34Types = [$lastSum34 % 10]; // 个位数
-        if ($lastSum34 >= 10) {
-            $lastSum34Types[] = intval($lastSum34 / 10); // 十位数
-        }
+        $lastSum12Types = [$lastSum12 % 10, 10+($lastSum12%10)]; // 个十位
+        $lastSum23Types = [$lastSum23 % 10, 10+($lastSum23%10)]; // 十百位
+        $lastSum34Types = [$lastSum34 % 10, 10+($lastSum34%10)]; // 百千位
         
         // 构建SQL条件 - 每个位置只与对应的上期位置比较
         $conditions = [];
@@ -1591,20 +1580,9 @@ class DynamicType2Service extends BaseService {
         $lastSum34 = $historyKjData['code3'] + $historyKjData['code4']; // 3,4位
         
         // 生成上期各位置合分的个位数和十位数
-        $lastSum12Types = [$lastSum12 % 10]; // 个位数
-        if ($lastSum12 >= 10) {
-            $lastSum12Types[] = intval($lastSum12 / 10); // 十位数
-        }
-        
-        $lastSum23Types = [$lastSum23 % 10]; // 个位数
-        if ($lastSum23 >= 10) {
-            $lastSum23Types[] = intval($lastSum23 / 10); // 十位数
-        }
-        
-        $lastSum34Types = [$lastSum34 % 10]; // 个位数
-        if ($lastSum34 >= 10) {
-            $lastSum34Types[] = intval($lastSum34 / 10); // 十位数
-        }
+        $lastSum12Types = [$lastSum12 % 10, 10+($lastSum12%10)]; // 个十位
+        $lastSum23Types = [$lastSum23 % 10, 10+($lastSum23%10)]; // 十百位
+        $lastSum34Types = [$lastSum34 % 10, 10+($lastSum34%10)]; // 百千位
         
         // 构建SQL条件 - 至少x个相等，每个位置只与对应的上期位置比较
         $conditions = [];
