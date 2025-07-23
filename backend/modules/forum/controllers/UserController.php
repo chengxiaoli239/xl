@@ -369,6 +369,8 @@ class UserController extends BaseController
                         'kj_num' => $postData['kj_num'],
                         'is_auto_login' => $nextUserType==AdminModel::USER_TYPE_GUI?1:0,
                         'sys_name' => $TzSystems->name,
+                        'balance' => 0.00,
+                        'current_profits' => 0.00,
                         'ssc_domain' => $TzSystems->ssc_domain??'',
                         'account' => $postData['site_account']?:'',
                         'password' => $postData['site_password']?:'',
