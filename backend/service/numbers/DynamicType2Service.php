@@ -1616,6 +1616,10 @@ class DynamicType2Service extends BaseService {
             ->where(['code_type' => $playway + 1])
             ->andWhere($where);
         
+        // 添加SQL日志
+        $sql = $query->createCommand()->getRawSql();
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '相邻合分至少' . $x . '个相等', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'qihao'=>$nextQiHao, 'sql'=>$sql]);
+        
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
         
