@@ -526,8 +526,6 @@ class IndexController extends Controller
         $UserSysPlans = UserSysPlans::findOne($plan_id='5834');
         $current_qihao = NumService::getPlanBetCurrentQihao($UserSysPlans, $lottery_type = 17);
         p($current_qihao);
-        $next_qihao = KjDataGet::getNextQihaoByQihao($qihao = '20211215286', $lottery_type = 8);
-        p($next_qihao);
         $miss = SscDataService::staticPeiShuDate($lottery_type = 8);
         p($miss);
         $rst['kj'] = KjDataGet::grabKjData();

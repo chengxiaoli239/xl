@@ -149,7 +149,7 @@ class IndexController extends Controller
         $userIds = TzSystemsUsers::find()->select(['uid'])->where($where)->asArray()->column();
         for($i=0; $i<$for_times; $i++){
             foreach ($userIds as $userId){
-                push_queue(UserBetJob::class, ['user_id'=>$userId]);
+                push_queue(UserBetJob::class, ['user_id'=>$userId, 'business_id'=>$userId]);
             }
             sleep($sleep_time);
             $rst[$i]['sleep_time'] = $sleep_time;

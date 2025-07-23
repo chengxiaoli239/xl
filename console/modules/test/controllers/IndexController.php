@@ -83,15 +83,17 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $plans = UserSysPlans::find()->where(['uid'=>35, 'status'=>[1,0]])->orderBy(['id'=>SORT_ASC])->all();
+        $planIds =[];
+        foreach ($plans as $plan){
+            var_dump($plan->id);
+            $planIds[$plan->id] = SscPlanService::copyOnePlan($userId=37, $planId=$plan->id);
+        };
+        p(['planIds'=>$planIds, 'count'=>count($planIds)]);
         $result = SscPlanService::copyOnePlan($userId=37, $planId=17926);p($result);
         $rst = NineNineNewService::getSnidBySn($uid = 74, $tz_system_id = 12, $lottery_type = 24);
         p($rst);
-        $plans = UserSysPlans::find()->where(['uid'=>25, 'status'=>[1,0]])->orderBy(['id'=>SORT_ASC])->all();
-        $planIds =[];
-        foreach ($plans as $plan){
-            $planIds[$plan->id] = SscPlanService::copyOnePlan($userId=34, $planId=$plan->id);
-        };
-        p(['planIds'=>$planIds, 'count'=>count($planIds)]);
+
 
         list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lottery_type=8); # 期号数据
         $result = BetService::insertRecord($plan_id=17712, $qiHao, $isAuto=2);
@@ -569,6 +571,7 @@ class IndexController extends Controller
      **/
     public function actionDw1($id=''){
         try {
+            $next_qihao = KjDataGet::getNextQihaoByQihao($qihao = '250723144', $lottery_type = 24); p($next_qihao);
             $plan = UserSysPlans::findOne(18327);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
             $result = StaticService::isCanOpStatic($lottery_type=23, 'opSystemBetPlans');p(['result'=>$result]);

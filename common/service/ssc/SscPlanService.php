@@ -35,7 +35,7 @@ class SscPlanService extends CommonService
             if (!$targetUser) {
                 throw_info('目标用户不存在');
             }
-            $singles = explode('-', trim($plan->singles));
+            $singles = !empty($plan->singles)?explode('-', trim($plan->singles)):[$plan->single];
 
             // 3. 复制计划
             $newPlan = new UserSysPlans();
@@ -54,10 +54,8 @@ class SscPlanService extends CommonService
             $newPlan->updated_at = time(); // 更新修改时间
             $newPlan->update_time = date('Y-m-d H:i:s'); // 更新修改时间
 
-            if (empty($singles)) $singles = [$plan->single];
-            $newPlan->single = $singles[0];
+            $newPlan->single = $singles[0]??0.1;
             $newPlan->status = 0;
-
 
             // 4. 保存新计划
             if (!$newPlan->save()) {
