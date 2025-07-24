@@ -32,8 +32,7 @@ class UserBetTaskRecordJob extends CommonJob {
             return '幸运五非开盘时间';
         }
 
-        $rst = BetService::insertPlansTask([$lottery_type], $isJob=1);
-        return $rst;
+        return BetService::insertPlansTask([$lottery_type], $isJob=1);
     }
 
 }

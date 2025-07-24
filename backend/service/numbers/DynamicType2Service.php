@@ -1694,4 +1694,60 @@ class DynamicType2Service extends BaseService {
         
         return $codes;
     }
+
+    /**
+     * 排除同位置最近n个号码复试
+     * @param $plan
+     * @param $dynamic
+     * @param $filterDesc
+     * @return array
+     * @throws \common\exceptions\InfoException
+     */
+    public static function filter35($plan, $dynamic, $filterDesc) {
+        $params = $dynamic['params'];
+        $lottery_type = $plan['lottery_type'];
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+        // 千百十个
+        $x = intval($params['x'] ?? 0);
+        $y = intval($params['y'] ?? 0);
+        $z = intval($params['z'] ?? 0);
+        $n = intval($params['n'] ?? 0);
+
+        if ($x < 1 || $y < 1 || $z < 1 || $n < 1) {
+            throw_info('参数错误，千百十个位都必须大于0');
+        }
+    
+        // 获取每个位最近N个号码
+        $qArr = NumService::getPosLatelyCode(1, $x, $lottery_type);
+        $bArr = NumService::getPosLatelyCode(2, $y, $lottery_type);
+        $sArr = NumService::getPosLatelyCode(3, $z, $lottery_type);
+        $gArr = NumService::getPosLatelyCode(4, $n, $lottery_type);
+    
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => $plan['playway'] + 1])
+            ->andWhere(['in', 'code_1', $qArr])
+            ->andWhere(['in', 'code_2', $bArr])
+            ->andWhere(['in', 'code_3', $sArr])
+            ->andWhere(['in', 'code_4', $gArr]);
+
+        $excludeCodes = array_column($query->all(), 'code');  
+        // 排除这些号码
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => $plan['playway'] + 1]); // 四定
+    
+        if (!empty($excludeCodes)) {
+            $query->andWhere(['not in', 'code', $excludeCodes]);
+        }
+    
+        $results = $query->all();
+
+        $betDesc = $filterDesc['desc'] . ":排除千/百/十/个位最近" . $n . "个号码的所有复试组合。参数分别为千" . $x . "、百" . $y . "、十" . $z . "、个" . $n;
+        NumCodeService::addBetDescRand($plan['id'], $nextQiHao, $betDesc);
+ 
+        return array_column($results, 'code');
+    }
 }

@@ -571,9 +571,9 @@ class IndexController extends Controller
      **/
     public function actionDw1($id=''){
         try {
-            $next_qihao = KjDataGet::getNextQihaoByQihao($qihao = '250723144', $lottery_type = 24); p($next_qihao);
-            $plan = UserSysPlans::findOne(18327);
+            $plan = UserSysPlans::findOne(18401);
             $codes = DynamicFilterService::getFilterDynamic2($plan, []);p(count($codes));
+            $next_qihao = KjDataGet::getNextQihaoByQihao($qihao = '250723144', $lottery_type = 24); p($next_qihao);
             $result = StaticService::isCanOpStatic($lottery_type=23, 'opSystemBetPlans');p(['result'=>$result]);
             $r = \backend\service\Lucky5\Lucky5Service::getBetNumsPer($uid=50); p($r);
             $plan = UserSysPlans::findOne(	17255);
