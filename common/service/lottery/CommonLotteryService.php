@@ -54,6 +54,7 @@ class CommonLotteryService extends BaseService
         if(!$useCache OR empty($lotteryBaseInfo)){
             $lotteryBaseInfo = LotteryType::find()->where(['lottery_type'=>$lotteryType])->limit(1)->asArray()->one();
             commonRedis()->setnx($mKey, $lotteryBaseInfo);
+            commonRedis()->expire($mKey, 3600);
         }
 
         return $lotteryBaseInfo;

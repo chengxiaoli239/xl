@@ -162,7 +162,7 @@ trait LotteryCacheKeyTrait
      */
     public static function lotteryBaseInfo($lottery_type): string
     {
-        return 'lottery:lottery_base_info:lt_'.$lottery_type;
+        return 'lottery:lottery_base_info:lt_x1_'.$lottery_type;
     }
 
     /**

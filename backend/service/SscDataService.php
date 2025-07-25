@@ -1769,9 +1769,9 @@ class SscDataService extends BaseService {
      * @return mixed|string
      */
     public static function getQiShu($lottery_type = DEFAULT_LOTTERY_TYPE){
-        $lotteryBaseInfo = CommonLotteryService::getLotteryBaseInfo($lottery_type);
+        $lotteryBaseInfo = CommonLotteryService::getLotteryBaseInfo($lottery_type, $useCache=0);
 
-        return $lotteryBaseInfo['open_num_perdate']??($lottery_type == DEFAULT_LOTTERY_TYPE)?252:1;
+        return $lotteryBaseInfo['num']??288;
     }
 
     public static function clearDataTables(){
