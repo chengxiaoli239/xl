@@ -1838,10 +1838,10 @@ class DynamicType2Service extends BaseService {
         if (empty($x)) {
             throw_info('参数x不能为空');
         }
-        
+
         // 获取上期开奖数据
         $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lottery_type);
-        if (empty($historyKjData) || empty($historyKjData['codes'])) {
+        if (empty($historyKjData)) {
             throw_info('上期开奖数据不存在');
         }
         
@@ -1905,7 +1905,8 @@ class DynamicType2Service extends BaseService {
             ->select(['code', 'code_type'])
             ->from('lt_num4_type')
             ->where($where);
-        
+
+        $sql = $query->createCommand()->getRawSql();
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
         
@@ -1915,6 +1916,7 @@ class DynamicType2Service extends BaseService {
         Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '指定位置合分不等于上期对应位置合分', [
             'plan_id' => $plan->id,
             'lottery_type' => $lottery_type,
+            'sql' => $sql,
             'current_kj_qihao' => $currentKjQiHao,
             'next_qihao' => $nextQiHao,
             'positions' => $positions,
