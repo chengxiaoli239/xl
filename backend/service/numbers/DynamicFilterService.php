@@ -49,6 +49,8 @@ class DynamicFilterService extends BaseService {
         ['type'=>33, 'label'=>'相邻两个相加合分至少只有x个相等', 'params'=>['x'=>''], 'desc'=>"相邻位置相加的合分与上期相邻位置相加的合分比较，至少有x个相等<br>1、合分计算：如4+8=12，合分为2和12（个位数和十位数）<br>2、x范围：0~3，表示至少相等的个数", 'playway'=>[1, 2, 3]],
         ['type'=>34, 'label'=>'过滤上x期的和值', 'params'=>['x'=>''], 'desc'=>"过滤上x期的和值，其中x=1则过滤上期的和值，x=2则过滤上上期的和值<br>例如：x=1，上期和值为15，则过滤掉所有和值为15的四定号码", 'playway'=>[3]],
         ['type'=>35, 'label'=>'同位置最近1:x个|2:y个|3:z个|4:n个号码复试排除', 'params'=>['x'=>'', 'y'=>'', 'z'=>'', 'n'=>''], 'desc'=>"排除千百十个位：x、y、z、n个号码的所有复试组合。参数分别为千x、百y、十z、个n。", 'playway'=>[3]],
+        ['type'=>36, 'label'=>'指定位置排除期号尾号', 'params'=>['x'=>''], 'desc'=>"指定位置排除期号尾号，比如x：12，期号：250727003，则第1位和第2位排除号码3<br>1、x可以灵活组合位置，如：1234、234、134等<br>2、1234分别代表千百十个位", 'playway'=>[1, 2, 3]],
+        ['type'=>37, 'label'=>'指定位置合分不等于上期对应位置合分', 'params'=>['x'=>''], 'desc'=>"指定位置合分不等于上期对应位置合分，比如x：234，上期开：9843，则234位合分：8+4+3=15，过滤：5、15、25、35<br>1、x可以灵活组合位置，如：1234、234、134等<br>2、1234分别代表千百十个位<br>3、过滤和值会根据位置数量自动调整", 'playway'=>[1, 2, 3]],
     ];
     public static int $filterType = 0;
 
@@ -161,6 +163,12 @@ class DynamicFilterService extends BaseService {
                     break;
                 case 35: # 排除同位置最近n个号码复试
                     $codes = DynamicType2Service::filter35($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 36: # 指定位置排除期号尾号
+                    $codes = DynamicType2Service::filter36($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 37: # 指定位置合分不等于上期对应位置合分
+                    $codes = DynamicType2Service::filter37($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
             }
             if(empty($codes)){

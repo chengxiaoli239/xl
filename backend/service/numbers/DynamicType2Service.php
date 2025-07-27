@@ -1531,7 +1531,7 @@ class DynamicType2Service extends BaseService {
             // 有且只有3个相等
             $conditions[] = "((code_1 + code_2) IN (" . implode(',', $lastSum12Types) . ") AND (code_2 + code_3) IN (" . implode(',', $lastSum23Types) . ") AND (code_3 + code_4) IN (" . implode(',', $lastSum34Types) . "))";
         }
-        
+
         $where = ['OR'];
         foreach ($conditions as $condition) {
             $where[] = $condition;
@@ -1542,7 +1542,9 @@ class DynamicType2Service extends BaseService {
             ->from('lt_num4_type')
             ->where(['code_type' => $playway + 1])
             ->andWhere($where);
-        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '相邻合分有且只有' . $x . '个相等', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'qihao'=>$nextQiHao, 'sql'=>$query->createCommand()->getRawSql()]);
+        //$sql = $query->createCommand()->getRawSql();p($sql);
+
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '相邻合分有且只有' . $x . '个相等', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'qihao'=>$nextQiHao, 'sql'=>$sql]);
         
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
@@ -1750,5 +1752,179 @@ class DynamicType2Service extends BaseService {
         NumCodeService::addBetDescRand($plan['id'], $nextQiHao, $betDesc);
  
         return array_column($results, 'code');
+    }
+
+    /**
+     * 指定位置排除期号尾号
+     * @param $plan
+     * @param $dynamic
+     * @param $filterDesc
+     * @return array
+     * @throws \common\exceptions\InfoException
+     */
+    public static function filter36($plan, $dynamic, $filterDesc) {
+        $params = $dynamic['params'];
+        $lottery_type = $plan->lottery_type;
+        $playway = $plan->playway;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+        
+        $x = $params['x'];
+        if (empty($x)) {
+            throw_info('参数x不能为空');
+        }
+        
+        // 获取期号尾号
+        $qihaoTail = substr($nextQiHao, -1);
+        
+        // 解析位置参数，1234分别代表千百十个位
+        $positions = str_split($x);
+        $excludeConditions = [];
+        
+        foreach ($positions as $pos) {
+            if (!in_array($pos, ['1', '2', '3', '4'])) {
+                throw_info('位置参数错误，只能包含1、2、3、4，分别代表千百十个位');
+            }
+            $excludeConditions[] = ['!=', 'code_' . $pos, $qihaoTail];
+        }
+        
+        // 构建查询条件
+        $where = ['AND'];
+        $where[] = ['code_type' => $playway + 1];
+        $where = array_merge($where, $excludeConditions);
+        
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where($where);
+        
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        
+        $positionNames = [];
+        foreach ($positions as $pos) {
+            $positionNames[] = ['1'=>'千', '2'=>'百', '3'=>'十', '4'=>'个'][$pos] . '位';
+        }
+        
+        $betDesc = $filterDesc['label'] . ":期号" . $nextQiHao . "尾号为" . $qihaoTail . "，排除" . implode('、', $positionNames) . "的号码" . $qihaoTail;
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+        
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '指定位置排除期号尾号', [
+            'plan_id' => $plan->id,
+            'lottery_type' => $lottery_type,
+            'next_qihao' => $nextQiHao,
+            'qihao_tail' => $qihaoTail,
+            'positions' => $positions,
+            'filtered_count' => count($codes)
+        ]);
+        
+        return $codes;
+    }
+
+    /**
+     * 指定位置合分不等于上期对应位置合分
+     * @param $plan
+     * @param $dynamic
+     * @param $filterDesc
+     * @return array
+     * @throws \common\exceptions\InfoException
+     */
+    public static function filter37($plan, $dynamic, $filterDesc) {
+        $params = $dynamic['params'];
+        $lottery_type = $plan->lottery_type;
+        $playway = $plan->playway;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+        
+        $x = $params['x'];
+        if (empty($x)) {
+            throw_info('参数x不能为空');
+        }
+        
+        // 获取上期开奖数据
+        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lottery_type);
+        if (empty($historyKjData) || empty($historyKjData['codes'])) {
+            throw_info('上期开奖数据不存在');
+        }
+        
+        // 解析位置参数，1234分别代表千百十个位
+        $positions = str_split($x);
+        $positionNames = [];
+        $positionSum = 0;
+        
+        foreach ($positions as $pos) {
+            if (!in_array($pos, ['1', '2', '3', '4'])) {
+                throw_info('位置参数错误，只能包含1、2、3、4，分别代表千百十个位');
+            }
+            $positionNames[] = ['1'=>'千', '2'=>'百', '3'=>'十', '4'=>'个'][$pos] . '位';
+            
+            // 获取上期对应位置的号码
+            $codeIndex = (int)$pos - 1; // 转换为数组索引
+            $positionSum += (int)$historyKjData['codes'][$codeIndex];
+        }
+        
+        // 计算上期指定位置的合分
+        $lastSum = $positionSum % 10; // 个位数
+        $lastSumTens = $positionSum; // 十位数（如果有的话）
+        
+        // 根据位置数量确定过滤的和值范围
+        $filterSums = [];
+        $positionCount = count($positions);
+        
+        // 根据位置数量调整过滤范围
+        if ($positionCount == 1) {
+            // 1个位置：过滤个位数和十位数
+            $filterSums = [$lastSum, $lastSumTens];
+        } elseif ($positionCount == 2) {
+            // 2个位置：过滤个位数和十位数
+            $filterSums = [$lastSum, $lastSumTens];
+        } elseif ($positionCount == 3) {
+            // 3个位置：过滤个位数、十位数、二十位数
+            $filterSums = [$lastSum, $lastSumTens, $lastSumTens + 10];
+        } else {
+            // 4个位置：过滤个位数、十位数、二十位数、三十位数
+            $filterSums = [$lastSum, $lastSumTens, $lastSumTens + 10, $lastSumTens + 20];
+        }
+        
+        // 去重并过滤掉0值
+        $filterSums = array_unique(array_filter($filterSums));
+        
+        // 构建查询条件
+        $where = ['AND'];
+        $where[] = ['code_type' => $playway + 1];
+        
+        // 构建位置相加的条件
+        $positionFields = [];
+        foreach ($positions as $pos) {
+            $positionFields[] = "code_{$pos}";
+        }
+        $sumExpression = "(" . implode(" + ", $positionFields) . ")";
+        
+        // 排除上期合分的和值
+        $where[] = ['NOT IN', $sumExpression, $filterSums];
+        
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where($where);
+        
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+        
+        $betDesc = $filterDesc['label'] . ":上期" . implode('、', $positionNames) . "合分为" . $lastSum . "，过滤和值" . implode('、', $filterSums);
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+        
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '指定位置合分不等于上期对应位置合分', [
+            'plan_id' => $plan->id,
+            'lottery_type' => $lottery_type,
+            'current_kj_qihao' => $currentKjQiHao,
+            'next_qihao' => $nextQiHao,
+            'positions' => $positions,
+            'position_names' => $positionNames,
+            'last_sum' => $lastSum,
+            'last_sum_tens' => $lastSumTens,
+            'filter_sums' => $filterSums,
+            'filtered_count' => count($codes)
+        ]);
+        
+        return $codes;
     }
 }
