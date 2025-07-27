@@ -5,6 +5,7 @@ use backend\models\Num4Type;
 use backend\models\SscKjData;
 use backend\service\BaseService;
 use backend\service\NumService;
+use backend\service\numbers\NumCodeService;
 use common\helpers\Code;
 use common\helpers\LotteryType;
 use common\service\ssc\QihaoService;
@@ -1857,8 +1858,7 @@ class DynamicType2Service extends BaseService {
             $positionNames[] = ['1'=>'千', '2'=>'百', '3'=>'十', '4'=>'个'][$pos] . '位';
             
             // 获取上期对应位置的号码
-            $codeIndex = (int)$pos - 1; // 转换为数组索引
-            $positionSum += (int)$historyKjData['codes'][$codeIndex];
+            $positionSum += (int)$historyKjData['code' . $pos];
         }
         
         // 计算上期指定位置的合分
