@@ -1542,6 +1542,7 @@ class DynamicType2Service extends BaseService {
             ->from('lt_num4_type')
             ->where(['code_type' => $playway + 1])
             ->andWhere($where);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '相邻合分有且只有' . $x . '个相等', ['plan_id'=>$plan->id, 'lottery_type'=>$lottery_type, 'qihao'=>$nextQiHao, 'sql'=>$query->createCommand()->getRawSql()]);
         
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
