@@ -40,7 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'inputTemplate'=>'{input}',
         'options' => [
         ],
-    ])->checkbox() ?>
+    ])->checkbox(['checked' => true]) ?>
 
     <?= Html::submitButton(Yii::t('common', 'login'), ['class' => 'btn btn-lg btn-login btn-block', 'name' => 'login-button']) ?>
 </div>

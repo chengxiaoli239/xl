@@ -51,6 +51,7 @@ class DynamicFilterService extends BaseService {
         ['type'=>35, 'label'=>'同位置最近1:x个|2:y个|3:z个|4:n个号码复试排除', 'params'=>['x'=>'', 'y'=>'', 'z'=>'', 'n'=>''], 'desc'=>"排除千百十个位：x、y、z、n个号码的所有复试组合。参数分别为千x、百y、十z、个n。", 'playway'=>[3]],
         ['type'=>36, 'label'=>'指定位置排除期号尾号', 'params'=>['x'=>''], 'desc'=>"指定位置排除期号尾号，比如x：12，期号：250727003，则第1位和第2位排除号码3<br>1、x可以灵活组合位置，如：1234、234、134等<br>2、1234分别代表千百十个位", 'playway'=>[1, 2, 3]],
         ['type'=>37, 'label'=>'指定位置合分不等于上期对应位置合分', 'params'=>['x'=>''], 'desc'=>"指定位置合分不等于上期对应位置合分，比如x：234，上期开：9843，则234位合分：8+4+3=15，过滤：5、15、25、35<br>1、x可以灵活组合位置，如：1234、234、134等<br>2、1234分别代表千百十个位<br>3、过滤和值会根据位置数量自动调整", 'playway'=>[1, 2, 3]],
+        ['type'=>38, 'label'=>'筛选昨天早8点到今天凌晨5点重复x次或x次以上的号码全倒', 'params'=>['x'=>''], 'desc'=>"主要为幸运五(lottery_type=8)，筛选昨天早8点到今天凌晨5点重复x次或x次以上的号码，这些号码来全倒，主要为4定号码", 'playway'=>[3], 'lottery_type'=>[8]],
     ];
     public static int $filterType = 0;
 
@@ -169,6 +170,9 @@ class DynamicFilterService extends BaseService {
                     break;
                 case 37: # 指定位置合分不等于上期对应位置合分
                     $codes = DynamicType2Service::filter37($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 38: # 动态过滤2
+                    $codes = DynamicType2Service::filter38($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
             }
             if(empty($codes)){

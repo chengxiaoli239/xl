@@ -1929,4 +1929,119 @@ class DynamicType2Service extends BaseService {
         
         return $codes;
     }
+
+    /**
+     * 动态过滤2 - 幸运五重复号码过滤
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     */
+    public static function filter38($plan, $dynamic, $filterDesc) {
+        $lottery_type = $plan->lottery_type;
+        $playway = $plan->playway;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+        
+        $params = $dynamic['params'];
+        $x = $params['x'];
+        if (empty($x)) {
+            throw_info('参数x不能为空');
+        }
+
+        // 检查是否为幸运五
+        if ($lottery_type != 8) {
+            throw_info('动态过滤2仅支持幸运五(lottery_type=8)');
+        }
+
+        // 生成缓存key，包含x参数
+        $cacheKey = "dynamic_filter_2_{$lottery_type}_{$x}_" . date('Y-m-d');
+        
+        // 检查缓存是否存在
+        $cachedCodes = commonRedis()->get($cacheKey);
+        if ($cachedCodes !== false) {
+            $codes = json_decode($cachedCodes, true);
+            $betDesc = $filterDesc['label'] . "[{$x}次]：使用缓存数据，过滤号码" . count($codes) . "个";
+            NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+            return $codes;
+        }
+
+        // 计算时间范围：根据用户习惯，早上8点到第二天凌晨5点为一个区间
+        $currentTime = time();
+        $today = date('Y-m-d');
+        
+        // 如果当前时间在08:00到23:59之间，取昨天早8点到今天凌晨5点
+        // 如果当前时间过了23:59，取前天早8点到昨天凌晨5点
+        if ($currentTime >= strtotime($today . ' 08:00:00') && $currentTime <= strtotime($today . ' 23:59:59')) {
+            // 今天08:00到23:59，取昨天早8点到今天凌晨5点
+            $startTime = strtotime(date('Y-m-d', strtotime('-1 day')) . ' 08:00:00');
+            $endTime = strtotime($today . ' 05:00:00');
+        } else {
+            // 过了23:59，取前天早8点到昨天凌晨5点
+            $startTime = strtotime(date('Y-m-d', strtotime('-2 day')) . ' 08:00:00');
+            $endTime = strtotime(date('Y-m-d', strtotime('-1 day')) . ' 05:00:00');
+        }
+
+        // 使用SQL GROUP BY直接统计出现次数大于等于x的号码
+        $filteredCodesQuery = SscKjData::find()
+            ->select(['code_4n', 'COUNT(id) as count'])
+            ->where(['lottery_type' => $lottery_type])
+            ->andWhere(['>=', 'created_at', $startTime])
+            ->andWhere(['<=', 'created_at', $endTime])
+            ->groupBy(['code_4n'])
+            ->having(['>=', 'COUNT(id)', $x]);
+
+        $filteredCodes = $filteredCodesQuery->asArray()->all();
+        
+        if (empty($filteredCodes)) {
+            // 如果没有符合条件的号码，返回所有号码
+            $query = Num4Type::find()
+                ->select(['code', 'code_4n', 'code_type'])
+                ->where(['code_type' => $playway + 1]);
+            $results = $query->asArray()->all();
+            $codes = ArrayHelper::getColumn($results, 'code');
+            
+            $betDesc = $filterDesc['label'] . "[{$x}次]：无重复号码，返回所有号码";
+            NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+            return $codes;
+        }
+
+        // 提取符合条件的号码
+        $filteredCodeList = ArrayHelper::getColumn($filteredCodes, 'code_4n');
+
+        // 直接查询号码表中code_str等于过滤出来号码的所有记录
+        $query = Num4Type::find()
+            ->select(['code', 'code_type'])
+            ->where(['code_type' => $playway + 1])
+            ->andWhere(['IN', 'code_str', $filteredCodeList]);
+
+        $sql = $query->createCommand()->getRawSql();
+        $results = $query->asArray()->all();
+        $allCodes = ArrayHelper::getColumn($results, 'code');
+
+        // 计算缓存剩余时间（到第二天凌晨5点）
+        $tomorrow5am = strtotime(date('Y-m-d', strtotime('+1 day')) . ' 05:00:00');
+        $cacheExpire = $tomorrow5am - time();
+
+        // 设置缓存
+        //commonRedis()->setex($cacheKey, $cacheExpire, $allCodes);
+
+        $betDesc = $filterDesc['label'] . "[大于等于{$x}次]：筛选出号码：".implode(',',$filteredCodeList).'，' . count($filteredCodeList) . "个重复号码，生成" . count($allCodes) . "个过滤号码";
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '动态过滤2', [
+            'plan_id' => $plan->id,
+            'lottery_type' => $lottery_type,
+            'x' => $x,
+            'sql' => $sql,
+            'start_time' => date('Y-m-d H:i:s', $startTime),
+            'end_time' => date('Y-m-d H:i:s', $endTime),
+            'filtered_codes' => $filteredCodeList,
+            'filtered_count' => count($filteredCodeList),
+            'result_count' => count($allCodes),
+            'cache_key' => $cacheKey,
+            'cache_expire' => $cacheExpire
+        ]);
+
+        return $allCodes;
+    }
 }
