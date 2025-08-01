@@ -1963,7 +1963,7 @@ class DynamicType2Service extends BaseService {
             $allCodes = $codesData['allCodes'];
             $betDesc = $filterDesc['label'] . "[大于等于{$x}次]：筛选出号码：".implode(',',$filteredCodeList).'，' . count($filteredCodeList) . "个重复号码，生成" . count($allCodes) . "个过滤号码";
             NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
-            return $filteredCodeList;
+            return $allCodes;
         }
 
         // 计算时间范围：根据用户习惯，早上8点到第二天凌晨5点为一个区间
