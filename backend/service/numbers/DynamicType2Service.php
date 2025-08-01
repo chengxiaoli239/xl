@@ -1957,12 +1957,13 @@ class DynamicType2Service extends BaseService {
         $cacheKey = "dynamic_filter_2_{$lottery_type}_{$x}_" . date('Y-m-d');
         
         // 检查缓存是否存在
-        $cachedCodes = commonRedis()->get($cacheKey);
-        if ($cachedCodes !== false) {
-            $codes = json_decode($cachedCodes, true);
-            $betDesc = $filterDesc['label'] . "[{$x}次]：使用缓存数据，过滤号码" . count($codes) . "个";
+        $codesData = commonRedis()->get($cacheKey);
+        if ($codesData !== false) {
+            $filteredCodeList = $codesData['filteredCodeList'];
+            $allCodes = $codesData['allCodes'];
+            $betDesc = $filterDesc['label'] . "[大于等于{$x}次]：筛选出号码：".implode(',',$filteredCodeList).'，' . count($filteredCodeList) . "个重复号码，生成" . count($allCodes) . "个过滤号码";
             NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
-            return $codes;
+            return $filteredCodeList;
         }
 
         // 计算时间范围：根据用户习惯，早上8点到第二天凌晨5点为一个区间
@@ -2022,8 +2023,12 @@ class DynamicType2Service extends BaseService {
         $tomorrow5am = strtotime(date('Y-m-d', strtotime('+1 day')) . ' 05:00:00');
         $cacheExpire = $tomorrow5am - time();
 
+        $codesData = [
+            'allCodes' => $allCodes,
+            'filteredCodeList' => $filteredCodeList,
+        ];
         // 设置缓存
-        //commonRedis()->setex($cacheKey, $cacheExpire, $allCodes);
+        commonRedis()->setex($cacheKey, $cacheExpire, $codesData);
 
         $betDesc = $filterDesc['label'] . "[大于等于{$x}次]：筛选出号码：".implode(',',$filteredCodeList).'，' . count($filteredCodeList) . "个重复号码，生成" . count($allCodes) . "个过滤号码";
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
