@@ -1954,7 +1954,7 @@ class DynamicType2Service extends BaseService {
         }
 
         // 生成缓存key，包含x参数
-        $cacheKey = "dynamic_filter_2_{$lottery_type}_{$x}_" . date('Y-m-d');
+        $cacheKey = "dynamic_filter_2_{$lottery_type}_{$x}_{$plan->id}_" . date('Y-m-d');
         
         // 检查缓存是否存在
         $codesData = commonRedis()->get($cacheKey);
@@ -1981,6 +1981,7 @@ class DynamicType2Service extends BaseService {
             $startTime = strtotime(date('Y-m-d', strtotime('-2 day')) . ' 08:00:00');
             $endTime = strtotime(date('Y-m-d', strtotime('-1 day')) . ' 05:00:00');
         }
+        //p([date('Y-m-d H:i:s', $startTime), date('Y-m-d H:i:s', $endTime)]);
 
         // 使用SQL GROUP BY直接统计出现次数大于等于x的号码
         $filteredCodesQuery = SscKjData::find()
@@ -2028,7 +2029,7 @@ class DynamicType2Service extends BaseService {
             'filteredCodeList' => $filteredCodeList,
         ];
         // 设置缓存
-        commonRedis()->setex($cacheKey, $cacheExpire, $codesData);
+        commonRedis()->setex($cacheKey, 3600, $codesData);
 
         $betDesc = $filterDesc['label'] . "[大于等于{$x}次]：筛选出号码：".implode(',',$filteredCodeList).'，' . count($filteredCodeList) . "个重复号码，生成" . count($allCodes) . "个过滤号码";
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
