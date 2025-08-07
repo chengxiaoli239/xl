@@ -2090,7 +2090,7 @@ class SscDataService extends BaseService {
         try {
             $logArr = [];
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划1', ['lottery_type'=>$lottery_type]);
-            $DataDealStatus = DealDataService::judgeDealTaskStatus($lottery_type, '', $field='opProfitsPlans_status');
+            $DataDealStatus = DealDataService::judgeDealTaskStatus($lottery_type, $qihao, $field='opProfitsPlans_status');
             if($DataDealStatus->$field == SscDataService::DEAL_DATA_STATUS_NOT_NEED_DEAL){
                 throw_info('未开启统计：'.DealDataService::$dealDataStatusFields[$field], 40001);
             }
