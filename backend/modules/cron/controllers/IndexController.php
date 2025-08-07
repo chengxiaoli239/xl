@@ -66,24 +66,6 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 用户计划投注
-     * @return array
-     */
-    public function actionBet(){
-        self::_init();
-        $time = date("H:i");
-        /*
-        if(\Yii::$app->params['ssc_kj_time_start'] <= $time && $time <= \Yii::$app->params['ssc_kj_time_end'] ){
-            $rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
-            return $rst;
-        }
-        */
-        $rst['bet'] = BetService::bet(); // 用户新计划投注，可正买可反买
-
-        return $rst;
-    }
-
-    /**
      * @desc 访问首页
      * @return mixed
      */

@@ -44,7 +44,6 @@ use common\service\cache\CacheKeyService;
 use common\service\CommonService;
 use common\service\helpers\ThirdD;
 use common\service\jobs\plan\OperateUserPlanKjJob;
-use common\service\jobs\plan\UserPlanBetJob;
 use common\service\lottery\aozhou5\AoZhou5BetService;
 use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
 use common\service\lottery\LotteryTypeService;
@@ -83,6 +82,7 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $rst['UserBetJob'] = BetService::lotteryBet($user_id=74);p($rst); # 用户游戏任务
         $rst = TzService::operateSystemBetPlans($lottery_type=23, $qihao='250807428', $ignore=0); p($rst);# 处理系统投注计划，更新统计数据、
         $plans = UserSysPlans::find()->where(['uid'=>35, 'status'=>[1,0]])->orderBy(['id'=>SORT_ASC])->all();
         $planIds =[];
@@ -135,11 +135,8 @@ class IndexController extends Controller
         $params = ['business_id'=>$BettingRecord->qihao, 'lottery_type'=>$lottery_type, 'bet_id'=>$BettingRecord->id];
         push_queue_open(OperateUserPlanKjJob::class, $params);
         p('dddddd');
-        $rst['data'] = BetService::insertPlansTask($lottery_types=[8], 1,'16795'); p($rst);
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type=8);
         $planId = 16742;
-        push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$planId, 'qiHao'=>$nextQiHao, 'business_id'=>$nextQiHao]);
-        p(['planId'=>$planId, 'nextQiHao'=>$nextQiHao]);
         $where = ['AND', ['=', 'qihao', $nextQiHao], ['=', 'plan_id', $planId], ['=', 'uid', 50]];
         if(BettingRecords::find()->where($where)->exists()){
             throw_info('yx表已记录1...');
@@ -163,7 +160,6 @@ class IndexController extends Controller
                 $uid = $plan->uid;
                 $status = $plan->status;
                 print_r(['planId'=>$planId, 'uid'=>$uid, 'status'=>$status]);
-                //push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$planId, 'qihao'=>$nextQiHao]);
                 $rst['data'] = ['activeQiHao'=>$nextQiHao, 'plan_id'=>$plan->id, 'msg'=>'正常'];
             }catch (\Exception $e){
                 if($e->getCode()<40000){

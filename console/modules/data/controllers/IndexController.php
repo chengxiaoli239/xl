@@ -79,24 +79,6 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 用户计划投注
-     * @return array
-     */
-    public function actionBet(){
-        self::_init();
-        $time = date("H:i");
-        /*
-        if(\Yii::$app->params['ssc_kj_time_start'] <= $time && $time <= \Yii::$app->params['ssc_kj_time_end'] ){
-            $rst = ['status'=>300, 'msg'=>'当前时间暂停投注~'.date("Y-m-d H:i:s")];
-            return $rst;
-        }
-        */
-        $rst['bet'] = BetService::bet(); // 用户新计划投注，可正买可反买
-
-        return $rst;
-    }
-
-    /**
      * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii data/index/bet-by-uid
      * @desc 多线程跑用户计划
      * @return mixed
@@ -121,27 +103,6 @@ class IndexController extends Controller
             }
             sleep($sleep_time);
             $rst[$i]['sleep_time'] = $sleep_time;
-        }
-
-        return $rst;
-    }
-
-
-    /**
-     * @desc 批量插入投注任务
-     * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii data/index/insert-plans-task
-     * @return array
-     */
-    public function actionInsertPlansTask(){
-        self::_init();
-        $rst = ['status'=>200, 'msg'=>'操作成功'];
-        #$post = \Yii::$app->request->post();
-        $lottery_types = [1, 8, 17];
-
-        for ($i=0; $i<3; $i++){
-            $rst['data'] = BetService::insertPlansTask($lottery_types);
-            //$rst['batch_simulate_data'] = BetService::batchSimulateBet($post['lottery_types']);
-            sleep(18);
         }
 
         return $rst;

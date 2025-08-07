@@ -189,41 +189,25 @@ class TzService extends BaseService {
             foreach ($plans as $plan){
                 # 处理完计划后,下一期投注开关开启(value:1) start
                 $next_mkey = BetService::buildBeforeAndAfterBetKey($lottery_type, $next_qihao, $plan->uid);
-                $rst11[$plan->id]['rst'] = $m->set($next_mkey,1,$next_time); # 真实
-                $rst11[$plan->id]['next_mkey'] = $next_mkey;
-                $rst11[$plan->id]['next_time'] = $next_time;
+                $m->set($next_mkey,1,$next_time); # 真实
             }
             $next_simulate_mkey = TzService::buildNextKey($lottery_type, $next_qihao);
-            $rst10['rst'] = $m->set($next_simulate_mkey,1,$next_time); # 模拟
-            $rst10['next_simulate_mkey'] = $next_simulate_mkey;
-            $rst10['next_time'] = $next_time;
+            $m->set($next_simulate_mkey,1,$next_time); # 模拟
             # 处理完计划后,下一期投注开关开启(value:1) end
 
             # 计划任务是否处理完成后锁住(value:1)，避免重复处理 start
             $pkey = BetService::buildPlanSwitchKey($lottery_type, $qihao);
-            //$simulate_pkey = \Yii::$app->params['PLAN_SWITCH_SIMULATE_KEY'].'_'.$qihao;
             $time = 1080;
             if($lottery_type == 5 && substr($qihao,6) == '010'){
                 $time = 60*60*4; # 4小时
             } elseif($lottery_type == 9){
                 $time = 60*60*7; # 台湾宾果 7小时
             }
-            $rst21['rst'] = $m->set($pkey,1,$time);
-            $rst21['pkey'] = $pkey;
-            $rst21['time'] = $time;
-            //$rst20 = $m->set($simulate_pkey,1,$time);
-            # 计划任务是否处理完成后锁住(value:1)，避免重复处理 end
+            $m->set($pkey,1,$time);
 
-            $where_deal = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao];
-            $DataDealStatus = DataDealStatus::findOne($where_deal);
-            if(!empty($DataDealStatus)){
-                $DataDealStatus->next_qihao = (string)$next_qihao;
-                if(!$DataDealStatus->save()){
-                    throw new \Exception(json_encode($DataDealStatus->getErrors(), 320));
-                }
-            }
+            DataDealStatus::updateAll(['next_qihao'=>(string)$next_qihao], ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
 
-            $logData = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'rst11'=>$rst11, 'rst10'=>$rst10, 'rst21'=>$rst21];
+            $logData = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao];
             Tool_Common::log('afterRunSysPlans','INFO','系统计划处理后', $logData);
             push_queue(UserBetTaskRecordJob::class, ['lottery_type'=>$lottery_type, 'business_id'=>$qihao]);
         }catch (\Exception $e){

@@ -721,8 +721,6 @@ class IndexController extends Controller
         p($rst);
         $data = QxcTcw::getTcwOne($returnType = 'json', $is_auto = 0);
         p($data);
-        $rst['bet'] = BetService::betByUidNew($uid = 11);
-        p($rst); // 用户新计划投注，可正买可反买
         $data = ZhongFaService::userInfo($uid = 14, $tz_system_id = 16);
         p($data);
         $data = LeCaiService::getLotteryBatchGw($lottery_type = 18);
@@ -859,9 +857,6 @@ class IndexController extends Controller
         $data = XjSsc::NineNineNew();
         p($data);
         $m = \Yii::$app->cache;
-        $mkey = BetService::buildBeforeAndAfterBetKey($lottery_type = 6, $qihao = '2020120603', $uid = 11);
-        $r = $m->get($mkey);
-        p([$mkey, $r]);
         $rst = NineNineNewService::getBalance($uid = 18, $tz_system_id = 12);
         p($rst);
         $loginRst = NineNineNewService::login($id = 18, $tz_system_id = 12);
@@ -1087,8 +1082,6 @@ class IndexController extends Controller
         p($rst);
         $rst = NumService::delByValue(['1', 'X', '3', 'X'], 'X');
         p($rst);
-        $rst = BetService::isCanBet($lottery_type = 5);
-        p($rst);
         $rst = CommonService::isCodeType3n2b('0,0,5,6');
         p($rst);
         $rst = CommonService::isCodeType3n2b('1,2,3,4');
@@ -1134,8 +1127,6 @@ class IndexController extends Controller
         p($rst);
 
 
-        $rst = BetService::bet();
-        p($rst);// 用户新计划投注，可正买可反买
         $data = XjSsc::batchSevenDay();
         p($data);
         $rst = BaseNumService::getRepeat4Codes22();
