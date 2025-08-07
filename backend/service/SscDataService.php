@@ -2070,9 +2070,11 @@ class SscDataService extends BaseService {
 
     /**
      * @desc 处理止盈止损计划
+     * @param int $lottery_type
+     * @param string $qihao 最新已经开奖的期号
      * @return array
      */
-    public static function operateProfitsPlans($lottery_type = DEFAULT_LOTTERY_TYPE): array
+    public static function operateProfitsPlans($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao=''): array
     {
         $now_HI = date('H:i:s');
         $lotteryTypeData = LotteryTypeService::getLotteryTypeData();
@@ -2101,7 +2103,7 @@ class SscDataService extends BaseService {
             Tool_Common::log('opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划2', ['lottery_type'=>$lottery_type]);
 
             $logArr = [];
-            $current_kj_qihao = HN0898Service::getCurrentQihao($lottery_type);
+            $current_kj_qihao = $qihao?:HN0898Service::getCurrentQihao($lottery_type);
 
             //$planIds = UserSysPlans::find()->select('id')->where(['status'=>1])->column();
             $planIdData = UserSysPlans::find()->select(['uid', 'id'])->where(['status'=>1])->asArray()->all();

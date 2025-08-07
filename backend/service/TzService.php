@@ -146,9 +146,10 @@ class TzService extends BaseService {
 
             # 止盈止损、倍投计划处理
             if($isCanOpStaticStatus = StaticService::isCanOpStatic($lottery_type, $qihao, $mkey = 'opProfitsPlans')) {
-                $rstLog['opProfitsPlans'] = SscDataService::operateProfitsPlans($lottery_type); # 处理止盈止损、倍投等计划
+                $rstLog['opProfitsPlans'] = SscDataService::operateProfitsPlans($lottery_type, $qihao); # 处理止盈止损、倍投等计划
                 StaticService::afterOpStatic($lottery_type, $qihao, 'opProfitsPlans');
             }
+            $time8 = microtime(true);
 
             $rst['consume_time0'] = ($time1 - $time0).'s';
             $rst['consume_time1'] = ($time2 - $time1).'s';
@@ -157,10 +158,11 @@ class TzService extends BaseService {
             //$rst['consume_time4'] = ($time5 - $time4).'s';
             $rst['consume_time5'] = ($time6 - $time5).'s';
             $rst['consume_time6'] = ($time7 - $time6).'s';
+            $rst['consume_time7'] = ($time8 - $time7).'s';
             $rst['isCanOpStaticStatus'] = $isCanOpStaticStatus;
-            Tool_Common::log('/static/'.__FUNCTION__,'INFO','处理系统投注计划', ['rst'=>$rst, 'rstLog'=>$rstLog]);
             StaticService::afterOpStatic($lottery_type, $qihao, 'opSystemBetPlans');
             #$rst['afterRunSysPlans'] = TzService::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
+            Tool_Common::log('/static/'.__FUNCTION__,'INFO','处理系统投注计划', ['rst'=>$rst, 'rstLog'=>$rstLog]);
             push_queue(\common\service\jobs\kj_data\AfterRunSysPlansJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'business_id'=>$qihao]);
         }catch (\Exception $e){
             StaticService::afterOpStatic($lottery_type, $qihao, 'opSystemBetPlans');
