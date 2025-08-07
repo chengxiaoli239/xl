@@ -2834,7 +2834,7 @@ class StaticService extends BaseService {
      */
     public static function isCanOpStatic($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao='', $key = 'opAllStaticProfits'){
         $m = \Yii::$app->cache;
-        $mkey = McKeyService::buildStaticMKey($key, $lottery_type);
+        $mkey = McKeyService::buildStaticMKey($key, $lottery_type, $qihao);
 
         $status = $m->get($mkey); # 为true或1则不能再往下执行统计
 
@@ -2866,7 +2866,7 @@ class StaticService extends BaseService {
         $qihao = $qihao?:HN0898Service::getCurrentQihao($lottery_type);
         if(SscKjData::findOne(['lottery_type'=>$lottery_type,'qihao'=>$qihao])) {
             $m = \Yii::$app->cache;
-            $mkey = McKeyService::buildStaticMKey($key, $lottery_type);
+            $mkey = McKeyService::buildStaticMKey($key, $lottery_type, $qihao);
 
             $cacheTime = BetService::getBetCacheTime($lottery_type, $qihao);
             $rst = $m->set($mkey, true, $cacheTime);

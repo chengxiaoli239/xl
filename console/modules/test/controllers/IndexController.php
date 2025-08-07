@@ -83,6 +83,7 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $rst = TzService::operateSystemBetPlans($lottery_type=23, $qihao='250807428', $ignore=0); p($rst);# 处理系统投注计划，更新统计数据、
         $plans = UserSysPlans::find()->where(['uid'=>35, 'status'=>[1,0]])->orderBy(['id'=>SORT_ASC])->all();
         $planIds =[];
         foreach ($plans as $plan){
@@ -337,7 +338,6 @@ class IndexController extends Controller
         $rst = OperatePlanService::operatePlans18($UserSysPlan, $current_kj_qihao='20240902131');
         p($rst);
 
-        $rst = TzService::operateSystemBetPlans($lottery_type=8, $qihao='20240902131', $ignore=0); p($rst);# 处理系统投注计划，更新统计数据、
         list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lotteryType=8);
         p([$currentKjQiHao, $qiHao]);
         $lottery_type = 8;
