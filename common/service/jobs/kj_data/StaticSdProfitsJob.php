@@ -24,8 +24,9 @@ class StaticSdProfitsJob extends CommonJob {
     public static function handle($params){
         self::_init();
         $lottery_type = $params['lottery_type'];
-        if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
-        $rst = StaticService::opAllStaticProfits([$lottery_type]);
+        $qihao = $params['qihao'];
+        if(!self::$staticStatus) return '数据统计开关已关闭';
+        $rst = StaticService::opAllStaticProfits($lottery_type, $qihao);
         return $rst;
     }
 

@@ -64,24 +64,6 @@ class IndexController extends Controller
         return true;
     }
 
-
-    /**
-     * @desc 统计
-     * @return array
-     */
-    public function actionOpStatic(): array
-    {
-        self::_init();
-        if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
-        $start_time = microtime(true);
-        $rst[] = StaticService::staticAll2NumsYl(); # 统计所有二字现遗漏
-        $log_time = microtime(true);
-
-        $rst['consume_time'] = ($log_time - $start_time).'s';
-
-        return $rst;
-    }
-
     /**
      * @desc 四定单双利润统计
      * @return array
@@ -92,20 +74,6 @@ class IndexController extends Controller
         if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
 
         $rst = StaticService::opAllStaticProfits();
-
-        return $rst;
-    }
-
-    /**
-     * @desc 四定和值利润统计
-     * @return array
-     */
-    public function actionStaticHzProfits(): array
-    {
-        self::_init();
-        if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
-        $post = \Yii::$app->request->post();
-        $rst = StaticService::opStatic($post['lottery_types']); # 和值、四定利润统计
 
         return $rst;
     }

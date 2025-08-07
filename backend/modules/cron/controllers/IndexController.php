@@ -39,22 +39,6 @@ class IndexController extends Controller
     }
 
     /**
-     * @desc 统计
-     * @return array
-     */
-    public function actionOpStatic(){
-        self::_init();
-        if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
-        $start_time = microtime(true);
-        $rst[] = StaticService::staticAll2NumsYl(); # 统计所有二字现遗漏
-        $log_time = microtime(true);
-
-        $rst['consume_time'] = ($log_time - $start_time).'s';
-
-        return $rst;
-    }
-
-    /**
      * @desc 号码和值投注记录
      * @return array
      */

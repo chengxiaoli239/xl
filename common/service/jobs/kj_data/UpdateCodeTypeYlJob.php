@@ -17,8 +17,9 @@ class UpdateCodeTypeYlJob extends CommonJob {
 
     public static function handle($params){
         $lottery_type = $params['lottery_type'];
+        $qihao = $params['qihao'];
 
-        $rst = StaticService::opAllCodeTypeYl([$lottery_type]);
+        $rst = StaticService::opAllCodeTypeYl($lottery_type, $qihao);
         return $rst;
     }
 

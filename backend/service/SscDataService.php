@@ -3829,7 +3829,7 @@ class SscDataService extends BaseService {
     /**
      * @desc 记录处理数据任务
      * @param $lottery_type
-     * @param string $qihao
+     * @param string $qihao 开奖号码对应的期号
      * @return array
      */
     public static function insertDealDataTask($lottery_type, $qihao=''): array

@@ -445,14 +445,7 @@ abstract class BetService extends BaseBetService {
                     Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-2', ['task_id'=>$task_id, 'plan_id'=>$plan_id, 'uid'=>$uid, 'lottery_type'=>$lottery_type, 'account'=>$account, 'tz_system_id'=>$tz_system_id, 'activeQiHao'=>$activeQiHao, 'qihao'=>$qihao]);
 
                     $BetService = self::getBetObj($uid, $tz_system_id, $lottery_type);
-                    if(false && $balance<$bet_money){
-                        BetService::closeTask($task_id, $qihao, $activeQiHao, $account, $msg='余额不足，不可重推'); # 关闭计划
-                    }elseif($qihao == $activeQiHao){ # 0:云服务
-                        #$betKey = BetService::buildLotteryBetKey($activeQiHao, $plan_id, $bet_sort_key, $task_id);
-                        #if($lock = $m->get($betKey)){
-                        #    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-3', ['task_id'=>$task_id,'betKey'=>$betKey]);
-                        #    continue;
-                        #}
+                    if($qihao == $activeQiHao){ # 0:云服务
                         $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao, 'opProfitsPlans_status');
                         Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断01', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan_id, 'DataDealStatus'=>$DataDealStatus, 'task_qihao'=>$qihao]);
                         if(empty($DataDealStatus) OR $DataDealStatus != 2){

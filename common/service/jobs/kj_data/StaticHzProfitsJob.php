@@ -25,11 +25,12 @@ class StaticHzProfitsJob extends CommonJob {
         try {
             self::_init();
             $lottery_type = $params['lottery_type'];
-            if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
+            $qihao = $params['qihao'];
+            if(!self::$staticStatus) return '数据统计开关已关闭';
             if($lottery_type == 23){
                 $rst = '高频不处理该数据类型的统计';
             }else{
-                $rst = StaticService::opStatic([$lottery_type]); # 和值、四定利润统计
+                $rst = StaticService::opStatic($lottery_type, $qihao); # 和值、四定利润统计
             }
         }catch (\Exception $e){
             return $e->getMessage();

@@ -594,7 +594,6 @@ class IndexController extends Controller
         $t = 5;
         p($t%($count));
         $batch_simulate_data = BetService::batchSimulateBet($lottery_types=[23], $uid=11, $is_auto=2);p($batch_simulate_data);
-        $rst = BetService::lotteryBet($uid=17);p($rst);
         $codes = '5,8,6,4,8';
         $codesArr = explode(',', $codes);
         p(array_pop($codesArr));
@@ -915,8 +914,6 @@ class IndexController extends Controller
         p($rst);
         $rst = NineNineNewService::getDifferentNums();
         p($rst);
-        $rst = StaticService::static2NumsYl($lottery_type = 5);
-        p($rst);
         $rst = SscDataService::update3NumYL($lottery_type = 6);
         p($rst);
         $dates = [];
@@ -1111,8 +1108,6 @@ class IndexController extends Controller
         p($rst);
         $miss = SscDataService::getCodeTypeYlHistoryMiss('555', $lottery_type = 5, 20000);
         p($miss);
-        $rst = StaticService::static2NumsYl($lottery_type = 8);
-        p($rst);
 
         //$str = '{"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}'; //p(json_decode($str, true)); d(strpos($str, "\"Status\":1") !== false);
 
@@ -1139,8 +1134,6 @@ class IndexController extends Controller
         p($rst);
 
 
-        $rst = StaticService::staticAll2NumsYl();
-        p($rst); # 统计所有二字现遗漏
         $rst = BetService::bet();
         p($rst);// 用户新计划投注，可正买可反买
         $data = XjSsc::batchSevenDay();
@@ -1223,10 +1216,6 @@ class IndexController extends Controller
         p($rst);
         $rst = StaticService::staticPerHzProfits('2019-03');
         p($rst); # 某月份每个和值利润统计
-        if ($status = StaticService::isCanOpStatic($lottery_type = 5, $mkey = 'opStatic')) {
-            p('xxxx');
-        }
-        p(rand());
         $rst = StaticService::staticSdHzProfitsPerdate();
         p($rst); # 每天每个和值利润统计
 
