@@ -204,8 +204,10 @@ abstract class BetService extends BaseBetService {
         $lottery_types = UserSysPlansService::getMyLotteryTypes($uid);
         foreach ($lottery_types as $data){
             if(in_array($data['lottery_type'], [\common\helpers\LotteryType::LUCKY_5, \common\helpers\LotteryType::ETH_3M, \common\helpers\LotteryType::ETH_10M])) { # 8、幸运五 18台湾快五
+                Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '下注-11111', ['uid'=>$uid, 'data'=>$data]);
                 $rst = BetService::betByUserUidTask([$data['lottery_type']], $uid);
             }else{
+                Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '下注-22222', ['uid'=>$uid, 'data'=>$data]);
                 $rst = BetService::betByUidNew($uid, $data['lottery_type']); // 预计要去掉
             }
         }
