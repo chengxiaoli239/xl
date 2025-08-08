@@ -799,45 +799,6 @@ class HN0898Service extends BaseTZService {
        return $rst;
    }
 
-   /**
-     * @desc 立即反买
-     * @param $account
-     * @param $plan_id
-     * @return array
-     */
-   public static function reverseTzNowBetRecord($uid, $BetRecordId){
-       $BettingRecords = BettingRecords::findOne($BetRecordId);
-       if(!$BettingRecords) return ['status'=>300, 'msg'=>'找不到投注计划记录'];
-
-       $tz_system_id = $BettingRecords->tz_system_id ? $BettingRecords->tz_system_id : 2;  # 默认99网
-       $HN0898Service = new HN0898Service($uid, $tz_system_id);
-       $oldCodes = $BettingRecords->codes;
-       $oldCodesArr = explode('@', $oldCodes);
-       $qihao = HN0898Service::getQihao();
-       $playway = $BettingRecords->playway;
-
-       $codes = '';
-       $SysPlansCodes = SysPlansCodes::find()->where(['AND',['NOT IN','code', $oldCodesArr], ['=', 'playway', $playway]])->all();
-       foreach ($SysPlansCodes as $sysPlansCode){
-           $codes .= $sysPlansCode->code.'@';
-       }
-       $codes = trim($codes, '@');
-
-       $m = \Yii::$app->cache;
-       $mkey = 'reverseTzNowBetRecord_'.$qihao.'_'.$playway;
-       if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了'];
-
-       $account = AdminModel::findOne(Yii::$app->user->id)['account'];
-       BetService::beforeBetNow($account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id, $uid);
-       $rst = $HN0898Service->bet($qihao, $BettingRecords->plan_id, $codes);
-       BetService::afterBetNow($BettingRecords->lottery_type, $qihao, $uid);
-
-       $m->set($mkey, 1, 5);
-
-       return $rst;
-   }
-
-
     /**
      * @decription 验证投注格式是否正确，待完善 2018.0220
      * @param $playway

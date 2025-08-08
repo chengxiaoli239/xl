@@ -154,15 +154,6 @@ class BettingRecordsController extends BaseController
     }
 
     /**
-     *@desc 投注列表 - 立即投注(反买)
-     */
-    public function actionReverseTzNow($id){
-        $rst = BetService::reverseTzNowBetRecord($this->_user_id, $id);
-
-        return $this->redirect(['index']);
-    }
-
-    /**
      * Updates an existing BettingRecords model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $id

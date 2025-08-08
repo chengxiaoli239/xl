@@ -66,16 +66,14 @@ class IndexController extends Controller
 
     /**
      * @desc 四定单双利润统计
-     * @return array
+     * @return array|string
      */
     public function actionStaticSdProfits(): array
     {
         self::_init();
         if(!self::$staticStatus) return ['status'=> 300, 'msg'=>'数据统计开关已关闭'];
 
-        $rst = StaticService::opAllStaticProfits();
-
-        return $rst;
+        return StaticService::opAllStaticProfits();
     }
 
     /**

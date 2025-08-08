@@ -203,16 +203,10 @@ abstract class BetService extends BaseBetService {
         # 4、下注
         $lottery_types = UserSysPlansService::getMyLotteryTypes($uid);
         foreach ($lottery_types as $data){
-            if(in_array($data['lottery_type'], [\common\helpers\LotteryType::LUCKY_5, \common\helpers\LotteryType::ETH_3M, \common\helpers\LotteryType::ETH_10M])) { # 8、幸运五 18台湾快五
-                Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '下注-11111', ['uid'=>$uid, 'data'=>$data]);
-                $rst = BetService::betByUserUidTask([$data['lottery_type']], $uid);
-            }else{
-                Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '下注-22222', ['uid'=>$uid, 'data'=>$data]);
-                $rst = BetService::betByUidNew($uid, $data['lottery_type']); // 预计要去掉
-            }
+            BetService::betByUserUidTask([$data['lottery_type']], $uid);
         }
 
-        return $rst;
+        return [];
     }
 
     /**
@@ -267,36 +261,6 @@ abstract class BetService extends BaseBetService {
         }
 
         return $datas;
-    }
-
-    /**
-     * @desc 单用户下注 - 新
-     */
-    public static function betByUidNew($uid = 0, $lottery_type=DEFAULT_LOTTERY_TYPE, $is_auto = 1){
-        if(!$uid) return ['status'=>300, 'msg'=>'用户id不能为0'];
-        $tzStatus = SystemConfig::findOne(['key'=>'tz_status'])->value;
-        if(!$tzStatus) return ['status'=>300, 'msg'=>'投注开关未开启'];
-        $lottery_types = $lottery_type ? [$lottery_type] : StaticService::getUserLotteryTypes($uid);
-        foreach ($lottery_types as $lottery_type) {
-            $hasActivePlan = CommonService::hasPlansActive($lottery_type);
-            if(in_array($lottery_type, [1, 8, 10, 11, 17, 22, 23, 24, 25]) && !$hasActivePlan){
-                continue;
-            }
-            $qihao = HN0898Service::getQihao($lottery_type);
-            $tzStatus = BetService::isCanBet($lottery_type, $uid);
-            Tool_Common::log('betByUid', 'INFO', '单用户下单-2', ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'tzStatus'=>$tzStatus]);
-            if (!$tzStatus) continue;
-
-            $where = ['AND',['=', 'lottery_type', $lottery_type], ['=', 'status', 1], ['=', 'uid', $uid], ['=', 'is_parent', 1]];
-            $plans = UserSysPlans::find()->where($where)->orderBy(['tz_sort'=>SORT_ASC])->all();
-            foreach ($plans as $plan){
-                $tzRst[$plan->id] = self::tzByPlanIdNew($plan->id, $is_auto);
-            }
-        }
-
-        Tool_Common::log('betByUidNew','INFO','用户真实投注-3', ['uid'=>$uid, 'rst'=>$tzRst]);
-
-        return ['status'=>200, 'msg'=>'系统定制化投注处理完成~'];
     }
 
     /**
@@ -983,130 +947,6 @@ abstract class BetService extends BaseBetService {
             case 3:
                 break;
         }
-
-        return $rst;
-    }
-
-    /**
-     * @desc 立即反买
-     * @param $account
-     * @param $plan_id
-     * @return array
-     */
-    public static function reverseTzNowBetRecord($uid, $id){
-        $BettingRecords = BettingRecords::findOne($id);
-        $TzSystems = TzSystems::findOne($BettingRecords->tz_system_id);
-
-        switch ($TzSystems->system_type_id){
-            case 1:
-                $rst = HN0898Service::reverseTzNowBetRecord($uid, $id);
-                break;
-            case 2:
-                $rst = SevenService::reverseTzNowBetRecord($uid, $id);
-                break;
-            case 3:
-                break;
-        }
-
-        return $rst;
-    }
-
-    /**
-     * @desc 根据计划id投注 - 立即投注
-     * @param $planId
-     * @param $isAuto - 是否自动,默认自动
-     * @return array
-     */
-    public static function tzByPlanIdNew($planId, $isAuto = 1){
-        if(!$plan = UserSysPlans::findOne($planId)){
-            return ['status'=>300, 'msg'=>'找不到对应记录'];
-        }
-        $m = \Yii::$app->cache;
-        $redis = new RedisLock();
-        $tz_system_id = trim($plan->tz_sites);
-        $lottery_type = $plan->lottery_type;
-
-        $rst = [];
-        $system_type_id = TzSystems::findOne($tz_system_id)->system_type_id;
-
-        $status = UserService::accountIsExpire($plan->uid, $tz_system_id); # 账号是否过期
-        if(!$status && $plan->account != 'gaozi2018'){
-            Tool_Common::log('accountIsExpire', 'ERR', '账号过期提示', ['uid'=>$plan->uid, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id]);
-            return ['status'=>300, 'msg'=>'账号过期提示'];
-        }
-
-        $qihao = HN0898Service::getQihao($plan->lottery_type);
-
-        # 4、投注号码 codes
-        $codes = self::getCodes($plan->tz_type, $plan->buy_type, $plan->hz_Arr, $planId);
-        //p([$system_type_id, $plan->tz_type, $plan->buy_type, $plan->sel_same, $plan->hz_Arr, $codes]);
-
-        $isAuto == 0 && BetService::beforeBetNow($plan->account, $tz_system_id, $plan->lottery_type, $qihao, $plan->id, $plan->uid); # 手动下注时，先删除缓存
-
-        $is_test = $plan->is_test;
-        list($sn, $snid) = BetService::getBetSnId($plan, $plan->plan_type, $is_test, $isAuto);
-
-        if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
-            $mkey = CacheKeyService::lotteryBetPlanIdKey($plan->account, $qihao, $plan->id);
-            $time = BetService::getBetCacheTime($plan->lottery_type, $qihao); # 投注之后缓存时间
-            if(commonRedis()->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了~'];
-            commonRedis()->setex($mkey, $time, 1);
-            $tmpRst = self::_logRecordsByPlandId($plan, $qihao, $codes, $plan->lottery_type, $is_test = 1, $sn, $snid, $plan->hz_Arr, $r=1); # 直接记录表
-        }else{ # 正式下注
-
-            $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'not_need_login_tz_system_ids'])->value); # 无需登陆站点
-            # 1、首先判断是否登录，否则登录之后再下注
-            if(!in_array($tz_system_id, $not_need_login_tz_system_ids)){
-                $lKey = 'bet_before_login_flag_'.$plan->uid;
-                $RKey = $lKey.'_redis';
-                if(!$flag = $m->get($lKey) && $redisLock = $redis->lock($RKey, 10)){
-                    $flag = self::isLogin($plan->uid, $tz_system_id, $r=3);
-                    $m->set($lKey, $flag, 15);
-                }
-                if(!$flag){
-                    if(!$TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id, 'status'=>1])){
-                        $msg = '账号已被禁用不能下注';
-                        Tool_Common::log('tzByPlanId_isLogin','INFO','投注记录tzByPlanId', ['uid'=>$plan->uid,'account'=>$plan->account, 'msg'=>$msg]);
-                        return ['status'=>400, 'msg'=>$msg];
-                    }
-                    $loginRst = BaseService::login($TzSystemsUsers->id);
-                    Tool_Common::log('/plan/'.__FUNCTION__,'INFO','投注记录tzByPlanId', ['loginRst'=>$loginRst, 'uid'=>$plan->uid, 'TzSystemsUsers_id'=>$TzSystemsUsers->id]);
-                    if($loginRst['status'] != 200) return $loginRst;
-                }
-            }
-
-            list($currentKjQiHao , $activeQiHao) = QihaoService::getKjQiHao($lottery_type);
-            $mkey = CacheKeyService::lotteryBetPlanIdKey($plan->account, $activeQiHao, $plan->id);
-            if(commonRedis()->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了~'];
-            $time = BetService::getBetCacheTime($plan->lottery_type, $activeQiHao); # 投注之后缓存时间
-            commonRedis()->setex($mkey, $time, 1);
-
-            $logArr = ['uid'=>$plan->uid, 'planId'=>$planId, 'qihao'=>$qihao, 'activeQiHao'=>$activeQiHao, 'time'=>$time, 'mkey'=>$mkey, 'account'=>$plan->account, 'tz_system_id'=>$tz_system_id];
-            Tool_Common::log('/plan/'.__FUNCTION__,'INFO','投注记录tzByPlanIdNew', $logArr);
-            # 5、投注请求
-            $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
-            $tmpRst = $BetService->bet($activeQiHao, $plan, $codes);
-            $logArr = ['account'=>$plan->account, 'tz_sites'=>$tz_system_id,'codes'=>$codes, 'postRst'=>$tmpRst];
-            Tool_Common::log('/plan/'.__FUNCTION__,'INFO','0898投注记录', $logArr);
-            if($tmpRst === false){
-                Tool_Common::log('/plan/'.__FUNCTION__,'INFO','投注记录 异常', $logArr);
-                return ['status'=>301, 'msg'=>'投注异常', 'tmpRst'=>false];
-            }
-
-            # 测试账号取消订单
-            if($tmpRst['status'] == 200 && in_array($plan->account, \Yii::$app->params['test_account'])){
-                if($tmpBets = BettingRecords::findAll(['account'=>$plan->account, 'cancel_status'=>0, 'qihao'=>$qihao])){
-                    foreach ($tmpBets as $tmpBet){
-                        if($tmpBet->sn) BetService::cancelOrder($plan->uid, $tmpBet->id);
-                    }
-                }
-            }
-        }
-        $isAuto == 0 && BetService::afterBetNow($plan->lottery_type, $qihao, $plan->uid); # 手动无需锁
-        is_array($tmpRst) && $tmpRst['lottery_type'] = $plan->lottery_type;
-        $rst[] = $tmpRst;
-        $logArr = ['tz_sites'=>$tz_system_id,'codes'=>$codes, 'postRst'=>$rst];
-        Tool_Common::log('/plan/'.__FUNCTION__,'INFO','0898投注记录', $logArr);
 
         return $rst;
     }

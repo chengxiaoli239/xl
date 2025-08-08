@@ -2396,17 +2396,6 @@ class StaticService extends BaseService {
    }
 
     /**
-     * @desc 用户分配的彩种
-     * @return array
-     */
-    public static function getUserLotteryTypes($uid){
-        $lottery_types = TzSystemsAuth::findOne(['uid'=>$uid])->lottery_types;
-        $lottery_typesArr = explode(',', $lottery_types);
-
-        return $lottery_typesArr;
-    }
-
-    /**
      * @desc 需要抓取开奖号码的彩种
      * @param int $useCache
      * @return array|LotteryType[]
