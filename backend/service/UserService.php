@@ -173,11 +173,10 @@ class UserService extends BaseService {
      * @description 更新用户表状态
      * @param $id
      * @param $status
-     * @return array
+     * @return boolean
      */
     public static function updateUserStatus($id, $status, $field='status')
     {
-        if(!$id) return ['status'=>300, 'msg'=>'id为空'];
         $m = \Yii::$app->cache;
         $mkey = 'updateUserStatus_'.$id.'_'.$status;
         if($rst = $m->get($mkey)) return false;
@@ -190,6 +189,7 @@ class UserService extends BaseService {
         $rst = $data->save(false);
         $TzSystemsUsers = TzSystemsUsers::findAll(['uid'=>$id]);
         foreach ($TzSystemsUsers as $TzSystemsUser){
+            if($TzSystemsUser->expire_time>time()) continue;
             $TzSystemsUser->status = $status == 1 ? 0 : 1;
             $TzSystemsUser->save();
         }

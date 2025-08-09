@@ -31,6 +31,7 @@ use common\framework\Redis;
 use common\kj\cqssc\CqsscKcw;
 use common\service\cache\CacheKeyService;
 use common\service\jobs\plan\UserPlanBetJob;
+use common\service\jobs\plan\UserTaskBetJob;
 use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
 use common\service\lottery\LotteryTypeService;
 use common\service\ssc\QihaoService;
@@ -92,7 +93,7 @@ abstract class BetService extends BaseBetService {
      * @param $uid
      * @param $tz_system_id - 表lt_tz_systems.id
      * @param int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
-     * @return HN0898Service|KuaiLe8Service|SevenService|XlService|Lucky5Service|NineNineNewService|JuHuaBaseService|ZhongFaService
+     * @return HN0898Service|SevenService|Lucky5Service|NineNineNewService
      */
     public static function getBetObj($uid, $tz_system_id, $lottery_type = DEFAULT_LOTTERY_TYPE){
         //p([$uid, $tz_system_id, $lottery_type]);
@@ -181,25 +182,6 @@ abstract class BetService extends BaseBetService {
             return ['status'=>301, 'msg'=>'账号过期提示'];
         }
 
-        /*
-        # 2、下注任务检测
-        $where = ['AND', ['=', 'uid', $uid], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1推送失败可重推，不可重推:3
-        $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(1)->one();
-        $tz_system_id = $BetErrorPlansTasks->tz_system_id;
-        $task_id = $BetErrorPlansTasks->id;
-        if(empty($BetErrorPlansTasks)){
-            $Model = TzSystemsUsers::findOne(['uid'=>$uid]);
-            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_not_task', 'INFO', '下注-没有可以下注的任务', ['uid'=>$uid, 'username'=>$Model->username]);
-            return ['status'=>300, 'msg'=>'没有可以下注的任务'];
-        }
-
-        # 3、登陆检测
-        $start_time = microtime(true);
-        $flag = self::isLogin($uid, $tz_system_id, $r=2);
-        $end_time = microtime(true);
-        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注-登陆检测-1', ['uid'=>$uid, 'flag'=>$flag, 'consume_time'=>($end_time-$start_time).'s']);
-        */
-
         # 4、下注
         $lottery_types = UserSysPlansService::getMyLotteryTypes($uid);
         foreach ($lottery_types as $data){
@@ -269,80 +251,95 @@ abstract class BetService extends BaseBetService {
      */
     public static function betByUserUidTask(array $lottery_types = [], $uid = ''){
         $lottery_types = $lottery_types ? : StaticService::getLotteryTypes();
+        $rst = [];
         foreach ($lottery_types as $lottery_type){
             # status可重推的状态0:未推送1推送失败可重推，不可重推:3  is_local_bet:1客户本地0云服务器
             $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]], ['=', 'is_local_bet', BetsBackend::BET_TYPE_SERVER_API]];
             if($uid){
                 $where = array_merge($where, [['=', 'uid', $uid]]);
             }
-            $BetErrorPlansTasks = BetErrorPlansTask::find()->where($where)->orderBy(['id'=>SORT_DESC])->limit(5)->all();
+            $BetErrorPlansTasks = BetErrorPlansTask::find()->select(['id', 'qihao'])->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1000)->all();
             if(empty($BetErrorPlansTasks)){
                 Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-1', ['uid' => $uid, 'msg'=>'没有下注计划']);
                 continue;
             }
-            list($currentKjQiHao, $activeQiHao) = QihaoService::getKjQiHao($lottery_type);
-            Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '用户计划下注脚本', ['currentKjQiHao'=>$currentKjQiHao, 'activeQiHao'=>$activeQiHao]);
             foreach ($BetErrorPlansTasks as $betErrorPlansTask){
-                try {
-                    $uid = $betErrorPlansTask->uid;
-                    $is_local_bet = $betErrorPlansTask->is_local_bet;
-                    $task_id = $betErrorPlansTask->id;
-                    $tz_system_id = $betErrorPlansTask->tz_system_id;
-                    $lottery_type = $betErrorPlansTask->lottery_type;
-                    $playway = $betErrorPlansTask->playway;
-                    $account = $betErrorPlansTask->account;
-                    $plan_id = $betErrorPlansTask->plan_id;
-                    $bet_sort_key = $betErrorPlansTask->bet_sort_key;
-
-                    $qihao = $betErrorPlansTask->qihao;
-                    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-2', ['task_id'=>$task_id, 'plan_id'=>$plan_id, 'uid'=>$uid, 'lottery_type'=>$lottery_type, 'account'=>$account, 'tz_system_id'=>$tz_system_id, 'activeQiHao'=>$activeQiHao, 'qihao'=>$qihao]);
-
-                    $BetService = self::getBetObj($uid, $tz_system_id, $lottery_type);
-                    if($qihao == $activeQiHao){ # 0:云服务
-                        $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao, 'opProfitsPlans_status');
-                        Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断01', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan_id, 'DataDealStatus'=>$DataDealStatus, 'task_qihao'=>$qihao]);
-                        if(empty($DataDealStatus) OR $DataDealStatus != 2){
-                            Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus]);
-                            throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
-                        }
-
-                        $s_time = microtime(true);
-                        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注脚本-4', ['task_id'=>$task_id]);
-                        $betRst = $BetService->repeatErrorBet($task_id);
-                        $e_time = microtime(true);
-                        $t_rst = $betRst['data']['bet_rst'];
-                        $rst[$lottery_type][$task_id]['repeatBetRst'] = $t_rst;
-                        $logArr = ['uid' => $uid, 'qihao'=>$activeQiHao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'consume_time'=>($e_time-$s_time).'s'];
-
-                        if(!empty($t_rst['snid'])){
-                            # 记录方案号
-                            $where = ['plan_id'=>$plan_id, 'qihao'=>(string)$activeQiHao, 'lottery_type'=>$lottery_type];
-                            $BettingRecords = BettingRecords::find()->where($where)->limit(1)->one();
-                            $BettingRecords->snid = trim($BettingRecords->snid.';'.$t_rst['snid'], ';');
-                            $BettingRecords->sn = trim($BettingRecords->sn.';'.$t_rst['sn'], ';');
-                            $flag = $BettingRecords->save();
-                            if(!$flag){
-                                $logArr1 = ['uid' => $uid, 'qihao'=>$activeQiHao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'err_msg'=>$BettingRecords->getErrors()];
-                                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '下注结果保存失败', $logArr1);
-                            }
-                        }
-
-                        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注成功-end', $logArr);
-                    }elseif(!empty($activeQiHao) && $qihao<$activeQiHao){ # 过期不下
-                        BetService::closeTask($task_id, $qihao, $activeQiHao, $account, $msg='未开盘或者已关盘[' . date('Y-m-d H:i:s') . ']'); # 关闭计划
-                        $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = ['status' => 300, 'qihao'=>$qihao, 'activeQiHao'=>$activeQiHao, 'msg' => $msg];
-                        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-5', ['uid'=>$uid,'account'=>$account,'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
-                    }
-
-                    $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetInfo'] = $betErrorPlansTask;
-                }catch (\Exception $exception){
-                    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '下注错误', ['task_id'=>$task_id]);
-                    $rst[$lottery_type][$task_id]['repeatBetRst'] = ['task_id'=>$task_id, 'err_msg'=>$exception->getMessage()];
-                }
+                continue; // 在写入任务节点已经异步执行下注，此处计划任务后续会去掉
+                $rst[$betErrorPlansTask->id] = self::betUserOneTask($betErrorPlansTask->id, $betErrorPlansTask->qihao);
             }
         }
 
         return $rst;
+    }
+
+    /**
+     * 单个任务下注
+     * @param $taskId
+     * @param string $activeQiHao
+     * @return string
+     */
+    public static function betUserOneTask($taskId, string $activeQiHao=''): string
+    {
+        try {
+            $betErrorPlansTask = BetErrorPlansTask::findOne($taskId);
+            $lottery_type = $betErrorPlansTask->lottery_type;
+            if(empty($activeQiHao)){
+                list($currentKjQiHao, $activeQiHao) = QihaoService::getKjQiHao($lottery_type);
+            }
+            $uid = $betErrorPlansTask->uid;
+            $is_local_bet = $betErrorPlansTask->is_local_bet;
+            $task_id = $betErrorPlansTask->id;
+            $tz_system_id = $betErrorPlansTask->tz_system_id;
+            $playway = $betErrorPlansTask->playway;
+            $account = $betErrorPlansTask->account;
+            $plan_id = $betErrorPlansTask->plan_id;
+            $bet_sort_key = $betErrorPlansTask->bet_sort_key;
+
+            $qihao = $betErrorPlansTask->qihao;
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-2', ['task_id'=>$task_id, 'plan_id'=>$plan_id, 'uid'=>$uid, 'lottery_type'=>$lottery_type, 'account'=>$account, 'tz_system_id'=>$tz_system_id, 'qihao'=>$qihao]);
+
+            $BetService = self::getBetObj($uid, $tz_system_id, $lottery_type);
+            if($qihao == $activeQiHao){ # 0:云服务
+                $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qihao, 'opProfitsPlans_status');
+                Tool_Common::log('/plan/data_deal_status', 'INFO', '下注期号判断01', ['lottery_type'=>$lottery_type, 'plan_id'=>$plan_id, 'DataDealStatus'=>$DataDealStatus, 'task_qihao'=>$qihao]);
+                if(empty($DataDealStatus) OR $DataDealStatus != 2){
+                    Tool_Common::log('next_qihao_not_active', 'INFO', '计划未处理完成', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'DataDealStatus'=>$DataDealStatus]);
+                    throw new Exception('计划未处理完成'.$lottery_type.'_'.$qihao);
+                }
+
+                $s_time = microtime(true);
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注脚本-4', ['task_id'=>$task_id]);
+                $betRst = $BetService->repeatErrorBet($task_id);
+                $e_time = microtime(true);
+                $t_rst = $betRst['data']['bet_rst'];
+                $rst[$lottery_type][$task_id]['repeatBetRst'] = $t_rst;
+                $logArr = ['uid' => $uid, 'qihao'=>$activeQiHao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'consume_time'=>($e_time-$s_time).'s'];
+
+                if(!empty($t_rst['snid'])){
+                    # 记录方案号
+                    $where = ['plan_id'=>$plan_id, 'qihao'=>(string)$activeQiHao, 'lottery_type'=>$lottery_type];
+                    $BettingRecords = BettingRecords::find()->where($where)->limit(1)->one();
+                    $BettingRecords->snid = trim($BettingRecords->snid.';'.$t_rst['snid'], ';');
+                    $BettingRecords->sn = trim($BettingRecords->sn.';'.$t_rst['sn'], ';');
+                    $flag = $BettingRecords->save();
+                    if(!$flag){
+                        $logArr1 = ['uid' => $uid, 'qihao'=>$activeQiHao, 'account'=>$account, 'plan_id'=>$plan_id, 'err_id'=>$task_id, 'err_msg'=>$BettingRecords->getErrors()];
+                        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '下注结果保存失败', $logArr1);
+                    }
+                }
+
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注成功-end', $logArr);
+            }elseif(!empty($activeQiHao) && $qihao<$activeQiHao){ # 过期不下
+                BetService::closeTask($task_id, $qihao, $activeQiHao, $account, $msg='未开盘或者已关盘[' . date('Y-m-d H:i:s') . ']'); # 关闭计划
+                $rst[$lottery_type][$betErrorPlansTask->id]['repeatBetRst'] = ['status' => 300, 'qihao'=>$qihao, 'activeQiHao'=>$activeQiHao, 'msg' => $msg];
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-5', ['uid'=>$uid,'account'=>$account,'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
+            }
+        }catch (\Exception $e){
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '下注错误', ['task_id'=>$task_id, $e->getMessage()]);
+            return  $e->getMessage();
+        }
+
+        return '处理完成';
     }
 
     /**
@@ -839,7 +836,7 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
-     * @desc 计划任务列表立即投注
+     * @desc 计划任务列表 - 立即下注
      * @param $id
      * @param $account
      */
@@ -1007,9 +1004,9 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
-     * @desc 根据计划id投注 - 立即投注
+     * @desc 根据计划id投注 - 立即投注(手动)
      * @param $planId
-     * @param $isAuto 是否自动,默认自动
+     * @param $isAuto - 是否自动,默认自动
      * @return array
      */
     public static function tzByPlanId($planId, $isAuto = 1){
@@ -1059,7 +1056,7 @@ abstract class BetService extends BaseBetService {
                Tool_Common::log('tzByPlanId','INFO','投注记录tzByPlanId', $logArr);
                # 5、投注请求
                $BetService = self::getBetObj($plan->uid, $tz_system_id, $plan->lottery_type);
-               $tmpRst = $BetService->bet($qihao, $plan, $codes, $is_task=0, $isAuto);
+               $tmpRst = $BetService->postBatchBet($qihao, $plan, $codes, $is_task=0); #  立即投注
                $logArr = ['tz_sites'=>$tz_sites,'codes'=>$codes, 'postRst'=>$rst];
                Tool_Common::log('/plan/'.__FUNCTION__,'INFO','0898投注记录', $logArr);
                if($tmpRst === false){
@@ -1815,14 +1812,17 @@ abstract class BetService extends BaseBetService {
                 if(!(Redis::lock($preInsertLockKey))){
                     throw_info('业务处理中，请稍后...', 40001);
                 }
+                print_r(['plan_id'=>$planId, 'isJob'=>$isJob, 'qiHao'=>$qiHao, 'business_id'=>$qiHao]);
 
                 $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId]];
                 if(BettingRecords::find()->where($where)->exists()){
                     throw_info('yx表已记录2...', 40001);
                 }
+                var_dump('dddd');
                 push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$planId, 'isJob'=>$isJob, 'qiHao'=>$qiHao, 'business_id'=>$qiHao]);
                 $rst['data'] = ['activeQiHao'=>$qiHao, 'plan_id'=>$plan->id, 'msg'=>'正常'];
             }catch (\Exception $e){
+                var_dump($e->getMessage());
                 if($e->getCode()<40000){
                     $logArr = [
                         'uid'=>$plan->uid,
@@ -1894,13 +1894,14 @@ abstract class BetService extends BaseBetService {
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入真实计划任务-1', $logArr);
 
                 $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
-                $insertRst = $BetService->postBatchBet($qiHao, $plan, $codes);
-                $rst['data'][$plan->id] = $insertRst;
+                $insertRst = $BetService->postBatchBet($qiHao, $plan, $codes); # 计划任务写入
+                if($TzSystemsUsers->is_local_bet == TzSystemsUsers::BET_TYPE_LOCAL_API){
+                    push_queue_fast(UserTaskBetJob::class, ['task_id'=>$insertRst['task_id'], 'user_id'=>$planId, 'qihao'=>$qiHao]);
+                }
 
                 $t3 = microtime(true);
                 $time_consume2 = ($t3-$t2).'s';
                 $logArr = ['uid'=>$plan->uid, 'account'=>$plan->account, 'plan_id'=>$plan->id, 'activeQiHao'=>$qiHao, 'insertRst'=>$insertRst, 'time_consume1'=>$time_consume1, 'time_consume2'=>$time_consume2];
-                $user_ids[$plan->uid] = ['user_id'=>$plan->uid];
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入计划任务结束', $logArr);
                 commonRedis()->setex($insert_mkey, 120, 1);
             }

@@ -16,7 +16,7 @@ use common\service\thirdD\OperateLotteryService;
 use Yii;
 use backend\service\OpKjService;
 use common\tools\KjDataGet;
-use yii\base\Controller;
+use yii\console\Controller;
 use common\tools\Tool_Common;
 use backend\service\BetService;
 use backend\service\StaticService;
@@ -104,6 +104,18 @@ class IndexController extends Controller
         }
 
         return $rst;
+    }
+
+    /**
+     * 计划任务写入
+     * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii data/index/insert-plan-task 8
+     *
+     * @param $lotteryType
+     * @return array|string
+     */
+    public function actionInsertPlanTask($lotteryType)
+    {
+        return BetService::insertPlansTask($lotteryType);
     }
 
     /**

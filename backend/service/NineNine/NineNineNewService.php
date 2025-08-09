@@ -407,25 +407,17 @@ class NineNineNewService extends BaseTZService {
         return $rst;
     }
 
-    public function postBatchBet($qihao, $plan, $code){
-        return $this->bet($qihao, $plan, $code);
-    }
-
     /**
      * @decription 新版投注，真实投注入口， 未完待续 2018.12.23
      *
-     * @param $tz_system_id
-     * @param $account
-     * @param int $playway
-     * @param $code
-     * @param $single
      * @param $qihao
-     * @param $tz_type
-     * @param $buy_type
-     * @param $order_type 1、跟投订单 2、大数据订单 3、系统计划订单
+     * @param $plan
+     * @param $code
+     * @param int $is_task 1:本地电脑 0云服务
+     * @param int $is_auto
      * @return array
      */
-    public function bet($qihao, $plan, $code, $is_task=1, $is_auto = 1){
+    public function postBatchBet($qihao, $plan, $code, $is_task=1, $is_auto = 1){
         self::__init(self::$user_id, self::$tz_system_id);
         //$plan = UserSysPlans::findOne($plan_id);
         $plan_id = $plan->id;
@@ -509,7 +501,8 @@ class NineNineNewService extends BaseTZService {
             $start_time = microtime(true);
             if($is_task){
                 # 任务表
-                BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $codesArr, $tz_type, $url, $headers, $post_data, $single, count($codesArr)*$single, $playway,self::$tz_system_id, [], $lottery_type);
+                $taskId = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $codesArr, $tz_type, $url, $headers, $post_data, $single, count($codesArr)*$single, $playway,self::$tz_system_id, [], $lottery_type);
+                $data['task_id'] = $taskId;
             }else{
                 $tmpRst = self::postBetCurl($url, $post_data, $headers);
 
@@ -996,45 +989,6 @@ class NineNineNewService extends BaseTZService {
 
         return $rst;
     }
-
-    /**
-     * @desc 立即反买
-     * @param $account
-     * @param $plan_id
-     * @return array
-     */
-    public static function reverseTzNowBetRecord($uid, $BetRecordId){
-        $BettingRecords = BettingRecords::findOne($BetRecordId);
-        if(!$BettingRecords) return ['status'=>300, 'msg'=>'找不到投注计划记录'];
-
-        $tz_system_id = $BettingRecords->tz_system_id ? $BettingRecords->tz_system_id : 2;  # 默认99网
-        $HN0898Service = new self($uid, $tz_system_id);
-        $oldCodes = $BettingRecords->codes;
-        $oldCodesArr = explode('@', $oldCodes);
-        $qihao = HN0898Service::getQihao();
-        $playway = $BettingRecords->playway;
-
-        $codes = '';
-        $SysPlansCodes = SysPlansCodes::find()->where(['AND',['NOT IN','code', $oldCodesArr], ['=', 'playway', $playway]])->all();
-        foreach ($SysPlansCodes as $sysPlansCode){
-            $codes .= $sysPlansCode->code.'@';
-        }
-        $codes = trim($codes, '@');
-
-        $m = \Yii::$app->cache;
-        $mkey = 'reverseTzNowBetRecord_'.$qihao.'_'.$playway;
-        if($r = $m->get($mkey)) return ['status'=>300, 'msg'=>'已经投注过了'];
-
-        $account = AdminModel::findOne(Yii::$app->user->id)['account'];
-        BetService::beforeBetNow($account, $BettingRecords->tz_system_id, $qihao, $BettingRecords->plan_id, $uid);
-        $rst = $HN0898Service->bet($qihao, $BettingRecords->plan_id, $codes);
-        BetService::afterBetNow($BettingRecords->lottery_type, $qihao, $uid);
-
-        $m->set($mkey, 1, 5);
-
-        return $rst;
-    }
-
 
     /**
      * @decription 验证投注格式是否正确，待完善 2018.0220

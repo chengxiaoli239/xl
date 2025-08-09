@@ -180,6 +180,7 @@ class TzService extends BaseService {
     public static function afterRunSysPlans($qihao, $lottery_type = DEFAULT_LOTTERY_TYPE){
 
         try {
+            Tool_Common::log('/data/'.__FUNCTION__,'INFO','系统计划处理开关处理前', ['qihao'=>$qihao, 'lottery_type'=>$lottery_type]);
             $m = Yii::$app->cache;
             $next_qihao = KjDataGet::getNextQihaoByQihao($qihao, $lottery_type);
             $next_time = \Yii::$app->params['TZ_LOCK_TIME'];
@@ -204,14 +205,13 @@ class TzService extends BaseService {
                 $time = 60*60*7; # 台湾宾果 7小时
             }
             $m->set($pkey,1,$time);
+            $rst = DataDealStatus::updateAll(['next_qihao'=>(string)$next_qihao], ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
 
-            DataDealStatus::updateAll(['next_qihao'=>(string)$next_qihao], ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
-
-            $logData = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao];
-            Tool_Common::log('afterRunSysPlans','INFO','系统计划处理后', $logData);
+            $logData = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'updateRst'=>$rst];
+            Tool_Common::log('/data/'.__FUNCTION__,'INFO','系统计划处理后', $logData);
             push_queue(UserBetTaskRecordJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'business_id'=>$qihao]);
         }catch (\Exception $e){
-            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '开关处理异常', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '开关处理异常', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'err_msg'=>$e->getMessage()]);
         }
 
         return true;

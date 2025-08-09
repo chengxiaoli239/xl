@@ -76,8 +76,8 @@ class BetsBackend extends Bets
     const BET_TYPE_LOCAL_SELENIUM = 2;
     # 下注方式
     const BET_TYPE_OPTIONS = [
-        self::BET_TYPE_SERVER_API => 'A', #'服务器API下单',
-        self::BET_TYPE_LOCAL_API => 'L', # 本地API
-        self::BET_TYPE_LOCAL_SELENIUM => 'S', //'selenium',
+        self::BET_TYPE_SERVER_API => '云服务', #'服务器API下单',
+        self::BET_TYPE_LOCAL_API => '本地电脑', # 本地API
+        self::BET_TYPE_LOCAL_SELENIUM => 'selenium', //'selenium',
     ];
 }

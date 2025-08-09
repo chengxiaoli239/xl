@@ -1279,8 +1279,6 @@ class IndexController extends Controller
         p($rst);
         $arr = [['reach_val' => 100, 'reduce_val' => 10], ['reach_val' => 300, 'reduce_val' => 50]];
         p(json_encode($arr));
-        $rst = BetService::userSysPlansTzNow(81, 3);
-        p($rst);
         $rst = CqsscSevenDay::getLotteryNo();
         p($rst);
         $rst = StaticService::getSameCodes('1221', 1);

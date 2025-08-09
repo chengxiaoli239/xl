@@ -18,10 +18,10 @@ use backend\service\StaticService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 
-class BetErrorPlansTaskService extends BaseService {
+class BetErrorPlansTaskService extends BaseService
+{
 
     public static function recordPlanTask($uid='',$account='', $plan_id='', $qihao='', $bet_sort_key=0, $bet_codes='', $tz_type = '', $bet_url='', $bet_headers=[], $post_datas='', $single = 0.1, $bet_moneys='', $playway = 3, $tz_system_id='', $error_rst = [], $lottery_type=DEFAULT_LOTTERY_TYPE, $status=0){
-        $rst = ['status'=>200, 'msg'=>'操作成功'];
         $where = ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'plan_id'=>$plan_id, 'bet_sort_key'=>$bet_sort_key];
         if($r = BetErrorPlansTask::findOne($where)){
             return ['status'=>300, 'msg'=>'记录已存在:'.$uid.'_'.$lottery_type.'_'.$qihao.'_'.$plan_id.'_'.$bet_sort_key];
@@ -69,10 +69,9 @@ class BetErrorPlansTaskService extends BaseService {
             $err_msg = json_encode($BetErrorPlansTask->getErrors(), 320);
             $logArr = ['setData'=>$setData, 'error'=>$err_msg];
             Tool_Common::log('/bet_errors/recordPlanTask', 'ERR', '下注失败记录异常', $logArr);
-            $rst = ['status'=>300, 'msg'=>$err_msg];
         }
 
-        return $rst;
+        return $BetErrorPlansTask->id;
     }
 
     /**
