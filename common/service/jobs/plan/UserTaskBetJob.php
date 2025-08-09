@@ -3,6 +3,7 @@ namespace common\service\jobs\plan;
 
 use backend\service\BetService;
 use common\service\jobs\CommonJob;
+use yii\helpers\Json;
 
 class UserTaskBetJob extends CommonJob {
 
@@ -22,7 +23,9 @@ class UserTaskBetJob extends CommonJob {
         }
         $qihao = $params['qihao'];
 
-        return BetService::betUserOneTask($taskId, $qihao);
+        $result = BetService::betUserOneTask($taskId, $qihao);
+
+        return is_json($result)?Json::decode($result):$result;
     }
 
 }
