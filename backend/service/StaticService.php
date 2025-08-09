@@ -435,10 +435,10 @@ class StaticService extends BaseService {
     public static function getStaticMonth($lottery_type = DEFAULT_LOTTERY_TYPE, $staticModel = 'StaticCodeTypeProfitsMonth'){
 
         $staticModel = 'backend\\models\\'.$staticModel;
-        if(!$static_month = $staticModel::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one()['month']){
-            $month = SscKjData::find()->select(['month'=>'LEFT(date,7)'])->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_ASC])->one()['month']; # 历史开奖第一期日期
+        if(!$static_month = $staticModel::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one()['month']){
+            $month = SscKjData::find()->select(['month'=>'LEFT(date,7)'])->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_ASC])->limit(1)->one()['month']; # 历史开奖第一期日期
         }else{
-            $last_month = SscKjData::find()->select(['month'=>'LEFT(date,7)', 'qihao'])->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->one()['month']; # 截止目前开奖日期
+            $last_month = SscKjData::find()->select(['month'=>'LEFT(date,7)', 'qihao'])->where(['lottery_type'=>$lottery_type])->asArray()->orderBy(['id'=>SORT_DESC])->limit(1)->one()['month']; # 截止目前开奖日期
             if($static_month<$last_month){
                 $month = Tools::getNextMonth($static_month, '-');
             }else{
