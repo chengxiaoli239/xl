@@ -1640,15 +1640,15 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '幸运-下注节点-40', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst]);
             }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [302, 305, 307])){
                 $status = 4; # 不可再次下注：302余额不足305已关盘307网盘账号停押
-                throw_info('幸运-下注节点-41'.Json::encode($row->getFirstErrors()));
+                throw_info(Json::encode($tmpRst));
             }elseif($tmpRst['data'] == "Proxy Connect Error"){
                 $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key, $id);
                 $m->delete($betKey); # 失败之后可重新下注的情况解锁
-                throw_info('幸运-下注节点-42'.Json::encode($row->getFirstErrors()));
+                throw_info(Json::encode($tmpRst));
             }else{
                 $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key, $id);
                 $m->delete($betKey); # 失败之后可重新下注的情况解锁
-                throw_info('幸运-下注节点-43'.Json::encode($row->getFirstErrors()));
+                throw_info('幸运-下注节点-异常');
             }
             if($tmpRst['errno']>0 OR in_array($tmpRst['code'], [309,311])){ # 309,310,311   310有排查是已经换过代理IP,有待排查，为确保
                 $status = 4; # 下注请求超时计划，后续可根据这个状态做是否重复下注处理，
