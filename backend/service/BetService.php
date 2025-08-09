@@ -282,7 +282,7 @@ abstract class BetService extends BaseBetService {
             return  $e->getMessage();
         }
 
-        return '处理完成';
+        return '处理完成:'.($snId??'');
     }
 
     /**
