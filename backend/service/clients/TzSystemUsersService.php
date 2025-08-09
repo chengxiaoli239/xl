@@ -578,7 +578,7 @@ class TzSystemUsersService extends ClientsBaseService{
             $sql = $BetErrorPlansTasksQuery->createCommand()->getRawSql();
 
             $log = ['uid'=>$uid, 'current_qihao'=>$current_qihao, 'count'=>count($BetErrorPlansTasks),'sql'=>$sql];
-            #Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-0', $log);
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-0', $log);
             if(empty($BetErrorPlansTasks)){
                 throw_info('没有下注任务');
             }
