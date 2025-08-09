@@ -328,10 +328,9 @@ class NineNineNewService extends BaseTZService {
     /**
      * @desc 目前为计划任务正常下注入口 2021.05.23
      * @param $id
+     * @return mixed|string
      */
     public function repeatErrorBet($id){
-        $rst = ['status'=>200, 'msg'=>'操作成功'];
-
         try {
             Tool_Common::log('/repeatErrorBet/'.__FUNCTION__,'INFO','九九网下注节点-1', ['task_id'=>$id]);
             $row = BetErrorPlansTask::findOne($id);
@@ -368,7 +367,6 @@ class NineNineNewService extends BaseTZService {
                 $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
                 $m->set($xCsrf_key, $xCsrf, 120);
             }
-            $data = [];
             if($rstData['errorCode'] == 'FAIL' && $rstData['msg'] == 'Illegal X-Csrf-Token!!!'){
                 array_pop($headers); # 删除最后一个原始
                 array_pop($headers); # 删除最后一个原始
@@ -387,7 +385,7 @@ class NineNineNewService extends BaseTZService {
             }
             $snRst = NineNineNewService::getSnidBySn($uid, $tz_system_id, $row->lottery_type);
             if(isset($snRst['list'][0]['orderNo'])){
-                $data['bet_rst']['snid'] = $snRst['list'][0]['orderNo']; // 获取方案内容
+                $snid = $snRst['list'][0]['orderNo']; // 获取方案内容
             }
             $tmpRst['bet_time'] = date('Y-m-d H:i:s');
             $status = ($tmpRst['rstData']['code'] == 200) ? 2 : 3;
@@ -399,12 +397,10 @@ class NineNineNewService extends BaseTZService {
                 throw new \Exception(json_encode($row->getErrors(), 320));
             }
         }catch (\Exception $e){
-            return ['status'=>201, 'msg'=>$e->getMessage()];
+            throw_info($e->getMessage());
         }
 
-        $rst['data'] = $data;
-
-        return $rst;
+        return $snid??'';
     }
 
     /**
