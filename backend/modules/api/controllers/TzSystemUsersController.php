@@ -179,7 +179,8 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = TzSystemUsersService::getActivePlanTasks($post['access_token'], $post['current_qihao'], $post['direct']??0, $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取激活任务', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
+        $data = $rst['data']??[];
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取激活任务', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'count'=>count($data), /*'rst'=>$rst*/]);
 
         return $rst;
     }
@@ -196,8 +197,7 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = TzSystemUsersService::getActiveQihao($post['lottery_type']);
-        $data = $rst['data']??[];
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取激活期号', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'count'=>count($data), /* 'rst'=>$rst*/]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取激活期号', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, /* 'rst'=>$rst*/]);
 
         return $rst;
     }
