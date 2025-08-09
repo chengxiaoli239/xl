@@ -1812,13 +1812,11 @@ abstract class BetService extends BaseBetService {
                 if(!(Redis::lock($preInsertLockKey))){
                     throw_info('业务处理中，请稍后...', 40001);
                 }
-                print_r(['plan_id'=>$planId, 'isJob'=>$isJob, 'qiHao'=>$qiHao, 'business_id'=>$qiHao]);
 
                 $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId]];
                 if(BettingRecords::find()->where($where)->exists()){
                     throw_info('yx表已记录2...', 40001);
                 }
-                var_dump('dddd');
                 push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$planId, 'isJob'=>$isJob, 'qiHao'=>$qiHao, 'business_id'=>$qiHao]);
                 $rst['data'] = ['activeQiHao'=>$qiHao, 'plan_id'=>$plan->id, 'msg'=>'正常'];
             }catch (\Exception $e){
