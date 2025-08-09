@@ -1754,14 +1754,16 @@ abstract class BetService extends BaseBetService {
      * @desc 批量填插入用户计划任务
      * @return string|array
      */
-    public static function insertPlansTask($lottery_type = DEFAULT_LOTTERY_TYPE, $isJob=0, $accountOrId=''){
+    public static function insertPlansTask($lottery_type = DEFAULT_LOTTERY_TYPE, $qiHao='', $isJob=0, $accountOrId=''){
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         $HI = date('H:i');
         if($lottery_type == 8 && '04:59'<$HI && $HI<'08:00'){
             Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '批量插入任务100', ['lottery_type'=>$lottery_type, 'err_msg'=>'幸运五非开盘时间']);
             return '幸运五非开盘时间';
         }
-        list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lottery_type); # 期号数据
+        if(empty($qiHao)){
+            list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lottery_type); # 期号数据
+        }
         $DataDealStatus = BetService::getDataDealStatus($lottery_type, $qiHao, 'opProfitsPlans_status');
         if(empty($DataDealStatus) OR $DataDealStatus != 2){
             Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '投注计划', ['lottery_type'=>$lottery_type, 'msg'=>$qiHao.'计划未处理完成']);
@@ -1813,13 +1815,6 @@ abstract class BetService extends BaseBetService {
                 if(!(Redis::lock($preInsertLockKey))){
                     throw_info('业务处理中，请稍后...', 40001);
                 }
-
-                /*
-                list($code, $current_profits) = UserService::updateUserProfits($TzSystemsUsers);
-                if($code>0 OR !$TzSystemsUsers->is_auto_bet){
-                    //throw_info('统计盈利异常:'.$code);
-                }
-                */
 
                 $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId]];
                 if(BettingRecords::find()->where($where)->exists()){

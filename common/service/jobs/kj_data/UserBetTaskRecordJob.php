@@ -31,8 +31,10 @@ class UserBetTaskRecordJob extends CommonJob {
         if($lottery_type == 8 && $closingTime<$HI && $HI<$openingTime){
             return '幸运五非开盘时间';
         }
+        $currentQiHao = $params['qihao'];
+        $qiHao = $params['next_qihao'];
 
-        return BetService::insertPlansTask($lottery_type, $isJob=1);
+        return BetService::insertPlansTask($lottery_type, $qiHao, $isJob=1);
     }
 
 }
