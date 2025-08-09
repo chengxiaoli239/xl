@@ -217,7 +217,6 @@ class IndexController extends Controller
         }
         p($rst);
         $codes = SscKjDataService::getRecentlyPosCodes($lotteryType=8, $positions=[3], $num = 4);p($codes);
-        $rst['allDateStaticCodeTypePerDate'] = StaticService::allDateStaticCodeTypePerDate($lottery_type=8);p($rst);
         $codeTypes = StaticService::getAllCodeTypes($type = 2); p($codeTypes);# 统计基础号码类型筛选,类型：1和值2号码类型[例如:双双重、三重]
         $HI = date('H:i');
         if('21:00'<$HI AND $HI<'22:00'){

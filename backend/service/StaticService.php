@@ -458,7 +458,7 @@ class StaticService extends BaseService {
     public static function getStaticDate($lottery_type = DEFAULT_LOTTERY_TYPE, $staticModel = 'StaticCodeTypeProfitsPerdate'){
 
         $staticModel = 'backend\\models\\'.$staticModel;
-        if(!$static_date = $staticModel::find()->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->one()['date']){
+        if(!$static_date = $staticModel::find()->select(['date'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one()['date']){
             $date = SscKjData::find()->select(['date'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_ASC])->one()['date']; # 历史开奖第一期日期
         }else{
             $last_date = SscKjData::find()->select(['date', 'qihao'])->where(['lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_DESC])->limit(1)->one()['date']; # 截止目前开奖日期
@@ -482,7 +482,7 @@ class StaticService extends BaseService {
         $month = self::getStaticMonth($lottery_type, 'StaticCodeTypeProfitsMonth');
         $rst = self::staticCodeTypeProfitsMonth($month, $lottery_type);
         if($month<date('Y-m')){
-            for ($i=0; $i<12;$i++){
+            for ($i=0; $i<2;$i++){
                 $date = self::getStaticMonth($lottery_type, 'StaticCodeTypeProfitsMonth');
                 $month = substr($date, 0,7);
                 $rst = self::staticCodeTypeProfitsMonth($month, $lottery_type);
@@ -499,14 +499,16 @@ class StaticService extends BaseService {
      */
     public static function staticCodeTypeProfitsDate_parent($lottery_type = DEFAULT_LOTTERY_TYPE){
 
-        $date = self::getStaticDate($lottery_type, 'StaticCodeTypeProfitsPerdate');
-        $rst = self::staticCodeTypeProfitsDate($date, $lottery_type);
-        if($date<date('Y-m-d')){
-            for ($i=0; $i<50;$i++){
-                $date = self::getStaticDate($lottery_type, 'StaticCodeTypeProfitsPerdate');
-                $rst = self::staticCodeTypeProfitsDate($date, $lottery_type);
+        try {
+            $date = self::getStaticDate($lottery_type, 'StaticCodeTypeProfitsPerdate');
+            $rst = self::staticCodeTypeProfitsDate($date, $lottery_type);
+            if($date<date('Y-m-d')){
+                for ($i=0; $i<2;$i++){
+                    $date = self::getStaticDate($lottery_type, 'StaticCodeTypeProfitsPerdate');
+                    $rst = self::staticCodeTypeProfitsDate($date, $lottery_type);
+                }
             }
-        }
+        }catch (\Exception $e){}
 
         return $rst;
     }
@@ -1460,39 +1462,40 @@ class StaticService extends BaseService {
         }
         //p($tmpProfits);
 
-        foreach ($tmpProfits as $tmpProfit){
-            foreach ($tmpProfit as $month=>$tmp){
-                //if($month != date('Y-m')) continue;
-                $setData = [];
-                if(!$Static4dProfits = Static4dProfits::findOne(['month'=>$month, 'lottery_type'=>$lottery_type])){
-                    $Static4dProfits = new Static4dProfits();
-                    $setData['created_at'] = time();
+        try {
+            foreach ($tmpProfits as $tmpProfit){
+                foreach ($tmpProfit as $month=>$tmp){
+                    //if($month != date('Y-m')) continue;
+                    $setData = [];
+                    if(!$Static4dProfits = Static4dProfits::findOne(['month'=>$month, 'lottery_type'=>$lottery_type])){
+                        $Static4dProfits = new Static4dProfits();
+                        $setData['created_at'] = time();
+                    }
+                    $setData['updated_at'] = time();
+                    $setData['month'] = $month;
+                    $setData['codes_4d_all'] = $tmpProfits[0][$month]; # 所有号码
+                    $setData['codes_13_31'] = $tmpProfits[1][$month]; # 一双三单||一单三双
+                    $setData['codes_22_22'] = $tmpProfits[2][$month]; # 两双两单
+                    $setData['codes_1111_2222'] = $tmpProfits[3][$month]; # 四双四单
+                    $setData['codes_13'] = $tmpProfits[4][$month]; # 一单三双
+                    $setData['codes_31'] = $tmpProfits[5][$month]; # 一双三单
+                    $setData['codes_13_2222'] = $tmpProfits[6][$month]; # 一单三双||四双
+                    $setData['codes_31_1111'] = $tmpProfits[7][$month]; # 一双三单||四单
+                    $setData['codes_13_1111'] = $tmpProfits[12][$month]; # 一单三双||四单
+                    $setData['codes_31_2222'] = $tmpProfits[13][$month]; # 一双三单||四双
+                    $setData['codes_13_1111_2222'] = $tmpProfits[14][$month]; # 一单三双||四单||四双
+                    $setData['codes_31_2222_1111'] = $tmpProfits[15][$month]; # 一双三单||四双||四单
+                    $setData['codes_2222'] = $tmpProfits[8][$month]; # 四双
+                    $setData['codes_1111'] = $tmpProfits[9][$month]; # 四单
+                    $setData['codes_1_nums'] = $tmpProfits[10][$month]; # 单数量
+                    $setData['codes_2_nums'] = $tmpProfits[11][$month]; # 双数量
+                    $setData['lottery_type'] = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
+                    $Static4dProfits->setAttributes($setData);
+
+                    $rst = $Static4dProfits->save();
                 }
-                $setData['updated_at'] = time();
-                $setData['month'] = $month;
-                $setData['codes_4d_all'] = $tmpProfits[0][$month]; # 所有号码
-                $setData['codes_13_31'] = $tmpProfits[1][$month]; # 一双三单||一单三双
-                $setData['codes_22_22'] = $tmpProfits[2][$month]; # 两双两单
-                $setData['codes_1111_2222'] = $tmpProfits[3][$month]; # 四双四单
-                $setData['codes_13'] = $tmpProfits[4][$month]; # 一单三双
-                $setData['codes_31'] = $tmpProfits[5][$month]; # 一双三单
-                $setData['codes_13_2222'] = $tmpProfits[6][$month]; # 一单三双||四双
-                $setData['codes_31_1111'] = $tmpProfits[7][$month]; # 一双三单||四单
-                $setData['codes_13_1111'] = $tmpProfits[12][$month]; # 一单三双||四单
-                $setData['codes_31_2222'] = $tmpProfits[13][$month]; # 一双三单||四双
-                $setData['codes_13_1111_2222'] = $tmpProfits[14][$month]; # 一单三双||四单||四双
-                $setData['codes_31_2222_1111'] = $tmpProfits[15][$month]; # 一双三单||四双||四单
-                $setData['codes_2222'] = $tmpProfits[8][$month]; # 四双
-                $setData['codes_1111'] = $tmpProfits[9][$month]; # 四单
-                $setData['codes_1_nums'] = $tmpProfits[10][$month]; # 单数量
-                $setData['codes_2_nums'] = $tmpProfits[11][$month]; # 双数量
-                $setData['lottery_type'] = $lottery_type; # 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
-                $Static4dProfits->setAttributes($setData);
-
-                $rst = $Static4dProfits->save();
             }
-
-        }
+        }catch (\Exception $e){}
 
         return ['status'=>200, 'data'=>$setData, 'rst'=>$rst];
     }
@@ -1506,32 +1509,33 @@ class StaticService extends BaseService {
        $allMonthStaticProfits = self::allMonthSdHzStaticProfits($lottery_type);
 
        $tmpProfits = $allMonthStaticProfits;
-       foreach ($tmpProfits as $tmpProfit){
-           foreach ($tmpProfit as $month=>$tmp){
-               //if($month != date('Y-m')) continue;
-               $setData = [];
-               if(!$StaticHzProfits = StaticHzProfits::findOne(['month'=>$month, 'lottery_type'=>$lottery_type])){
-                   $StaticHzProfits = new StaticHzProfits();
-                   $setData['created_at'] = time();
+       try {
+           foreach ($tmpProfits as $tmpProfit){
+               foreach ($tmpProfit as $month=>$tmp){
+                   //if($month != date('Y-m')) continue;
+                   $setData = [];
+                   if(!$StaticHzProfits = StaticHzProfits::findOne(['month'=>$month, 'lottery_type'=>$lottery_type])){
+                       $StaticHzProfits = new StaticHzProfits();
+                       $setData['created_at'] = time();
+                   }
+                   $setData['lottery_type'] = $lottery_type;
+                   $setData['updated_at'] = time();
+                   $setData['month'] = $month;
+                   $setData['hz_0_4'] = $tmpProfits['hz_0_4'][$month]; # 0-4 和值
+                   $setData['hz_1_6'] = $tmpProfits['hz_1_6'][$month]; # 1-6 和值
+                   $setData['hz_5_10'] = $tmpProfits['hz_5_10'][$month]; # 5-10 和值
+                   $setData['hz_11_15'] = $tmpProfits['hz_11_15'][$month]; # 11 - 15
+                   $setData['hz_16_19'] = $tmpProfits['hz_16_19'][$month]; # 16 - 19
+                   $setData['hz_20_24'] = $tmpProfits['hz_20_24'][$month]; # 20 - 24
+                   $setData['hz_25_29'] = $tmpProfits['hz_25_29'][$month]; # 25 - 29
+                   $setData['hz_30_35'] = $tmpProfits['hz_30_35'][$month]; # 30 - 35
+
+                   $StaticHzProfits->setAttributes($setData);
+
+                   $rst = $StaticHzProfits->save();
                }
-               $setData['lottery_type'] = $lottery_type;
-               $setData['updated_at'] = time();
-               $setData['month'] = $month;
-               $setData['hz_0_4'] = $tmpProfits['hz_0_4'][$month]; # 0-4 和值
-               $setData['hz_1_6'] = $tmpProfits['hz_1_6'][$month]; # 1-6 和值
-               $setData['hz_5_10'] = $tmpProfits['hz_5_10'][$month]; # 5-10 和值
-               $setData['hz_11_15'] = $tmpProfits['hz_11_15'][$month]; # 11 - 15
-               $setData['hz_16_19'] = $tmpProfits['hz_16_19'][$month]; # 16 - 19
-               $setData['hz_20_24'] = $tmpProfits['hz_20_24'][$month]; # 20 - 24
-               $setData['hz_25_29'] = $tmpProfits['hz_25_29'][$month]; # 25 - 29
-               $setData['hz_30_35'] = $tmpProfits['hz_30_35'][$month]; # 30 - 35
-
-               $StaticHzProfits->setAttributes($setData);
-
-               $rst = $StaticHzProfits->save();
            }
-
-       }
+        }catch (\Exception $e){}
 
         return ['status'=>200, 'data'=>$setData, 'rst'=>$rst];
     }
@@ -1544,22 +1548,24 @@ class StaticService extends BaseService {
         $SscKjDataDs = SscKjDataDs::find()->orderBy(['id'=>SORT_DESC])->limit(90)->asArray()->all();
         $SscKjDataDs = array_reverse($SscKjDataDs);
         $m = \Yii::$app->cache;
-        foreach ($SscKjDataDs as $key=>$dsData){
-            if(in_array($key, [0, 10, 11])) continue;
-            foreach (self::$typeArr as $k=>$Arr){
-                if(in_array($dsData['code_1_2_3_4'], $Arr)){
-                    $mkey = 'SD_LAST_TIME_RECORD_'.$k;
-                    $m->set($mkey, $dsData['code_1_2_3_4'], 4*60*60);
+        try {
+            foreach ($SscKjDataDs as $key=>$dsData){
+                if(in_array($key, [0, 10, 11])) continue;
+                foreach (self::$typeArr as $k=>$Arr){
+                    if(in_array($dsData['code_1_2_3_4'], $Arr)){
+                        $mkey = 'SD_LAST_TIME_RECORD_'.$k;
+                        $m->set($mkey, $dsData['code_1_2_3_4'], 4*60*60);
+                    }
                 }
             }
-        }
-        //p($SscKjDataDs);
-        $LastTime = [];
-        foreach (self::$typeArr as $k=>$Arr){
-            if(in_array($k, [0, 8, 9, 10, 11])) continue;
-            $mkey = 'SD_LAST_TIME_RECORD_'.$k;
-            $LastTime[$k] = $m->get($mkey);
-        }
+            //p($SscKjDataDs);
+            $LastTime = [];
+            foreach (self::$typeArr as $k=>$Arr){
+                if(in_array($k, [0, 8, 9, 10, 11])) continue;
+                $mkey = 'SD_LAST_TIME_RECORD_'.$k;
+                $LastTime[$k] = $m->get($mkey);
+            }
+        }catch (\Exception $e){}
 
         return ['status'=>200, 'data'=>$LastTime];
     }
@@ -1880,52 +1886,54 @@ class StaticService extends BaseService {
         $m = \Yii::$app->cache;
         $mkey = 'allDateStatic3Nums_PERDATE_03_' . $lottery_type;
 
-        $flag = Static3numArisePerdate::find()->where(['lottery_type' => $lottery_type])->count();
-        static $i = 5;
-        for ($s = 0; $s < $i; $s++) {
-            if (!$flag OR !$time = $m->get($mkey)) {
-                $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
-                $time = $staticsStarTime;
-                /*
-                for ($i=0; $i<20; $i++){
-                    self::allDateStatic3NumsPerDate($lottery_type);
+        try {
+            $flag = Static3numArisePerdate::find()->where(['lottery_type' => $lottery_type])->count();
+            static $i = 5;
+            for ($s = 0; $s < $i; $s++) {
+                if (!$flag OR !$time = $m->get($mkey)) {
+                    $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
+                    $time = $staticsStarTime;
+                    /*
+                    for ($i=0; $i<20; $i++){
+                        self::allDateStatic3NumsPerDate($lottery_type);
+                    }
+                    */
+                } else {
+                    $i = 5;
+                    $time = $time + 24 * 3600 - 10 * 60;
                 }
-                */
-            } else {
-                $i = 5;
-                $time = $time + 24 * 3600 - 10 * 60;
-            }
 
-            $date = date('Y-m-d', $time);
-            $date = min([date('Y-m-d'), $date]);
-            if ($date > date('Y-m-d')) break;
-            if ($statics = self::staticKj3NumCounts($date, $lottery_type)) {
-                //p([$statics, $date]);
-                if ($statics['status'] == 300) {
-                    $m->set($mkey, $time, 7 * 24 * 3600);
-                    continue;
-                }
-                $setData = [];
-                foreach ($statics as $key => $static) {
-                    $setData['codes_' . $key] = $static;
-                }
-                if (!$Static3numArisePerdate = Static3numArisePerdate::findOne(['date' => $date, 'lottery_type' => $lottery_type])) {
-                    $Static3numArisePerdate = new Static3numArisePerdate();
-                    $setData['created_at'] = time();
-                }
-                $setData = array_merge($setData, [
-                    'date' => $date,
-                    'lottery_type' => $lottery_type,
-                    'updated_at' => time(),
-                ]);
+                $date = date('Y-m-d', $time);
+                $date = min([date('Y-m-d'), $date]);
+                if ($date > date('Y-m-d')) break;
+                if ($statics = self::staticKj3NumCounts($date, $lottery_type)) {
+                    //p([$statics, $date]);
+                    if ($statics['status'] == 300) {
+                        $m->set($mkey, $time, 7 * 24 * 3600);
+                        continue;
+                    }
+                    $setData = [];
+                    foreach ($statics as $key => $static) {
+                        $setData['codes_' . $key] = $static;
+                    }
+                    if (!$Static3numArisePerdate = Static3numArisePerdate::findOne(['date' => $date, 'lottery_type' => $lottery_type])) {
+                        $Static3numArisePerdate = new Static3numArisePerdate();
+                        $setData['created_at'] = time();
+                    }
+                    $setData = array_merge($setData, [
+                        'date' => $date,
+                        'lottery_type' => $lottery_type,
+                        'updated_at' => time(),
+                    ]);
 
-                $Static3numArisePerdate->setAttributes($setData);
-                //p($Static3numArisePerdate->attributes);
-                $rst = $Static3numArisePerdate->save();
-                //p(['date'=>$date, 'lottery_type'=>$lottery_type, $Static3numArisePerdate, $rst]);
+                    $Static3numArisePerdate->setAttributes($setData);
+                    //p($Static3numArisePerdate->attributes);
+                    $rst = $Static3numArisePerdate->save();
+                    //p(['date'=>$date, 'lottery_type'=>$lottery_type, $Static3numArisePerdate, $rst]);
+                }
+                $m->set($mkey, $time, 7 * 24 * 3600);
             }
-            $m->set($mkey, $time, 7 * 24 * 3600);
-        }
+        }catch (\Exception $e){}
     }
 
     /**
@@ -1939,31 +1947,33 @@ class StaticService extends BaseService {
         }
 
         $allStatic = [];
-        foreach ($months as $month){
-            //if($month>date('Y-m')) break;
-            if($statics = self::staticKj3nCounts($month, $lottery_type)){
-                $setData = [];
-                foreach ($statics as $key=>$static){
-                    $setData['code_'.$key] = (int)$static;
-                }
-                if(!$data = StaticCode3nAriseMonth::findOne(['month'=>$month, 'lottery_type'=>$lottery_type])){
-                    $data = new StaticCode3nAriseMonth();
-                    $setData['created_at'] = time();
-                }
-                $setData = array_merge($setData, [
-                    'month' => $month,
-                    'lottery_type' => $lottery_type,
-                    'updated_at' => time(),
-                ]);
+        try {
+            foreach ($months as $month){
+                //if($month>date('Y-m')) break;
+                if($statics = self::staticKj3nCounts($month, $lottery_type)){
+                    $setData = [];
+                    foreach ($statics as $key=>$static){
+                        $setData['code_'.$key] = (int)$static;
+                    }
+                    if(!$data = StaticCode3nAriseMonth::findOne(['month'=>$month, 'lottery_type'=>$lottery_type])){
+                        $data = new StaticCode3nAriseMonth();
+                        $setData['created_at'] = time();
+                    }
+                    $setData = array_merge($setData, [
+                        'month' => $month,
+                        'lottery_type' => $lottery_type,
+                        'updated_at' => time(),
+                    ]);
 
-                $data->setAttributes($setData);
-                //p($data->attributes);
-                //$allStatic[$month] = $data->attributes;
-                $rst = $data->save();
-                $allStatic[$month] = $rst;
-                //p(['date'=>$date, 'lottery_type'=>$lottery_type, $Static3numArisePerdate, $rst]);
+                    $data->setAttributes($setData);
+                    //p($data->attributes);
+                    //$allStatic[$month] = $data->attributes;
+                    $rst = $data->save();
+                    $allStatic[$month] = $rst;
+                    //p(['date'=>$date, 'lottery_type'=>$lottery_type, $Static3numArisePerdate, $rst]);
+                }
             }
-        }
+        }catch (\Exception $e){}
 
         return $allStatic;
     }
@@ -1981,31 +1991,33 @@ class StaticService extends BaseService {
         }
 
         $allStatic = [];
-        foreach ($months as $month){
-            //if($month>date('Y-m')) break;
-            if($statics = self::staticKj4NCounts($month, $lottery_type)){
-                $setData = [];
-                foreach ($statics as $key=>$static){
-                    $setData['code_'.$key] = (int)$static;
-                }
-                if(!$data = StaticCode4nAriseMonth::findOne(['month'=>$month, 'lottery_type'=>$lottery_type])){
-                    $data = new StaticCode4nAriseMonth();
-                    $setData['created_at'] = time();
-                }
-                $setData = array_merge($setData, [
-                    'month' => $month,
-                    'lottery_type' => $lottery_type,
-                    'updated_at' => time(),
-                ]);
+        try {
+            foreach ($months as $month){
+                //if($month>date('Y-m')) break;
+                if($statics = self::staticKj4NCounts($month, $lottery_type)){
+                    $setData = [];
+                    foreach ($statics as $key=>$static){
+                        $setData['code_'.$key] = (int)$static;
+                    }
+                    if(!$data = StaticCode4nAriseMonth::findOne(['month'=>$month, 'lottery_type'=>$lottery_type])){
+                        $data = new StaticCode4nAriseMonth();
+                        $setData['created_at'] = time();
+                    }
+                    $setData = array_merge($setData, [
+                        'month' => $month,
+                        'lottery_type' => $lottery_type,
+                        'updated_at' => time(),
+                    ]);
 
-                $data->setAttributes($setData);
-                //p($data->attributes);
-                //$allStatic[$month] = $data->attributes;
-                $rst = $data->save();
-                $allStatic[$month] = $rst;
-                //p(['date'=>$date, 'lottery_type'=>$lottery_type, $Static3numArisePerdate, $rst]);
+                    $data->setAttributes($setData);
+                    //p($data->attributes);
+                    //$allStatic[$month] = $data->attributes;
+                    $rst = $data->save();
+                    $allStatic[$month] = $rst;
+                    //p(['date'=>$date, 'lottery_type'=>$lottery_type, $Static3numArisePerdate, $rst]);
+                }
             }
-        }
+        }catch (\Exception $e){}
 
         return $allStatic;
     }
@@ -2020,47 +2032,49 @@ class StaticService extends BaseService {
         $mkey = 'allDateStaticCodeType_PERDATE_05_'.$lottery_type;
 
         $allStatic = [];
-        $flag = StaticCodeTypeArisePerdate::find()->where(['lottery_type'=>$lottery_type])->count();
-        static $i = 2;
-        for($s=0; $s<$i; $s++){
-            if(!$flag OR !$time = $m->get($mkey)) {
-                $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
-                $time = $staticsStarTime;
-                /*
-                for ($i=0; $i<20; $i++){
-                    self::allDateStaticCodeTypePerDate($lottery_type);
+        try {
+            $flag = StaticCodeTypeArisePerdate::find()->where(['lottery_type'=>$lottery_type])->count();
+            static $i = 2;
+            for($s=0; $s<$i; $s++){
+                if(!$flag OR !$time = $m->get($mkey)) {
+                    $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
+                    $time = $staticsStarTime;
+                    /*
+                    for ($i=0; $i<20; $i++){
+                        self::allDateStaticCodeTypePerDate($lottery_type);
+                    }
+                    */
+                }else{
+                    $i = 2;
+                    $time = $time + 24 * 3600;
                 }
-                */
-            }else{
-                $i = 2;
-                $time = $time + 24 * 3600;
-            }
 
-            $date = date('Y-m-d', $time);
-            $date = min([date('Y-m-d'), $date]);
-            if($date>date('Y-m-d')) break;
-            if($statics = StaticService::staticCodeTypeCounts($date, $lottery_type)){
-                $setData = [];
-                foreach ($statics as $key=>$static){
-                    $setData[$key] = $static;
-                }
-                if(!$StaticTables = StaticCodeTypeArisePerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
-                    $StaticTables = new StaticCodeTypeArisePerdate();
-                    $setData['created_at'] = time();
-                }
-                $setData = array_merge($setData, [
-                    'date' => $date,
-                    'lottery_type' => $lottery_type,
-                    'updated_at' => time(),
-                ]);
-                $allStatic[] = $setData;
+                $date = date('Y-m-d', $time);
+                $date = min([date('Y-m-d'), $date]);
+                if($date>date('Y-m-d')) break;
+                if($statics = StaticService::staticCodeTypeCounts($date, $lottery_type)){
+                    $setData = [];
+                    foreach ($statics as $key=>$static){
+                        $setData[$key] = $static;
+                    }
+                    if(!$StaticTables = StaticCodeTypeArisePerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
+                        $StaticTables = new StaticCodeTypeArisePerdate();
+                        $setData['created_at'] = time();
+                    }
+                    $setData = array_merge($setData, [
+                        'date' => $date,
+                        'lottery_type' => $lottery_type,
+                        'updated_at' => time(),
+                    ]);
+                    $allStatic[] = $setData;
 
-                $StaticTables->setAttributes($setData);
-                $StaticTables->save();
-                //p(['date'=>$date, 'lottery_type'=>$lottery_type, $Static3numArisePerdate, $rst]);
+                    $StaticTables->setAttributes($setData);
+                    $StaticTables->save();
+                    //p(['date'=>$date, 'lottery_type'=>$lottery_type, $Static3numArisePerdate, $rst]);
+                }
+                $m->set($mkey, $time, 7*24*3600);
             }
-            $m->set($mkey, $time, 7*24*3600);
-        }
+        }catch (\Exception $e){}
 
         return $allStatic;
     }
@@ -2109,50 +2123,52 @@ class StaticService extends BaseService {
         $m = \Yii::$app->cache;
         $mkey = 'allDateStaticHz_PERDATE_05_'.$lottery_type;
 
-        $allStatic = [];
-        $flag = StaticHzArisePerdate::find()->where(['lottery_type'=>$lottery_type])->count();
-        static $i = 2;
-        for($s=0; $s<$i; $s++){
-            if(!$flag OR !$time = $m->get($mkey)) {
-                $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
-                $time = $staticsStarTime;
-                /*
-                for ($i=0; $i<20; $i++){ # 死循环
-                    self::allDateStaticHzPerDate($lottery_type);
+        try {
+            $allStatic = [];
+            $flag = StaticHzArisePerdate::find()->where(['lottery_type'=>$lottery_type])->count();
+            static $i = 2;
+            for($s=0; $s<$i; $s++){
+                if(!$flag OR !$time = $m->get($mkey)) {
+                    $staticsStarTime = self::getStaticStartTime($lottery_type); # 获取统计开始时间
+                    $time = $staticsStarTime;
+                    /*
+                    for ($i=0; $i<20; $i++){ # 死循环
+                        self::allDateStaticHzPerDate($lottery_type);
+                    }
+                    */
+                }else{
+                    $i = 2;
+                    $time = $time + 24 * 3600;
                 }
-                */
-            }else{
-                $i = 2;
-                $time = $time + 24 * 3600;
-            }
 
-            $date = date('Y-m-d', $time);
-            $date = min([date('Y-m-d'), $date]);
-            if($date>date('Y-m-d')) break;
-            if($statics = StaticService::staticHzCounts($date, $lottery_type)){
-                $setData = [];
-                foreach ($statics as $key=>$static){
-                    $setData[$key] = $static;
-                }
-                if(!$StaticTables = StaticHzArisePerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
-                    $StaticTables = new StaticHzArisePerdate();
-                    $setData['created_at'] = time();
-                }
-                $setData = array_merge($setData, [
-                    'date' => $date,
-                    'lottery_type' => $lottery_type,
-                    'updated_at' => time(),
-                ]);
-                $allStatic[] = $setData;
-                //p($setData,0);
+                $date = date('Y-m-d', $time);
+                $date = min([date('Y-m-d'), $date]);
+                if($date>date('Y-m-d')) break;
+                if($statics = StaticService::staticHzCounts($date, $lottery_type)){
+                    $setData = [];
+                    foreach ($statics as $key=>$static){
+                        $setData[$key] = $static;
+                    }
+                    if(!$StaticTables = StaticHzArisePerdate::findOne(['date'=>$date, 'lottery_type'=>$lottery_type])){
+                        $StaticTables = new StaticHzArisePerdate();
+                        $setData['created_at'] = time();
+                    }
+                    $setData = array_merge($setData, [
+                        'date' => $date,
+                        'lottery_type' => $lottery_type,
+                        'updated_at' => time(),
+                    ]);
+                    $allStatic[] = $setData;
+                    //p($setData,0);
 
-                $StaticTables->setAttributes($setData);
-                $rst = $StaticTables->save();
-                //p($rst,0); p($StaticTables->attributes);
-                //p(['date'=>$date, 'lottery_type'=>$lottery_type, $StaticTables, $rst]);
+                    $StaticTables->setAttributes($setData);
+                    $rst = $StaticTables->save();
+                    //p($rst,0); p($StaticTables->attributes);
+                    //p(['date'=>$date, 'lottery_type'=>$lottery_type, $StaticTables, $rst]);
+                }
+                $m->set($mkey, $time, 7*24*3600);
             }
-            $m->set($mkey, $time, 7*24*3600);
-        }
+        }catch (\Exception $e){}
 
         return $allStatic;
     }
@@ -2313,7 +2329,7 @@ class StaticService extends BaseService {
 
            $rst['staticCodeTypeProfitsMonth_parent'] = StaticService::staticCodeTypeProfitsMonth_parent($lottery_type);
            $t9 = microtime(true);
-           Tool_Common::log('/data/'.__FUNCTION__, "INFO", '处理统计数据-开始', [
+           Tool_Common::log('/data/'.__FUNCTION__, "INFO", '处理统计数据-结束', [
                'lottery_type'=>$lottery_type,
                'time_consume1'=>($t2-$t1).'s',
                'time_consume2'=>($t3-$t2).'s',
