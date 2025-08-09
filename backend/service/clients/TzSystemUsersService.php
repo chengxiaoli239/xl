@@ -575,10 +575,11 @@ class TzSystemUsersService extends ClientsBaseService{
             $where = TzSystemUsersService::getActivePlanTasksWhere($uid, $current_qihao, $direct, $lottery_type);
             $BetErrorPlansTasksQuery = BetErrorPlansTask::find()->where($where);
             $BetErrorPlansTasks = $BetErrorPlansTasksQuery->orderBy(['bet_money'=>SORT_DESC, 'id'=>SORT_DESC])->limit(20)->all();
+            /*
             $sql = $BetErrorPlansTasksQuery->createCommand()->getRawSql();
-
             $log = ['uid'=>$uid, 'current_qihao'=>$current_qihao, 'count'=>count($BetErrorPlansTasks),'sql'=>$sql];
             Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '用户计划下注脚本-0', $log);
+            */
             if(empty($BetErrorPlansTasks)){
                 throw_info('没有下注任务');
             }
