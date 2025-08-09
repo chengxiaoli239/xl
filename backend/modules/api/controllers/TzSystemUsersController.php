@@ -179,7 +179,7 @@ class TzSystemUsersController extends Controller
         }
 
         $rst = TzSystemUsersService::getActivePlanTasks($post['access_token'], $post['current_qihao'], $post['direct']??0, $post['lottery_type']);
-        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取激活任务', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, /*'rst'=>$rst*/]);
+        Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '获取激活任务', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;
     }
