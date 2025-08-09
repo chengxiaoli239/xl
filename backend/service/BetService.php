@@ -259,16 +259,16 @@ abstract class BetService extends BaseBetService {
 
                 $s_time = microtime(true);
                 Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注脚本-4', ['task_id'=>$task_id]);
-                $snid = $BetService->repeatErrorBet($task_id);
+                $snId = $BetService->repeatErrorBet($task_id);
                 $e_time = microtime(true);
-                $logArr = ['uid' => $uid, 'qihao'=>$activeQiHao, 'account'=>$account, 'plan_id'=>$plan_id, 'task_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'rst'=>$betRst, 'consume_time'=>($e_time-$s_time).'s'];
+                $logArr = ['uid' => $uid, 'qihao'=>$activeQiHao, 'account'=>$account, 'plan_id'=>$plan_id, 'task_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'snId'=>$snId, 'consume_time'=>($e_time-$s_time).'s'];
 
-                if(!empty($snid)){
+                if(!empty($snId)){
                     # 记录方案号
                     $where = ['plan_id'=>$plan_id, 'qihao'=>(string)$activeQiHao, 'lottery_type'=>$lottery_type];
                     $BettingRecords = BettingRecords::find()->where($where)->limit(1)->one();
-                    $BettingRecords->snid = trim($BettingRecords->snid.';'.$snid, ';');
-                    $BettingRecords->sn = trim($BettingRecords->sn.';'.$snid, ';');
+                    $BettingRecords->snid = trim($BettingRecords->snid.';'.$snId, ';');
+                    $BettingRecords->sn = trim($BettingRecords->sn.';'.$snId, ';'); // 这里幸运五是sn，暂时写snid
                     $BettingRecords->save();
                 }
 
