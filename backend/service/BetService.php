@@ -1888,7 +1888,7 @@ abstract class BetService extends BaseBetService {
                     commonRedis()->setex($insert_mkey, 300, 1);
                 }
             }else{
-                $logArr = ['plan_id'=>$plan->id, 'is_auto_bet'=>$TzSystemsUsers->is_auto_bet, 'is_local_bet'=>$TzSystemsUsers->is_local_bet, 'account'=>$TzSystemsUsers->account, 'lottery_type'=>$lottery_type, 'uid'=>$plan->uid];
+                $logArr = ['plan_id'=>$plan->id, 'is_local_bet'=>$TzSystemsUsers->is_local_bet, 'account'=>$TzSystemsUsers->account, 'lottery_type'=>$lottery_type, 'uid'=>$plan->uid];
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入真实计划任务-1', $logArr);
 
                 $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
