@@ -1760,7 +1760,7 @@ abstract class BetService extends BaseBetService {
                 if(BettingRecords::find()->where($where)->exists()){
                     throw_info('yx表已记录2...', 40001);
                 }
-                push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$planId, 'isJob'=>$isJob, 'qiHao'=>$qiHao, 'business_id'=>$qiHao]);
+                push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$planId, 'isJob'=>$isJob, 'qiHao'=>$qiHao, 'business_id'=>$qiHao, 'msg'=>'写入计划']);
                 $rst['data'] = ['activeQiHao'=>$qiHao, 'plan_id'=>$plan->id, 'msg'=>'正常'];
             }catch (\Exception $e){
                 var_dump($e->getMessage());

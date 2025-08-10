@@ -2,6 +2,7 @@
 namespace common\service\jobs\kj_data;
 
 use backend\service\BetService;
+use common\helpers\LotteryType;
 use common\service\jobs\CommonJob;
 use common\service\lottery\LotteryTypeService;
 use common\tools\KjDataGet;
@@ -21,7 +22,7 @@ class UserBetTaskRecordJob extends CommonJob {
         $lottery_type = $params['lottery_type'];
 
         KjDataGet::isCanGrab($lottery_type, $isCanBet);
-        if(!$isCanBet){
+        if(!$isCanBet && $lottery_type == LotteryType::LUCKY_5){
             return '非开盘时间段';
         }
         $lotteryTypeData = LotteryTypeService::getLotteryTypeData();
