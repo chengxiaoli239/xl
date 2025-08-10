@@ -17,7 +17,7 @@ class SscPlanService extends CommonService
      * @param int $planId 被复制的计划ID
      * @return array
      */
-    public static function copyOnePlan($userId, $planId)
+    public static function copyOnePlan($userId, $planId, $isTest=1, $status=0)
     {
         try {
             // 1. 获取原计划
@@ -55,7 +55,8 @@ class SscPlanService extends CommonService
             $newPlan->update_time = date('Y-m-d H:i:s'); // 更新修改时间
 
             $newPlan->single = $singles[0]??0.1;
-            $newPlan->status = 0;
+            $newPlan->is_test = $isTest;
+            $newPlan->status = $status;
 
             // 4. 保存新计划
             if (!$newPlan->save()) {
