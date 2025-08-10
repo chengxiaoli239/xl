@@ -171,7 +171,7 @@
                 var data = obj.data;
                 console.log(data);
                 if(obj.event === 'detail'){
-                    requestApi('/forum/queue/status', {system_queue_id:data.system_queue_id}, function(data) {
+                    requestApi('/forum/queue-log/status', {system_queue_id:data.system_queue_id}, function(data) {
                         layer.alert(data.message);
                     }, 'no');
                 }
