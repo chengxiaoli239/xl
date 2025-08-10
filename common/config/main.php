@@ -53,13 +53,16 @@ return [
             // Queue channel key
             'channel' => 'lottery:queue',
             'as log'=> \yii\queue\LogBehavior::class,
+            'ttr' => 30,         // 30秒超时
+            'attempts' => 2,     // 总共执行2次
         ],
         'queue_fast' => [
             'class' => \yii\queue\redis\Queue::class,
             'redis' => 'redis', // Redis connection component or its config
             'channel' => 'lottery:queue_fast', // Queue channel key
             'as log' => \yii\queue\LogBehavior::class,
-            'ttr' => 3600,
+            'ttr' => 30,         // 30秒超时
+            'attempts' => 2,     // 总共执行2次
         ],
         'queue_open' => [
             'class' => \yii\queue\redis\Queue::class,
