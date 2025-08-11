@@ -28,7 +28,7 @@ class GrabKjDatasJob extends CommonJob {
             }
             $rst = KjDataGet::insertOneLotteryKjData($lottery_type, $qihao, $kjData);
         }catch (\Exception $e){
-            return $e->getMessage();
+            return $e->getMessage().'_'.$e->getFile();
         }
         return $rst;
     }

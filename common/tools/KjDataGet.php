@@ -576,7 +576,7 @@ class KjDataGet
         $nextQihao = $m->get($mkey);
 
         if(empty($nextQihao)){
-            $nextQihao = $qihao + 1;
+            $nextQihao = (int)$qihao + 1;
             switch ($lottery_type){
                 case 1: # 七星彩
                 case 17: # 排列五
@@ -633,7 +633,7 @@ class KjDataGet
             $m->set($mkey, $nextQihao, 600);
         }
 
-        return $nextQihao;
+        return (string)$nextQihao;
     }
 
     /**
