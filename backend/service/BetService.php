@@ -1837,7 +1837,11 @@ abstract class BetService extends BaseBetService {
                 $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
                 $insertRst = $BetService->postBatchBet($qiHao, $plan, $codes); # 计划任务写入
                 if($TzSystemsUsers->is_local_bet === 0){
-                    push_queue_fast(UserTaskBetJob::class, ['task_id'=>$insertRst['task_id'], 'user_id'=>$plan->uid, 'business_id'=>$planId, 'qihao'=>$qiHao]);
+                    $params = ['task_id'=>$insertRst['task_id'], 'user_id'=>$plan->uid, 'business_id'=>$planId, 'qihao'=>$qiHao];
+                    if($lottery_type == \common\helpers\LotteryType::ETH_10M){
+                        $params['queue_delay_time'] = 30;
+                    }
+                    push_queue_fast(UserTaskBetJob::class, $params);
                 }
 
                 $t3 = microtime(true);

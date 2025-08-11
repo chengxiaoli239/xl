@@ -21,8 +21,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="panel-body">
             <div class="adv-table editable-table ">
 
-                <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+                <?php //echo $this->render('_search', ['model' => $searchModel]); ?>
 
+                <?php include(dirname(__FILE__).'/index_tab.php'); ?>
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     #'filterModel' => $searchModel,

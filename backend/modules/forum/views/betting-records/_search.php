@@ -24,10 +24,12 @@ $cancelStatus = [
             'class' => 'd-flex align-items-center' // 使用 Flexbox 对齐
         ],
     ]); ?>
-
     <div class="row">
             <div class="col-lg-2 col-xs-6">
                 <?= $form->field($model, 'plan_id')->label('计划ID') ?>
+            </div>
+            <div class="col-lg-2 col-xs-6">
+                <?= $form->field($model, 'qihao')->label('期号') ?>
             </div>
         <?php if($userId == 1){?>
             <div class="col-lg-2 col-xs-6">
@@ -41,7 +43,7 @@ $cancelStatus = [
                 )->label('是否撤单') ?>
             </div>
             <div class="col-lg-2 col-xs-6">
-                <?= $form->field($model, 'is_simulate')->dropDownList(\backend\models\BettingRecords::IS_SIMULATE_OPTION, ['prompt' => '-请选择-'])->label('计划类型') ?>
+                <?= $form->field($model, 'is_simulate')->dropDownList(\backend\models\BettingRecords::IS_SIMULATE_OPTION, ['prompt' => '-请选择-'])->label('模拟/真实') ?>
             </div>
 
         <div class="col-lg-2 col-xs-6 d-flex align-items-center">

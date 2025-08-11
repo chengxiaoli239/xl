@@ -2,6 +2,7 @@
 
 namespace backend\models\searchs;
 
+use common\tools\Tools;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -66,7 +67,7 @@ class BettingRecords extends BettingRecordsModel
             'account' => $this->account,
             'betting_money' => $this->betting_money,
             'bonus' => $this->bonus,
-            'plan_id' => $this->plan_id,
+            //'plan_id' => $this->plan_id,
             'single' => $this->single,
             'profits' => $this->profits,
             'status' => $this->status,
@@ -77,12 +78,21 @@ class BettingRecords extends BettingRecordsModel
         ];
         if($params['BettingRecords']['uid'] !==1) $filterWhere['uid'] = $params['BettingRecords']['uid'];
 
+        if(!empty($params['BettingRecords']['plan_id'])){
+            $ids = Tools::getQuerySplit($params['BettingRecords']['plan_id']);
+            $query->andWhere(['IN', 'plan_id', $ids]);
+        }
+        if(!empty($params['BettingRecords']['qihao'])){
+            $ids = Tools::getQuerySplit($params['BettingRecords']['qihao']);
+            $query->andWhere(['IN', 'qihao', $ids]);
+        }
+
         $query->andFilterWhere($filterWhere);
 
         $query->andFilterWhere(['like', 'codes', $this->codes])
             //->andFilterWhere(['like', 'account', $this->account])
             ->andFilterWhere(['like', 'playway_name', $this->playway_name])
-            ->andFilterWhere(['like', 'qihao', $this->qihao])
+            //->andFilterWhere(['like', 'qihao', $this->qihao])
             ->andFilterWhere(['like', 'kj_codes', $this->kj_codes])
             ->andFilterWhere(['like', 'position', $this->position])
             ->andFilterWhere(['like', 'sn', $this->sn])

@@ -3,6 +3,7 @@
 namespace backend\modules\forum\controllers;
 
 use backend\service\HN0898Service;
+use backend\service\UserSysPlansService;
 use common\service\CommonService;
 use Yii;
 use backend\models\BetErrorPlansTask;
@@ -41,6 +42,8 @@ class BetErrorPlansTaskController extends BaseController
         $queryParams = Yii::$app->request->queryParams;
 
         $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
+        $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);
+        $queryParams['BetErrorPlansTask']['lottery_type'] = $lottery_type;
 
         if($this->_user_id !== 1){
             $queryParams['BetErrorPlansTask']['lottery_type'] = $lottery_type;
@@ -49,6 +52,8 @@ class BetErrorPlansTaskController extends BaseController
 
         $dataProvider = $searchModel->search($queryParams);
         $data = [
+            'lottery_types' => $lottery_types,
+            'lottery_type' => $lottery_type,
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'currentQihao' => HN0898Service::getQihao($lottery_type),

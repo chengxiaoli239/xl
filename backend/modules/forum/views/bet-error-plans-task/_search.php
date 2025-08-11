@@ -11,67 +11,31 @@ use yii\widgets\ActiveForm;
 <div class="bet-error-plans-task-search">
 
     <?php $form = ActiveForm::begin([
-        'action' => ['index'],
+       'action' => ['index'],
         'method' => 'get',
+        'options' => [
+            'data-pjax' => 1,
+            'class' => 'd-flex align-items-center' // 使用 Flexbox 对齐
+        ],
     ]); ?>
 
-    <?= $form->field($model, 'id') ?>
+    <div class="row">
+        <div class="col-lg-2 col-xs-6">
+            <?= $form->field($model, 'plan_id')->label('计划ID') ?>
+        </div>
+        <div class="col-lg-2 col-xs-6">
+            <?= $form->field($model, 'qihao')->label('期号') ?>
+        </div>
+        <?php if($userId == 1){?>
+            <div class="col-lg-2 col-xs-6">
+                <?= $form->field($model, 'account')->dropDownList($userNameList, ['prompt' => '-选择-'])->label('账号名称') ?>
+            </div>
+        <?php }?>
 
-    <?= $form->field($model, 'codes') ?>
-
-    <?= $form->field($model, 'uid') ?>
-
-    <?= $form->field($model, 'agent_id') ?>
-
-    <?= $form->field($model, 'account') ?>
-
-    <?php // echo $form->field($model, 'bet_url') ?>
-
-    <?php // echo $form->field($model, 'bet_headers') ?>
-
-    <?php // echo $form->field($model, 'post_datas') ?>
-
-    <?php // echo $form->field($model, 'playway') ?>
-
-    <?php // echo $form->field($model, 'tz_type') ?>
-
-    <?php // echo $form->field($model, 'playway_name') ?>
-
-    <?php // echo $form->field($model, 'bet_money') ?>
-
-    <?php // echo $form->field($model, 'single') ?>
-
-    <?php // echo $form->field($model, 'qihao') ?>
-
-    <?php // echo $form->field($model, 'kj_codes') ?>
-
-    <?php // echo $form->field($model, 'status') ?>
-
-    <?php // echo $form->field($model, 'sn') ?>
-
-    <?php // echo $form->field($model, 'snid') ?>
-
-    <?php // echo $form->field($model, 'plan_id') ?>
-
-    <?php // echo $form->field($model, 'tz_system_id') ?>
-
-    <?php // echo $form->field($model, 'lotteryclass') ?>
-
-    <?php // echo $form->field($model, 'lottery_type') ?>
-
-    <?php // echo $form->field($model, 'post_desc') ?>
-
-    <?php // echo $form->field($model, 'error_desc') ?>
-
-    <?php // echo $form->field($model, 'updated_time') ?>
-
-    <?php // echo $form->field($model, 'updated_at') ?>
-
-    <?php // echo $form->field($model, 'created_at') ?>
-
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-default']) ?>
+        <div class="form-group">
+            <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
+            <?= Html::resetButton(Yii::t('app', 'Reset'), ['class' => 'btn btn-default']) ?>
+        </div>
     </div>
 
     <?php ActiveForm::end(); ?>

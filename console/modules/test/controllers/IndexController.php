@@ -83,11 +83,13 @@ class IndexController extends Controller
     public function actionDw(): array
     {
         $rst = TzService::operateSystemBetPlans($lottery_type=23, $qihao='250807428', $ignore=0); p($rst);# 处理系统投注计划，更新统计数据、
-        $plans = UserSysPlans::find()->where(['uid'=>35, 'status'=>[1,0]])->orderBy(['id'=>SORT_ASC])->all(); // 被复制的用户userId,as06:25
+        //复制计划
+        $plans = UserSysPlans::find()->where(['uid'=>25, 'status'=>[1,0]])->orderBy(['id'=>SORT_ASC])->all(); // 被复制的用户userId,as06:25
         $planIds =[];
         foreach ($plans as $plan){
             var_dump($plan->id);
-            $planIds[$plan->id] = SscPlanService::copyOnePlan($userId=37, $planId=$plan->id); // 这里userId是要复制的用户id, aa55:34、aa68:75
+            $planIds[$plan->id] = SscPlanService::copyOnePlan($userId=34, $planId=$plan->id, $isTest=1, $status=1); // 这里userId是要复制的用户id, aa55:34、aa68:75
+            $planIds[$plan->id] = SscPlanService::copyOnePlan($userId=75, $planId=$plan->id, $isTest=1, $status=1); // 这里userId是要复制的用户id, aa55:34、aa68:75
         };
         p(['planIds'=>$planIds, 'count'=>count($planIds)]);
         $result = SscPlanService::copyOnePlan($userId=37, $planId=17926);p($result);
