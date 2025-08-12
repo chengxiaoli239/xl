@@ -2474,10 +2474,10 @@ class StaticService extends BaseService {
         $lastIndexId = SscDataService::getLastIndexId($lottery_type);
         $dateNum = ($playway == 3) ? 7 : 3;
         $lastIndexId7 = SscDataService::getLastIndexId($lottery_type, 7);
-        $dateNum = ($playway == 3) ? 30 : 10;
-        $lastIndexId30 = SscDataService::getLastIndexId($lottery_type, $dateNum);
+        $dateNum = ($playway == 3) ? 20 : 10;
+        $lastIndexId20 = SscDataService::getLastIndexId($lottery_type, $dateNum);
         if($staticAll){
-            $lastIndexId30 = 0;
+            $lastIndexId20 = 0;
             ini_set('memory_limit', '10240M');
         }
         switch ($playway){
@@ -2500,7 +2500,7 @@ class StaticService extends BaseService {
                         $concatStr = "CONCAT(code1, ',', code2, ',', code3, ',X')";
                         break;
                 }
-                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', $concatStr, $codes], ['>=', 'index_id', $lastIndexId30]];
+                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', $concatStr, $codes], ['>=', 'index_id', $lastIndexId20]];
                 $query = SscKjData::find()->select(['id', 'index_id', 'qihao', 'code_4n_str'])->where($where);
                 //p($query->createCommand()->getRawSql());
                 if(!$staticAll){
@@ -2509,7 +2509,7 @@ class StaticService extends BaseService {
                 $SscKjData = $query->asArray()->orderBy('id DESC')->all();
                 break;
             case 3: # 四字定
-                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'code_4n_str', $codes], ['>=', 'index_id', $lastIndexId30]];
+                $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'code_4n_str', $codes], ['>=', 'index_id', $lastIndexId20]];
                 $query = SscKjData::find()->select(['id', 'index_id', 'qihao', 'code_4n_str'])->where($where);
                 if(!$staticAll){
                     $query->limit(20000);
@@ -2658,6 +2658,7 @@ class StaticService extends BaseService {
 
        $lastIndexId = SscDataService::getLastIndexId($lottery_type);
        $lastIndexId7 = SscDataService::getLastIndexId($lottery_type, 7);
+       $lastIndexId20 = SscDataService::getLastIndexId($lottery_type, 20);
        $lastIndexId30 = SscDataService::getLastIndexId($lottery_type, 30);
        $static_nums = 300;
        $min_index_id = $lastIndexId-$static_nums;
