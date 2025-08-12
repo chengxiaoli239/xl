@@ -2239,10 +2239,10 @@ class SscDataService extends BaseService {
                     $originSingle = $UserSysPlan->single;
 
                     # 遗漏期数[不中奖期数]
-                    $lossQs = self::getLossQs($UserSysPlan->id);
+                    //$lossQs = self::getLossQs($UserSysPlan->id);
 
                     $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['flag'] = $flag; # 中奖标识
-                    $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
+                    //$logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
 
                     # 倍数处理，中的计划回第一个倍数
                     $singles = explode('-', trim($UserSysPlan->singles));
@@ -3034,10 +3034,10 @@ class SscDataService extends BaseService {
             $flags[$UserSysPlan->uid][$UserSysPlan->id] = $flag;
 
             # 遗漏期数[不中奖期数]
-            $lossQs = self::getLossQs($UserSysPlan->id);
+            //$lossQs = self::getLossQs($UserSysPlan->id);
 
             $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['flag'] = $flag; # 中奖标识
-            $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
+            //$logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
 
             # 倍数处理，中的计划回第一个倍数
             $singles = explode('-', trim($UserSysPlan->singles));
