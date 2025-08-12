@@ -161,7 +161,7 @@ class Lucky5 extends BaseKj {
             if(empty($kjData['opencode'])){
                 throw_info('开奖号码不能为空');
             }
-            Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '号码抓取-实讯网02', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'is_remote'=>$is_remote, 'checkStatus'=>$checkStatus]);
+            Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '号码抓取-实讯网02', ['lottery_type'=>self::$lottery_type, 'kjData'=>$kjData, 'is_remote'=>$is_remote, 'checkStatus'=>$checkStatus, 'data'=>$data??[]]);
         }catch (\Exception $e){
             $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
 

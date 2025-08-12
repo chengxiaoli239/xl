@@ -239,8 +239,6 @@ class IndexController extends Controller
         $t2 = microtime(true);
         p(['rst'=>$rst, 'time_consume'=>($t2-$t1).'s']);
 
-        list($lastQihao, $lastIndexId, $lastId, $nextQihao) = SscDataService::getKjDataLastIndexId($lottery_type=8);
-        p([$lastQihao, $lastIndexId, $lastId, $nextQihao]);
         $t1 = microtime(true);
         $rstLog['updateSdHzYL'] = SscDataService::updateSdHzYl($lottery_type=8);$t2 = microtime(true);
         $rstLog['time_consume']=($t2-$t1).'s';
