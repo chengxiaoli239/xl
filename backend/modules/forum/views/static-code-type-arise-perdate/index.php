@@ -1,5 +1,6 @@
 <?php
 
+use backend\service\SscDataService;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -10,22 +11,19 @@ use yii\grid\GridView;
 $this->title = Yii::t('app', 'Static Code Type Arise Perdates');
 $this->params['breadcrumbs'][] = $this->title;
 $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type);
+
+$qiShu = SscDataService::getQiShu($lottery_type);
+$hasOpenQiShu = \backend\models\SscKjData::find()->where(['lottery_type'=>$lottery_type, 'date'=>date('Y-m-d')])->count();
 ?>
 <section class="static-code-type-arise-perdate-index wrapper site-min-height">
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title).'-'.$lottery_type_name ?>
+            <?php include(dirname(__FILE__).'/index_tab.php'); ?>
+            <?= Html::encode($this->title) . '，总期数:<font color="#663399">'.$qiShu.'</font>期，已开:<font color="green">'.$hasOpenQiShu . '</font>期，待开:<font color="red">'.($qiShu-$hasOpenQiShu).'</font>期'; ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
-                <!--div class="clearfix">
-                    <div class="btn-group">
-                        <?= Html::a('Create Static Code Type Arise Perdate', ['create'], ['class' => 'btn btn-success', 'style' => 'margin-bottom:15px;']) ?>
-                    </div>
-                </div-->
-
-                <?php include(dirname(__FILE__).'/index_tab.php'); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
                 <?= GridView::widget([
