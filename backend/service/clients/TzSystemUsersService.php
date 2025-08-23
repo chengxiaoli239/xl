@@ -332,6 +332,9 @@ class TzSystemUsersService extends ClientsBaseService{
             if(empty($kjData['expect'])){
                 throw_info('开奖数据期号不能为空');
             }
+            if(trim($kjData['expect']) == '期号'){
+                throw_info('开奖数据期号异常：'.$kjData['expect']);
+            }
             if(empty($kjData['opencode'])){
                 throw_info('开奖数据不能为空');
             }

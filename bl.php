@@ -5,8 +5,8 @@ function getfiles($path){
         if($afile=='.'||$afile=='..'){
             if(count(scandir($afile))==2){//目录为空,=2是因为.和..存在
             rmdir($curfile);// 删除空目录 
-          } 
-        } 
+          }
+        }
         if(is_dir($path.'/'.$afile)) { 
             getfiles($path.'/'.$afile); 
         } else { 
