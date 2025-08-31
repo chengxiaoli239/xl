@@ -2,6 +2,7 @@
 
 namespace backend\models\searchs;
 
+use common\tools\Tools;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -81,13 +82,21 @@ class BetErrorPlansTask extends BetErrorPlansTaskModel
         }
         // grid filtering conditions
         $query->andFilterWhere($filterWhere);
+        if(!empty($params['BetErrorPlansTask']['plan_ids'])){
+            $ids = Tools::getQuerySplit($params['BetErrorPlansTask']['plan_ids']);
+            $query->andWhere(['IN', 'plan_id', $ids]);
+        }
+        if(!empty($params['BetErrorPlansTask']['qihao'])){
+            $ids = Tools::getQuerySplit($params['BetErrorPlansTask']['qihao']);
+            $query->andWhere(['IN', 'qihao', $ids]);
+        }
 
         $query->andFilterWhere(['like', 'codes', $this->codes])
             ->andFilterWhere(['like', 'bet_url', $this->bet_url])
             ->andFilterWhere(['like', 'bet_headers', $this->bet_headers])
             ->andFilterWhere(['like', 'post_datas', $this->post_datas])
             ->andFilterWhere(['like', 'playway_name', $this->playway_name])
-            ->andFilterWhere(['like', 'qihao', $this->qihao])
+            //->andFilterWhere(['like', 'qihao', $this->qihao])
             ->andFilterWhere(['like', 'kj_codes', $this->kj_codes])
             ->andFilterWhere(['like', 'sn', $this->sn])
             ->andFilterWhere(['like', 'snid', $this->snid])

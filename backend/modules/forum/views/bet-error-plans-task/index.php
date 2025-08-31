@@ -21,9 +21,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="panel-body">
             <div class="adv-table editable-table ">
 
-                <?php //echo $this->render('_search', ['model' => $searchModel]); ?>
-
                 <?php include(dirname(__FILE__).'/index_tab.php'); ?>
+
+                <?php echo $this->render('_search', ['model' => $searchModel]); ?>
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     #'filterModel' => $searchModel,
@@ -48,12 +48,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         //],
                         //'agent_id',
                         //'account',
-                        ['attribute' => 'account','label' => '账号',
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                return $model->account."[".$model->uid."]";
-                            }
-                        ],
                         ['attribute' => 'plan_id','label' => 'planid',
                             'format'=>'raw',
                             'value' => function($model) {

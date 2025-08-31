@@ -82,6 +82,8 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $rst = TzSystemUsersService::getActiveQihao($lottery_type=8); p($rst);
+        $rst = Lucky5Service::login($uid = 35, $tz_system_id = 9); p($rst);
         $rst = TzService::operateSystemBetPlans($lottery_type=23, $qihao='250807428', $ignore=0); p($rst);# 处理系统投注计划，更新统计数据、
         //复制计划
         $plans = UserSysPlans::find()->where(['uid'=>25, 'status'=>[1,0]])->orderBy(['id'=>SORT_ASC])->all(); // 被复制的用户userId,as06:25

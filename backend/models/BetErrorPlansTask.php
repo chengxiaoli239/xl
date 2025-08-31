@@ -40,6 +40,19 @@ use Yii;
  */
 class BetErrorPlansTask extends \common\models\base\BaseModel
 {
+    public $plan_ids;
+
+    const STATUS_WAIT = 0;
+    const STATUS_SUCCESS = 2;
+    const STATUS_FAIL = 3;
+    const STATUS_CAN_NOT_RE_PUSH = 4;
+    const STATUS_OPTIONS = [
+        self::STATUS_WAIT => '等待推送',
+        self::STATUS_SUCCESS => '推送成功',
+        self::STATUS_FAIL => '推送失败',
+        self::STATUS_CAN_NOT_RE_PUSH => '不可重推',
+    ];
+
     /**
      * @inheritdoc
      */

@@ -471,8 +471,6 @@ class IndexController extends Controller
         p([$isExists, $isExists2]);
         $rst = StaticService::static4dPerDateProfits($lottery_type = 8);
         p($rst); # 每天四定利润统计，四定类型详见：StaticService::$typeArr
-        $rst = Lucky5Service::login($uid = 12, $tz_system_id = 9);
-        p($rst);
         $rst = ProxyBaseService::preGetValidIp($proxy_type=1, $is_auto = 0);
         p($rst);
         $rst = SevenService::synBalance(17);
@@ -486,8 +484,6 @@ class IndexController extends Controller
         $b = [1,2,2,3];
         $intersection = array_intersect($a, $b);
         p($intersection);
-        $rst = TzSystemUsersService::getActiveQihao($lottery_type=8);
-        p($rst);
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
         echo json_encode(['code'=>200, 'msg'=>'操作成功', 'data'=>[]], JSON_FORCE_OBJECT|320);exit();
