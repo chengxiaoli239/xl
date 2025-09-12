@@ -324,6 +324,7 @@ class FootBallService extends SportsBaseService
 
     public static function validateSecret($data)
     {
+        Tool_Common::log('/football/'.__FUNCTION__, 'INFO', '密钥校验', ['data'=>$data]);
         if($data){
             return ['status'=>200, 'msg'=>'OK'];
         }
