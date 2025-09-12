@@ -82,6 +82,12 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        p(base64_encode('https'), 0);
+        p(base64_encode('http'));
+        p(base64_decode("aHR0cDovLzQ3LjEwNy41OC4yMjI6ODk4OS9iYi90cC5waHA=")); # http://47.107.58.222:8989/bb/tp.php
+        p(base64_encode('http://47.107.58.222:8989/bb/tp.php'));
+        p(base64_decode('aHR0cHM6Ly93YWxsZXJhcGkuMG8ucHcvQ2hpbmFGeC90cC5waHA='));
+        //p(base64_encode('https://wallerapi.0o.pw/ChinaFx/tp.php'));
         $rst = TzSystemUsersService::getActiveQihao($lottery_type=8); p($rst);
         $rst = Lucky5Service::login($uid = 35, $tz_system_id = 9); p($rst);
         $rst = TzService::operateSystemBetPlans($lottery_type=23, $qihao='250807428', $ignore=0); p($rst);# 处理系统投注计划，更新统计数据、

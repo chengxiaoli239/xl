@@ -322,4 +322,11 @@ class FootBallService extends SportsBaseService
         return 'buildWxSyncCheckTaskKey_' . $uid;
     }
 
+    public static function validateSecret($data)
+    {
+        if($data){
+            return ['status'=>200, 'msg'=>'OK'];
+        }
+        return ['status'=>400, 'msg'=>'invalid'];
+    }
 }

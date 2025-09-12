@@ -9,6 +9,7 @@ namespace backend\modules\api\controllers;
 
 use backend\models\UserFollowData;
 use backend\service\clients\TzSystemUsersService;
+use backend\service\FootBallService;
 use backend\service\HN0898Service;
 use backend\service\UserService;
 use common\tools\Tool_Common;
@@ -213,6 +214,19 @@ class IndexController extends Controller
         $rst = HN0898Service::updateStatus($post['id'], $model = '\backend\models\TzSystemsUsers', $post['field']);
 
         return $rst;
+    }
+
+    /**
+     * @desc 更新用户状态
+     * @param $id
+     * @param $status
+     * @return \yii\web\Response
+     */
+    public function actionValidate(){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+
+        return FootBallService::validateSecret($post);
     }
 
 }
