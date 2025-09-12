@@ -11,7 +11,7 @@ class ValidateController extends Controller
      * @param $status
      * @return array|\yii\web\Response
      */
-    public function actionValidate(){
+    public function actionValidateSecret(){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
 
