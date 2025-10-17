@@ -184,7 +184,7 @@ class KjDataGet
      * @param int $lottery_type
      * @return array|string
      */
-    public static function insertOneLotteryKjData(int $lottery_type=DEFAULT_LOTTERY_TYPE, $qihao='', $kjData=[]): ?array
+    public static function insertOneLotteryKjData(int $lottery_type=DEFAULT_LOTTERY_TYPE, $qihao='', $kjData=[])
     {
         $RedisLock = new RedisLock();
         $grabOneKey = 'grabOneLotteryKjData_x0_'.$lottery_type;
