@@ -189,6 +189,9 @@ class KjDataGet
         $RedisLock = new RedisLock();
         $grabOneKey = 'grabOneLotteryKjData_x0_'.$lottery_type;
         if($qihao && !empty($kjData)){
+            if(!$RedisLock->lock($grabOneKey, 15)){
+                throw_info('短时间内操作-暂不处理');
+            }
             $data = $kjData;
             if(!empty($data['expect']) && !empty($data['opencode'])){
                 # ssc
