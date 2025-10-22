@@ -17,9 +17,8 @@ class UserPlanInitJob extends CommonJob {
 
     public static function handle($params){
         $lotteryType = $params['lottery_type'];
-        $rst = OperatePlanService::initPlanPerDate($lotteryType); // 每天收盘初始化需要初始化的计划
 
-        return $rst;
+        return OperatePlanService::initPlanPerDate($lotteryType); // 每天收盘初始化需要初始化的计划
     }
 
 }

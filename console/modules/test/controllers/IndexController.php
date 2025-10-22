@@ -82,12 +82,13 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        p(base64_encode('http://8.210.76.131/bb/tp.php')); # aHR0cHM6Ly9hcGkubm5ycm4udG9wL2JiL3RwLnBocA==   有时候两个有时候一个等号
+        p(base64_encode('https://api.nnrrn.top/bb/tp.php')); # aHR0cHM6Ly9hcGkubm5ycm4udG9wL2JiL3RwLnBocA=
         $params = json_decode(
             '{ "lottery_type": 8, "qihao": "20251017241", "kj_data": { "expect": "20251017241", "opencode": "2,8,5,7,4", "opentime": "2025-10-17 20:09:59" }, "title": "幸运五_网盘推送", "business_id": "20251017241" }'
         , true);
         $rst = \common\service\jobs\kj_data\GrabKjDatasJob::handle($params);p($rst);
         p(base64_encode('https://api.hmscy.cn/bb/tp.php')); # aHR0cHM6Ly9hcGkuaG1zY3kuY24vYmIvdHAucGhw
-        p(base64_encode('https://api.nnrrn.top/bb/tp.php')); # aHR0cHM6Ly9hcGkubm5ycm4udG9wL2JiL3RwLnBocA=
         p(base64_encode('http://47.107.58.222:8989/bb/tp.php')); # aHR0cDovLzQ3LjEwNy41OC4yMjI6ODk4OS9iYi90cC5waHA=
         p(base64_encode('http://154.221.16.132/bb/tp.php')); # aHR0cDovLzE1NC4yMjEuMTYuMTMyL2JiL3RwLnBocA=
         //p(base64_encode('https://wallerapi.0o.pw/ChinaFx/tp.php'));
