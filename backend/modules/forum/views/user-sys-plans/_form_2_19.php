@@ -93,6 +93,10 @@ use yii\widgets\ActiveForm;
                         </div>
                     </div>
 
+                    <!--区间盈利止盈止损-->
+                    <?php if(isset(SscDataService::PLAN_TYPE_OPTIONS[SscDataService::PLAN_TYPE_AREA_SINGLES_BET])){ include(dirname(__FILE__).'/take_profits_area.php');} ?>
+
+
                     <?php include(dirname(__FILE__).'/take_or_stop_profits.php'); ?>
 
                     <?= $form->field($model, 'tz_sites')->checkboxList($tz_sites_Arr)->label('投注站点') ?>
