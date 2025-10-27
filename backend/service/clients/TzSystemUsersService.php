@@ -338,6 +338,9 @@ class TzSystemUsersService extends ClientsBaseService{
             if(empty($kjData['opencode'])){
                 throw_info('开奖数据不能为空');
             }
+            if($kjData['opencode'] == $expect){
+                throw_info('开奖数据异常：期号和开奖号码一致');
+            }
             $m = \Yii::$app->cache;
             $mkey = 'syncClientKjDatas_x0_'.$lottery_type.'_'.$expect;
             Lucky5::setKjDataCache($lottery_type, $expect, $kjData);
