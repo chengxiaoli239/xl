@@ -26,6 +26,10 @@ class GrabKjDatasJob extends CommonJob {
             if($lottery_type==DEFAULT_LOTTERY_TYPE && '05:01:30'<$dateHI && $dateHI<'08:05:35'){
                 return '幸运五非抓取数据时间节点';
             }
+            $openCode = $params['opencode'];
+            if($openCode == $qihao){
+                return '推送开奖数据格式问题：期号和开奖号码一致';
+            }
             $rst = KjDataGet::insertOneLotteryKjData($lottery_type, $qihao, $kjData);
         }catch (\Exception $e){
             return $e->getMessage().'_'.$e->getFile();
