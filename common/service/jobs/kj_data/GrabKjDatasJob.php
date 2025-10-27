@@ -27,7 +27,7 @@ class GrabKjDatasJob extends CommonJob {
                 return '幸运五非抓取数据时间节点';
             }
             $openCode = $params['opencode'];
-            if($openCode == $qihao){
+            if($openCode == $qihao && !empty($openCode)){
                 return '推送开奖数据格式问题：期号和开奖号码一致';
             }
             $rst = KjDataGet::insertOneLotteryKjData($lottery_type, $qihao, $kjData);
