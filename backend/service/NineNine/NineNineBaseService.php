@@ -2,7 +2,7 @@
 
 /**
  * Created by PhpStorm.
- *   
+ *
  * Date: 2018/02/06
  * Time: 09:40
  */
@@ -504,9 +504,7 @@ class NineNineBaseService extends BaseTZService {
             $rstData = CurlService::postCurl($url, http_build_query($post_data), $headers);
             $rst[$key]['data'] = $rstData;
             if ($rstData == 'ok') {
-                $BettingRecords = BettingRecords::findOne(['snid' => $snid]);
-                $BettingRecords->cancel_status = 1;
-                $BettingRecords->save();
+                BettingRecords::updateAll(['cancel_status'=>1], ['snid' => $snid]);
                 $rst[$key]['status'] = 200;
             }
         }

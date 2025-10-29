@@ -871,13 +871,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $t3 = microtime(true);
 
             if($rst['Status'] == 1 && strpos($rst['Data'], '退码成功')){
-                $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
-                $BettingRecords->cancel_status = 1;
-                $BettingRecords->save();
+                BettingRecords::updateAll(['cancel_status'=>1], ['snid' => $snid]);
                 $rst['status'] = 200;
-            }else{
-                //if(isset($rst['Data'])) p($rst['Data'], 0);
-                //sleep(1);
             }
 
             $logArr = [
