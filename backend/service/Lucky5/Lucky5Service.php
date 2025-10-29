@@ -1497,7 +1497,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if(strpos(strtolower($url), 'http') === false OR is_array($url)) return ['status'=>300, 'msg'=>'无效url', 'key'=>'SSC_INDEX', 'url'=>$url];
         $headers = [
             "Accept: application/json, text/javascript, */*; q=0.01",
-            "Accept-Encoding: gunzip, deflate, br",
+            "Accept-Encoding: gzip, deflate",
             "Accept-Language: zh-CN,zh;q=0.9",
             #"Connection: keep-alive",
             "Cookie: ".trim($TzSystemsUsers->cookie).' NOTICE_LOGIN_IN=1',
@@ -1532,14 +1532,26 @@ class Lucky5Service { # 重庆7时彩登陆体系
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'time_consume'=>$time_consume, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
         $desc = '';
-        if(isset($rst['Status']) && $data['Status'] != 1){
+        // 修复：使用$data而不是$rst
+        if(isset($data['Status']) && $data['Status'] != 1){
             $desc = json_encode($data, 320);
         }
         $TzSystemsUsers->desc = $desc;
-        $TzSystemsUsers->balance = $data['Data']['credit_balance']??0;
-        $TzSystemsUsers->save();
         //p($logArr);
         Tool_Common::log('userInfo','INFO','幸运五星-用户信息-2', $logArr);
+
+        // 检查是否有错误（如zstd压缩错误等）
+        if(isset($data['status']) && $data['status'] != 200 && $data['status'] != 1){
+            // 如果是错误响应，不缓存，直接返回
+            return $data;
+        }
+
+        // 确保data是数组且包含正常数据时才设置余额
+        if(is_array($data) && isset($data['Data']['credit_balance'])){
+            $TzSystemsUsers->balance = $data['Data']['credit_balance'];
+            $TzSystemsUsers->save();
+        }
+
         $m->set($mkey, $data, 15);
         return $data;
     }
@@ -2575,8 +2587,18 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
 
+        // 移除Accept-Encoding中的br和zstd，避免服务器返回zstd压缩
+        $header_modified = [];
+        foreach($header as $h){
+            if(stripos($h, 'Accept-Encoding') !== false){
+                // 只保留gzip和deflate，移除br和zstd
+                $h = preg_replace('/Accept-Encoding:\s*(.*)/i', 'Accept-Encoding: gzip, deflate', $h);
+            }
+            $header_modified[] = $h;
+        }
+
         // 设置浏览器的特定header
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header_modified);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
         BaseService::setPoxy($ch, $url, $uid); # 设置代理IP
@@ -2587,14 +2609,35 @@ class Lucky5Service { # 重庆7时彩登陆体系
         curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
-        curl_setopt($ch, CURLOPT_HEADER,0);
+        curl_setopt($ch, CURLOPT_HEADER, 1);  // 获取响应头以检查Content-Encoding
+        curl_setopt($ch, CURLOPT_ENCODING, ''); // 启用curl自动解压缩gzip/deflate
 
-        $data = curl_exec($ch);
+        $response = curl_exec($ch);
+
+        // 分离响应头和响应体
+        $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $response_headers = substr($response, 0, $header_size);
+        $data = substr($response, $header_size);
 
         $errno = curl_errno( $ch );
         //$logArr = ['url'=>$url, 'url'=>$url, 'headers'=>$header,'data'=>$data]; p($logArr);
         //if(strpos($url, 'GetInfoByName') !== false or $uid==17){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
         $curl_error = curl_error($ch);
+
+        // 检查响应头中的Content-Encoding
+        if(stripos($response_headers, 'Content-Encoding: zstd') !== false || stripos($response_headers, 'content-encoding: zstd') !== false){
+            // 如果服务器返回了zstd压缩，记录错误并尝试提示
+            Tool_Common::log('/error/'.__FUNCTION__, 'ERR', '服务器返回zstd压缩，无法解压', [
+                'url'=>$url,
+                'headers'=>$header_modified,
+                'response_headers'=>$response_headers,
+                'data_preview'=>substr($data, 0, 200)
+            ]);
+            curl_close($ch);
+            // 返回错误信息，提示需要zstd解压缩支持
+            return ['status'=>500, 'err_msg'=>'服务器返回zstd压缩格式，当前环境不支持解压。请检查服务器IP限制或请求头配置。', 'raw_data_preview'=>substr($data, 0, 500)];
+        }
+
         curl_close($ch);
         //p(['data'=>$data, 'errno'=>$errno]);
         if($errno) {
@@ -2602,7 +2645,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }
 
         if(!BaseService::is_json($data)){
-            Tool_Common::log('/error/'.__FUNCTION__, 'ERR', 'get请求失败', ['url'=>$url, 'headers'=>$header, 'errno'=>$errno, 'data'=>$data]);
+            Tool_Common::log('/error/'.__FUNCTION__, 'ERR', 'get请求失败', ['url'=>$url, 'headers'=>$header_modified, 'errno'=>$errno, 'data'=>$data]);
             return $data;
         }
         $data = json_decode($data, true);
