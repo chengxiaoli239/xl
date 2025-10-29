@@ -887,7 +887,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             ];
             Tool_Common::log('cancelOrder','INFO','撤单记录', $logArr);
         }catch (\Exception $e){
-            Tool_Common::log('cancelOrder','ERR','撤单记录-失败', $logArr);
+            Tool_Common::log('cancelOrder','ERR','撤单记录-失败', ['id'=>$id, 'tz_system_id'=>$tz_system_id, 'err'=>$e->getMessage()]);
         }
 
         return $rst;
