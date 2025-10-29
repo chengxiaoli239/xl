@@ -832,8 +832,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $snid = $BettingRecords->snid;
             $sn = $BettingRecords->sn;
             self::__init($uid, $tz_system_id);
+            $t1 = microtime(true);
 
             Lucky5Service::userInfo($uid, $tz_system_id);//p($userInfo);
+            $t2 = microtime(true);
 
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
             $qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
@@ -866,6 +868,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $response = (new Client())->request('POST', self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER'), $options);
             $content = $response->getBody()->getContents();
             $rst = Json::decode($content);
+            $t3 = microtime(true);
 
             if($rst['Status'] == 1 && strpos($rst['Data'], '退码成功')){
                 $BettingRecords = BettingRecords::findOne(['snid'=>$snid]);
@@ -884,6 +887,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 'post_data'=>$post_data,
                 'rst'=>$rst,
                 'content' => $content,
+                't1' => ($t2 - $t1).'s',
+                't2' => ($t3 - $t2).'s',
             ];
             Tool_Common::log('cancelOrder','INFO','撤单记录', $logArr);
         }catch (\Exception $e){
