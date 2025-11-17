@@ -52,6 +52,7 @@ class DynamicFilterService extends BaseService {
         ['type'=>36, 'label'=>'指定位置排除期号尾号', 'params'=>['x'=>''], 'desc'=>"指定位置排除期号尾号，比如x：12，期号：250727003，则第1位和第2位排除号码3<br>1、x可以灵活组合位置，如：1234、234、134等<br>2、1234分别代表千百十个位", 'playway'=>[1, 2, 3]],
         ['type'=>37, 'label'=>'指定位置合分不等于上期对应位置合分', 'params'=>['x'=>''], 'desc'=>"指定位置合分不等于上期对应位置合分，比如x：234，上期开：9843，则234位合分：8+4+3=15，过滤：5、15、25、35<br>1、x可以灵活组合位置，如：1234、234、134等<br>2、1234分别代表千百十个位<br>3、过滤和值会根据位置数量自动调整", 'playway'=>[1, 2, 3]],
         ['type'=>38, 'label'=>'筛选昨天早8点到今天凌晨5点重复x次或x次以上的号码全倒', 'params'=>['x'=>''], 'desc'=>"主要为幸运五(lottery_type=8)，筛选昨天早8点到今天凌晨5点重复x次或x次以上的号码，这些号码来全倒，主要为4定号码", 'playway'=>[3], 'lottery_type'=>[8]],
+        ['type'=>39, 'label'=>'过滤x范围直码', 'params'=>['x'=>''], 'desc'=>"过滤指定期数范围的直码：<br>1、支持格式：1-2;4~6 则过滤前1、2、4、5、6期的直码<br>2、支持格式：1-100 或 1~100，则过滤最近100期的直码<br>3、支持混合格式：1,2;4~6;10-15，则过滤前1、2、4、5、6、10、11、12、13、14、15期的直码<br>4、格式说明：用分号(;)分隔不同范围，用逗号(,)分隔单个期数，用横线(-)或波浪号(~)表示连续范围", 'playway'=>[1, 2, 3]],
     ];
     public static int $filterType = 0;
 
@@ -173,6 +174,9 @@ class DynamicFilterService extends BaseService {
                     break;
                 case 38: # 动态过滤2
                     $codes = DynamicType2Service::filter38($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 39: # 过滤x范围直码
+                    $codes = DynamicType2Service::filter39($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
             }
             if(empty($codes)){

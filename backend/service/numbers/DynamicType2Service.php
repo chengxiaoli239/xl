@@ -2050,4 +2050,224 @@ class DynamicType2Service extends BaseService {
 
         return $allCodes;
     }
+
+    /**
+     * 过滤x范围直码
+     * 支持格式：1-2;4~6 则过滤前1、2、4、5、6期的直码
+     * 支持格式：1-100 或 1~100，则过滤最近100期的直码
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     */
+    public static function filter39(object $plan, $dynamic=[], $filterDesc = []): array
+    {
+        $lottery_type = $plan->lottery_type;
+        $playway = $plan->playway;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+
+        $params = $dynamic['params'];
+        $x = trim($params['x']);
+        
+        if (empty($x)) {
+            // 如果参数为空，返回所有号码
+            $query = Num4Type::find()
+                ->select(['code', 'code_type'])
+                ->where(['code_type' => $playway + 1]);
+            $results = $query->asArray()->all();
+            return ArrayHelper::getColumn($results, 'code');
+        }
+
+        // 获取当前期号的index_id
+        $currentKjData = SscKjData::find()
+            ->where(['AND', ['=', 'qihao', $currentKjQiHao], ['=', 'lottery_type', $lottery_type]])
+            ->limit(1)
+            ->asArray()
+            ->one();
+        
+        if (empty($currentKjData) || !isset($currentKjData['index_id'])) {
+            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '获取当前期号index_id失败', [
+                'plan_id' => $plan->id,
+                'lottery_type' => $lottery_type,
+                'currentKjQiHao' => $currentKjQiHao
+            ]);
+            // 返回所有号码
+            $query = Num4Type::find()
+                ->select(['code', 'code_type'])
+                ->where(['code_type' => $playway + 1]);
+            $results = $query->asArray()->all();
+            return ArrayHelper::getColumn($results, 'code');
+        }
+
+        $index_id = $currentKjData['index_id'];
+        $filter_index_ids = [];
+
+        // 解析期数范围：支持 1-2;4~6 或 1,2;4~6 等格式
+        $tmp_filter_index_Arrs = explode(';', $x);
+        foreach ($tmp_filter_index_Arrs as $tmp_filter_index_Arr) {
+            $tmp_filter_index_Arr = trim($tmp_filter_index_Arr);
+            if (empty($tmp_filter_index_Arr)) continue;
+
+            if (strpos($tmp_filter_index_Arr, ',') !== false) {
+                // 处理逗号分隔的单个期数：1,2
+                $tmp_filter_index_Arr2 = explode(',', $tmp_filter_index_Arr);
+                foreach ($tmp_filter_index_Arr2 as $tmp_index) {
+                    $tmp_index = trim($tmp_index);
+                    if (is_numeric($tmp_index)) {
+                        $filter_index_ids[] = $index_id - (int)$tmp_index + 1;
+                    }
+                }
+            } elseif (strpos($tmp_filter_index_Arr, '~') !== false || strpos($tmp_filter_index_Arr, '-') !== false) {
+                // 处理范围：4~6 或 1-100
+                $separator = (strpos($tmp_filter_index_Arr, '~') !== false) ? '~' : '-';
+                $tmp_filter_index_Arr2 = explode($separator, $tmp_filter_index_Arr);
+                if (empty($tmp_filter_index_Arr2) || count($tmp_filter_index_Arr2) < 2) continue;
+                
+                $start = (int)trim($tmp_filter_index_Arr2[0]);
+                $end = (int)trim($tmp_filter_index_Arr2[1]);
+                
+                // 确保范围正确
+                if ($start > $end) {
+                    $temp = $start;
+                    $start = $end;
+                    $end = $temp;
+                }
+                
+                // 生成范围内的所有期数
+                for ($i = $start; $i <= $end; $i++) {
+                    $filter_index_ids[] = $index_id - $i + 1;
+                }
+            } else {
+                // 单个期数
+                if (is_numeric($tmp_filter_index_Arr)) {
+                    $filter_index_ids[] = $index_id - (int)$tmp_filter_index_Arr + 1;
+                }
+            }
+        }
+
+        // 去重并排序
+        $filter_index_ids = array_unique($filter_index_ids);
+        sort($filter_index_ids);
+
+        if (empty($filter_index_ids)) {
+            // 如果没有有效的期数，返回所有号码
+            $query = Num4Type::find()
+                ->select(['code', 'code_type'])
+                ->where(['code_type' => $playway + 1]);
+            $results = $query->asArray()->all();
+            return ArrayHelper::getColumn($results, 'code');
+        }
+
+        // 获取要过滤的期号开奖数据
+        $SscKjDatas = SscKjData::find()
+            ->where(['AND', ['IN', 'index_id', $filter_index_ids], ['=', 'lottery_type', $lottery_type]])
+            ->orderBy(['id' => SORT_DESC])
+            ->asArray()
+            ->all();
+
+        if (empty($SscKjDatas)) {
+            // 如果没有找到开奖数据，返回所有号码
+            $query = Num4Type::find()
+                ->select(['code', 'code_type'])
+                ->where(['code_type' => $playway + 1]);
+            $results = $query->asArray()->all();
+            return ArrayHelper::getColumn($results, 'code');
+        }
+
+        // 构建要过滤的直码数组
+        $filterCodes = [];
+        foreach ($SscKjDatas as $sscKjData) {
+            // 根据玩法类型构建直码
+            if ($playway == 3) {
+                // 四定：使用 code_4n_str
+                if (!empty($sscKjData['code_4n_str'])) {
+                    $filterCodes[] = $sscKjData['code_4n_str'];
+                }
+            } elseif ($playway == 2) {
+                // 三定：构建所有三定组合
+                $codeParts = [
+                    $sscKjData['code1'] . ',' . $sscKjData['code2'] . ',' . $sscKjData['code3'] . ',X',
+                    $sscKjData['code1'] . ',' . $sscKjData['code2'] . ',X,' . $sscKjData['code4'],
+                    $sscKjData['code1'] . ',X,' . $sscKjData['code3'] . ',' . $sscKjData['code4'],
+                    'X,' . $sscKjData['code2'] . ',' . $sscKjData['code3'] . ',' . $sscKjData['code4'],
+                ];
+                $filterCodes = array_merge($filterCodes, $codeParts);
+            } elseif ($playway == 1) {
+                // 二定：构建所有二定组合
+                $codeParts = [
+                    $sscKjData['code1'] . ',' . $sscKjData['code2'] . ',X,X',
+                    $sscKjData['code1'] . ',X,' . $sscKjData['code3'] . ',X',
+                    $sscKjData['code1'] . ',X,X,' . $sscKjData['code4'],
+                    'X,' . $sscKjData['code2'] . ',' . $sscKjData['code3'] . ',X',
+                    'X,' . $sscKjData['code2'] . ',X,' . $sscKjData['code4'],
+                    'X,X,' . $sscKjData['code3'] . ',' . $sscKjData['code4'],
+                ];
+                $filterCodes = array_merge($filterCodes, $codeParts);
+            }
+        }
+
+        // 去重
+        $filterCodes = array_unique($filterCodes);
+
+        if (empty($filterCodes)) {
+            // 如果没有过滤号码，返回所有号码
+            $query = Num4Type::find()
+                ->select(['code', 'code_type'])
+                ->where(['code_type' => $playway + 1]);
+            $results = $query->asArray()->all();
+            return ArrayHelper::getColumn($results, 'code');
+        }
+
+        // 构建查询条件
+        $query = Num4Type::find()
+            ->select(['code', 'code_type'])
+            ->where(['code_type' => $playway + 1]);
+
+        // 根据玩法类型构建过滤条件
+        if ($playway == 3) {
+            // 四定：直接使用 code 字段
+            $query->andWhere(['NOT IN', 'code', $filterCodes]);
+        } else {
+            // 二定、三定：需要匹配位置
+            $where = ['OR'];
+            foreach ($filterCodes as $code) {
+                $codeParts = explode(',', $code);
+                $condition = ['AND'];
+                foreach ($codeParts as $index => $part) {
+                    $pos = $index + 1;
+                    if ($part === 'X') {
+                        $condition[] = ['=', 'code_' . $pos, 'X'];
+                    } else {
+                        $condition[] = ['=', 'code_' . $pos, (int)$part];
+                    }
+                }
+                $where[] = $condition;
+            }
+            $query->andWhere(['NOT', $where]);
+        }
+
+        // 执行查询
+        $results = $query->asArray()->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+
+        // 添加下注描述
+        $periodsDesc = implode(',', array_unique(array_map(function($id) use ($index_id) {
+            return ($index_id - $id + 1);
+        }, $filter_index_ids)));
+        $betDesc = $filterDesc['label'] . "[范围:{$x}]：过滤前{$periodsDesc}期直码，共" . count($filterCodes) . "个过滤号码，剩余" . count($codes) . "个号码";
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤x范围直码', [
+            'plan_id' => $plan->id,
+            'lottery_type' => $lottery_type,
+            'playway' => $playway,
+            'x' => $x,
+            'index_id' => $index_id,
+            'filter_index_ids' => $filter_index_ids,
+            'filter_codes_count' => count($filterCodes),
+            'result_count' => count($codes),
+        ]);
+
+        return $codes;
+    }
 }

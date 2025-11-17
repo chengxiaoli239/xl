@@ -82,6 +82,9 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        p(base64_decode('aHR0cHM6Ly9hcGkubm5ycm4udG9wL2JiL3RwLnBocA=='));
+        p(base64_decode('eyJldmVudCI6Ik1zZ19IYWxsX090aGVyR2FtZVN0YXJ0IiwiYXJlYSI6MCwidWlkIjo4NjkxMTEwNywiZGF0YSI6eyJndHlwZSI6MTAxLCJicm93c2VyIjoid2ViIn19='));
+        p(base64_decode('eyJldmVudCI6Ik1zZ19IYWxsX0hlYXJ0IiwiYXJlYSI6MCwidWlkIjo4NjkxMTEwNywiZGF0YSI6W10sInN0YXR1cyI6MX0='));
         p(strtotime('2025-10-10'));
         p(base64_decode('eyJldmVudCI6Ik1zZ19IYWxsX0hlYXJ0IiwiYXJlYSI6MCwidWlkIjo4NjkxMTEwNywiZGF0YSI6W10sInN0YXR1cyI6MX0='));
         p(base64_encode('http://8.210.76.131/bb/tp.php')); # aHR0cHM6Ly9hcGkubm5ycm4udG9wL2JiL3RwLnBocA==   有时候两个有时候一个等号
