@@ -30,7 +30,7 @@ class Lucky5 extends BaseKj {
         try {
             $hasActivePlan = CommonService::hasPlansActive(self::$lottery_type);
             $status = KjDataGet::isCanGrab(self::$lottery_type);
-            if(self::$lottery_type == 8 && (!$hasActivePlan OR !$status)){
+            if($is_auto==1 && self::$lottery_type == 8 && (!$hasActivePlan OR !$status)){
                 return false;
             }
 

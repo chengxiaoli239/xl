@@ -112,7 +112,7 @@ $this->registerJs($js);
                         ['attribute' => 'created_at', 'label'=> '时间', //'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                return date('Y-m-d H:i', $model->created_at);
+                                return date('Y-m-d H:i:s', $model->created_at);
                             }
                         ],
 
