@@ -10,7 +10,7 @@ use yii\queue\RetryableJobInterface;
 
 abstract class CommonJob extends BaseObject implements JobInterface, RetryableJobInterface
 {
-    public $retryCount = 3; // 最大重试次数
+    public $retryCount = 3; // 最大重试次数（总共执行3次：第1次 + 2次重试）
 
     // 重试间隔时间（秒）
     public function getTtr(): int
@@ -34,13 +34,42 @@ abstract class CommonJob extends BaseObject implements JobInterface, RetryableJo
 
     /**
      * 判断是否需要重试
-     * @param $attempt
-     * @param $error
+     * @param $attempt 当前尝试次数（从1开始）
+     * @param $error 异常对象
      * @return bool
      */
     public function canRetry($attempt, $error): bool
     {
-        #return $attempt < $this->retryCount;
+        // 检查是否是超时异常，如果是则允许重试
+        if ($error instanceof \Symfony\Component\Process\Exception\ProcessTimedOutException) {
+            // 超时异常允许重试，但不超过配置的最大重试次数
+            // 注意：队列框架会在调用 canRetry 之前检查 attempts 配置
+            // 所以这里只需要检查是否小于 retryCount 即可
+            Tool_Common::log('/queue/retry', 'INFO', '检测到超时异常，允许重试', [
+                'queue_id' => $this->queueId,
+                'attempt' => $attempt,
+                'retry_count' => $this->retryCount,
+                'error' => $error->getMessage()
+            ]);
+            return $attempt < $this->retryCount;
+        }
+        
+        // 检查错误消息中是否包含超时相关关键词
+        $errorMessage = $error instanceof \Exception ? $error->getMessage() : (string)$error;
+        if (stripos($errorMessage, 'timeout') !== false || 
+            stripos($errorMessage, 'exceeded the timeout') !== false ||
+            stripos($errorMessage, '超时') !== false ||
+            stripos($errorMessage, 'ProcessTimedOutException') !== false) {
+            Tool_Common::log('/queue/retry', 'INFO', '检测到超时关键词，允许重试', [
+                'queue_id' => $this->queueId,
+                'attempt' => $attempt,
+                'retry_count' => $this->retryCount,
+                'error_message' => substr($errorMessage, 0, 200)
+            ]);
+            return $attempt < $this->retryCount;
+        }
+        
+        // 其他异常默认不重试
         return false;
     }
 

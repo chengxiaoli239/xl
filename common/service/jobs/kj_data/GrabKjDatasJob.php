@@ -13,6 +13,15 @@ class GrabKjDatasJob extends CommonJob {
         return self::$name;
     }
 
+    /**
+     * 获取任务执行超时时间（秒）
+     * @return int
+     */
+    public function getTtr(): int
+    {
+        return 30; // 保持30秒超时
+    }
+
     public function exec($params) {
         return self::handle($params);
     }

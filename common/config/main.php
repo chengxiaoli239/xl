@@ -54,7 +54,7 @@ return [
             'channel' => 'lottery:queue',
             'as log'=> \yii\queue\LogBehavior::class,
             'ttr' => 30,         // 30秒超时
-            'attempts' => 2,     // 总共执行2次
+            'attempts' => 3,     // 总共执行3次（第1次 + 2次重试）
         ],
         'queue_fast' => [
             'class' => \yii\queue\redis\Queue::class,
@@ -62,7 +62,7 @@ return [
             'channel' => 'lottery:queue_fast', // Queue channel key
             'as log' => \yii\queue\LogBehavior::class,
             'ttr' => 30,         // 30秒超时
-            'attempts' => 2,     // 总共执行2次
+            'attempts' => 3,     // 总共执行3次（第1次 + 2次重试）
         ],
         'queue_open' => [
             'class' => \yii\queue\redis\Queue::class,
