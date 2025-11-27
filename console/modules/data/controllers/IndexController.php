@@ -81,7 +81,10 @@ class IndexController extends Controller
      */
     public function actionInsertPlanTask($lotteryType)
     {
-        return BetService::insertPlansTask($lotteryType);
+        for($i=0; $i<3; $i++){
+            return BetService::insertPlansTask($lotteryType);
+            sleep(12);
+        }
     }
 
     /**

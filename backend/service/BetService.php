@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- *   
+ *
  * Date: 2018/12/10
  * Time: 17:28
  */
@@ -1745,16 +1745,20 @@ abstract class BetService extends BaseBetService {
             }
         }
         foreach ($plansQuery->each(20) as $plan){
+            $planId = $plan->id;
+            $preInsertLockKey = null;
+            $lockAcquired = false;
             try {
                 $isCanBet = $isCanBetUids[$plan->uid]??1;
                 if(!$isCanBet){
                     throw_info('当前情况不能下注');
                 }
-                $planId = $plan->id;
                 $preInsertLockKey = CacheKeyService::preInsertPlanTaskKey($planId, $qiHao);
-                if(!(Redis::lock($preInsertLockKey))){
-                    throw_info('业务处理中，请稍后...', 40001);
+                // 增加锁的过期时间到60秒，确保有足够时间处理，即使异常也会自动过期
+                if(!(Redis::lock($preInsertLockKey, 60))){
+                    throw_info('业务处理中，请稍后...planId:'.$planId, 40001);
                 }
+                $lockAcquired = true;
 
                 $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId]];
                 if(BettingRecords::find()->where($where)->exists()){
@@ -1778,6 +1782,16 @@ abstract class BetService extends BaseBetService {
                     Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '插入计划-异常', $logArr);
                 }
                 $rst['data']['plan_id'] = ['plan_id'=>$planId, 'msg'=>$e->getMessage()];
+            }finally{
+                // 确保锁在异常时也能释放，避免锁一直占用导致后续无法处理
+                if($lockAcquired && $preInsertLockKey){
+                    try {
+                        Redis::clearLock($preInsertLockKey);
+                        Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '释放锁', ['plan_id'=>$planId, 'lock_key'=>$preInsertLockKey]);
+                    }catch (\Exception $e){
+                        Tool_Common::log('/bet/'.__FUNCTION__, 'ERR', '释放锁失败', ['plan_id'=>$planId, 'lock_key'=>$preInsertLockKey, 'err_msg'=>$e->getMessage()]);
+                    }
+                }
             }
         }
         $err_post_desc = Json::encode(['Status'=>0, 'msg'=>'过期未下单', 'time'=>date('Y-m-d H:i:s')]);
