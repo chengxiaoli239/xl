@@ -248,8 +248,6 @@ class IndexController extends Controller
         $sscData = SscKjData::find()->where(['date'=>'2024-09-15', 'lottery_type'=>8])->asArray()->all();
         p(array_column($sscData, 'qihao'));
         $status = (new LotteryBet())->checkLotteryStatus($lottery_type=1); p([$lottery_type, $status]);# 是否封盘, 封盘之时即是抓取之时
-        $rst['kj'] = KjDataGet::grabKjData();
-        p($rst);
         $countArr = SscDataService::getAriseCounts($val='type_log', $count=4360, $lottery_type=8);p($countArr);
         # 三字现带双重
         $t1 = microtime(true);

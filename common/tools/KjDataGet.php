@@ -7,6 +7,7 @@
  *
  */
 namespace common\tools;
+use backend\models\DataDealStatus;
 use backend\models\DataTime;
 use backend\models\KjConfig;
 use backend\models\Num4Type;
@@ -189,32 +190,65 @@ class KjDataGet
         $RedisLock = new RedisLock();
         $grabOneKey = 'grabOneLotteryKjData_x0_'.$lottery_type;
         if($qihao && !empty($kjData)){
-            if(!$RedisLock->lock($grabOneKey, 15)){
-                throw_info('短时间内操作-暂不处理');
-            }
-            $data = $kjData;
-            if(!empty($data['expect']) && !empty($data['opencode'])){
-                # ssc
-                Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖记录0', ['lottery_type'=>$lottery_type, 'kjData'=>$kjData]);
-                KjDataGet::insertKjData($data['expect'], $lottery_type, $data['opencode'], $data['opentime']);
-                KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
-                $RedisLock->unlock($grabOneKey);
-            }else{
-                return '推送数据不全expect、opencode';
+            $lockAcquired = false;
+            try {
+                if(!$RedisLock->lock($grabOneKey, 15)){
+                    throw_info('短时间内操作-暂不处理1');
+                }
+                $lockAcquired = true; // 标记锁已获取
+                Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '锁已获取(推送)', ['lottery_type'=>$lottery_type, 'key'=>$grabOneKey, 'time'=>date('Y-m-d H:i:s')]);
+
+                $data = $kjData;
+                if(!empty($data['expect']) && !empty($data['opencode'])){
+                    # ssc
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖记录0', ['lottery_type'=>$lottery_type, 'kjData'=>$kjData]);
+                    KjDataGet::insertKjData($data['expect'], $lottery_type, $data['opencode'], $data['opentime']);
+
+                    $afterKjStartTime = microtime(true);
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开始处理afterKj(推送)', ['lottery_type'=>$lottery_type, 'time'=>date('Y-m-d H:i:s')]);
+                    KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
+                    $afterKjEndTime = microtime(true);
+                    $afterKjDuration = round($afterKjEndTime - $afterKjStartTime, 2);
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', 'afterKj处理完成(推送)', ['lottery_type'=>$lottery_type, 'duration'=>$afterKjDuration.'s', 'time'=>date('Y-m-d H:i:s')]);
+                }else{
+                    throw_info('推送数据不全expect、opencode');
+                }
+            }catch (\Exception $e){
+                Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '推送开奖数据处理异常', [
+                    'lottery_type'=>$lottery_type,
+                    'err_msg'=>$e->getMessage(),
+                    'file'=>$e->getFile(),
+                    'line'=>$e->getLine(),
+                    'lock_acquired'=>$lockAcquired
+                ]);
+                return $e->getMessage().'_'.$e->getFile();
+            }finally{
+                // 确保锁被释放
+                if($lockAcquired){
+                    try {
+                        $RedisLock->unlock($grabOneKey);
+                        Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '锁已释放(推送)', ['lottery_type'=>$lottery_type, 'key'=>$grabOneKey, 'time'=>date('Y-m-d H:i:s')]);
+                    }catch (\Exception $e){
+                        Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '释放锁异常(推送)', ['lottery_type'=>$lottery_type, 'key'=>$grabOneKey, 'err_msg'=>$e->getMessage()]);
+                    }
+                }
             }
 
             return '推送开奖数据处理完成';
         }else{
             $KjConfigs = KjConfig::findAll(['enable'=>1, 'lottery_type'=>$lottery_type]);
             foreach ($KjConfigs as $kjConfig){
+                $lockAcquired = false;
                 try {
                     $status = KjDataGet::isCanGrab($kjConfig->lottery_type);
                     if(!$status && !$kjConfig->is_batch){
                         throw_info('该时间段不可抓取');
                     }
                     if(!$RedisLock->lock($grabOneKey, 15)){
-                        throw_info('短时间内操作-暂不处理');
+                        throw_info('短时间内操作-暂不处理2');
                     }
+                    $lockAcquired = true; // 标记锁已获取
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '锁已获取', ['lottery_type'=>$lottery_type, 'key'=>$grabOneKey, 'time'=>date('Y-m-d H:i:s')]);
 
                     $url = trim($kjConfig->host).trim($kjConfig->path);
                     $data = CurlService::httpGet($url);
@@ -244,13 +278,35 @@ class KjDataGet
                         $logArr = ['data'=>$data, 'lottery_type'=>$lottery_type, 'lottery'=>CqsscKcw::getLotteryNameArr()[$kjConfig->lottery_type]];
                     }
                     Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开奖记录', $logArr);
+
                     /* 处理系统投注计划 add 2019-01-21 */
+                    $afterKjStartTime = microtime(true);
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '开始处理afterKj', ['lottery_type'=>$lottery_type, 'time'=>date('Y-m-d H:i:s')]);
                     KjDataGet::afterKj($lottery_type); # 处理系统投注计划，更新统计数据
-                    $RedisLock->unlock($grabOneKey);
+                    $afterKjEndTime = microtime(true);
+                    $afterKjDuration = round($afterKjEndTime - $afterKjStartTime, 2);
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', 'afterKj处理完成', ['lottery_type'=>$lottery_type, 'duration'=>$afterKjDuration.'s', 'time'=>date('Y-m-d H:i:s')]);
+
                 }catch (\Exception $e){
-                    $RedisLock->unlock($grabOneKey);
-                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '短时间内操作', ['lottery_type'=>$lottery_type, 'lottery_name'=>LotteryType::getName($lottery_type), 'err_msg'=>$e->getMessage().'_'.$e->getFile().'_'.$e->getLine()]);
+                    Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '开奖数据处理异常', [
+                        'lottery_type'=>$lottery_type,
+                        'lottery_name'=>LotteryType::getName($lottery_type),
+                        'err_msg'=>$e->getMessage(),
+                        'file'=>$e->getFile(),
+                        'line'=>$e->getLine(),
+                        'lock_acquired'=>$lockAcquired
+                    ]);
                     return ['code'=>$e->getCode(), 'msg'=>$e->getMessage()];
+                }finally{
+                    // 确保锁被释放（即使已经释放过也不会报错）
+                    if($lockAcquired){
+                        try {
+                            $RedisLock->unlock($grabOneKey);
+                            Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '锁已释放', ['lottery_type'=>$lottery_type, 'key'=>$grabOneKey, 'time'=>date('Y-m-d H:i:s')]);
+                        }catch (\Exception $e){
+                            Tool_Common::log('/kj_data/'.__FUNCTION__, 'ERR', '释放锁异常', ['lottery_type'=>$lottery_type, 'key'=>$grabOneKey, 'err_msg'=>$e->getMessage()]);
+                        }
+                    }
                 }
             }
         }
@@ -376,7 +432,12 @@ class KjDataGet
 
         $rst = ['status'=>200, 'msg'=>'处理成功'];
         if($code!=0) {
-            return $rst;
+            sleep(3);
+            $where = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao];
+            $DataDealStatus = DataDealStatus::findOne($where);
+            if(!empty($DataDealStatus) && $DataDealStatus->updateDs_status == 1){
+                return $rst;
+            }
         }
         $lottery_name = \common\service\CommonService::getLotteryName($lottery_type);
         switch (true){
