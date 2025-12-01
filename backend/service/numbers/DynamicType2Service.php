@@ -2270,4 +2270,66 @@ class DynamicType2Service extends BaseService {
 
         return $codes;
     }
+
+    # 随机x组号码
+    public static function filter40(object $plan, $dynamic=[], $filterDesc = []): array
+    {
+        $lottery_type = $plan->lottery_type;
+        $playway = $plan->playway;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+
+        $params = $dynamic['params'];
+        $x = isset($params['x']) && !empty($params['x']) ? (int)$params['x'] : 9000; // 默认9000组
+
+        // 如果x小于等于0，返回空数组
+        if($x <= 0){
+            $label = !empty($filterDesc['label']) ? $filterDesc['label'] : '随机x组号码';
+            $betDesc = $label . "[x:{$x}]：参数无效，返回空数组";
+            NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+            return [];
+        }
+
+        // 查询所有符合条件的号码
+        $query = Num4Type::find()
+            ->select(['code', 'code_type'])
+            ->andWhere(['=', 'code_type', $playway+1]);
+        
+        $allNumTypes = $query->asArray()->all();
+        $allCodes = ArrayHelper::getColumn($allNumTypes, 'code');
+        $totalCount = count($allCodes);
+
+        // 如果x大于等于总数，返回所有号码
+        if($x >= $totalCount){
+            $label = !empty($filterDesc['label']) ? $filterDesc['label'] : '随机x组号码';
+            $betDesc = $label . "[x:{$x}]：随机" . $totalCount . "组（全部）";
+            NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+            return $allCodes;
+        }
+
+        // 随机选择x组号码
+        $query = Num4Type::find()
+            ->select(['code', 'code_type'])
+            ->andWhere(['=', 'code_type', $playway+1])
+            ->orderBy('RAND()')
+            ->limit($x);
+        
+        $NumTypes = $query->asArray()->all();
+        $codes = ArrayHelper::getColumn($NumTypes, 'code');
+
+        // 添加下注描述
+        $label = !empty($filterDesc['label']) ? $filterDesc['label'] : '随机x组号码';
+        $betDesc = $label . "[x:{$x}]：随机" . count($codes) . "组";
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '随机x组号码', [
+            'plan_id' => $plan->id,
+            'lottery_type' => $lottery_type,
+            'playway' => $playway,
+            'x' => $x,
+            'total_count' => $totalCount,
+            'result_count' => count($codes),
+        ]);
+
+        return $codes;
+    }
 }

@@ -382,7 +382,7 @@ class NumCodeService extends BaseService
         $NumTypes = $query->orderBy('RAND()')->asArray()->limit($limit)->all();
         $codes = ArrayHelper::getColumn($NumTypes, 'code');
 
-        $betDesc = "随机9000组";
+        $betDesc = "随机".$limit."组";
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
 
         return $codes;
