@@ -2,7 +2,7 @@
 
 /**
  * Created by PhpStorm.
- *   
+ *
  * Date: 2018/02/06
  * Time: 09:40
  */
@@ -3885,10 +3885,10 @@ class SscDataService extends BaseService {
 
         }catch (\Exception $e){
             Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '数据处理任务写入异常', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'err_msg'=>$e->getMessage()]);
-            return [10000, $e->getMessage()];
+            return [10000, $qihao, $e->getMessage()];
         }
 
-        return [0, $qihao];
+        return [0, $qihao, '成功'];
     }
 
 }

@@ -196,7 +196,11 @@ class KjDataGet
                     throw_info('短时间内操作-暂不处理1');
                 }
                 $lockAcquired = true; // 标记锁已获取
-                Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '锁已获取(推送)', ['lottery_type'=>$lottery_type, 'key'=>$grabOneKey, 'time'=>date('Y-m-d H:i:s')]);
+                Tool_Common::log('/kj_data/'.__FUNCTION__, 'INFO', '锁已获取(推送)', [
+                    'lottery_type'=>$lottery_type,
+                    'key'=>$grabOneKey,
+                    'time'=>date('Y-m-d H:i:s'),
+                ]);
 
                 $data = $kjData;
                 if(!empty($data['expect']) && !empty($data['opencode'])){
@@ -422,8 +426,8 @@ class KjDataGet
     public static function afterKj($lottery_type = DEFAULT_LOTTERY_TYPE): array
     {
 
-        list($code, $qihao) = SscDataService::insertDealDataTask($lottery_type); # 数据处理任务写入
-        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '开奖后处理', ['code'=>$code, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
+        list($code, $qihao, $msg) = SscDataService::insertDealDataTask($lottery_type); # 数据处理任务写入
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '开奖后处理', ['code'=>$code, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'msg'=>$msg]);
         if($lottery_type == LotteryType::LUCKY_5 && substr($qihao, -3)=='288'){
             $tmpDate = date('Y-m-d', time()-86400);
         }else{
@@ -435,7 +439,7 @@ class KjDataGet
             sleep(3);
             $where = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao];
             $DataDealStatus = DataDealStatus::findOne($where);
-            if(!empty($DataDealStatus) && $DataDealStatus->updateDs_status == 1){
+            if(!empty($DataDealStatus) && ($DataDealStatus->updateDs_status == 2 OR $DataDealStatus->static4dPerDateProfits_status == 2)){
                 return $rst;
             }
         }
