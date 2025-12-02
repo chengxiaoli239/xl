@@ -2,7 +2,7 @@
 
 /**
  * Created by PhpStorm.
- *   
+ *
  * Date: 2018/02/06
  * Time: 09:40
  */
@@ -162,7 +162,7 @@ class TzService extends BaseService {
             $rst['isCanOpStaticStatus'] = $isCanOpStaticStatus;
             StaticService::afterOpStatic($lottery_type, $qihao, 'opSystemBetPlans');
             #$rst['afterRunSysPlans'] = TzService::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
-            Tool_Common::log('/static/'.__FUNCTION__,'INFO','处理系统投注计划', ['rst'=>$rst, 'rstLog'=>$rstLog]);
+            Tool_Common::log('/static/'.__FUNCTION__,'INFO','处理系统投注计划', ['rst'=>$rst]);
             push_queue(\common\service\jobs\kj_data\AfterRunSysPlansJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'business_id'=>$qihao]);
         }catch (\Exception $e){
             StaticService::afterOpStatic($lottery_type, $qihao, 'opSystemBetPlans');
