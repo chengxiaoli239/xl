@@ -262,6 +262,7 @@ abstract class BetService extends BaseBetService {
                 $snId = $BetService->repeatErrorBet($task_id);
                 $e_time = microtime(true);
                 $logArr = ['uid' => $uid, 'qihao'=>$activeQiHao, 'account'=>$account, 'plan_id'=>$plan_id, 'task_id'=>$task_id, 'tz_system_id' => $tz_system_id, 'snId'=>$snId, 'consume_time'=>($e_time-$s_time).'s'];
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注脚本-34', $logArr);
 
                 if(!empty($snId)){
                     # 记录方案号
