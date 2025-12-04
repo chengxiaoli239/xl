@@ -1635,7 +1635,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 $status = 2;
                 $tmpRst['status'] = $status; # 下注成功
                 if(isset($tmpRst['Data']['SerialNo'])){
-                    $snid = $tmpRst['Data']['SerialNo']
+                    $snid = $tmpRst['Data']['SerialNo'];
                     $sn = $tmpRst['Data']['SerialNo'];
                 }else{
                     //# 获取方案号，记录id, 用于撤单
