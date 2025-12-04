@@ -270,7 +270,9 @@ abstract class BetService extends BaseBetService {
                     $BettingRecords = BettingRecords::find()->where($where)->limit(1)->one();
                     $BettingRecords->snid = $snId;
                     $BettingRecords->sn = trim($BettingRecords->sn.';'.$snId, ';'); // 这里幸运五是sn，暂时写snid
-                    $BettingRecords->save();
+                    $r = $BettingRecords->save();
+                    $errMsg = $r ? 'success' : Json::encode($BettingRecords->errors);
+                    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注保存方案号', ['where'=>$where, 'snId'=>$snId, 'errMsg'=>$errMsg]);
                 }
 
                 Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注成功-end', $logArr);
