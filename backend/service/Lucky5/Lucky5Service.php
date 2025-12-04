@@ -2511,6 +2511,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }
         $rstData = json_decode($data, true); # data : {"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
+        Tool_Common::log('postBetCurl','INFO','httpPost下注结果', ['rstData'=>$rstData]);
         if(strpos($data, "\"Status\":1") !== false && strpos($data, "\"CompletedStatus\":1") !== false){ # json解析异常处理
             $rstData['Status'] = 1;
         }
