@@ -267,7 +267,7 @@ abstract class BetService extends BaseBetService {
                     # 记录方案号
                     $where = ['plan_id'=>$plan_id, 'qihao'=>(string)$activeQiHao, 'lottery_type'=>$lottery_type];
                     $BettingRecords = BettingRecords::find()->where($where)->limit(1)->one();
-                    $BettingRecords->snid = trim($BettingRecords->snid.';'.$snId, ';');
+                    $BettingRecords->snid = $snId;
                     $BettingRecords->sn = trim($BettingRecords->sn.';'.$snId, ';'); // 这里幸运五是sn，暂时写snid
                     $BettingRecords->save();
                 }
