@@ -2339,7 +2339,7 @@ class DynamicType2Service extends BaseService {
             if($playway != 3 && !empty($fixedSelPos)){
                 $posNames = ['1'=>'千', '2'=>'百', '3'=>'十', '4'=>'个'];
                 $fixedPosNames = array_map(function($p) use ($posNames){ return $posNames[$p] ?? $p; }, $fixedSelPos);
-                $posDesc = '，定位：' . implode('、', $fixedPosNames) . '位';
+                $posDesc = '，定X位：' . implode('、', $fixedPosNames) . '位';
             }
             $betDesc = $label . "[x:{$x}]：随机" . $totalCount . "组（全部）{$posDesc}";
             NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
