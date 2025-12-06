@@ -2279,7 +2279,7 @@ class DynamicType2Service extends BaseService {
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
 
         $params = $dynamic['params'];
-        $x = isset($params['x']) && !empty($params['x']) ? (int)$params['x'] : 9000; // 默认9000组
+        $x = !empty($params['x']) ? (int)$params['x'] : 9000; // 默认9000组
 
         // 如果x小于等于0，返回空数组
         if($x <= 0){
@@ -2381,7 +2381,6 @@ class DynamicType2Service extends BaseService {
             'playway' => $playway,
             'x' => $x,
             'fixed_sel_pos' => $fixedSelPos,
-            'random_pos' => $randomPos,
             'total_count' => $totalCount,
             'result_count' => count($codes),
         ]);
