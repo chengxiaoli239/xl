@@ -163,7 +163,7 @@ class TzService extends BaseService {
             StaticService::afterOpStatic($lottery_type, $qihao, 'opSystemBetPlans');
             #$rst['afterRunSysPlans'] = TzService::afterRunSysPlans($qihao, $lottery_type); # 开关的开启或关闭
             Tool_Common::log('/static/'.__FUNCTION__,'INFO','处理系统投注计划', ['rst'=>$rst]);
-            push_queue(\common\service\jobs\kj_data\AfterRunSysPlansJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'business_id'=>$qihao]);
+            push_queue(AfterRunSysPlansJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'business_id'=>$qihao]);
         }catch (\Exception $e){
             StaticService::afterOpStatic($lottery_type, $qihao, 'opSystemBetPlans');
             Tool_Common::log('/static/'.__FUNCTION__, 'INFO', '数据统计异常', ['lottery_type'=>$lottery_type, 'err_msg'=>$e->getMessage()]);
@@ -205,11 +205,16 @@ class TzService extends BaseService {
                 $time = 60*60*7; # 台湾宾果 7小时
             }
             $m->set($pkey,1,$time);
-            $rst = DataDealStatus::updateAll(['next_qihao'=>(string)$next_qihao], ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
+            $updateData = ['next_qihao'=>(string)$next_qihao];
+            if($lottery_type == 8 && substr($qihao,8) == '096'){
+                $updateData['status'] = 2; // 第1期不投
+            }else{
+                push_queue(UserBetTaskRecordJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'business_id'=>$qihao]);
+            }
+            $rst = DataDealStatus::updateAll($updateData, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao]);
 
             $logData = ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'updateRst'=>$rst];
             Tool_Common::log('/data/'.__FUNCTION__,'INFO','系统计划处理后', $logData);
-            push_queue(UserBetTaskRecordJob::class, ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'business_id'=>$qihao]);
         }catch (\Exception $e){
             Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '开关处理异常', ['lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'next_qihao'=>$next_qihao, 'err_msg'=>$e->getMessage()]);
         }

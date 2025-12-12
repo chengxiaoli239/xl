@@ -82,6 +82,9 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        p(substr('20251212097', 8));
+        p(base64_decode('TW96aWxsYS81LjAgKExpbnV4OyBBbmRy'));
+        p(base64_encode('4428ced14da4e0c3'));
         $data = Lucky5::getLotteryLucky($type = 'json', $is_auto = 2); d($data);
         p(base64_decode('aHR0cHM6Ly9hcGkubm5ycm4udG9wL2JiL3RwLnBocA=='));
         p(base64_decode('eyJldmVudCI6Ik1zZ19IYWxsX090aGVyR2FtZVN0YXJ0IiwiYXJlYSI6MCwidWlkIjo4NjkxMTEwNywiZGF0YSI6eyJndHlwZSI6MTAxLCJicm93c2VyIjoid2ViIn19='));
