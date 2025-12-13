@@ -2288,6 +2288,7 @@ class NumCodeService extends BaseService
         }
         //$sql = $query->createCommand()->getRawSql();p($sql);
         Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '合分过滤', [
+            'plan_id' => $plan->id,
             'historyKjData' => $historyKjData,
             'qihao' => $nextQiHao,
             'positions' => $positions,
