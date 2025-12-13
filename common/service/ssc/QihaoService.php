@@ -2,12 +2,13 @@
 namespace common\service\ssc;
 /**
  * Created by PhpStorm.
- *   
+ *
  * Date: 2018/05/06
  * Time: 09:40
  */
 
 use backend\models\DataDealStatus;
+use backend\models\SscKjData;
 use backend\models\SscKjDataDs;
 use common\service\cache\CacheKeyService;
 use common\service\CommonService;
@@ -83,18 +84,18 @@ class QihaoService extends CommonService
         if ($count < 1) {
             return false;
         }
-        
+
         $targetQiHao = $currentQiHao;
-        
+
         for ($i = 0; $i < $count; $i++) {
             // 获取上一期期号
             $targetQiHao = KjDataGet::getBeforeQiHaoByQiHao($targetQiHao, $lottery_type);
-            
+
             if (empty($targetQiHao)) {
                 return false;
             }
         }
-        
+
         return $targetQiHao;
     }
 }

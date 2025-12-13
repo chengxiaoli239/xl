@@ -82,6 +82,12 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $lottery_type = 8;
+        $currentKjDataQihao = SscKjData::find()->select(['qihao'])
+            ->where(['lottery_type'=>$lottery_type])
+            ->orderBy(['id'=>SORT_DESC])
+            ->asArray()->one()['qihao'];
+        p($currentKjDataQihao);
         p(substr('20251212097', 8));
         p(base64_decode('TW96aWxsYS81LjAgKExpbnV4OyBBbmRy'));
         p(base64_encode('4428ced14da4e0c3'));

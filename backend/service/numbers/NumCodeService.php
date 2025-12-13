@@ -2287,6 +2287,14 @@ class NumCodeService extends BaseService
             }
         }
         //$sql = $query->createCommand()->getRawSql();p($sql);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '合分过滤', [
+            'historyKjData' => $historyKjData,
+            'qihao' => $nextQiHao,
+            'positions' => $positions,
+            'current_kj_qihao' => $currentKjQiHao,
+            'sumHz' => $sumHz,
+            'hz' => $hz,
+        ]);
 
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
