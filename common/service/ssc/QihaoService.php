@@ -40,6 +40,7 @@ class QihaoService extends CommonService
     }
 
     /**
+     * 返回当前已经开奖的期号和下一期期号
      * @param int $lottery_type
      * @return array|mixed
      */
@@ -47,13 +48,14 @@ class QihaoService extends CommonService
     {
         $mKey = CacheKeyService::lotteryQiHaoInfo($lottery_type);
         $data = commonRedis()->get($mKey);
-        if(empty($data)){
+        if(empty($data) OR true){
             $whereNext = ['AND', ['=', 'lottery_type', $lottery_type], ['IS NOT', 'next_qihao', NULL]];
-            $DataDealStatus = DataDealStatus::find()->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
+            $DataDealStatus = DataDealStatus::find()->select(['qihao', 'next_qihao'])
+                ->where($whereNext)->orderBy(['id'=>SORT_DESC])->asArray()->limit(1)->one();
             $currentKjQihao = $DataDealStatus['qihao'];
             $nextQihao = $DataDealStatus['next_qihao'];
             $data = [$currentKjQihao, $nextQihao];
-            commonRedis()->setex($mKey, 8, $data);
+            commonRedis()->setex($mKey, 2, $data);
         }
 
         return $data;

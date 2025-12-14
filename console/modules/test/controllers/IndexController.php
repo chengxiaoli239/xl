@@ -82,6 +82,8 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lottery_type=8); # 期号数据
+        p([$currentKjQiHao, $qiHao]);
         $lottery_type = 8;
         $currentKjDataQihao = SscKjData::find()->select(['qihao'])
             ->where(['lottery_type'=>$lottery_type])
@@ -124,7 +126,6 @@ class IndexController extends Controller
         p($rst);
 
 
-        list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lottery_type=8); # 期号数据
         $result = BetService::insertRecord($plan_id=17712, $qiHao, $isAuto=2);
         //$result = BetService::insertRecord($plan_id=17718, '', $isAuto=2);
         p($result);
