@@ -124,16 +124,18 @@ class DynamicType2Service extends BaseService {
             ->andWhere($where);
 
         //$sql = $query->createCommand()->getRawSql();//p($sql);
-        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤两个位置一样的所有号码', [
-            'plan_id'=>$plan->id,
-            'lottery_type'=>$lottery_type,
-            'current_kj_qihao'=>$currentKjQiHao,
-            //'sql'=>$sql
-        ]);
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
         //p(['count'=>count($codes), 'historyKjData'=>$historyKjData, /*'codes'=>$codes*/]);
         $betDesc = $filterDesc['desc'].":过滤近".$x."天直码";
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '过滤两个位置一样的所有号码', [
+            'plan_id'=>$plan->id,
+            'lottery_type'=>$lottery_type,
+            'current_kj_qihao'=>$currentKjQiHao,
+            'count' => count($codes),
+            'bet_desc'=>$betDesc,
+            //'sql'=>$sql
+        ]);
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc); # 添加动态计划下注描述
         //p([count($codes)]);
 

@@ -66,11 +66,6 @@ class DynamicFilterService extends BaseService {
     {
         $lottery_type = $plan->lottery_type;
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
-        $md5PlanKey = md5($plan->id.'_'.$plan->hz_Arr.'_'.$plan->update_time.'_'.$nextQiHao);
-        $cacheKey = CacheKeyService::getPlanCurrentCodeKey($plan->id, $nextQiHao, $md5PlanKey);
-        if($data = commonRedis()->get($cacheKey)){
-            //return $data;
-        }
         $playway = $plan->playway;
         $query = Num4Type::find()->select(['code', 'code_type'])->andWhere(['=', 'code_type', $playway+1]);
         $NumTypes = $query->asArray()->all();
@@ -187,9 +182,6 @@ class DynamicFilterService extends BaseService {
                 $codes = $allCodes;
             }
             $codesArr = array_intersect($codesArr, $codes);
-        }
-        if(!empty($codesArr)){
-            commonRedis()->setex($cacheKey, 30, $codesArr);
         }
         #p(['counts'=>count($codesArr), 'codesArr'=>$codesArr]);
 
