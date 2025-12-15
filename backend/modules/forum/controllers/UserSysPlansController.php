@@ -484,6 +484,8 @@ class UserSysPlansController extends BaseController
                     }else{
                         $codeHz['bet_op_to_wp'] = UserSysPlans::BET_DIRECT_Z;
                     }
+                    // 批量修改倍数
+                    $codeHz['bet_op_to_wp_singles'] = isset($post['betOpToWpSingles']) && $post['betOpToWpSingles'] !== '' ? $post['betOpToWpSingles'] : '1';
                     $model->plan_type = $newPlanType;
                     $model->singles = $newSingles;
                     $model->hz_Arr = Json::encode($codeHz);
@@ -494,6 +496,28 @@ class UserSysPlansController extends BaseController
             return ['status' => 200, 'message' => '操作成功'];
         } catch (\Exception $e) {
             return ['status' => 500, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * 获取计划的bet_op_to_wp_singles值
+     * @return array
+     */
+    public function actionGetPlanBetOpToWpSingles()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $id = Yii::$app->request->post('id');
+
+        try {
+            $model = UserSysPlans::findOne($id);
+            if ($model && $model->hz_Arr) {
+                $codeHz = Json::decode($model->hz_Arr);
+                $bet_op_to_wp_singles = isset($codeHz['bet_op_to_wp_singles']) ? $codeHz['bet_op_to_wp_singles'] : '1';
+                return ['status' => 200, 'bet_op_to_wp_singles' => $bet_op_to_wp_singles];
+            }
+            return ['status' => 200, 'bet_op_to_wp_singles' => '1'];
+        } catch (\Exception $e) {
+            return ['status' => 500, 'bet_op_to_wp_singles' => '1', 'message' => $e->getMessage()];
         }
     }
 
@@ -766,21 +790,21 @@ class UserSysPlansController extends BaseController
     public function actionCreateFromSuggestion()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-        
+
         try {
             $suggestion = Yii::$app->request->post();
-            
+
             $model = new UserSysPlans();
             $model->attributes = $suggestion;
             $model->uid = Yii::$app->user->id;
-            
+
             if ($model->save()) {
                 return [
                     'status' => 200,
                     'message' => '计划创建成功'
                 ];
             }
-            
+
             return [
                 'status' => 400,
                 'message' => '计划创建失败：' . implode(', ', $model->getErrorSummary(true))

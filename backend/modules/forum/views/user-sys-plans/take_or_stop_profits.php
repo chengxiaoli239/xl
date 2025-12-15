@@ -1,76 +1,35 @@
 <?php
 
 use yii\helpers\Html;
-$isNewRecord = $model->isNewRecord;
-// 使用更高的优先级，确保最后执行
+// 确保字段始终显示，不受"反打"选择影响
 $this->registerJs("
-    (function() {
-        var isNewRecord = " . ($isNewRecord ? 'true' : 'false') . ";
-        
-        function forceShowField() {
-            if (isNewRecord) {
-                var field = document.getElementById('bet-op-to-wp-singles');
-                if (field) {
-                    field.style.setProperty('display', 'block', 'important');
-                }
+    $(document).ready(function() {
+        // 确保字段始终显示
+        function ensureFieldVisible() {
+            var field = document.getElementById('bet-op-to-wp-singles');
+            if (field && field.style.display === 'none') {
+                field.style.setProperty('display', 'block', 'important');
             }
         }
         
-        function initBetOpToWpSingles() {
-            // 如果是新建计划，强制显示
-            if (isNewRecord) {
-                forceShowField();
-                // 持续监控，防止被其他脚本隐藏
-                var checkInterval = setInterval(function() {
-                    var field = document.getElementById('bet-op-to-wp-singles');
-                    if (field && field.style.display === 'none') {
-                        field.style.setProperty('display', 'block', 'important');
-                    }
-                }, 100);
-                
-                // 5秒后停止监控（页面应该已经加载完成）
-                setTimeout(function() {
-                    clearInterval(checkInterval);
-                }, 5000);
-                return;
-            }
-            
-            // 编辑计划时，根据选择来控制显示/隐藏
-            function toggleBetOpToWpSingles() {
-                if ($('input[name=\"UserSysPlans[bet_op_to_wp][]\"][value=\"2\"]').is(':checked')) {
-                    $('#bet-op-to-wp-singles').show();
-                } else {
-                    $('#bet-op-to-wp-singles').hide();
-                }
-            }
-            
-            toggleBetOpToWpSingles();
-            
-            $('input[name=\"UserSysPlans[bet_op_to_wp][]\"]').off('change.betOpToWp').on('change.betOpToWp', function() {
-                toggleBetOpToWpSingles();
-            });
-        }
+        // 立即显示
+        ensureFieldVisible();
         
-        // 立即执行一次
-        forceShowField();
+        // 持续监控，防止被其他脚本隐藏
+        var checkInterval = setInterval(function() {
+            ensureFieldVisible();
+        }, 100);
         
-        // 使用多个时机确保执行
-        if (document.readyState === 'complete') {
-            setTimeout(initBetOpToWpSingles, 100);
-        } else {
-            $(document).ready(function() {
-                setTimeout(initBetOpToWpSingles, 100);
-            });
-        }
-        
-        // 额外延迟执行，确保在其他脚本之后
+        // 5秒后停止监控（页面应该已经加载完成）
         setTimeout(function() {
-            forceShowField();
-        }, 300);
-        setTimeout(function() {
-            forceShowField();
-        }, 600);
-    })();
+            clearInterval(checkInterval);
+        }, 5000);
+        
+        // 监听选择变化，确保字段始终显示
+        $('input[name=\"UserSysPlans[bet_op_to_wp][]\"]').on('change', function() {
+            ensureFieldVisible();
+        });
+    });
 ", \yii\web\View::POS_END);
 
 ?>
@@ -103,8 +62,8 @@ $this->registerJs("
             ]
         )->label('打盘口方向') ?>
     </div>
-    <div class="col-lg-3 col-xs-6"?>
-        <?= $form->field($model, 'bet_op_to_wp_singles')->textInput()->label('反向倍数：乘倍数为真实打的倍数,例：0.5') ?>
+    <div class="col-lg-3 col-xs-6" id="bet-op-to-wp-singles">
+        <?= $form->field($model, 'bet_op_to_wp_singles')->textInput()->label('倍数：乘倍数为真实打的倍数,例：0.5') ?>
     </div>
 </div>
 

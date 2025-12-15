@@ -404,8 +404,8 @@ $columns = array_merge(
                     <div class="pull-right">
                         <?= Html::a($tipTxt, 'javascript:;', ['class' => 'btn red-text']) ?>
                         <?= Html::tag('span', '总盈利: ' . number_format($all_profits, 2), [
-                            'class' => 'btn', 
-                            'style' => 'color:' . ($all_profits > 0 ? 'green' : ($all_profits < 0 ? 'red' : 'black')) . 
+                            'class' => 'btn',
+                            'style' => 'color:' . ($all_profits > 0 ? 'green' : ($all_profits < 0 ? 'red' : 'black')) .
                                       ';font-weight:bold;margin-left:10px;'
                         ]) ?>
                     </div>
@@ -540,6 +540,12 @@ $columns = array_merge(
                                         </div>
                                     </div>
                                 </div>
+                                <div class="form-group" style="margin-bottom: 15px;">
+                                    <label class="col-sm-3 control-label">倍数（乘倍数为真实打的倍数,例：0.5）：</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="betOpToWpSingles" name="betOpToWpSingles" placeholder="乘倍数为真实打的倍数,例：0.5">
+                                    </div>
+                                </div>
                                 <div class="form-group">
                                     <label class="col-sm-3 control-label">修改的计划ID：</label>
                                     <div class="col-sm-9">
@@ -581,6 +587,22 @@ $columns = array_merge(
             // Update the selected IDs display
             $('#selectedPlanIds').html(selectedIds.join(', '));
 
+            // 获取第一个计划的bet_op_to_wp_singles值
+            $.post('/forum/user-sys-plans/get-plan-bet-op-to-wp-singles',
+                {
+                    id: selectedIds[0]
+                },
+                function(response) {
+                    if (response.status === 200) {
+                        $('#betOpToWpSingles').val(response.bet_op_to_wp_singles || '1');
+                    } else {
+                        $('#betOpToWpSingles').val('1');
+                    }
+                }, 'json'
+            ).fail(function() {
+                $('#betOpToWpSingles').val('1');
+            });
+
             $('#batchUpdatePlanTypeModal').modal('show');
         });
 
@@ -609,7 +631,8 @@ $columns = array_merge(
                         ids: selectedIds,
                         newPlanType: newPlanType,
                         newSingles: $('#newSingles').val(),
-                        betOpToWp: selectedCheckboxes[0]
+                        betOpToWp: selectedCheckboxes[0],
+                        betOpToWpSingles: $('#betOpToWpSingles').val() || '1'
                     },
                     function(response) {
                         if (response.status === 200) {
@@ -790,7 +813,7 @@ $columns = array_merge(
                 x: e.clientX - pos.left,
                 y: e.clientY - pos.top
             };
-            
+
             document.addEventListener('mousemove', onMouseMove);
             document.addEventListener('mouseup', onMouseUp);
             e.preventDefault();
@@ -802,7 +825,7 @@ $columns = array_merge(
                 x: e.touches[0].clientX - pos.left,
                 y: e.touches[0].clientY - pos.top
             };
-            
+
             document.addEventListener('touchmove', onTouchMove, { passive: false });
             document.addEventListener('touchend', onTouchEnd);
             e.preventDefault();
@@ -850,16 +873,16 @@ $columns = array_merge(
             event.stopPropagation();
         }
         console.log('dddddd')
-        
+
         const chatWindow = document.getElementById('deepseekChat');
         const chatTrigger = document.querySelector('.chat-trigger');
         const isVisible = chatWindow.style.display === 'block';
-        
+
         if (!isVisible) {
             // 显示聊天窗口，隐藏触发按钮
             chatWindow.style.display = 'block';
             chatTrigger.classList.add('hidden');
-            
+
             setTimeout(() => {
                 chatWindow.style.opacity = '1';
             }, 10);
@@ -877,13 +900,13 @@ $columns = array_merge(
     document.addEventListener('DOMContentLoaded', function() {
         const chatTrigger = document.querySelector('.chat-trigger');
         const chatWindow = document.getElementById('deepseekChat');
-        
+
         makeDraggable(chatTrigger);
 
         // 点击聊天框外部关闭
         document.addEventListener('click', function(event) {
-            if (chatWindow.style.display === 'block' && 
-                !chatWindow.contains(event.target) && 
+            if (chatWindow.style.display === 'block' &&
+                !chatWindow.contains(event.target) &&
                 !chatTrigger.contains(event.target)) {
                 toggleChat();
             }
@@ -922,7 +945,7 @@ $columns = array_merge(
             });
 
             const data = await response.json();
-            
+
             // 添加机器人回复
             addMessage(data.message, 'bot');
 
