@@ -1818,6 +1818,9 @@ abstract class BetService extends BaseBetService {
             if($isAuto == 1 && $plan->status != 1){
                 throw_info('计划未开启...');
             }
+            if(!DataDealStatus::find()->where(['next_qihao'=>$qiHao, 'status'=>2])->exists()){
+                throw_info('数据未处理完成');
+            }
             $where = ['AND', ['=', 'qihao', $qiHao], ['=', 'plan_id', $planId], ['=', 'uid', $plan->uid]];
             if($isAuto == 1 && BettingRecords::find()->where($where)->exists()){
                 throw_info('yx表已记录3...');

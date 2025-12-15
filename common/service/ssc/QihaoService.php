@@ -55,7 +55,7 @@ class QihaoService extends CommonService
             $currentKjQihao = $DataDealStatus['qihao'];
             $nextQihao = $DataDealStatus['next_qihao'];
             $data = [$currentKjQihao, $nextQihao];
-            commonRedis()->setex($mKey, 2, $data);
+            commonRedis()->setex($mKey, 4, $data);
         }
 
         return $data;

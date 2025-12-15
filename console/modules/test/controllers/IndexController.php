@@ -82,6 +82,11 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $qiHao = '20251215104';
+        if(!DataDealStatus::find()->where(['next_qihao'=>$qiHao, 'status'=>2])->exists()){
+            print_r('数据未处理完成');exit();
+        }
+        p('完成');
         list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($lottery_type=8); # 期号数据
         p([$currentKjQiHao, $qiHao]);
         $lottery_type = 8;
