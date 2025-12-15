@@ -1,9 +1,13 @@
 <?php
 
 use yii\helpers\Html;
+$isNewRecord = $model->isNewRecord;
 $this->registerJs("
     $(document).ready(function() {
+        var isNewRecord = " . ($isNewRecord ? 'true' : 'false') . ";
+        
         function toggleBetOpToWpSingles() {
+            // 根据是否选中值为2来决定显示/隐藏
             if ($('input[name=\"UserSysPlans[bet_op_to_wp][]\"][value=\"2\"]').is(':checked')) {
                 $('#bet-op-to-wp-singles').show();
             } else {
@@ -11,9 +15,16 @@ $this->registerJs("
             }
         }
 
-        toggleBetOpToWpSingles();
+        // 如果是新建计划，默认显示，不执行切换逻辑
+        if (isNewRecord) {
+            $('#bet-op-to-wp-singles').show();
+        } else {
+            // 编辑计划时，根据选择来控制显示/隐藏
+            toggleBetOpToWpSingles();
+        }
 
         $('input[name=\"UserSysPlans[bet_op_to_wp][]\"]').change(function() {
+            // 用户选择后，按正常逻辑处理
             toggleBetOpToWpSingles();
         });
     });
@@ -49,7 +60,7 @@ $this->registerJs("
             ]
         )->label('打盘口方向') ?>
     </div>
-    <div class="col-lg-3 col-xs-6" id="bet-op-to-wp-singles" style="display: none;">
+    <div class="col-lg-3 col-xs-6" id="bet-op-to-wp-singles">
         <?= $form->field($model, 'bet_op_to_wp_singles')->textInput()->label('反向倍数：乘倍数为真实打的倍数,例：0.5') ?>
     </div>
 </div>
