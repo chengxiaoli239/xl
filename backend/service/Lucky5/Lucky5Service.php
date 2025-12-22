@@ -2115,6 +2115,15 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $count = count($codesArr);
         //p(['codesArr'=>$codesArr,'count'=>$count, 'codeHz'=>Json::decode($plan->hz_Arr)], 0);
         $hzArr = Json::decode($plan->hz_Arr);
+        
+        # 获取倍数倍数（bet_op_to_wp_singles）
+        $opWpSingles = isset($hzArr['bet_op_to_wp_singles']) ? explode('-', $hzArr['bet_op_to_wp_singles']) : [];
+        if(empty($opWpSingles[0])){
+            $opWpSingle = 1;
+        }else{
+            $opWpSingle = floatval($opWpSingles[0]);
+        }
+        
         if($hzArr['bet_op_to_wp'] == UserSysPlans::BET_DIRECT_F){
             # 反向打盘口
             $query = Num4Type::find()->where(['NOT IN', 'code_n', $codesArr])->select('code_n');
@@ -2135,29 +2144,28 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     }
                 }
             }
-            $opWpSingles = explode('-', $hzArr['bet_op_to_wp_singles']);
-            if(empty($opWpSingles[0])){
-                $opWpSingle = 1;
-            }else{
-                $opWpSingle = $opWpSingles[0];
-            }
             $codesArr = $query->column();
-            $opSingle = $single * $opWpSingle;
-
-            $bet_single = floor($opSingle * 10)/10;  # bet_single 向下保留一位小数
-            if(in_array($playway, [2, 3]) && $bet_single<0.1){
-                $bet_single = 0.1;
-            }
-            if($playway == 1){
-                if($bet_single<1){
-                    $bet_single = 1;
-                }else{
-                    $bet_single = (int)$bet_single;
-                }
-            }
-            //p(['count1'=>$count, 'count2'=>count($codesArr)]);
-            $single = $bet_single;
         }
+        
+        # 应用倍数倍数：原始倍数 * 倍数倍数 = 理论倍数
+        $opSingle = $single * $opWpSingle;
+        
+        # 向上取整到0.1（乘以10向上取整再除以10），因为盘口最低是1毛，没有具体到分
+        $bet_single = ceil($opSingle * 10) / 10;
+        
+        # 根据玩法设置最小值
+        if(in_array($playway, [2, 3]) && $bet_single<0.1){
+            $bet_single = 0.1;
+        }
+        if($playway == 1){
+            if($bet_single<1){
+                $bet_single = 1;
+            }else{
+                $bet_single = (int)$bet_single;
+            }
+        }
+        
+        $single = $bet_single;
         //p(['count1'=>$count, 'count2'=>count($codesArr)]);
 
         $betNums = self::getBetNumsPer($plan->uid);
