@@ -2389,4 +2389,174 @@ class DynamicType2Service extends BaseService {
 
         return $codes;
     }
+
+    # 随机位置号码个数
+    public static function filter41(object $plan, $dynamic=[], $filterDesc = []): array
+    {
+        $lottery_type = $plan->lottery_type;
+        $playway = $plan->playway;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+
+        $params = $dynamic['params'];
+        $x = !empty($params['x']) ? (int)$params['x'] : 0; // 位置1（千位）随机号码个数
+        $y = !empty($params['y']) ? (int)$params['y'] : 0; // 位置2（百位）随机号码个数
+        $z = !empty($params['z']) ? (int)$params['z'] : 0; // 位置3（十位）随机号码个数
+        $h = !empty($params['h']) ? (int)$params['h'] : 0; // 位置4（个位）随机号码个数
+
+        // 位置名称映射
+        $posNames = ['1'=>'千', '2'=>'百', '3'=>'十', '4'=>'个'];
+        
+        // 所有可选号码 0-9
+        $allNumbers = range(0, 9);
+        
+        // 存储每个位置随机选择的号码
+        $posNumbers = [];
+        $posConfigs = [
+            '1' => ['count' => $x, 'name' => '千'],
+            '2' => ['count' => $y, 'name' => '百'],
+            '3' => ['count' => $z, 'name' => '十'],
+            '4' => ['count' => $h, 'name' => '个'],
+        ];
+        
+        // 随机选择每个位置的号码
+        foreach ($posConfigs as $pos => $config) {
+            $count = $config['count'];
+            if ($count > 0 && $count <= 10) {
+                // 从0-9中随机选择count个号码
+                shuffle($allNumbers);
+                $posNumbers[$pos] = array_slice($allNumbers, 0, $count);
+                sort($posNumbers[$pos]); // 排序以便显示
+            } else {
+                // 如果未填写或无效，使用所有号码0-9
+                $posNumbers[$pos] = $allNumbers;
+            }
+        }
+        
+        // 如果所有位置都没有填写，返回空数组
+        if ($x <= 0 && $y <= 0 && $z <= 0 && $h <= 0) {
+            $label = !empty($filterDesc['label']) ? $filterDesc['label'] : '随机位置号码个数';
+            $betDesc = $label . "[x:{$x}, y:{$y}, z:{$z}, h:{$h}]：参数无效，返回空数组";
+            NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+            return [];
+        }
+        
+        // 根据玩法类型生成号码
+        $codes = [];
+        
+        if ($playway == 3) {
+            // 四定：生成所有可能的组合
+            foreach ($posNumbers['1'] as $code1) {
+                foreach ($posNumbers['2'] as $code2) {
+                    foreach ($posNumbers['3'] as $code3) {
+                        foreach ($posNumbers['4'] as $code4) {
+                            $codes[] = $code1 . $code2 . $code3 . $code4;
+                        }
+                    }
+                }
+            }
+        } elseif ($playway == 2) {
+            // 三定：需要确定哪个位置是X
+            $codeHz = Json::decode($plan->hz_Arr);
+            $fixedSelPos = [];
+            if(!empty($codeHz['fixed_sel_pos'])){
+                $fixedSelPos = array_map('trim', explode(',', $codeHz['fixed_sel_pos']));
+                $fixedSelPos = array_filter($fixedSelPos);
+            }
+            
+            // 如果没有指定定位置，随机选择一个位置为X
+            if(empty($fixedSelPos)){
+                $allPos = NumService::$ALL_POSES;
+                $randomIndex = array_rand($allPos);
+                $xPos = $allPos[$randomIndex];
+                $fixedSelPos = array_values(array_diff($allPos, [$xPos]));
+            }
+            
+            // 生成三定号码
+            foreach ($posNumbers['1'] as $code1) {
+                foreach ($posNumbers['2'] as $code2) {
+                    foreach ($posNumbers['3'] as $code3) {
+                        foreach ($posNumbers['4'] as $code4) {
+                            $codeArr = [$code1, $code2, $code3, $code4];
+                            // 将定位置设置为X
+                            foreach ($fixedSelPos as $pos) {
+                                $codeArr[(int)$pos - 1] = 'X';
+                            }
+                            $codes[] = implode('', $codeArr);
+                        }
+                    }
+                }
+            }
+        } elseif ($playway == 1) {
+            // 二定：需要确定哪两个位置是X
+            $codeHz = Json::decode($plan->hz_Arr);
+            $fixedSelPos = [];
+            if(!empty($codeHz['fixed_sel_pos'])){
+                $fixedSelPos = array_map('trim', explode(',', $codeHz['fixed_sel_pos']));
+                $fixedSelPos = array_filter($fixedSelPos);
+            }
+            
+            // 如果没有指定定位置，随机选择两个位置为X
+            if(empty($fixedSelPos)){
+                $allPos = NumService::$ALL_POSES;
+                $randomIndices = array_rand($allPos, 2);
+                $xPos = [$allPos[$randomIndices[0]], $allPos[$randomIndices[1]]];
+                $fixedSelPos = array_values(array_diff($allPos, $xPos));
+            }
+            
+            // 生成二定号码
+            foreach ($posNumbers['1'] as $code1) {
+                foreach ($posNumbers['2'] as $code2) {
+                    foreach ($posNumbers['3'] as $code3) {
+                        foreach ($posNumbers['4'] as $code4) {
+                            $codeArr = [$code1, $code2, $code3, $code4];
+                            // 将定位置设置为X
+                            foreach ($fixedSelPos as $pos) {
+                                $codeArr[(int)$pos - 1] = 'X';
+                            }
+                            $codes[] = implode('', $codeArr);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // 去重
+        $codes = array_unique($codes);
+        
+        // 验证号码是否存在（查询数据库）
+        $query = Num4Type::find()
+            ->select(['code', 'code_type'])
+            ->andWhere(['=', 'code_type', $playway+1])
+            ->andWhere(['IN', 'code', $codes]);
+        
+        $NumTypes = $query->asArray()->all();
+        $validCodes = ArrayHelper::getColumn($NumTypes, 'code');
+        
+        // 添加下注描述
+        $label = !empty($filterDesc['label']) ? $filterDesc['label'] : '随机位置号码个数';
+        $posDesc = [];
+        foreach ($posConfigs as $pos => $config) {
+            if ($config['count'] > 0 && $config['count'] <= 10) {
+                $selectedNums = isset($posNumbers[$pos]) ? implode('', $posNumbers[$pos]) : '';
+                $posDesc[] = $config['name'] . "位{$config['count']}个(" . $selectedNums . ")";
+            }
+        }
+        $posDescStr = implode('、', $posDesc);
+        $betDesc = $label . "[x:{$x}, y:{$y}, z:{$z}, h:{$h}]：{$posDescStr}，共" . count($validCodes) . "个号码";
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+        
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '随机位置号码个数', [
+            'plan_id' => $plan->id,
+            'lottery_type' => $lottery_type,
+            'playway' => $playway,
+            'x' => $x,
+            'y' => $y,
+            'z' => $z,
+            'h' => $h,
+            'pos_numbers' => $posNumbers,
+            'result_count' => count($validCodes),
+        ]);
+        
+        return $validCodes;
+    }
 }
