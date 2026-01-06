@@ -2440,22 +2440,27 @@ class DynamicType2Service extends BaseService {
             return [];
         }
         
-        // 根据玩法类型生成号码
-        $codes = [];
+        // 直接使用数据库查询，根据每个位置的号码范围进行过滤
+        $query = Num4Type::find()
+            ->select(['code', 'code_type'])
+            ->andWhere(['=', 'code_type', $playway+1]);
         
-        if ($playway == 3) {
-            // 四定：生成所有可能的组合
-            foreach ($posNumbers['1'] as $code1) {
-                foreach ($posNumbers['2'] as $code2) {
-                    foreach ($posNumbers['3'] as $code3) {
-                        foreach ($posNumbers['4'] as $code4) {
-                            $codes[] = $code1 . $code2 . $code3 . $code4;
-                        }
-                    }
-                }
-            }
-        } elseif ($playway == 2) {
-            // 三定：需要确定哪个位置是X
+        // 根据每个位置的随机号码设置查询条件
+        if (!empty($posNumbers['1']) && count($posNumbers['1']) < 10) {
+            $query->andWhere(['IN', 'code_1', $posNumbers['1']]);
+        }
+        if (!empty($posNumbers['2']) && count($posNumbers['2']) < 10) {
+            $query->andWhere(['IN', 'code_2', $posNumbers['2']]);
+        }
+        if (!empty($posNumbers['3']) && count($posNumbers['3']) < 10) {
+            $query->andWhere(['IN', 'code_3', $posNumbers['3']]);
+        }
+        if (!empty($posNumbers['4']) && count($posNumbers['4']) < 10) {
+            $query->andWhere(['IN', 'code_4', $posNumbers['4']]);
+        }
+        
+        // 对于二定和三定，需要处理定位置（X位置）
+        if ($playway != 3) {
             $codeHz = Json::decode($plan->hz_Arr);
             $fixedSelPos = [];
             if(!empty($codeHz['fixed_sel_pos'])){
@@ -2463,72 +2468,29 @@ class DynamicType2Service extends BaseService {
                 $fixedSelPos = array_filter($fixedSelPos);
             }
             
-            // 如果没有指定定位置，随机选择一个位置为X
+            // 如果没有指定定位置，根据玩法类型随机选择
             if(empty($fixedSelPos)){
                 $allPos = NumService::$ALL_POSES;
-                $randomIndex = array_rand($allPos);
-                $xPos = $allPos[$randomIndex];
-                $fixedSelPos = array_values(array_diff($allPos, [$xPos]));
-            }
-            
-            // 生成三定号码
-            foreach ($posNumbers['1'] as $code1) {
-                foreach ($posNumbers['2'] as $code2) {
-                    foreach ($posNumbers['3'] as $code3) {
-                        foreach ($posNumbers['4'] as $code4) {
-                            $codeArr = [$code1, $code2, $code3, $code4];
-                            // 将定位置设置为X
-                            foreach ($fixedSelPos as $pos) {
-                                $codeArr[(int)$pos - 1] = 'X';
-                            }
-                            $codes[] = implode('', $codeArr);
-                        }
-                    }
+                if($playway == 2){
+                    // 三定：随机选择一个位置为X
+                    $randomIndex = array_rand($allPos);
+                    $xPos = $allPos[$randomIndex];
+                    $fixedSelPos = array_values(array_diff($allPos, [$xPos]));
+                }elseif($playway == 1){
+                    // 二定：随机选择两个位置为X
+                    $randomIndices = array_rand($allPos, 2);
+                    $xPos = [$allPos[$randomIndices[0]], $allPos[$randomIndices[1]]];
+                    $fixedSelPos = array_values(array_diff($allPos, $xPos));
                 }
             }
-        } elseif ($playway == 1) {
-            // 二定：需要确定哪两个位置是X
-            $codeHz = Json::decode($plan->hz_Arr);
-            $fixedSelPos = [];
-            if(!empty($codeHz['fixed_sel_pos'])){
-                $fixedSelPos = array_map('trim', explode(',', $codeHz['fixed_sel_pos']));
-                $fixedSelPos = array_filter($fixedSelPos);
-            }
             
-            // 如果没有指定定位置，随机选择两个位置为X
-            if(empty($fixedSelPos)){
-                $allPos = NumService::$ALL_POSES;
-                $randomIndices = array_rand($allPos, 2);
-                $xPos = [$allPos[$randomIndices[0]], $allPos[$randomIndices[1]]];
-                $fixedSelPos = array_values(array_diff($allPos, $xPos));
-            }
-            
-            // 生成二定号码
-            foreach ($posNumbers['1'] as $code1) {
-                foreach ($posNumbers['2'] as $code2) {
-                    foreach ($posNumbers['3'] as $code3) {
-                        foreach ($posNumbers['4'] as $code4) {
-                            $codeArr = [$code1, $code2, $code3, $code4];
-                            // 将定位置设置为X
-                            foreach ($fixedSelPos as $pos) {
-                                $codeArr[(int)$pos - 1] = 'X';
-                            }
-                            $codes[] = implode('', $codeArr);
-                        }
-                    }
-                }
+            // 将定位置设置为X（这些位置不受随机号码限制）
+            foreach ($fixedSelPos as $pos) {
+                $query->andWhere(['=', 'code_'.$pos, 'X']);
             }
         }
         
-        // 去重
-        $codes = array_unique($codes);
-        
-        // 验证号码是否存在（查询数据库）
-        $query = Num4Type::find()
-            ->select(['code', 'code_type'])
-            ->andWhere(['=', 'code_type', $playway+1])
-            ->andWhere(['IN', 'code', $codes]);
-        
+        // 执行查询
         $NumTypes = $query->asArray()->all();
         $validCodes = ArrayHelper::getColumn($NumTypes, 'code');
         
