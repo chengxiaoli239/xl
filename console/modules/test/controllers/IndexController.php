@@ -82,6 +82,7 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        $r = Yii::$app->db->getSchema()->refreshTableSchema('{{%agent_user_bet_logs}}'); p($r);
         $rst = Lucky5Service::login($uid = 23, $tz_system_id = 9); p($rst);
         $qiHao = '20251215104';
         if(!DataDealStatus::find()->where(['next_qihao'=>$qiHao, 'status'=>2])->exists()){

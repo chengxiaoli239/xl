@@ -167,8 +167,8 @@ class AgentClientsService extends ClientsBaseService{
         $buy_type = in_array($logData['account'], $flow_wp_accounts) ? 1 : 0;  # 购买类型，0反买账号，1正买账号
 
         // 计算operation_content的MD5值
-        $operation_content_md5 = md5($logData['operation_content']);
-        
+        $operation_content_md5 = md5($logData['operation_content'].'_',$logData['operation_datetime']);
+
         // 检查表结构是否有 operation_content_md5 字段
         $useMd5Index = false;
         try {
@@ -178,7 +178,7 @@ class AgentClientsService extends ClientsBaseService{
             // 如果获取表结构失败，使用原来的方式
             $useMd5Index = false;
         }
-        
+
         // 使用access_token + operation_content_md5联合查询判断唯一性（如果字段存在）
         // 否则使用原来的方式：access_token + wp_record_id
         if ($useMd5Index) {
@@ -267,12 +267,12 @@ class AgentClientsService extends ClientsBaseService{
             'from' => $from,  # 来源：api、page
             'log_type' => $logData['log_type'],  # 目前看都是102
         ];
-        
+
         // 如果表结构有 operation_content_md5 字段，则添加该字段的值
         if ($useMd5Index) {
             $setDatas['operation_content_md5'] = $operation_content_md5; # operation_content的MD5值，用于联合索引
         }
-        
+
         // 如果表结构有 operation_content_md5 字段，则添加该字段的值
         if ($useMd5Index) {
             $setDatas['operation_content_md5'] = $operation_content_md5; # operation_content的MD5值，用于联合索引
