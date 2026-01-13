@@ -169,15 +169,39 @@ class AgentClientsService extends ClientsBaseService{
         // 计算operation_content的MD5值
         $operation_content_md5 = md5($logData['operation_content']);
         
-        // 使用access_token + operation_content_md5联合查询判断唯一性
-        $AgentUserBetLogs = AgentUserBetLogs::findOne([
-            'access_token' => $access_token,
-            'operation_content_md5' => $operation_content_md5
-        ]);
-        if(!empty($AgentUserBetLogs)){
-            throw_info('日志记录已存在 operation_content_md5:'.$operation_content_md5, 40003);
-        }else{
-            $AgentUserBetLogs = new AgentUserBetLogs();
+        // 检查表结构是否有 operation_content_md5 字段
+        $useMd5Index = false;
+        try {
+            $tableSchema = AgentUserBetLogs::getTableSchema();
+            $useMd5Index = isset($tableSchema->columns['operation_content_md5']);
+        } catch (\Exception $e) {
+            // 如果获取表结构失败，使用原来的方式
+            $useMd5Index = false;
+        }
+        
+        // 使用access_token + operation_content_md5联合查询判断唯一性（如果字段存在）
+        // 否则使用原来的方式：access_token + wp_record_id
+        if ($useMd5Index) {
+            $AgentUserBetLogs = AgentUserBetLogs::findOne([
+                'access_token' => $access_token,
+                'operation_content_md5' => $operation_content_md5
+            ]);
+            if(!empty($AgentUserBetLogs)){
+                throw_info('日志记录已存在 operation_content_md5:'.$operation_content_md5, 40003);
+            } else {
+                $AgentUserBetLogs = new AgentUserBetLogs();
+            }
+        } else {
+            // 回退到原来的查询方式
+            $AgentUserBetLogs = AgentUserBetLogs::findOne([
+                'access_token' => $access_token,
+                'wp_record_id' => $logData['log_member_quick_select_id']
+            ]);
+            if(!empty($AgentUserBetLogs)){
+                throw_info('日志记录已存在 wp_record_id:'.$logData['log_member_quick_select_id'], 40003);
+            } else {
+                $AgentUserBetLogs = new AgentUserBetLogs();
+            }
         }
         $qihao = HN0898Service::getQihao($lottery_type, substr($logData['time_value'], -8), date('Y').'-'.substr($logData['operation_datetime'], 0, 5));
         $bet_log_n = str_replace(['[', ']'], '', $logData['operation_content']);
@@ -217,7 +241,6 @@ class AgentClientsService extends ClientsBaseService{
             'member_id' => $logData['member_id'],
             'account' => $TzSystemsUsers->account,
             'bet_logs' => $logData['operation_content'], # 原始日志
-            'operation_content_md5' => $operation_content_md5, # operation_content的MD5值，用于联合索引
             'bet_logs_codes_hz' => json_encode($data['codes_hz'], 320), # 解析成系统的codes_hz
             'bet_logs_n' => (string)$bet_log_n, # 转换后的快译
             'bet_codes' => $bet_codes, # 用户正常下注号码
@@ -244,6 +267,16 @@ class AgentClientsService extends ClientsBaseService{
             'from' => $from,  # 来源：api、page
             'log_type' => $logData['log_type'],  # 目前看都是102
         ];
+        
+        // 如果表结构有 operation_content_md5 字段，则添加该字段的值
+        if ($useMd5Index) {
+            $setDatas['operation_content_md5'] = $operation_content_md5; # operation_content的MD5值，用于联合索引
+        }
+        
+        // 如果表结构有 operation_content_md5 字段，则添加该字段的值
+        if ($useMd5Index) {
+            $setDatas['operation_content_md5'] = $operation_content_md5; # operation_content的MD5值，用于联合索引
+        }
         $AgentUserBetLogs->setAttributes($setDatas);
         //p($AgentUserBetLogs->getAttributes());
         $flag = $AgentUserBetLogs->save();
