@@ -70,11 +70,16 @@ class AgentClientsService extends ClientsBaseService{
             $record = 'not_in';
             foreach ($logDatas as $logData){
                 try {
+                    // 重新生成log_member_quick_select_id
+                    $originalId = $logData['log_member_quick_select_id'];
+                    $md5Value = md5($logData['operation_datetime'] . $logData['operation_content']);
+                    $logData['log_member_quick_select_id'] = self::regenerateLogMemberQuickSelectId($originalId, $md5Value);
+                    
                     $record_id = $logData['log_member_quick_select_id'];
                     list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token, $from_type, $from, $lottery_type);
                     $record = 'record';
                 }catch (\Exception $e){
-                    $mcKey = 'wp_record_xxx_'.$access_token.'_'.$record_id;
+                    $mcKey = 'wp_record_xxx_'.$access_token.'_'.$record_id.'_'.md5($logData['operation_content']);
                     $num = \Yii::$app->redis->incr($mcKey);
                     \Yii::$app->redis->expire($mcKey, 10);
                     if($num>2) continue;
@@ -119,6 +124,11 @@ class AgentClientsService extends ClientsBaseService{
                 AgentClientsService::checkProfits($toTzSystemsUsers);
                 foreach ($logDatas as $logData){
                     try {
+                        // 重新生成log_member_quick_select_id
+                        $originalId = $logData['log_member_quick_select_id'];
+                        $md5Value = md5($logData['operation_datetime'] . $logData['operation_content']);
+                        $logData['log_member_quick_select_id'] = self::regenerateLogMemberQuickSelectId($originalId, $md5Value);
+                        
                         $to_record_id = $logData['log_member_quick_select_id'];
                         $toMcKey = 'wp_record_xxx_'.$access_token.'_'.$to_record_id;
                         AgentClientsService::operateOneBetLog($logData, $toAccessToken, $from_type, $from, $lottery_type);
@@ -137,6 +147,30 @@ class AgentClientsService extends ClientsBaseService{
         Tool_Common::log('/client_xy/'.__FUNCTION__.'_t', 'INFO', '时间耗时', ['username'=>$TzSystemsUsers->username, 'qihao'=>$qihao, 'flag'=>$record, 'c1'=>$c1, 'c2'=>$c2]);
 
         return $rst;
+    }
+
+    /**
+     * 重新生成log_member_quick_select_id
+     * 格式：{原来的log_member_quick_select_id}{MD5的最后6位数字}
+     * @param string $originalId 原来的log_member_quick_select_id
+     * @param string $md5Value operation_datetime和operation_content的MD5值
+     * @return string 新的log_member_quick_select_id
+     */
+    public static function regenerateLogMemberQuickSelectId($originalId, $md5Value){
+        // 从MD5中提取所有数字字符
+        // MD5是32位十六进制字符串（0-9, a-f），我们需要提取其中的数字部分（0-9）
+        preg_match_all('/\d+/', $md5Value, $matches);
+        $allDigits = implode('', $matches[0]);
+        
+        // 如果提取的数字长度>=6，取最后6位；否则用0补齐到6位
+        if(strlen($allDigits) >= 6){
+            $last6Digits = substr($allDigits, -6);
+        } else {
+            $last6Digits = str_pad($allDigits, 6, '0', STR_PAD_LEFT);
+        }
+        
+        // 组合：原来的ID + MD5的最后6位数字
+        return $originalId . $last6Digits;
     }
 
     /**
@@ -166,42 +200,15 @@ class AgentClientsService extends ClientsBaseService{
         }
         $buy_type = in_array($logData['account'], $flow_wp_accounts) ? 1 : 0;  # 购买类型，0反买账号，1正买账号
 
-        // 计算operation_content的MD5值
-        $operation_content_md5 = md5($logData['operation_content'].'_',$logData['operation_datetime']);
-
-        // 检查表结构是否有 operation_content_md5 字段
-        $useMd5Index = false;
-        try {
-            $tableSchema = AgentUserBetLogs::getTableSchema();
-            $useMd5Index = isset($tableSchema->columns['operation_content_md5']);
-        } catch (\Exception $e) {
-            // 如果获取表结构失败，使用原来的方式
-            $useMd5Index = false;
-        }
-
-        // 使用access_token + operation_content_md5联合查询判断唯一性（如果字段存在）
-        // 否则使用原来的方式：access_token + wp_record_id
-        if ($useMd5Index) {
-            $AgentUserBetLogs = AgentUserBetLogs::findOne([
-                'access_token' => $access_token,
-                'operation_content_md5' => $operation_content_md5
-            ]);
-            if(!empty($AgentUserBetLogs)){
-                throw_info('日志记录已存在 operation_content_md5:'.$operation_content_md5, 40003);
-            } else {
-                $AgentUserBetLogs = new AgentUserBetLogs();
-            }
+        // 使用access_token + wp_record_id作为联合索引（恢复原来的方式）
+        $AgentUserBetLogs = AgentUserBetLogs::findOne([
+            'access_token' => $access_token,
+            'wp_record_id' => $logData['log_member_quick_select_id']
+        ]);
+        if(!empty($AgentUserBetLogs)){
+            throw_info('日志记录已存在 wp_record_id:'.$logData['log_member_quick_select_id'], 40003);
         } else {
-            // 回退到原来的查询方式
-            $AgentUserBetLogs = AgentUserBetLogs::findOne([
-                'access_token' => $access_token,
-                'wp_record_id' => $logData['log_member_quick_select_id']
-            ]);
-            if(!empty($AgentUserBetLogs)){
-                throw_info('日志记录已存在 wp_record_id:'.$logData['log_member_quick_select_id'], 40003);
-            } else {
-                $AgentUserBetLogs = new AgentUserBetLogs();
-            }
+            $AgentUserBetLogs = new AgentUserBetLogs();
         }
         $qihao = HN0898Service::getQihao($lottery_type, substr($logData['time_value'], -8), date('Y').'-'.substr($logData['operation_datetime'], 0, 5));
         $bet_log_n = str_replace(['[', ']'], '', $logData['operation_content']);
@@ -267,16 +274,6 @@ class AgentClientsService extends ClientsBaseService{
             'from' => $from,  # 来源：api、page
             'log_type' => $logData['log_type'],  # 目前看都是102
         ];
-
-        // 如果表结构有 operation_content_md5 字段，则添加该字段的值
-        if ($useMd5Index) {
-            $setDatas['operation_content_md5'] = $operation_content_md5; # operation_content的MD5值，用于联合索引
-        }
-
-        // 如果表结构有 operation_content_md5 字段，则添加该字段的值
-        if ($useMd5Index) {
-            $setDatas['operation_content_md5'] = $operation_content_md5; # operation_content的MD5值，用于联合索引
-        }
         $AgentUserBetLogs->setAttributes($setDatas);
         //p($AgentUserBetLogs->getAttributes());
         $flag = $AgentUserBetLogs->save();
