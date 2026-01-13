@@ -37,6 +37,7 @@ use Yii;
  * @property int $created_at 创建时间
  * @property int $updated_at 更新时间
  * @property string $update_time 更新时间
+ * @property string $operation_content_md5 operation_content的MD5值，用于联合索引
  */
 class AgentUserBetLogs extends \common\models\base\BaseModel
 {
@@ -60,6 +61,7 @@ class AgentUserBetLogs extends \common\models\base\BaseModel
             [['member_bet_time', 'update_time'], 'safe'],
             [['access_token', 'account', 'qihao'], 'string', 'max' => 32],
             [['desc'], 'string', 'max' => 255],
+            [['operation_content_md5'], 'string', 'max' => 32],
         ];
     }
 
@@ -99,6 +101,7 @@ class AgentUserBetLogs extends \common\models\base\BaseModel
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'update_time' => 'Update Time',
+            'operation_content_md5' => 'Operation Content MD5',
         ];
     }
 }
