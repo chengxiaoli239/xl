@@ -170,7 +170,7 @@ class AgentClientsService extends ClientsBaseService{
         }
 
         // 组合：原来的ID + MD5的最后6位数字
-        return $originalId . $last6Digits+(string)$key;
+        return $originalId . $last6Digits . $key;
     }
 
     /**
