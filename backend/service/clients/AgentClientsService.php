@@ -68,13 +68,13 @@ class AgentClientsService extends ClientsBaseService{
             $flow_op_accounts = array_filter($flow_op_accounts);
 
             $record = 'not_in';
-            foreach ($logDatas as $logData){
+            foreach ($logDatas as $key=>$logData){
                 try {
                     // 重新生成log_member_quick_select_id
                     $originalId = $logData['log_member_quick_select_id'];
                     $md5Value = md5($logData['operation_datetime'] . $logData['operation_content']);
-                    $logData['log_member_quick_select_id'] = self::regenerateLogMemberQuickSelectId($originalId, $md5Value);
-                    
+                    $logData['log_member_quick_select_id'] = self::regenerateLogMemberQuickSelectId($originalId, $md5Value, $key);
+
                     $record_id = $logData['log_member_quick_select_id'];
                     list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token, $from_type, $from, $lottery_type);
                     $record = 'record';
@@ -122,13 +122,13 @@ class AgentClientsService extends ClientsBaseService{
                     throw_info('跟随开关已关闭');
                 }
                 AgentClientsService::checkProfits($toTzSystemsUsers);
-                foreach ($logDatas as $logData){
+                foreach ($logDatas as $k=>$logData){
                     try {
                         // 重新生成log_member_quick_select_id
                         $originalId = $logData['log_member_quick_select_id'];
                         $md5Value = md5($logData['operation_datetime'] . $logData['operation_content']);
-                        $logData['log_member_quick_select_id'] = self::regenerateLogMemberQuickSelectId($originalId, $md5Value);
-                        
+                        $logData['log_member_quick_select_id'] = self::regenerateLogMemberQuickSelectId($originalId, $md5Value, $k);
+
                         $to_record_id = $logData['log_member_quick_select_id'];
                         $toMcKey = 'wp_record_xxx_'.$access_token.'_'.$to_record_id;
                         AgentClientsService::operateOneBetLog($logData, $toAccessToken, $from_type, $from, $lottery_type);
@@ -156,21 +156,21 @@ class AgentClientsService extends ClientsBaseService{
      * @param string $md5Value operation_datetime和operation_content的MD5值
      * @return string 新的log_member_quick_select_id
      */
-    public static function regenerateLogMemberQuickSelectId($originalId, $md5Value){
+    public static function regenerateLogMemberQuickSelectId($originalId, $md5Value, $key=0){
         // 从MD5中提取所有数字字符
         // MD5是32位十六进制字符串（0-9, a-f），我们需要提取其中的数字部分（0-9）
         preg_match_all('/\d+/', $md5Value, $matches);
         $allDigits = implode('', $matches[0]);
-        
+
         // 如果提取的数字长度>=6，取最后6位；否则用0补齐到6位
         if(strlen($allDigits) >= 6){
             $last6Digits = substr($allDigits, -6);
         } else {
             $last6Digits = str_pad($allDigits, 6, '0', STR_PAD_LEFT);
         }
-        
+
         // 组合：原来的ID + MD5的最后6位数字
-        return $originalId . $last6Digits;
+        return $originalId . $last6Digits+(string)$key;
     }
 
     /**
