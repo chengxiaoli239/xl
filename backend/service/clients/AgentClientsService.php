@@ -73,7 +73,7 @@ class AgentClientsService extends ClientsBaseService{
                     // 重新生成log_member_quick_select_id
                     $originalId = $logData['log_member_quick_select_id'];
                     $md5Value = md5($logData['operation_datetime'] . $logData['operation_content']);
-                    $logData['log_member_quick_select_id'] = self::regenerateLogMemberQuickSelectId($originalId, $md5Value, $key);
+                    $logData['log_member_quick_select_id'] = self::regenerateLogMemberQuickSelectId($originalId, $md5Value);
 
                     $record_id = $logData['log_member_quick_select_id'];
                     list($code, $qihao) = AgentClientsService::operateOneBetLog($logData, $access_token, $from_type, $from, $lottery_type);
@@ -127,7 +127,7 @@ class AgentClientsService extends ClientsBaseService{
                         // 重新生成log_member_quick_select_id
                         $originalId = $logData['log_member_quick_select_id'];
                         $md5Value = md5($logData['operation_datetime'] . $logData['operation_content']);
-                        $logData['log_member_quick_select_id'] = self::regenerateLogMemberQuickSelectId($originalId, $md5Value, $k);
+                        $logData['log_member_quick_select_id'] = self::regenerateLogMemberQuickSelectId($originalId, $md5Value);
 
                         $to_record_id = $logData['log_member_quick_select_id'];
                         $toMcKey = 'wp_record_xxx_'.$access_token.'_'.$to_record_id;
@@ -156,7 +156,7 @@ class AgentClientsService extends ClientsBaseService{
      * @param string $md5Value operation_datetime和operation_content的MD5值
      * @return string 新的log_member_quick_select_id
      */
-    public static function regenerateLogMemberQuickSelectId($originalId, $md5Value, $key=0){
+    public static function regenerateLogMemberQuickSelectId($originalId, $md5Value){
         // 从MD5中提取所有数字字符
         // MD5是32位十六进制字符串（0-9, a-f），我们需要提取其中的数字部分（0-9）
         preg_match_all('/\d+/', $md5Value, $matches);
@@ -170,7 +170,7 @@ class AgentClientsService extends ClientsBaseService{
         }
 
         // 组合：原来的ID + MD5的最后6位数字
-        return $originalId . $last6Digits . $key;
+        return $originalId . $last6Digits;
     }
 
     /**
