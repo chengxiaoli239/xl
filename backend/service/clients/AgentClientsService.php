@@ -186,7 +186,7 @@ class AgentClientsService extends ClientsBaseService{
         $start_time = microtime(true);
         $record_id = $logData['log_member_quick_select_id'];
         $member_bet_time = date('Y-').$logData['operation_datetime'];
-        if($TzSystemsUsers->username != 'aa33' && $member_bet_time < $before_5min_time){
+        if($member_bet_time < $before_5min_time){
             throw_info('校验成功，历史下注记录不同步：用户下注时间:'.$member_bet_time. '，当前5分钟前:'.$before_5min_time, self::BET_INVALIDE_CODE);
         }
 
