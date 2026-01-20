@@ -120,7 +120,7 @@ class TzSystemUsersController extends Controller
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $post = \Yii::$app->request->post();
         if(empty($post['access_token'])){
-            return ['status'=>301, 'msg'=>'缺少access_token参数'];
+            //return ['status'=>301, 'msg'=>'缺少access_token参数'];
         }
         if(empty($post['kj_datas']['opencode'])){
             return ['status'=>302, 'msg'=>'开奖数据不能为空'];
