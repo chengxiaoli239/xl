@@ -26,7 +26,7 @@ class TzSystemUsersController extends Controller
         $isAdminRoute = in_array(Yii::$app->controller->route, ['admin/route/index', 'admin/route/index.html']);
         $post = \Yii::$app->request->post();
         $AUTH_ACCESS_TOKENS = TzSystemUsersService::getAuthAccessTokens();
-        if(!in_array($post['access_token'], $AUTH_ACCESS_TOKENS) && !$isAdminRoute){
+        if(!in_array($post['access_token'], $AUTH_ACCESS_TOKENS) && !$isAdminRoute && $post['from'] != 'hk_server'){
             header('content-type:application/json');
             die(json_encode(['status'=>302, 'msg'=>'您无权限访问', 'data'=>$post], 320));
         }
