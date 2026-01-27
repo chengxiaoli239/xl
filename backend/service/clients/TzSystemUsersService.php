@@ -526,6 +526,9 @@ class TzSystemUsersService extends ClientsBaseService{
         if($uid){
             $where = array_merge($where, [['=', 'uid', $uid]]);
         }
+        // todo 5分钟内的计划不重复推送
+        $where = array_merge($where, [['>=', 'created_at', time() - 300]]);
+
         if($direct){
             $where[] = ['=', 'bet_direct', $direct];
         }
