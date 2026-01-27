@@ -522,7 +522,7 @@ class TzSystemUsersService extends ClientsBaseService{
      */
     public static function getActivePlanTasksWhere($uid='', $current_qihao='', $direct=0, $lottery_type=DEFAULT_LOTTERY_TYPE){
         $RedisLock = new RedisLock();
-        $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1, 3]]]; # 可重推的状态0:未推送1异常可重复处理2推送成功3推送失败不可重推
+        $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1异常可重复处理2推送成功3推送失败不可重推
         if($uid){
             $where = array_merge($where, [['=', 'uid', $uid]]);
         }
