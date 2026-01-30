@@ -329,6 +329,10 @@ class TzSystemUsersService extends ClientsBaseService{
             $expect = $kjData['expect'] = trim($kjData['expect']);
             $kjData['opencode'] = trim($kjData['opencode']);
             $kjData['opentime'] = $kjData['opentime'] ? : $now_time;
+            # $kjData['kj_data'] 后面三位数，也就是每天的期号为 097 就不处理
+            if(substr($kjData['expect'], -3) == '097'){
+                return ['status'=>200, 'data'=>$data, 'msg'=>'数据同步成功'];
+            }
             if(empty($kjData['expect'])){
                 throw_info('开奖数据期号不能为空');
             }
