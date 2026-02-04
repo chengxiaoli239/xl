@@ -839,8 +839,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
             $qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
-            //$counts = (int)($BettingRecords->betting_money/$BettingRecords->single);
-            $post_data = [ 'ids'=>"{".$snid."}|".($BettingRecords->betting_money/$BettingRecords->single), 'period_no' => $qihao];
+            $counts = (int)round($BettingRecords->betting_money / $BettingRecords->single, 0);
+            $post_data = [ 'ids'=>"{".$snid."}|".$counts, 'period_no' => $qihao];
 
             $_t = round(microtime(true) * 1000);
             $headers = [
