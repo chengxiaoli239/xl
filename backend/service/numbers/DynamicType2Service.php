@@ -2521,4 +2521,95 @@ class DynamicType2Service extends BaseService {
         
         return $validCodes;
     }
+
+    /**
+     * 两数分离：指定两个数字不能同时上奖
+     * x:1 和值两数分离—上期和值的两位不能同时上奖（如5916和值21，则2、1不能同时上奖）
+     * x:2 期号尾号最后两位不能同时上奖（如20260203123，则2、3不能同时上奖）
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     */
+    public static function filter42(object $plan, $dynamic = [], $filterDesc = []): array
+    {
+        $lottery_type = $plan->lottery_type;
+        $playway = $plan->playway;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+
+        $params = $dynamic['params'];
+        $x = (string)($params['x'] ?? '');
+        if ($x === '') {
+            throw_info('两数分离参数x不能为空，x:1 和值两数分离，x:2 期号尾号最后两位');
+        }
+
+        $d1 = null;
+        $d2 = null;
+        $sourceDesc = '';
+
+        if ($x === '1') {
+            // 和值两数分离：上期开奖和值的十位、个位不能同时上奖
+            $targetQiHao = QihaoService::getLastQiHao($lottery_type, $nextQiHao, 1);
+            if (empty($targetQiHao)) {
+                throw_info('无法获取上期开奖数据');
+            }
+            $targetKjData = NumCodeService::getKjData($targetQiHao, $lottery_type);
+            if (empty($targetKjData) || !isset($targetKjData['codes_hz'])) {
+                throw_info('上期开奖和值数据不存在');
+            }
+            $sum = (int)$targetKjData['codes_hz'];
+            $d1 = (string)((int)floor($sum / 10) % 10);
+            $d2 = (string)($sum % 10);
+            $sourceDesc = "上期和值{$sum}，两数{$d1}、{$d2}不能同时上奖";
+        } elseif ($x === '2') {
+            // 期号尾号最后两位不能同时上奖
+            $tail2 = substr($nextQiHao, -2);
+            if (strlen($tail2) < 2) {
+                throw_info('期号长度不足，无法取最后两位');
+            }
+            $d1 = $tail2[0];
+            $d2 = $tail2[1];
+            $sourceDesc = "期号{$nextQiHao}最后两位{$d1}、{$d2}不能同时上奖";
+        } else {
+            throw_info('两数分离参数x只能为1或2，x:1 和值两数分离，x:2 期号尾号最后两位');
+        }
+
+        if ($d1 === $d2) {
+            // 两数相同：“同时上奖”视为该数出现至少两次，排除该数出现>=2次的号码
+            $countExpr = "((code_1=:d1)+(code_2=:d1)+(code_3=:d1)+(code_4=:d1))";
+            $excludeQuery = (new \yii\db\Query())
+                ->select(['code'])
+                ->from('lt_num4_type')
+                ->where(['code_type' => $playway + 1])
+                ->andWhere(['>=', new \yii\db\Expression($countExpr), 2])
+                ->addParams([':d1' => $d1]);
+            $excludeCodes = $excludeQuery->column();
+        } else {
+            // 排除：四个位置中既出现 d1 又出现 d2 的号码
+            $excludeQuery = (new \yii\db\Query())
+                ->select(['code'])
+                ->from('lt_num4_type')
+                ->where(['code_type' => $playway + 1])
+                ->andWhere(['or', ['code_1' => $d1], ['code_2' => $d1], ['code_3' => $d1], ['code_4' => $d1]])
+                ->andWhere(['or', ['code_1' => $d2], ['code_2' => $d2], ['code_3' => $d2], ['code_4' => $d2]]);
+            $excludeCodes = $excludeQuery->column();
+        }
+
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => $playway + 1]);
+
+        if (!empty($excludeCodes)) {
+            $query->andWhere(['not in', 'code', $excludeCodes]);
+        }
+
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+
+        $betDesc = ($filterDesc['label'] ?? '两数分离') . "[x:{$x}]：" . $sourceDesc;
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+
+        return $codes;
+    }
 }

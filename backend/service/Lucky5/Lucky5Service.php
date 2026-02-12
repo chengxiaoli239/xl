@@ -839,8 +839,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
             $qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
-            //$counts = (int)($BettingRecords->betting_money/$BettingRecords->single);
-            $post_data = [ 'ids'=>"{".$snid."}|".($BettingRecords->betting_money/$BettingRecords->single), 'period_no' => $qihao];
+            $counts = (int)round($BettingRecords->betting_money / $BettingRecords->single, 0);
+            $post_data = [ 'ids'=>"{".$snid."}|".$counts, 'period_no' => $qihao];
 
             $_t = round(microtime(true) * 1000);
             $headers = [
@@ -2115,7 +2115,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $count = count($codesArr);
         //p(['codesArr'=>$codesArr,'count'=>$count, 'codeHz'=>Json::decode($plan->hz_Arr)], 0);
         $hzArr = Json::decode($plan->hz_Arr);
-        
+
         # 获取倍数倍数（bet_op_to_wp_singles）
         $opWpSingles = isset($hzArr['bet_op_to_wp_singles']) ? explode('-', $hzArr['bet_op_to_wp_singles']) : [];
         if(empty($opWpSingles[0])){
@@ -2123,7 +2123,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }else{
             $opWpSingle = floatval($opWpSingles[0]);
         }
-        
+
         if($hzArr['bet_op_to_wp'] == UserSysPlans::BET_DIRECT_F){
             # 反向打盘口
             $query = Num4Type::find()->where(['NOT IN', 'code_n', $codesArr])->select('code_n');
@@ -2146,13 +2146,13 @@ class Lucky5Service { # 重庆7时彩登陆体系
             }
             $codesArr = $query->column();
         }
-        
+
         # 应用倍数倍数：原始倍数 * 倍数倍数 = 理论倍数
         $opSingle = $single * $opWpSingle;
-        
+
         # 向上取整到0.1（乘以10向上取整再除以10），因为盘口最低是1毛，没有具体到分
         $bet_single = ceil($opSingle * 10) / 10;
-        
+
         # 根据玩法设置最小值
         if(in_array($playway, [2, 3]) && $bet_single<0.1){
             $bet_single = 0.1;
@@ -2164,7 +2164,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 $bet_single = (int)$bet_single;
             }
         }
-        
+
         $single = $bet_single;
         //p(['count1'=>$count, 'count2'=>count($codesArr)]);
 
@@ -2209,6 +2209,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
                 }else{
                     $is_xian = in_array($tz_type, \Yii::$app->params['IS_XIAN']) ? 1 : 0;
+                    // todo 防止盘口提示短时间重复注单，随机打乱
+                    shuffle($tmpcodesArr);
                     $bet_codes = implode(',', $tmpcodesArr);
                     $post_data = [
                         'bet_number'=>$bet_codes,

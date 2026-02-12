@@ -3364,7 +3364,7 @@ $sql .= '
         $data2 = array_combine($keys2, $vals2); # 每个周期开奖期数
         //p([$static_type, $qs, $data2]);
 
-        $counts = count($codes);
+        $counts = (int)count($codes);  # 组数保证为整数
         $profits = [];
         foreach ($data2 as $timer=>$qishu_per_section){
             # 利润 = 中奖金额(中奖次数*赔率) - 投注金额(号码注数*投注金额*每个周期期数)

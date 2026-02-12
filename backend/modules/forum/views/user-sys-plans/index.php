@@ -287,7 +287,7 @@ $columns = array_merge(
                     $url1 = "/forum/user-sys-plans/re-calculate-profits?id=".$model->id; # 重新计算盈利
                     $txt .= ' | '.Html::a('重算盈利', $url1, ['title' => '重算盈利'.$model->id,'alt'=>$model->id]);
                 }
-
+                $txt .= ' | '.Html::a('每期盈利', ['period-profits', 'id' => $model->id], ['title' => '查看计划每期盈利记录', 'target' => '_blank']);
                 return $txt;
             }
         ],

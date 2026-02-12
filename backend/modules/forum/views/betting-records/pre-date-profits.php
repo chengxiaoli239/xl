@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         ['attribute' => 'tz_num', 'label'=>'投注期数',# 'headerOptions'=>['width'=>'5%'],
                             'value' => function($model) {
-                                return $model->tz_num;
+                                return (int)round((float)$model->tz_num, 0);
                             }
                         ],
                         ['attribute' => 'tz_money', 'label'=>'投注金额',# 'headerOptions'=>['width'=>'5%'],

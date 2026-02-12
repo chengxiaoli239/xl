@@ -329,6 +329,10 @@ class TzSystemUsersService extends ClientsBaseService{
             $expect = $kjData['expect'] = trim($kjData['expect']);
             $kjData['opencode'] = trim($kjData['opencode']);
             $kjData['opentime'] = $kjData['opentime'] ? : $now_time;
+            # $kjData['kj_data'] 后面三位数，也就是每天的期号为 097 就不处理
+            if(substr($kjData['expect'], -3) == '097'){
+                return ['status'=>200, 'data'=>$data, 'msg'=>'数据同步成功'];
+            }
             if(empty($kjData['expect'])){
                 throw_info('开奖数据期号不能为空');
             }
@@ -526,6 +530,9 @@ class TzSystemUsersService extends ClientsBaseService{
         if($uid){
             $where = array_merge($where, [['=', 'uid', $uid]]);
         }
+        // todo 5分钟内的计划不重复推送
+        $where = array_merge($where, [['>=', 'created_at', time() - 300]]);
+
         if($direct){
             $where[] = ['=', 'bet_direct', $direct];
         }
@@ -580,7 +587,7 @@ class TzSystemUsersService extends ClientsBaseService{
 
             $where = TzSystemUsersService::getActivePlanTasksWhere($uid, $current_qihao, $direct, $lottery_type);
             $BetErrorPlansTasksQuery = BetErrorPlansTask::find()->where($where);
-            $BetErrorPlansTasks = $BetErrorPlansTasksQuery->orderBy(['bet_money'=>SORT_DESC, 'id'=>SORT_DESC])->limit(20)->all();
+            $BetErrorPlansTasks = $BetErrorPlansTasksQuery->orderBy(['bet_money'=>SORT_DESC, 'id'=>SORT_DESC])->limit(1)->all();
             /*
             $sql = $BetErrorPlansTasksQuery->createCommand()->getRawSql();
             $log = ['uid'=>$uid, 'current_qihao'=>$current_qihao, 'count'=>count($BetErrorPlansTasks),'sql'=>$sql];

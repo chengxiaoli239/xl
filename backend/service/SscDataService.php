@@ -13,6 +13,7 @@ use backend\models\DataDealStatus;
 use backend\models\ImportPlanCodes;
 use backend\models\LotteryDataDealStatus;
 use backend\models\Num4Type;
+use backend\models\PlanPeriodProfits;
 use backend\models\PlanStaticProfits;
 use backend\models\searchs\SscDwsHzNums;
 use backend\models\Ssc3numYl;
@@ -2026,6 +2027,43 @@ class SscDataService extends BaseService {
     }
 
     /**
+     * 获取计划某期的一条投注记录并解析：投注金额（单条）、组数（号码个数如1234 3452=2组）、倍数
+     * 每计划每期一条记录，故不 sum，直接取该条。
+     * @param \backend\models\UserSysPlans $UserSysPlan
+     * @param array $andWhere 如 ['=', 'qihao', $qihao]
+     * @return array ['bet_amount'=>0, 'group_count'=>0, 'multiple'=>0]
+     */
+    public static function getPlanPeriodBetStats($UserSysPlan, $andWhere = [])
+    {
+        $where = ['AND', ['=', 'plan_id', $UserSysPlan->id], ['=', 'is_profits_record', 1],
+            ['OR', ['=', 'is_simulate', 0], ['AND', ['=', 'is_simulate', 1], ['=', 'sn', BetService::$test_true_sn]]]];
+        if (!empty($andWhere)) {
+            $where[] = $andWhere;
+        }
+        $record = BettingRecords::find()->where($where)->limit(1)->one();
+        if (!$record) {
+            return ['bet_amount' => 0, 'group_count' => 0, 'multiple' => 0];
+        }
+        $bet_amount = (float) $record->betting_money;
+        $multiple = (float) $record->single;
+        $codes = trim((string) $record->codes);
+        if ($codes === '') {
+            $group_count = 0;
+        } else {
+            if (strpos($codes, '@') !== false) {
+                $group_count = count(array_filter(explode('@', $codes)));
+            } else {
+                $group_count = count(array_filter(preg_split('/\s+/', $codes)));
+            }
+        }
+        return [
+            'bet_amount' => round($bet_amount, 2),
+            'group_count' => $group_count,
+            'multiple' => round($multiple, 2),
+        ];
+    }
+
+    /**
      * @desc 获取一个计划当前的利润
      * @param $UserSysPlan
      * @param array $andWhere
@@ -2161,6 +2199,29 @@ class SscDataService extends BaseService {
 
                         $profits = PlanStaticProfits::find()->select(['cut_profits'])->where(['plan_id'=>$UserSysPlan->id])->scalar();
                         $transaction->commit();
+
+                        // 每期盈利记录表（独立 try-catch，不影响下注与盈利主流程，上线稳定后可去掉 try-catch）
+                        try {
+                            $periodStats = SscDataService::getPlanPeriodBetStats($UserSysPlan, ['=', 'qihao', $current_kj_qihao]);
+                            PlanPeriodProfits::addRecord(
+                                $UserSysPlan->id,
+                                $current_kj_qihao,
+                                $beforeProfits,
+                                $currentQiProfits,
+                                $profits,
+                                $UserSysPlan->uid,
+                                $lottery_type,
+                                $periodStats['bet_amount'],
+                                $periodStats['group_count'],
+                                $periodStats['multiple']
+                            );
+                        } catch (\Exception $periodLogEx) {
+                            Tool_Common::log('/data/'.__FUNCTION__, 'ERR', '计划每期盈利记录写入失败（不影响主流程）', [
+                                'plan_id' => $UserSysPlan->id,
+                                'qihao' => $current_kj_qihao,
+                                'err_msg' => $periodLogEx->getMessage(),
+                            ]);
+                        }
                     }catch (\Exception $e){
                         $profits = SscDataService::getPlanProfits($UserSysPlan);
                         $transaction->rollBack();
