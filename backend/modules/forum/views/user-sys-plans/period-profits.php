@@ -26,29 +26,23 @@ $currentProfits = isset($currentProfits) ? (float) $currentProfits : 0.00;
             </p>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
-                'tableOptions' => ['class' => 'table table-striped table-bordered'],
+                'tableOptions' => ['class' => 'table table-striped table-bordered', 'style' => 'table-layout:fixed;'],
                 'columns' => [
-                    ['class' => 'yii\grid\SerialColumn', 'header' => '序号'],
-                    ['attribute' => 'qihao', 'label' => '期号', 'headerOptions' => ['width' => '120']],
-                    ['attribute' => 'profit_before', 'label' => '开奖前盈利', 'format' => ['decimal', 2], 'headerOptions' => ['width' => '100'],
-                        'contentOptions' => function ($model) {
-                            return ['style' => 'color:' . ($model->profit_before >= 0 ? '#0a0' : 'red')];
-                        }
-                    ],
-                    ['attribute' => 'profit_change', 'label' => '本期盈亏', 'format' => ['decimal', 2], 'headerOptions' => ['width' => '100'],
-                        'contentOptions' => function ($model) {
-                            return ['style' => 'color:' . ($model->profit_change >= 0 ? '#0a0' : 'red')];
-                        }
-                    ],
-                    ['attribute' => 'profit_after', 'label' => '开奖后盈利', 'format' => ['decimal', 2], 'headerOptions' => ['width' => '100'],
-                        'contentOptions' => function ($model) {
-                            return ['style' => 'color:' . ($model->profit_after >= 0 ? '#0a0' : 'red')];
-                        }
-                    ],
-                    ['attribute' => 'period_bet_amount', 'label' => '投注金额', 'format' => ['decimal', 2], 'headerOptions' => ['width' => '90']],
-                    ['attribute' => 'period_group_count', 'label' => '组数', 'headerOptions' => ['width' => '70']],
-                    ['attribute' => 'period_multiple', 'label' => '倍数', 'format' => ['decimal', 2], 'headerOptions' => ['width' => '70']],
-                    ['attribute' => 'created_at', 'label' => '记录时间', 'format' => ['date', 'php:Y-m-d H:i:s'], 'headerOptions' => ['width' => '150']],
+                    ['class' => 'yii\grid\SerialColumn', 'header' => '序号', 'headerOptions' => ['style' => 'width:52px;'], 'contentOptions' => ['style' => 'width:52px;']],
+                    ['attribute' => 'qihao', 'label' => '期号', 'headerOptions' => ['style' => 'width:110px;'], 'contentOptions' => ['style' => 'width:110px;']],
+                    ['attribute' => 'profit_before', 'label' => '开奖前盈利', 'format' => ['decimal', 2], 'headerOptions' => ['style' => 'width:95px;'], 'contentOptions' => function ($model) {
+                        return ['style' => 'width:95px; color:' . ($model->profit_before >= 0 ? '#0a0' : 'red')];
+                    }],
+                    ['attribute' => 'profit_change', 'label' => '本期盈亏', 'format' => ['decimal', 2], 'headerOptions' => ['style' => 'width:95px;'], 'contentOptions' => function ($model) {
+                        return ['style' => 'width:95px; color:' . ($model->profit_change >= 0 ? '#0a0' : 'red')];
+                    }],
+                    ['attribute' => 'profit_after', 'label' => '开奖后盈利', 'format' => ['decimal', 2], 'headerOptions' => ['style' => 'width:95px;'], 'contentOptions' => function ($model) {
+                        return ['style' => 'width:95px; color:' . ($model->profit_after >= 0 ? '#0a0' : 'red')];
+                    }],
+                    ['attribute' => 'period_bet_amount', 'label' => '投注金额', 'format' => ['decimal', 2], 'headerOptions' => ['style' => 'width:85px;'], 'contentOptions' => ['style' => 'width:85px;']],
+                    ['attribute' => 'period_group_count', 'label' => '组数', 'headerOptions' => ['style' => 'width:58px;'], 'contentOptions' => ['style' => 'width:58px;']],
+                    ['attribute' => 'period_multiple', 'label' => '倍数', 'format' => ['decimal', 2], 'headerOptions' => ['style' => 'width:58px;'], 'contentOptions' => ['style' => 'width:58px;']],
+                    ['attribute' => 'created_at', 'label' => '记录时间', 'format' => ['date', 'php:Y-m-d H:i:s'], 'headerOptions' => ['style' => 'width:155px;'], 'contentOptions' => ['style' => 'width:155px;']],
                 ],
                 'layout' => "{items}\n<div class='text-right'>{pager}</div>",
                 'pager' => [

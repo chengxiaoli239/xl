@@ -3,6 +3,7 @@
 namespace backend\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * 计划每期盈利记录表（每期开奖后一条）
@@ -28,6 +29,20 @@ class PlanPeriodProfits extends \common\models\base\BaseModel
     public static function tableName()
     {
         return '{{%plan_period_profits}}';
+    }
+
+    /**
+     * 仅自动维护 created_at，表无 updated_at 字段
+     */
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'createdAtAttribute' => 'created_at',
+                'updatedAtAttribute' => false,
+            ],
+        ];
     }
 
     /**
