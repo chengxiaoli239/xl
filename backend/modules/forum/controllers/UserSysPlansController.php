@@ -3,6 +3,7 @@
 namespace backend\modules\forum\controllers;
 
 use backend\models\ImportPlanCodes;
+use backend\models\PlanPeriodProfits;
 use backend\models\PlanStaticProfits;
 use backend\models\TzSystemsAuth;
 use backend\models\TzSystemsUsers;
@@ -29,6 +30,7 @@ use yii\helpers\Json;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
+use yii\data\ActiveDataProvider;
 
 /**
  * UserSysPlansController implements the CRUD actions for UserSysPlans model.
@@ -785,6 +787,37 @@ class UserSysPlansController extends BaseController
         }
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+    }
+
+    /**
+     * 计划每期盈利记录（分页）
+     * @param string $id 计划id
+     * @return string
+     */
+    public function actionPeriodProfits($id)
+    {
+        $plan = $this->findModel($id, \Yii::$app->user->id);
+        $query = PlanPeriodProfits::find()
+            ->where(['plan_id' => $plan->id])
+            ->orderBy(['id' => SORT_DESC]);
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => 20,
+                'pageParam' => 'page',
+                'pageSizeParam' => 'per-page',
+            ],
+        ]);
+        $currentProfits = PlanStaticProfits::find()
+            ->select(['cut_profits'])
+            ->where(['plan_id' => $plan->id])
+            ->scalar();
+        $currentProfits = $currentProfits !== null && $currentProfits !== '' ? (float) $currentProfits : 0.00;
+        return $this->render('period-profits', [
+            'plan' => $plan,
+            'dataProvider' => $dataProvider,
+            'currentProfits' => $currentProfits,
+        ]);
     }
 
     public function actionCreateFromSuggestion()
