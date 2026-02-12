@@ -82,6 +82,8 @@ class IndexController extends Controller
      */
     public function actionDw(): array
     {
+        p(base64_encode('basw2'));
+        p(json_decode('{"detail":"\u9274\u6743\u5931\u8d25","success":false}'));
         //$logData = Json::decode('{"log_member_quick_select_id":"54445270","member_id":8234,"account":"Yyng3690","nickname":"","fix_num":"30","bet_count":1,"bet_money":0,"operation_content":"[四定位]，定位置“[取]”：千=[3]，百=[0]，十=[9]，个=[5]","operation_datetime":"01-14 03:00:52","time_value":"","operation_ip":"112.120.*.*","ip_value":"112.120.*.*","operation_ip_extension":"112.120.*.*","is_package":"0","log_type":"102"},{"log_member_quick_select_id":"54445270","member_id":8234,"account":"Yyng3690","nickname":"","fix_num":"30","bet_count":1,"bet_money":0,"operation_content":"[四定位]，定位置“[取]”：千=[2]，百=[3]，十=[4]，个=[1]","operation_datetime":"01-14 03:00:30","time_value":"","operation_ip":"112.120.*.*","ip_value":"112.120.*.*","operation_ip_extension":"112.120.*.*","is_package":"0","log_type":"102"},{"log_member_quick_select_id":"54445270","member_id":8234,"account":"Yyng3690","nickname":"","fix_num":"30","bet_count":2,"bet_money":0,"operation_content":"[四定位]，定位置“[取]”：千=[23]，百=[4]，十=[6]，个=[1]","operation_datetime":"01-14 02:57:25","time_value":"","operation_ip":"112.120.*.*","ip_value":"112.120.*.*","operation_ip_extension":"112.120.*.*","is_package":"0","log_type":"102"}');
         $logDatas = Json::decode('{
     "Status": "1",
