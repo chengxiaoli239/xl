@@ -15,6 +15,7 @@ use backend\service\StaticService;
 use backend\service\TzService;
 use backend\service\UserService;
 use backend\service\UserSysPlansService;
+use backend\service\PlanProfitStatGroupService;
 use common\service\CommonService;
 use common\service\jobs\plan\UserPlanBetJob;
 use common\service\jobs\user\UserExpireTimeOperateJob;
@@ -47,6 +48,10 @@ class UserSysPlansController extends BaseController
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST', 'GET'],
+                    'create-profit-stat-group' => ['POST'],
+                    'delete-profit-stat-group' => ['POST'],
+                    'assign-profit-stat-group' => ['POST'],
+                    'remove-plan-profit-stat-group' => ['POST'],
                 ],
             ],
         ];
@@ -112,6 +117,53 @@ class UserSysPlansController extends BaseController
         }
 
         //$view = $this->_user_id !== 1 ? 'index' : 'index_admin';
+        $statOwnerUid = PlanProfitStatGroupService::resolveStatOwnerUid($this->_user_id, $searchModel->account ?: null);
+        $profitStatGroupsUi = [];
+        $statGroupOptions = [];
+        $currentIdsNorm = '';
+        if (!empty($queryParams['UserSysPlans']['ids'])) {
+            $currentIdsNorm = PlanProfitStatGroupService::normalizeIdsString($queryParams['UserSysPlans']['ids']);
+        }
+        if ($statOwnerUid !== null) {
+            foreach (PlanProfitStatGroupService::getGroups($statOwnerUid, $lottery_type) as $g) {
+                $pids = PlanProfitStatGroupService::getGroupPlanIds($g->id);
+                $idsNorm = PlanProfitStatGroupService::normalizeIdsString(implode(',', $pids));
+                $statGroupOptions[$g->id] = $g->name . ' (' . count($pids) . '/' . PlanProfitStatGroupService::MAX_PLANS_PER_GROUP . ')';
+                $profitStatGroupsUi[] = [
+                    'id' => $g->id,
+                    'name' => $g->name,
+                    'plan_count' => count($pids),
+                    'total_profit' => PlanProfitStatGroupService::sumCutProfitsForPlans($pids),
+                    'ids_normalized' => $idsNorm,
+                    'filter_active' => $currentIdsNorm !== '' && $currentIdsNorm === $idsNorm,
+                ];
+            }
+        }
+        $planGroupUiByPlanId = [];
+        if ($statOwnerUid !== null && $dataProvider->models) {
+            $planIdsPage = [];
+            foreach ($dataProvider->models as $m) {
+                $planIdsPage[] = (int) $m->id;
+            }
+            $pgMap = PlanProfitStatGroupService::getPlanGroupMap($statOwnerUid, $lottery_type, $planIdsPage);
+            $groupIdsNorm = [];
+            foreach ($profitStatGroupsUi as $row) {
+                $groupIdsNorm[$row['id']] = $row['ids_normalized'];
+            }
+            foreach ($pgMap as $pid => $info) {
+                $gid = $info['id'];
+                $planGroupUiByPlanId[$pid] = [
+                    'name' => $info['name'],
+                    'group_id' => $gid,
+                    'ids_normalized' => $groupIdsNorm[$gid] ?? '',
+                ];
+            }
+        }
+        $statIndexBase = ['/forum/user-sys-plans/index', 'UserSysPlans[lottery_type]' => $lottery_type];
+        if ($searchModel->account !== null && $searchModel->account !== '') {
+            $statIndexBase['UserSysPlans[account]'] = $searchModel->account;
+        }
+
         $data = [
             'lottery_types' => $lottery_types,
             'lottery_type' => $lottery_type,
@@ -121,6 +173,12 @@ class UserSysPlansController extends BaseController
             'all_profits' => $totalProfits, // Pass total profits to view
             'ids' => $queryParams['UserSysPlans']['ids']??'',
             'tipTxt' => $tipTxt,
+            'statOwnerUid' => $statOwnerUid,
+            'profitStatGroupsUi' => $profitStatGroupsUi,
+            'statGroupOptions' => $statGroupOptions,
+            'statIndexBase' => $statIndexBase,
+            'planGroupUiByPlanId' => $planGroupUiByPlanId,
+            'currentIdsNorm' => $currentIdsNorm,
         ];
 
         return $this->render('index', $data);
@@ -847,6 +905,79 @@ class UserSysPlansController extends BaseController
                 'status' => 500,
                 'message' => $e->getMessage()
             ];
+        }
+    }
+
+    public function actionCreateProfitStatGroup()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        try {
+            $account = Yii::$app->request->post('account');
+            $owner = PlanProfitStatGroupService::resolveStatOwnerUid($this->_user_id, $account ?: null);
+            if ($owner === null) {
+                return ['status' => 400, 'message' => '请先选择账号后再创建分组（管理员）'];
+            }
+            $lotteryType = (int) Yii::$app->request->post('lottery_type');
+            $name = (string) Yii::$app->request->post('name', '');
+            PlanProfitStatGroupService::createGroup($owner, $lotteryType, $name);
+            return ['status' => 200, 'message' => '已创建分组'];
+        } catch (\Throwable $e) {
+            return ['status' => 400, 'message' => $e->getMessage()];
+        }
+    }
+
+    public function actionDeleteProfitStatGroup()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        try {
+            $account = Yii::$app->request->post('account');
+            $owner = PlanProfitStatGroupService::resolveStatOwnerUid($this->_user_id, $account ?: null);
+            if ($owner === null) {
+                return ['status' => 400, 'message' => '请先选择账号'];
+            }
+            $id = (int) Yii::$app->request->post('id');
+            PlanProfitStatGroupService::deleteGroup($id, $owner);
+            return ['status' => 200, 'message' => '已删除分组'];
+        } catch (\Throwable $e) {
+            return ['status' => 400, 'message' => $e->getMessage()];
+        }
+    }
+
+    public function actionAssignProfitStatGroup()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        try {
+            $account = Yii::$app->request->post('account');
+            $owner = PlanProfitStatGroupService::resolveStatOwnerUid($this->_user_id, $account ?: null);
+            if ($owner === null) {
+                return ['status' => 400, 'message' => '请先选择账号后再操作（管理员）'];
+            }
+            $groupId = (int) Yii::$app->request->post('group_id');
+            $ids = Yii::$app->request->post('plan_ids', []);
+            if (!is_array($ids)) {
+                $ids = [];
+            }
+            PlanProfitStatGroupService::assignPlansToGroup($groupId, $owner, $ids);
+            return ['status' => 200, 'message' => '已加入分组'];
+        } catch (\Throwable $e) {
+            return ['status' => 400, 'message' => $e->getMessage()];
+        }
+    }
+
+    public function actionRemovePlanProfitStatGroup()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        try {
+            $account = Yii::$app->request->post('account');
+            $owner = PlanProfitStatGroupService::resolveStatOwnerUid($this->_user_id, $account ?: null);
+            if ($owner === null) {
+                return ['status' => 400, 'message' => '请先选择账号'];
+            }
+            $planId = (int) Yii::$app->request->post('plan_id');
+            PlanProfitStatGroupService::removePlanFromGroup($planId, $owner);
+            return ['status' => 200, 'message' => '已移出分组'];
+        } catch (\Throwable $e) {
+            return ['status' => 400, 'message' => $e->getMessage()];
         }
     }
 }

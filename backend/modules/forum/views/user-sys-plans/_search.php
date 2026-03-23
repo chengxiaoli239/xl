@@ -9,6 +9,8 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 $userId = \Yii::$app->user->id;
 $userNameList = \common\models\AdminModel::find()->select(['username'])->where('id>1 and user_type=1')->indexBy('username')->column();
+$ids = $ids ?? '';
+$lottery_type = $lottery_type ?? $model->lottery_type;
 ?>
 
 <div class="user-sys-plans-search">
@@ -16,6 +18,7 @@ $userNameList = \common\models\AdminModel::find()->select(['username'])->where('
         'action' => ['index'],
         'method' => 'get',
     ]); ?>
+    <?= Html::activeHiddenInput($model, 'lottery_type', ['value' => $lottery_type]) ?>
     <div class="row">
         <div class="col-lg-2 col-xs-6">
             <?= $form->field($model, 'ids')->textInput(['placeholder' => '请输入ID', 'value'=>$ids])->label('计划ID'); ?>

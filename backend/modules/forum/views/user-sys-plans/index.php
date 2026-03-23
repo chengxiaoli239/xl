@@ -167,8 +167,10 @@
 use backend\models\PlanStaticProfits;
 use backend\service\SscDataService;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\grid\GridView;
 use yii\helpers\BaseStringHelper;
+use backend\service\PlanProfitStatGroupService;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\searchs\UserSysPlans */
@@ -188,6 +190,27 @@ $columns = array_merge(
                 $url = '/forum/betting-records/index?BettingRecords[plan_id]='.$model->id;
                 $remark = '<br>'.Html::a($model->remark?'[备:'.$model->remark.']':'[备注]', 'javascript:;', ['class'=>'set_remark_pop', 'id'=>'remark_plan_id_'.$model->id, 'data-id'=>$model->id, 'data-remark'=>$model->remark]);
                 return $playWayArr[$model->playway].'['.Html::a($model->id, $url).']'.$remark;
+            }
+        ],
+        ['label' => '利润统计分组', 'headerOptions'=>['width'=>'8%'], 'format'=>'raw',
+            'value' => function($model) use ($planGroupUiByPlanId, $statIndexBase, $currentIdsNorm, $statOwnerUid) {
+                if ($statOwnerUid === null) {
+                    return '';
+                }
+                $info = $planGroupUiByPlanId[$model->id] ?? null;
+                if (!$info) {
+                    return Html::tag('span', '—', ['class'=>'text-muted']);
+                }
+                $active = $currentIdsNorm !== '' && $currentIdsNorm === $info['ids_normalized'];
+                $urlParams = $statIndexBase;
+                if (!$active && $info['ids_normalized'] !== '') {
+                    $urlParams['UserSysPlans[ids]'] = $info['ids_normalized'];
+                }
+                $u = Url::to($urlParams);
+                $link = Html::a(Html::encode($info['name']), $u, [
+                    'title' => $active ? '再次点击取消分组筛选' : '按该分组内计划在列表中筛选',
+                ]);
+                return $link . ' <a href="javascript:;" class="profit-stat-remove-plan text-danger" data-plan-id="' . (int)$model->id . '" title="移出分组">×</a>';
             }
         ],
 
@@ -389,7 +412,54 @@ $columns = array_merge(
                     <?endforeach;?>
                 </div>
 
-                <?php echo $this->render('_search', ['model' => $searchModel]); ?>
+                <?php echo $this->render('_search', ['model' => $searchModel, 'ids' => $ids, 'lottery_type' => $lottery_type]); ?>
+                <?php
+                $userId = \Yii::$app->user->id;
+                $canUseProfitStatGroups = ($statOwnerUid !== null);
+                ?>
+                <?php if ($canUseProfitStatGroups): ?>
+                <div class="panel panel-default" style="margin-bottom:15px;">
+                    <div class="panel-heading" style="padding:8px 12px;">利润统计分组（每组最多 <?= PlanProfitStatGroupService::MAX_PLANS_PER_GROUP ?> 个计划，分组盈利为组内计划「当前盈利」合计）</div>
+                    <div class="panel-body" style="padding:10px 12px;">
+                        <div class="row" style="margin-bottom:8px;">
+                            <div class="col-sm-8">
+                                <?php foreach ($profitStatGroupsUi as $g):
+                                    $urlParams = $statIndexBase;
+                                    if (!$g['filter_active'] && $g['ids_normalized'] !== '') {
+                                        $urlParams['UserSysPlans[ids]'] = $g['ids_normalized'];
+                                    }
+                                    $u = Url::to($urlParams);
+                                    $cls = $g['filter_active'] ? 'btn-success' : 'btn-default';
+                                    ?>
+                                    <span style="display:inline-block;margin:0 10px 8px 0;white-space:nowrap;">
+                                        <a href="<?= Html::encode($u) ?>" class="btn btn-xs <?= $cls ?>" title="<?= $g['filter_active'] ? '再次点击取消分组筛选' : '点击按分组内计划筛选列表（与计划ID搜索一致）' ?>">
+                                            <?= Html::encode($g['name']) ?>
+                                            <span style="opacity:.85;">(<?= (int)$g['plan_count'] ?>)</span>
+                                            盈利 <?= number_format($g['total_profit'], 2) ?>
+                                        </a>
+                                        <button type="button" class="btn btn-xs btn-link text-danger profit-stat-delete-group" data-id="<?= (int)$g['id'] ?>">删除</button>
+                                    </span>
+                                <?php endforeach; ?>
+                                <?php if (empty($profitStatGroupsUi)): ?>
+                                    <span class="text-muted">暂无分组，右侧可新建</span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="col-sm-4 text-right">
+                                <div class="input-group input-group-sm" style="max-width:340px;float:right;">
+                                    <input type="text" class="form-control" id="profitStatNewName" placeholder="新分组名称">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-primary" type="button" id="profitStatCreateBtn">新建分组</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <?= Html::hiddenInput('profit_stat_lottery_type', (string)$lottery_type, ['id'=>'profitStatLotteryType']) ?>
+                        <?= Html::hiddenInput('profit_stat_account', (string)($searchModel->account ?? ''), ['id'=>'profitStatAccount']) ?>
+                    </div>
+                </div>
+                <?php elseif ($userId == 1): ?>
+                <div class="alert alert-warning" style="margin-bottom:15px;padding:8px 12px;">利润统计分组：请先在上方搜索条件中选择<b>账号名称</b>并搜索后，再使用分组功能。</div>
+                <?php endif; ?>
                 <div class="operation-row" style="margin-bottom: 15px;">
                     <div class="btn-group">
                         <?= Html::button("批量关闭", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchClose']) ?> &nbsp;
@@ -400,6 +470,10 @@ $columns = array_merge(
                         <?= Html::button("批量正", ['class' => 'btn btn-success btn-xs', 'id' => 'batchForward']) ?> &nbsp;
                         <?= Html::button("批量反", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchReverse']) ?>
                         <?= Html::button("批量修改类型", ['class' => 'btn btn-primary btn-xs', 'id' => 'batchUpdatePlanType']) ?>
+                        <?= Html::button("加入利润统计分组", array_merge([
+                            'class' => 'btn btn-info btn-xs',
+                            'id' => 'profitStatAssignOpen',
+                        ], !$canUseProfitStatGroups ? ['disabled' => true] : [])) ?>
                     </div>
                     <div class="pull-right">
                         <?= Html::a($tipTxt, 'javascript:;', ['class' => 'btn red-text']) ?>
@@ -565,6 +639,33 @@ $columns = array_merge(
     </div>
 </div>
 <input type="hidden" id="operate_id" name="operate_id" value="">
+<div class="modal fade" id="profitStatAssignModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <h4 class="modal-title">将勾选计划加入利润统计分组</h4>
+            </div>
+            <div class="modal-body">
+                <?php if (!empty($statGroupOptions)): ?>
+                    <label>选择分组</label>
+                    <select class="form-control" id="profitStatGroupSelect">
+                        <?php foreach ($statGroupOptions as $gid => $glabel): ?>
+                            <option value="<?= (int)$gid ?>"><?= Html::encode($glabel) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <p class="text-muted" style="margin-top:10px;">每组最多 <?= PlanProfitStatGroupService::MAX_PLANS_PER_GROUP ?> 个计划；若计划已在其它分组会先移到本组。</p>
+                <?php else: ?>
+                    <p class="text-warning">请先在上方「利润统计分组」区域新建分组。</p>
+                <?php endif; ?>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="confirmProfitStatAssign" <?= empty($statGroupOptions) ? 'disabled' : '' ?>>确定</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!--提示框-end-->
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
@@ -604,6 +705,94 @@ $columns = array_merge(
             });
 
             $('#batchUpdatePlanTypeModal').modal('show');
+        });
+
+        $('#profitStatCreateBtn').on('click', function () {
+            var name = $('#profitStatNewName').val();
+            $.post('/forum/user-sys-plans/create-profit-stat-group', {
+                name: name,
+                lottery_type: $('#profitStatLotteryType').val(),
+                account: $('#profitStatAccount').val()
+            }, function (r) {
+                if (r.status === 200) {
+                    layer.msg(r.message);
+                    location.reload();
+                } else {
+                    layer.alert(r.message || '操作失败');
+                }
+            }, 'json').fail(function () {
+                layer.alert('请求失败');
+            });
+        });
+        $(document).on('click', '.profit-stat-delete-group', function () {
+            var gid = $(this).data('id');
+            layer.confirm('确定删除该分组？组内计划关联会解除。', function (idx) {
+                layer.close(idx);
+                $.post('/forum/user-sys-plans/delete-profit-stat-group', {
+                    id: gid,
+                    account: $('#profitStatAccount').val()
+                }, function (r) {
+                    if (r.status === 200) {
+                        layer.msg(r.message);
+                        location.reload();
+                    } else {
+                        layer.alert(r.message || '操作失败');
+                    }
+                }, 'json');
+            });
+        });
+        $('#profitStatAssignOpen').on('click', function () {
+            if ($(this).prop('disabled')) {
+                return;
+            }
+            if (!$('#profitStatGroupSelect option').length) {
+                layer.msg('请先新建分组');
+                return;
+            }
+            var selectedIds = $('input[name="selection[]"]:checked').map(function () {
+                return this.value;
+            }).get();
+            if (selectedIds.length <= 0) {
+                layer.alert('至少选择一项');
+                return;
+            }
+            $('#profitStatAssignModal').modal('show');
+        });
+        $('#confirmProfitStatAssign').on('click', function () {
+            var selectedIds = $('input[name="selection[]"]:checked').map(function () {
+                return this.value;
+            }).get();
+            var groupId = $('#profitStatGroupSelect').val();
+            $.post('/forum/user-sys-plans/assign-profit-stat-group', {
+                group_id: groupId,
+                plan_ids: selectedIds,
+                account: $('#profitStatAccount').val()
+            }, function (r) {
+                if (r.status === 200) {
+                    layer.msg(r.message);
+                    $('#profitStatAssignModal').modal('hide');
+                    location.reload();
+                } else {
+                    layer.alert(r.message || '操作失败');
+                }
+            }, 'json');
+        });
+        $(document).on('click', '.profit-stat-remove-plan', function () {
+            var pid = $(this).data('plan-id');
+            layer.confirm('将该计划移出利润统计分组？', function (idx) {
+                layer.close(idx);
+                $.post('/forum/user-sys-plans/remove-plan-profit-stat-group', {
+                    plan_id: pid,
+                    account: $('#profitStatAccount').val()
+                }, function (r) {
+                    if (r.status === 200) {
+                        layer.msg(r.message);
+                        location.reload();
+                    } else {
+                        layer.alert(r.message || '操作失败');
+                    }
+                }, 'json');
+            });
         });
 
         $('#confirmBatchUpdatePlanType').click(function() {
