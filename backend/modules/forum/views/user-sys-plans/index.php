@@ -469,7 +469,7 @@ $columns = array_merge(
                         <?= Html::button("批量模拟", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchSimulate']) ?> &nbsp;
                         <?= Html::button("批量正", ['class' => 'btn btn-success btn-xs', 'id' => 'batchForward']) ?> &nbsp;
                         <?= Html::button("批量反", ['class' => 'btn btn-danger btn-xs', 'id' => 'batchReverse']) ?>
-                        <?= Html::button("批量修改类型", ['class' => 'btn btn-primary btn-xs', 'id' => 'batchUpdatePlanType']) ?>
+                        <?= Html::button("批量修改类型", ['class' => 'btn btn-primary btn-xs', 'id' => 'batchUpdatePlanType']) ?> &nbsp;
                         <?= Html::button("加入利润统计分组", array_merge([
                             'class' => 'btn btn-info btn-xs',
                             'id' => 'profitStatAssignOpen',
