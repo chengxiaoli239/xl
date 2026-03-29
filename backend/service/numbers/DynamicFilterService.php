@@ -56,6 +56,7 @@ class DynamicFilterService extends BaseService {
         ['type'=>40, 'label'=>'随机x组号码', 'params'=>['x'=>''], 'desc'=>"随机选择x组号码（主要针对四定）：<br>1、x可以填写任意数字，如：9000、5000、10000等<br>2、系统会从所有符合条件的号码中随机选择x组<br>3、如果x大于总号码数，则返回所有号码", 'playway'=>[1, 2, 3]],
         ['type'=>41, 'label'=>'随机位置号码个数', 'params'=>['x'=>'', 'y'=>'', 'z'=>'', 'h'=>''], 'desc'=>"随机指定位置号码个数：<br>1、x：位置1（千位）随机号码个数<br>2、y：位置2（百位）随机号码个数<br>3、z：位置3（十位）随机号码个数<br>4、h：位置4（个位）随机号码个数<br>5、例如：x:9、y:8、z:9、h:7，则千位随机9个数、百位随机8个数、十位随机9个数、个位随机7个数，生成所有组合", 'playway'=>[1, 2, 3]],
         ['type'=>42, 'label'=>'两数分离', 'params'=>['x'=>''], 'desc'=>"两数不能同时上奖：<br>1、x:1 和值两数分离—上期开奖和值的两位数字不能同时上奖，如开5916和值21，则下一把2、1不能同时上奖<br>2、x:2 期号尾号最后两位不能同时上奖，如期号20260203123，最后两位2、3不能同时上奖", 'playway'=>[1, 2, 3]],
+        ['type'=>43, 'label'=>'取x位最近n个号码复式', 'params'=>['x'=>'', 'n'=>''], 'desc'=>"与「排除x位最近n个码的复试」相反，只保留落在该复式内的号码（逻辑对应类型27未填k时的复式池）：<br>1、x:1，n:6，则千位取最近6个开奖数字组成复式池，只保留四位数字均在该池内的号码<br>2、x:12，n:6，则保留「满足千位池复式」或「满足百位池复式」的号码（并集）", 'playway'=>[3]],
     ];
     public static int $filterType = 0;
 
@@ -184,6 +185,9 @@ class DynamicFilterService extends BaseService {
                     break;
                 case 42: # 两数分离
                     $codes = DynamicType2Service::filter42($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    break;
+                case 43: # 取x位最近n个号码复式（与类型27排除相反）
+                    $codes = DynamicType2Service::filter43($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
                     break;
             }
             if(empty($codes)){

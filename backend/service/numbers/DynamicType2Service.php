@@ -1069,6 +1069,64 @@ class DynamicType2Service extends BaseService {
     }
 
     /**
+     * 与 filter21（类型27 排除复式）相反：只保留各位均在「该位最近 n 个开奖数字」复式池内的号码。
+     * 仅实现与类型27 params 中未传 k 时相同的那套复式条件（类型27 的「除双重」分支不在此类型提供）。
+     */
+    public static function filter43(object $plan, $dynamic = [], $filterDesc = []): array
+    {
+        $playway = $plan->playway;
+        $lottery_type = $plan->lottery_type;
+        $lotteryType = $plan->lottery_type;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
+
+        $params = $dynamic['params'];
+        $x = $params['x'];
+        $n = $params['n'];
+
+        $positions = array_filter(str_split(trim((string) $x)));
+        if ($positions === [] || (int) $n < 1) {
+            Tool_Common::log('/data/' . __FUNCTION__, 'WARNING', '取x位最近n个码复式参数无效', ['x' => $x, 'n' => $n]);
+            $NumTypes = Num4Type::find()->select(['code'])
+                ->where(['=', 'code_type', $playway + 1])
+                ->asArray()->all();
+
+            return ArrayHelper::getColumn($NumTypes, 'code');
+        }
+        $where = ['OR'];
+        $desc = '';
+        foreach ($positions as $p) {
+            $beforeQuery = SscKjData::find()
+                ->select(['code' => 'code' . $p, 'qihao' => 'MAX(qihao)'])
+                ->where(['lottery_type' => $lottery_type])
+                ->groupBy('code' . $p)
+                ->orderBy(['MAX(qihao)' => SORT_DESC])
+                ->limit((int) $n);
+            $beforeQuery->andWhere(['<=', 'qihao', $currentKjQiHao]);
+            $currentKjCodes = $beforeQuery->asArray()->all();
+            $filterCodes = ArrayHelper::getColumn($currentKjCodes, 'code');
+            $where[] = [
+                'AND',
+                ['IN', 'code_1', $filterCodes],
+                ['IN', 'code_2', $filterCodes],
+                ['IN', 'code_3', $filterCodes],
+                ['IN', 'code_4', $filterCodes],
+            ];
+            $desc .= ' ' . $p . '位近' . $n . '个码:' . implode('', $filterCodes);
+        }
+
+        $query = Num4Type::find()->select(['code'])
+            ->where(['=', 'code_type', $playway + 1])
+            ->andWhere($where);
+        $sql = $query->createCommand()->getRawSql();
+        Tool_Common::log('/data/' . __FUNCTION__, 'INFO', '取x位最近n个码的复试', ['currentKjQiHao' => $currentKjQiHao, 'lottery_type' => $lottery_type, 'sql' => $sql]);
+        $NumTypes = $query->asArray()->all();
+        $betDesc = $filterDesc['desc'] . '：保留' . $desc . ' 复式内号码，最终组数：' . count($NumTypes);
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+
+        return ArrayHelper::getColumn($NumTypes, 'code');
+    }
+
+    /**
      * 获取查询对象
      * @param $where
      * @param $playway
