@@ -126,18 +126,6 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                     [ 'attribute'=>'update_time','label'=>'更新时间','value'=>function($model){
                                         return $model->update_time;
                                     }],
-                                    ['attribute' => 'wechat_service', 'label'=>'客服微信',
-                                        'format'=>'raw',
-                                        'value'=> function($model){
-                                            $wechatId = 'TedGod';
-                                            $viewBtn = Html::a('查看', 'javascript:;', [
-                                                'id' => 'viewWechatQr',
-                                                'alt' => '查看微信二维码',
-                                                'class' => 'btn btn-xs btn-info'
-                                            ]);
-                                            return $wechatId . ' &nbsp; ' . $viewBtn;
-                                        }
-                                    ],
                                 ],
                             ]) ?>
                         </div>
@@ -262,6 +250,7 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
 </div>
 
 <!--微信二维码-->
+<!--
 <div class="modal fade" id="wechatQrModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
@@ -284,6 +273,7 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
         </div>
     </div>
 </div>
+-->
 
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <!--script src="https://cdn.bootcss.com/jquery/2.0.3/jquery.js"></script-->
@@ -392,12 +382,12 @@ $(function () {
         var img = document.getElementById('wechatQrImage');
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext('2d');
-        
+
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
-        
+
         ctx.drawImage(img, 0, 0);
-        
+
         canvas.toBlob(function(blob) {
             var url = URL.createObjectURL(blob);
             var a = document.createElement('a');

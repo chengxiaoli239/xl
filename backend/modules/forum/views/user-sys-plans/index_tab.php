@@ -12,9 +12,9 @@ foreach ($lottery_types as $k=>$lottery) {
 <?php
 }
 ?>
-<?= Html::a('客服微信', 'javascript:;', ['class' => 'btn btn-sm btn-info', 'style' => 'margin-bottom:15px;', 'id' => 'viewWechatQr']) ?>
 
 <!--微信二维码模态框-->
+<!--
 <div class="modal fade" id="wechatQrModal" tabindex="-1" role="dialog" aria-labelledby="ModalLabel">
     <div class="modal-dialog modal-sm" role="document">
         <div class="modal-content">
@@ -37,6 +37,7 @@ foreach ($lottery_types as $k=>$lottery) {
         </div>
     </div>
 </div>
+-->
 
 <script>
 $(function () {
@@ -50,12 +51,12 @@ $(function () {
         var img = document.getElementById('wechatQrImage');
         var canvas = document.createElement('canvas');
         var ctx = canvas.getContext('2d');
-        
+
         canvas.width = img.naturalWidth;
         canvas.height = img.naturalHeight;
-        
+
         ctx.drawImage(img, 0, 0);
-        
+
         canvas.toBlob(function(blob) {
             var url = URL.createObjectURL(blob);
             var a = document.createElement('a');
