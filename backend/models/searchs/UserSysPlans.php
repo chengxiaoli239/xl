@@ -83,8 +83,9 @@ class UserSysPlans extends UserSysPlansModel
             'updated_at' => $this->updated_at,
             'update_time' => $this->update_time,
         ];
-        if($this->uid !== 1){
-            $queryWhere['uid'] = $params['UserSysPlans']['uid'];
+        $uid = $params['UserSysPlans']['uid'] ?? 1;
+        if((int)$uid !== 1){
+            $queryWhere['uid'] = $uid;
         }
         if(!empty($params['UserSysPlans']['ids'])){
             $ids = Tools::getQuerySplit($params['UserSysPlans']['ids']);

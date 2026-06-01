@@ -328,7 +328,7 @@ class AgentUsersService extends BaseService {
         if(true OR !$m->get($mkey)){
             $where = ['AND', ['=', 'uid', $admin_id], ['=', 'status', 1]];
             $TzSystemsUsers = TzSystemsUsers::find()->where($where)->one();
-            if($TzSystemsUsers->is_agent){
+            if(!empty($TzSystemsUsers) && $TzSystemsUsers->is_agent){
                 $flag = true;
             }
             $m->set($mkey, $flag, 3600);

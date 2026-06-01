@@ -17,8 +17,8 @@ class OperateBetPlans extends CommonJob {
 
     public static function handle($params){
         $lottery_type = $params['lottery_type'];
-        $qihao = $params['qihao']?:''; # 要处理的开奖期号
-        $ignore = $params['ignore']?:0; # 是否忽略缓存
+        $qihao = $params['qihao'] ?? ''; # 要处理的开奖期号
+        $ignore = $params['ignore'] ?? 0; # 是否忽略缓存
         try {
             $rst = TzService::operateSystemBetPlans($lottery_type, $qihao, $ignore); # 处理系统投注计划，更新统计数据、
         }catch (\Exception $e){

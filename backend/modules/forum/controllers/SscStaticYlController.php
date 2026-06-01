@@ -42,11 +42,10 @@ class SscStaticYlController extends BaseController
         $queryParams = Yii::$app->request->queryParams;
         $lottery_type = CommonService::getIndexLotteryType($this->_user_id, $queryParams);
         $queryParams['SscStaticYl']['status'] = 1;
-        $type = $queryParams['SscStaticYl']['type'] ? $queryParams['SscStaticYl']['type'] : 2;
+        $type = $queryParams['SscStaticYl']['type'] ?? 2;
         $queryParams['SscStaticYl']['type'] = $type;
 
-        $codeType = $queryParams['SscStaticYl']['code_type'];
-        $codeType = $codeType ? $codeType : 1;
+        $codeType = $queryParams['SscStaticYl']['code_type'] ?? 1;
         $codeTypeName = CommonService::getCodeTypeName($codeType);
         //p($codeTypeName);
         $lottery_types = UserSysPlansService::getMyLotteryTypes($this->_user_id);

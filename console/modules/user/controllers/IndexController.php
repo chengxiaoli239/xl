@@ -8,19 +8,20 @@ use common\service\thirdD\sx\Ssxx3dBetService;
 use Yii;
 use yii\base\Controller;
 use common\tools\Tool_Common;
+use yii\console\ExitCode;
 
 
 class IndexController extends Controller
 {
     /**
      * @desc 自动登录
-     * /www/server/php/74/bin/php /www/wwwroot/lottery_xl/yii user/index/auto-login
+     * /www/server/php/74/bin/php /www/wwwroot/lt/lottery_xl/xl/yii user/index/auto-login
      */
-    public function actionAutoLogin(): array
+    public function actionAutoLogin(): int
     {
-        $rst = CrontabIndexService::autoLogin();
+        CrontabIndexService::autoLogin();
 
-        return $rst;
+        return ExitCode::OK;
     }
 
     /**

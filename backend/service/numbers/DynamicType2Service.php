@@ -1015,10 +1015,15 @@ class DynamicType2Service extends BaseService {
         $lotteryType = $plan->lottery_type;
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lotteryType);
 
-        $params = $dynamic['params'];
-        $x = $params['x']; # x位
-        $n = $params['n']; # n个码
-        $k = $params['k']; # 0不除双重，1除双重
+        $params = $dynamic['params'] ?? [];
+        $x = $params['x'] ?? ''; # x位
+        $n = (int)($params['n'] ?? 0); # n个码
+        $k = (int)($params['k'] ?? 0); # 0不除双重，1除双重
+
+        if($x === '' || $n < 1){
+            Tool_Common::log('/data/'.__FUNCTION__, 'WARNING', '过滤x位最近n个码的复试参数无效', ['plan_id'=>$plan->id, 'params'=>$params]);
+            return $allCodes = Num4Type::find()->select(['code'])->where(['=', 'code_type', $playway+1])->column();
+        }
 
         $positions = str_split(trim($x));
         $where = ['OR'];

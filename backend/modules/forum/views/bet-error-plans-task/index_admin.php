@@ -20,7 +20,11 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="panel-body">
             <div class="adv-table editable-table ">
 
-                <?php echo $this->render('_search', ['model' => $searchModel]); ?>
+                <?php echo $this->render('_search', [
+                    'model' => $searchModel,
+                    'plan_ids' => $plan_ids ?? '',
+                    'qihao' => $qihao ?? '',
+                ]); ?>
 
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,

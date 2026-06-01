@@ -161,6 +161,167 @@ abstract class BetService extends BaseBetService {
     }
 
     /**
+     * @desc 投注号码是否有效，避免基础号码表或筛选异常时写入空投注记录
+     */
+    public static function hasValidBetCodes($codes){
+        if(is_array($codes)){
+            foreach ($codes as $code){
+                if(trim((string)$code) !== ''){
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        return trim((string)$codes) !== '';
+    }
+
+    /**
+     * @desc 远程盘口下注请求最多重试3次，仅处理网络/代理/超时/空响应类异常
+     * @param callable $callback
+     * @param array $context
+     * @param int $maxAttempts
+     * @param int $sleepSeconds
+     * @return mixed
+     */
+    public static function requestBetWithRetry(callable $callback, array $context = [], int $maxAttempts = 3, int $sleepSeconds = 1)
+    {
+        $maxAttempts = max(1, $maxAttempts);
+        $lastRst = null;
+        $attempts = 0;
+
+        for($attempt = 1; $attempt <= $maxAttempts; $attempt++){
+            $attempts = $attempt;
+            $startTime = microtime(true);
+            try {
+                $lastRst = $callback($attempt);
+            }catch (\Exception $exception){
+                $lastRst = self::buildRetryableBetResponse($exception->getMessage());
+            }
+
+            $lastRst = self::normalizeBetRetryResponse($lastRst);
+            $retryable = self::isRetryableBetResponse($lastRst);
+            $timeConsume = sprintf('%.3fs', microtime(true) - $startTime);
+
+            if(!$retryable || $attempt >= $maxAttempts){
+                break;
+            }
+
+            Tool_Common::log('/repeatErrorBet/requestBetWithRetry', 'WARN', '远程盘口请求异常重试', array_merge($context, [
+                'attempt' => $attempt,
+                'max_attempts' => $maxAttempts,
+                'time_consume' => $timeConsume,
+                'rst' => self::getBetRetryLogSummary($lastRst),
+            ]));
+
+            if($sleepSeconds > 0){
+                sleep($sleepSeconds);
+            }
+        }
+
+        if(is_array($lastRst)){
+            $lastRst['bet_retry_attempts'] = $attempts;
+        }
+
+        return $lastRst;
+    }
+
+    /**
+     * @desc 判断下注请求结果是否属于可重试异常
+     * @param mixed $response
+     * @return bool
+     */
+    public static function isRetryableBetResponse($response): bool
+    {
+        if($response === null || $response === false || $response === ''){
+            return true;
+        }
+        if(is_array($response) && empty($response)){
+            return true;
+        }
+        if(!is_array($response)){
+            return self::containsRetryableBetText((string)$response);
+        }
+
+        if((isset($response['Status']) && (int)$response['Status'] === 1)
+            || (isset($response['success']) && $response['success'] === true)
+            || (isset($response['rstData']['code']) && (int)$response['rstData']['code'] === 200)){
+            return false;
+        }
+
+        $code = isset($response['code']) ? (int)$response['code'] : 0;
+        if(in_array($code, [302, 303, 304, 305, 306, 307, 310, 313], true)){
+            return false;
+        }
+        if(isset($response['errno']) && (int)$response['errno'] > 0){
+            return true;
+        }
+        if(in_array($code, [309, 311, 312], true)){
+            return true;
+        }
+        if(array_key_exists('rstData', $response) && empty($response['rstData'])){
+            return true;
+        }
+
+        return self::containsRetryableBetText(json_encode($response, 320));
+    }
+
+    private static function normalizeBetRetryResponse($response)
+    {
+        if($response === null || $response === false || $response === '' || (is_array($response) && empty($response))){
+            return self::buildRetryableBetResponse('远程盘口无响应');
+        }
+
+        return $response;
+    }
+
+    private static function buildRetryableBetResponse(string $message): array
+    {
+        return [
+            'Status' => 0,
+            'success' => false,
+            'code' => 309,
+            'errno' => 1,
+            'msg' => $message ?: '远程盘口请求异常',
+            'rstData' => [
+                'code' => 500,
+                'errorCode' => 'FAIL',
+                'msg' => $message ?: '远程盘口请求异常',
+            ],
+        ];
+    }
+
+    private static function containsRetryableBetText(string $text): bool
+    {
+        $nonRetryableKeywords = ['余额不足', '已关盘', '停押', '重复提交', '请重新登录', 'cookie', '维护中', 'Illegal X-Csrf-Token'];
+        foreach($nonRetryableKeywords as $keyword){
+            if(stripos($text, $keyword) !== false){
+                return false;
+            }
+        }
+
+        $retryableKeywords = ['超时', '网络', '代理IP网络故障', 'Proxy Connect Error', 'Too Many Request', 'Too Many Requests', 'timeout', 'timed out', 'Failed to connect', 'Connection refused', 'Connection reset', 'Bad Gateway', 'Gateway Timeout', 'Empty reply', 'resolve host', 'SSL connect'];
+        foreach($retryableKeywords as $keyword){
+            if(stripos($text, $keyword) !== false){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function getBetRetryLogSummary($response)
+    {
+        if(!is_array($response)){
+            $response = (string)$response;
+            return strlen($response) > 500 ? substr($response, 0, 500).'...' : $response;
+        }
+
+        $text = json_encode($response, 320);
+        return strlen($text) > 500 ? substr($text, 0, 500).'...' : $text;
+    }
+
+    /**
      * @desc 彩种名称缓存key
      * @return string
      */
@@ -398,7 +559,16 @@ abstract class BetService extends BaseBetService {
             if(empty($lottery_type)){
                 $lottery_type = DEFAULT_LOTTERY_TYPE;
             }
-            if(strpos($betRst['msg'], '您当前使用的浏览器不支持cookie') !== false){
+            if(is_string($betRst)){
+                $tmpBetRst = json_decode($betRst, true);
+                $betRst = is_array($tmpBetRst) ? $tmpBetRst : ['task_status'=>BetErrorPlansTask::STATUS_FAIL, 'msg'=>$betRst];
+            }
+            if(!is_array($betRst)){
+                $betRst = ['task_status'=>BetErrorPlansTask::STATUS_FAIL, 'msg'=>(string)$betRst];
+            }
+
+            $betMsg = (string)($betRst['msg'] ?? $betRst['err_msg'] ?? '');
+            if(strpos($betMsg, '您当前使用的浏览器不支持cookie') !== false){
                 throw_info('下注失败，等待下注');
             }
 
@@ -423,7 +593,7 @@ abstract class BetService extends BaseBetService {
                 }
             }
 
-            $task_status = $betRst['task_status'];
+            $task_status = $betRst['task_status'] ?? BetErrorPlansTask::STATUS_FAIL;
             $snId = '';
             try {
                 if(isset($betRst['Data']['SerialNo'])){
@@ -434,7 +604,27 @@ abstract class BetService extends BaseBetService {
             //p(['class'=>$class, 'model'=>$model]);
             $m = \Yii::$app->cache;
             $mkey = __FUNCTION__.'_'.$plan_id."_".$qihao;
-            if($task_status == 3 && strpos($betRst['err_msg'], '短时间内重复提交') !== false){
+            $lock = 0;
+            $retryKey = __FUNCTION__.'_retry_'.$model->id;
+            if((int)$task_status !== BetErrorPlansTask::STATUS_SUCCESS && self::isRetryableBetResponse($betRst)){
+                $retryAttempts = (int)\Yii::$app->redis->incr($retryKey);
+                \Yii::$app->redis->expire($retryKey, 300);
+                $betRst['bet_retry_attempts'] = $retryAttempts;
+                $betRst['bet_retry_max_attempts'] = 3;
+                if($retryAttempts < 3){
+                    $task_status = BetErrorPlansTask::STATUS_WAIT;
+                    $betRst['task_status'] = $task_status;
+                    $betRst['retry_msg'] = '远程盘口请求异常，等待第'.($retryAttempts + 1).'次重试';
+                }else{
+                    $task_status = BetErrorPlansTask::STATUS_CAN_NOT_RE_PUSH;
+                    $betRst['task_status'] = $task_status;
+                    $betRst['retry_msg'] = '远程盘口请求异常，已重试3次';
+                }
+                Tool_Common::log('/client_xy/'.__FUNCTION__, 'WARN', '本地下注请求异常重试', ['username'=>$TzSystemsUsers->username, 'plan_id'=>$plan_id, 'qihao'=>$qihao, 'task_id'=>$model->id, 'retry_attempts'=>$retryAttempts, 'task_status'=>$task_status, 'betRst'=>$betRst]);
+            }elseif((int)$task_status === BetErrorPlansTask::STATUS_SUCCESS){
+                \Yii::$app->redis->del($retryKey);
+            }
+            if($task_status == 3 && strpos($betRst['err_msg'] ?? '', '短时间内重复提交') !== false){
                 $num = \Yii::$app->redis->incr($mkey);
                 Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '重复提交', ['username'=>$TzSystemsUsers->username, 'plan_id'=>$plan_id, 'qihao'=>$qihao, 'betRst'=>$betRst]);
                 \Yii::$app->redis->expire($mkey, 120);
@@ -590,6 +780,8 @@ abstract class BetService extends BaseBetService {
         //p([$tz_type, $buy_type, $sel_same, $codes_hz, $playway]);
         $m = \Yii::$app->cache;
         $codes_hz_data = json_decode($codes_hz, true);
+        $codes_hz_data = is_array($codes_hz_data) ? $codes_hz_data : [];
+        $codesArr = [];
         # 排除类型
         BetService::getDynamicsHzArr($codes_hz_data, $plan_id);
         //p($codes_hz_data);
@@ -679,20 +871,23 @@ abstract class BetService extends BaseBetService {
         }
 
         # 动态过滤1
-        if(isset($codes_hz_data['is_filter_dynamic']) && $codes_hz_data['is_filter_dynamic']==1 && count($codes_hz_data['filter_dynamic_types'])>0){
+        $filterDynamicTypes = $codes_hz_data['filter_dynamic_types'] ?? [];
+        if(isset($codes_hz_data['is_filter_dynamic']) && $codes_hz_data['is_filter_dynamic']==1 && is_array($filterDynamicTypes) && count($filterDynamicTypes)>0){
             $filter_dynamic_codes = NumService::getBeforeKjCodesDynamic($plan);
             if(!empty($filter_dynamic_codes)){
                 $codesArr = array_intersect($codesArr, $filter_dynamic_codes); # 返回$codesArr和$filter_dynamic_codes交集
             }
         }
         # 动态过滤2
-        if(isset($codes_hz_data['filter_dynamic_types2'])){
+        $filterDynamicTypes2 = $codes_hz_data['filter_dynamic_types2'] ?? [];
+        if(is_array($filterDynamicTypes2) && !empty($filterDynamicTypes2)){
             $filter_dynamic_codes2 = DynamicFilterService::getFilterDynamic2($plan);
             if(!empty($filter_dynamic_codes2)){
                 $codesArr = array_intersect($codesArr, $filter_dynamic_codes2); # 返回$codesArr和$filter_dynamic_codes交集
             }
         }
 
+        $codesArr = is_array($codesArr) ? $codesArr : [];
         $before_count=count($codesArr);
         # 反买号码获取
         if($buy_type==0 && !in_array($tz_type, [22])){ # 22 四定单双
@@ -931,8 +1126,11 @@ abstract class BetService extends BaseBetService {
                 $snid = 'istest_id';
             }
             Tool_Common::log('/plan/'.__FUNCTION__.'_is_bet_true', 'INFO', '是否真实下注计划', ['plan_id'=>$planId, 'flag'=>$flag, 'fh'=>(boolean)(in_array($flag, [0, -1]) && $isAuto == 1), 'sn'=>$sn, 'snid'=>$snid]);
-        }elseif(in_array($hzArr['filters']['filter_type'], BetService::getCodesNewFilterTypes())){
+        }elseif(in_array($hzArr['filters']['filter_type'] ?? 0, BetService::getCodesNewFilterTypes())){
             $BettingRecords = BettingRecords::find()->where(['lottery_type'=>$UserSysPlans->lottery_type, 'plan_id'=>$planId])->orderBy(['id'=>SORT_DESC])->limit(1)->one();
+            if(empty($BettingRecords)){
+                return [$sn, $snid];
+            }
             $codesArr = explode(',', $BettingRecords->kj_codes);
             array_pop($codesArr);
             $codesArr = array_unique($codesArr);
@@ -1177,6 +1375,19 @@ abstract class BetService extends BaseBetService {
      */
     public static function _logRecords($data){
         if(!$data OR !is_array($data)) return false;
+        if(!self::hasValidBetCodes($data['codes'] ?? '')){
+            $msg = '生成投注号码为空，已阻止写入投注记录';
+            Tool_Common::log('logRecords', 'ERR', '投注号码为空', [
+                'plan_id'=>$data['plan_id'] ?? '',
+                'uid'=>$data['uid'] ?? '',
+                'qihao'=>$data['qihao'] ?? '',
+                'tz_type'=>$data['tz_type'] ?? '',
+                'playway'=>$data['playway'] ?? '',
+                'lottery_type'=>$data['lottery_type'] ?? '',
+                'post_desc'=>$data['post_desc'] ?? '',
+            ]);
+            return ['status'=>300, 'data'=>[], 'msg'=>$msg];
+        }
         try{
             $transaction = Yii::$app->db->beginTransaction();
             $insertData = [
@@ -1576,6 +1787,21 @@ abstract class BetService extends BaseBetService {
         //p([$plan_id, $qihao, $codes, $lottery_type = DEFAULT_LOTTERY_TYPE, $is_test, $sn, $snid],0);
         //$UserSysPlans = UserSysPlans::findOne($plan_id);
         $plan_id = $UserSysPlans->id;
+        if(!self::hasValidBetCodes($codes)){
+            $msg = '生成投注号码为空，已阻止写入投注记录plan_id:'.$plan_id.'_uid:'.$UserSysPlans->uid;
+            Tool_Common::log('/bet/empty_codes', 'ERR', '投注号码为空', [
+                'plan_id'=>$plan_id,
+                'uid'=>$UserSysPlans->uid,
+                'account'=>$UserSysPlans->account,
+                'qihao'=>$qihao,
+                'tz_type'=>$UserSysPlans->tz_type,
+                'playway'=>$UserSysPlans->playway,
+                'lottery_type'=>$lottery_type,
+                'post_desc'=>$post_desc,
+                'r'=>$r,
+            ]);
+            return ['status'=>300, 'data'=>[], 'msg'=>$msg];
+        }
 
         $where = ['AND', ['=', 'qihao', $qihao], ['=', 'plan_id', $plan_id], ['=', 'uid', $UserSysPlans->uid]];
         $flag = BettingRecords::find()->select(['id'])->where($where)->limit(1)->one();
@@ -2056,33 +2282,51 @@ abstract class BetService extends BaseBetService {
      * @param int $lottery_type
      */
     public static function getDynamicsHzArr(&$hzArr = [], $plan_id){
-        $filters = $hzArr['filters'];
-        $filter_type = $filters['filter_type'];
+        if(!is_array($hzArr)){
+            return;
+        }
+
+        $filters = $hzArr['filters'] ?? [];
+        if(!is_array($filters) || empty($filters['filter_type'])){
+            return;
+        }
+
+        $filter_type = (int)$filters['filter_type'];
         if($filter_type == 1){
-            $filter_poses = $hzArr['filters']['filter_poses'];
+            $filter_poses = $filters['filter_poses'] ?? [];
+            if(!is_array($filter_poses)){
+                $filter_poses = array_filter(explode(',', (string)$filter_poses), 'strlen');
+            }
             $x_poses = array_diff(NumService::$ALL_POSES, $filter_poses);
             foreach ($x_poses as $x_pos){
                 $hzArr['p'.$x_pos] = 'X';
             }
         }elseif(in_array($filter_type, BetService::getCodesNewFilterTypes())){
             $plan = UserSysPlans::findOne($plan_id);
+            if(empty($plan)){
+                return;
+            }
             $lottery_type = $plan->lottery_type;
             if(empty($filters['current_kj_qihao'])){
-                $filterNumsQihao = BettingRecords::find()->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan_id])->limit(1)->one()->qihao;
-                if(empty($betMaxQihao)){
-                    $filterNumsQihao = $filters['start_qihao'];
-                }
+                $lastBetRecord = BettingRecords::find()->where(['lottery_type'=>$lottery_type, 'plan_id'=>$plan_id])->limit(1)->one();
+                $filterNumsQihao = $lastBetRecord->qihao ?? ($filters['start_qihao'] ?? '');
             }else{
                 $filterNumsQihao = $filters['current_kj_qihao']; # 上期开奖之后记录开奖当期期号
+            }
+            if(empty($filterNumsQihao)){
+                return;
             }
             $qh_where = [
                 'AND',
                 ['=', 'lottery_type', $lottery_type],
                 ['=', 'qihao', $filterNumsQihao],
             ];
-            $remove_types = $hzArr['remove_types'] ? : [];
+            $remove_types = $hzArr['remove_types'] ?? [];
 
             $SscKjData = SscKjData::find()->where($qh_where)->limit(1)->one();
+            if(empty($SscKjData)){
+                return;
+            }
             # 兄弟
             if($SscKjData->type_2b == 0){
                 $hzArr['type_2b'] = 1;
@@ -2115,7 +2359,9 @@ abstract class BetService extends BaseBetService {
                 $n_code_type = $SscKjData->code_1_2_3_4;
                 $type_ds_details = ["2222","1111","1112","1121","1211","2111","1122","1212","1221","2112","2121","2211","1222","2122","2212","2221"];
                 $type_key = array_keys($type_ds_details, $n_code_type);
-                unset($type_ds_details[$type_key[0]]);
+                if(isset($type_key[0])){
+                    unset($type_ds_details[$type_key[0]]);
+                }
                 $hzArr['type_ds_details'] = $type_ds_details;
 
                 if(isset($hzArr['type_2b']) && $hzArr['type_2b'] == 1){

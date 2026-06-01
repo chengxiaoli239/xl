@@ -1592,13 +1592,21 @@ class ZhongFaService { # 宝岛众发登陆体系
 
         //$headers = json_decode($row->bet_headers, true);
         $time1 = microtime(true);
-        $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid, $b_type=3); # 调试阶段先注释12.26
+        $tmpRst = BetService::requestBetWithRetry(function () use ($url, $post_data, $headers, $uid) {
+            return self::postBetCurl($url, $post_data, $headers, $uid, $b_type=3);
+        }, [
+            'platform' => 'zhongfa',
+            'task_id' => $id,
+            'plan_id' => $row->plan_id,
+            'uid' => $uid,
+            'url' => $url,
+        ]);
         $time2 = microtime(true);
         $time_consume = ($time2 - $time1).'s';
         $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'uid'=>$uid, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
         Tool_Common::log('/zhongfa/'.__FUNCTION__, 'INFO', '众发下注', $logArr);
         $status = 0;
-        if($tmpRst['success']){
+        if(!empty($tmpRst['success'])){
             $status = 2;
             $tmpRst['status'] = $status;
             //# 获取方案号，记录id, 用于撤单
@@ -1616,13 +1624,13 @@ class ZhongFaService { # 宝岛众发登陆体系
             $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key);
             $lockTime = BetService::getBetCacheTime($row->lottery_type);
             $m->set($betKey, 1, $lockTime);
-        }elseif(!$tmpRst['success'] && in_array($tmpRst['code'], [302, 305, 307])){
+        }elseif(empty($tmpRst['success']) && in_array($tmpRst['code'] ?? 0, [302, 305, 307], true)){
             $status = 3; # 不可再次下注：302余额不足305已关盘307网盘账号停押
         }else{
             $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key);
             $m->delete($betKey); # 失败之后可重新下注的情况解锁
         }
-        if(in_array($tmpRst['code'], [309, 311])){
+        if(in_array($tmpRst['code'] ?? 0, [309, 311, 312], true)){
             $m = \Yii::$app->cache;
             $mkey_time_out = 'mkey_time_out_retry_key_'.$row->uid.'_'.$row->plan_id.'_'.$row->bet_sort_key;
             $val = $m->get($mkey_time_out);

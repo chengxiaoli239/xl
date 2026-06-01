@@ -23,7 +23,11 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <?php include(dirname(__FILE__).'/index_tab.php'); ?>
 
-                <?php echo $this->render('_search', ['model' => $searchModel]); ?>
+                <?php echo $this->render('_search', [
+                    'model' => $searchModel,
+                    'plan_ids' => $plan_ids ?? '',
+                    'qihao' => $qihao ?? '',
+                ]); ?>
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     #'filterModel' => $searchModel,

@@ -185,6 +185,7 @@ class StaticService extends BaseService {
         $mkey = 'opStaticSdProfitsDay_'.$lottery_type;
 
         for($s=0; $s<1; $s++) {
+            $beforeDays = 0;
             $StaticTables = Static4dProfitsDay::find()->all();
             $flag = count($StaticTables);
             if (!$flag) $beforeDays = 120; # 数据表为空时默认统计前120前的数据
@@ -233,6 +234,7 @@ class StaticService extends BaseService {
         $mkey = 'opStaticSdProfitsMonth_'.$lottery_type;
 
         for($s=0; $s<1; $s++) {
+            $beforeDays = 0;
             $StaticTables = Static4dProfitsMonth::find()->all();
             $flag = count($StaticTables);
             if (!$flag) $beforeDays = 12; # 数据表为空时默认统计前120前的数据
@@ -346,8 +348,10 @@ class StaticService extends BaseService {
         if($month != date('Y-m') && $allStatic = $m->get($mkey)){
             return $allStatic;
         }
-        $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>=', 'date', $month.'-01'], ['<=', 'date', $month.'-31']];
-        $static = [ 0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0, 6=>0, 7=>0, 8=>0, 9=>0, 10=>0, 11=>0]; # 统计每种组合出现次数
+        $monthStart = $month.'-01';
+        $monthEnd = date('Y-m-t', strtotime($monthStart));
+        $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>=', 'date', $monthStart], ['<=', 'date', $monthEnd]];
+        $static = array_fill_keys(array_keys(self::$typeArr), 0); # 统计每种组合出现次数
         //$SscKjDatas = SscKjData::find()->where($where)->limit($num)->all();
         $SscKjDataDs = SscKjDataDs::find()->where($where)->orderBy(['id'=>SORT_DESC])->all();
         $num = count($SscKjDataDs);
@@ -808,7 +812,7 @@ class StaticService extends BaseService {
         $mkey = 'DATE_STATIC_DATA_'.$lottery_type.'_'.$date;
         $typeArr = self::$typeArr;
         $where = ['lottery_type'=>$lottery_type, 'date' => $date];
-        $static = [ 0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0, 6=>0, 7=>0, 8=>0, 9=>0, 10=>0, 11=>0]; # 统计每种组合出现次数
+        $static = array_fill_keys(array_keys(self::$typeArr), 0); # 统计每种组合出现次数
         # 开奖表，type_4ds : 四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
         //$SscKjDatas = SscKjData::find()->where($where)->limit($num)->all();
         $num = SscKjData::find()->where($where)->count('id');
@@ -817,6 +821,7 @@ class StaticService extends BaseService {
         //p($datas);
         foreach ($datas as $data){
             $type_4ds = $data['type_4ds'];
+            $sTypes = [];
 
             # 四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
             if($type_4ds == 1){ # 四单
@@ -841,7 +846,7 @@ class StaticService extends BaseService {
                 $sTypes = [0,1,5,7,13,15];
             }
             foreach ($sTypes as $sType){
-                $static[$sType] = $static[$sType] + $data['4ds'];
+                $static[$sType] = ($static[$sType] ?? 0) + $data['4ds'];
             }
         }
         //p([$static, $num, $lottery_type]);
@@ -1206,6 +1211,7 @@ class StaticService extends BaseService {
      */
     public static function static4dPerDateProfits($lottery_type = DEFAULT_LOTTERY_TYPE, $s_date = ''){
         $rst = ['status'=>200, 'msg'=>'处理成功'];
+        $setData = [];
 
         $start_time = microtime(true);
         try {
@@ -1220,6 +1226,14 @@ class StaticService extends BaseService {
             foreach ($allStaticProfits as $key=>$allStaticProfit){
                 $tmpProfits[] = $allStaticProfit;
             }
+            $profitValue = function($type, $date) use ($tmpProfits, $allStaticProfits) {
+                $typeName = self::$kArr[$type] ?? null;
+                if($typeName !== null && isset($allStaticProfits[$typeName][$date])){
+                    return $allStaticProfits[$typeName][$date];
+                }
+
+                return $tmpProfits[$type][$date] ?? 0;
+            };
 
             foreach ($tmpProfits as $tmpProfit){
                 foreach ($tmpProfit as $date=>$tmp){
@@ -1232,22 +1246,22 @@ class StaticService extends BaseService {
                     }
                     $setData['updated_at'] = time();
                     $setData['date'] = $date;
-                    $setData['codes_4d_all'] = $tmpProfits[0][$date]; # 所有号码
-                    $setData['codes_13_31'] = $tmpProfits[1][$date]; # 一双三单||一单三双
-                    $setData['codes_22_22'] = $tmpProfits[2][$date]; # 两双两单
-                    $setData['codes_1111_2222'] = $tmpProfits[3][$date]; # 四双四单
-                    $setData['codes_13'] = $tmpProfits[4][$date]; # 一单三双
-                    $setData['codes_31'] = $tmpProfits[5][$date]; # 一双三单
-                    $setData['codes_13_2222'] = $tmpProfits[6][$date]; # 一单三双||四双
-                    $setData['codes_31_1111'] = $tmpProfits[7][$date]; # 一双三单||四单
-                    $setData['codes_2222'] = $tmpProfits[8][$date]; # 四双
-                    $setData['codes_1111'] = $tmpProfits[9][$date]; # 四单
-                    $setData['codes_13_1111'] = $tmpProfits[12][$date]; # 一单三双||四单
-                    $setData['codes_31_2222'] = $tmpProfits[13][$date]; # 一双三单||四双
-                    $setData['codes_13_1111_2222'] = $tmpProfits[14][$date]; # 一单三双||四单
-                    $setData['codes_31_2222_1111'] = $tmpProfits[15][$date]; # 一双三单||四双
-                    $setData['codes_1_nums'] = $tmpProfits[10][$date]; # 单数量
-                    $setData['codes_2_nums'] = $tmpProfits[11][$date]; # 双数量
+                    $setData['codes_4d_all'] = $profitValue(0, $date); # 所有号码
+                    $setData['codes_13_31'] = $profitValue(1, $date); # 一双三单||一单三双
+                    $setData['codes_22_22'] = $profitValue(2, $date); # 两双两单
+                    $setData['codes_1111_2222'] = $profitValue(3, $date); # 四双四单
+                    $setData['codes_13'] = $profitValue(4, $date); # 一单三双
+                    $setData['codes_31'] = $profitValue(5, $date); # 一双三单
+                    $setData['codes_13_2222'] = $profitValue(6, $date); # 一单三双||四双
+                    $setData['codes_31_1111'] = $profitValue(7, $date); # 一双三单||四单
+                    $setData['codes_2222'] = $profitValue(8, $date); # 四双
+                    $setData['codes_1111'] = $profitValue(9, $date); # 四单
+                    $setData['codes_13_1111'] = $profitValue(12, $date); # 一单三双||四单
+                    $setData['codes_31_2222'] = $profitValue(13, $date); # 一双三单||四双
+                    $setData['codes_13_1111_2222'] = $profitValue(14, $date); # 一单三双||四单
+                    $setData['codes_31_2222_1111'] = $profitValue(15, $date); # 一双三单||四双
+                    $setData['codes_1_nums'] = $profitValue(10, $date); # 单数量
+                    $setData['codes_2_nums'] = $profitValue(11, $date); # 双数量
                     $setData['lottery_type'] = $lottery_type;
                     $Static4dProfits->setAttributes($setData);
 
@@ -1273,6 +1287,7 @@ class StaticService extends BaseService {
      * @return array
      */
     public static function opStatic($lottery_type = DEFAULT_LOTTERY_TYPE, $qihao=''){
+        $rst = [];
         $status = StaticService::isCanOpStatic($lottery_type, $qihao, $mkey = 'opStatic');
         if($status) {
             $t1 = microtime(true);
@@ -2261,10 +2276,24 @@ class StaticService extends BaseService {
        $SscKjDatas = SscKjData::find()->select(['id','qihao','index_id','kj_code','qihao'])->where($where)->andWhere('index_id>='.$limit_id)->andWhere(['lottery_type'=>$lottery_type])->limit($limit)->orderBy(['id'=>SORT_DESC])->asArray()->all();
        //p($SscKjDatas);
 
-       $yl_records = '';
-       $max_miss = 0;
-       foreach ($SscKjDatas as $k=>$SscKjData){
-           if($k == 0) continue;
+	       $yl_records = '';
+	       $max_miss = 0;
+	       $last_time_miss = 0;
+	       $last_time_miss_range = '';
+	       $max_range = '';
+	       if(empty($SscKjDatas)){
+	           return [
+	               'current_miss' => $last_id,
+	               'yl_records' => $yl_records,
+	               'lottery_type' => $lottery_type,
+	               'last_time_miss' => $last_time_miss,
+	               'max_miss' => $max_miss,
+	               'last_time_miss_range' => $last_time_miss_range,
+	               'max_range' => $max_range,
+	           ];
+	       }
+	       foreach ($SscKjDatas as $k=>$SscKjData){
+	           if($k == 0) continue;
            $yl = $SscKjDatas[$k-1]['index_id']-$SscKjData['index_id'] - 1;
            $yl_records .= '-'.$yl;
            if($k == 1) {

@@ -124,6 +124,9 @@ class Lucky5 extends BaseKj {
      * @return array|bool
      */
     public static function getLotteryShiXunOne($returnType = 'json', $is_auto=1){
+        $kjData = [];
+        $rst = [];
+        $checkStatus = null;
         try {
             $is_remote = 0;
             $status = KjDataGet::isCanGrab(self::$lottery_type);
@@ -193,6 +196,9 @@ class Lucky5 extends BaseKj {
      * @return array|bool
      */
     public static function getLotteryShiXunOneNew($returnType = 'json', $is_auto=1){
+        $kjData = [];
+        $rst = [];
+        $checkStatus = null;
         try {
             $is_remote = 0;
             $status = KjDataGet::isCanGrab(self::$lottery_type);
@@ -205,13 +211,12 @@ class Lucky5 extends BaseKj {
             if($is_auto==2 OR empty($kjData)) {
                 $is_remote = 1;
 
-                $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun-one');
+                $domain = BaseKj::getApiHostByRoute('/kj/lucky5/shi-xun-one-new');
                 $url = $domain.'/server/kaihaoview/list?type=ygxy5&start=0'; #当前开奖号码
                 $rst = CurlService::getCurl302($url);
                 //p(['url'=>$url, 'data'=>$rst]);
-                $data = $rst['data']['history'][0];
 
-                if (!isset($rst['data']['history'][0]) OR empty($data)){
+                if (!isset($rst['data']['history'][0]) OR empty($rst['data']['history'][0])){
                     throw_info('开奖数据为空：'.yii\helpers\Json::encode($rst, 320));
                 }
                 $newData = $rst['data']['history'][0];

@@ -26,6 +26,8 @@ use Yii;
  * @property int $is_custom 是否智能切换购买方向
  * @property int $is_test 是否为系统测试计划
  * @property int $is_batch_simulate 是否批量模拟计划
+ * @property int $is_profits_record 是否参与账号盈利统计0是1否
+ * @property int $is_area_profits 是否区间盈利记录0否1是
  * @property int $lottery_type 彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc
  * @property string $take_profits 止盈点
  * @property string $stop_loss 止损点
@@ -269,7 +271,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['is_parent', 'uid', 'playway', 'status', 'tz_type', 'bet_direct', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'is_batch_simulate', 'is_init_perdate', 'lottery_type', 'plan_type', 'tz_sort', 'created_at', 'updated_at'], 'integer'],
+            [['is_parent', 'uid', 'playway', 'status', 'tz_type', 'bet_direct', 'buy_type', 'nums', 'sel_same', 'is_custom', 'is_test', 'is_batch_simulate', 'is_profits_record', 'is_area_profits', 'is_init_perdate', 'lottery_type', 'plan_type', 'tz_sort', 'created_at', 'updated_at'], 'integer'],
             [['uid', 'account', 'single', 'created_at', 'updated_at'], 'required'],
             [['single', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
             [['update_time'], 'safe'],
@@ -305,6 +307,8 @@ class UserSysPlans extends \common\models\base\BaseModel
             'is_custom' => '是否智能切换购买方向',
             'is_test' => '是否为系统测试计划',
             'is_batch_simulate' => '是否批量模拟计划',
+            'is_profits_record' => '是否参与账号盈利统计',
+            'is_area_profits' => '是否区间盈利记录',
             'is_init_perdate' => '是否每天初始化',
             'lottery_type' => '彩种类型：1:1.5分 2:3分 3:5分 4:10分|希腊、5:重庆ssc 6:新疆ssc',
             'take_profits' => '止盈点',

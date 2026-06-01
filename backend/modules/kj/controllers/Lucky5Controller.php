@@ -38,7 +38,7 @@ class Lucky5Controller extends Controller
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
 
-        return Lucky5::getLotteryShiXun($type, $post['is_auto']);
+        return Lucky5::getLotteryShiXun($type, $post['is_auto'] ?? 1);
     }
 
     /**
@@ -49,7 +49,7 @@ class Lucky5Controller extends Controller
     public function actionShiXunOne($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
-        $data = Lucky5::getLotteryShiXunOne($type, $post['is_auto']);
+        $data = Lucky5::getLotteryShiXunOne($type, $post['is_auto'] ?? 1);
         return $data;
     }
 
@@ -61,7 +61,7 @@ class Lucky5Controller extends Controller
     public function actionShiXunOneNew($type = 'json'){
         ($type == 'json' OR !$type) && (\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON);
         $post = \Yii::$app->request->post();
-        $data = Lucky5::getLotteryShiXunOneNew($type, $post['is_auto']);
+        $data = Lucky5::getLotteryShiXunOneNew($type, $post['is_auto'] ?? 1);
         return $data;
     }
 }

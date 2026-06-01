@@ -17,7 +17,7 @@ class CommonDataStaticsJob extends CommonJob {
 
     public static function handle($params){
         $lotteryType = $params['lottery_type'];
-        $date = $params['date']?:date('Y-m-d');
+        $date = $params['date'] ?? date('Y-m-d');
 
         $rst = PositionDxDsService::staticPositionDxDs($lotteryType, $date);
         return $rst;

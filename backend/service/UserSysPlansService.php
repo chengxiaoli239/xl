@@ -956,6 +956,10 @@ class UserSysPlansService extends BaseService {
         $key = ($hzArr['change_per']==0 OR $hzArr['turn_key']==0) ? 0 : $hzArr['turn_key'];
         $data = ImportPlanCodes::find()->where(['plan_id'=>$plan_id, 'plan_id_sort_key'=>$key, 'status'=>1])->one();
         //p(['plan_id'=>$plan_id, 'plan_id_sort_key'=>$key, 'status'=>1, $data]);
+        if(empty($data) || empty($data->codes)){
+            Tool_Common::log('/error/'.__FUNCTION__, 'ERR', '导入方案号码为空', ['plan_id'=>$plan_id, 'plan_id_sort_key'=>$key, 'status'=>1]);
+            return '';
+        }
 
         $code_types = [1=>2, 2=>3, 3=>4]; # playway:code_type
         $codes = explode('@',$data->codes);

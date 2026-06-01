@@ -57,6 +57,8 @@ class BetErrorPlansTaskController extends BaseController
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'currentQihao' => HN0898Service::getQihao($lottery_type),
+            'plan_ids' => $queryParams['BetErrorPlansTask']['plan_ids'] ?? '',
+            'qihao' => $queryParams['BetErrorPlansTask']['qihao'] ?? '',
         ];
 
         if($this->_user_id !== 1){ # 超级管理员

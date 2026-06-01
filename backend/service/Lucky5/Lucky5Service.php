@@ -1612,7 +1612,15 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         try {
             $time1 = microtime(true);
-            $tmpRst = self::postBetCurl($url, $post_data, $headers, $uid); # 下注请求
+            $tmpRst = BetService::requestBetWithRetry(function () use ($url, $post_data, $headers, $uid) {
+                return self::postBetCurl($url, $post_data, $headers, $uid);
+            }, [
+                'platform' => 'lucky5',
+                'task_id' => $id,
+                'plan_id' => $plan_id,
+                'account' => $account,
+                'url' => $url,
+            ]);
             $time11 = microtime(true);
             Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '幸运-下注节点-3', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst, 'time_consume'=>($time11-$time1).'s', 'slow_seconds'=>$slow_seconds]);
             sleep((int)$slow_seconds); # 下注延迟秒数
@@ -1628,10 +1636,13 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 'account'=>$account,
                 'mkey_time_out'=>$mkey_time_out,
                 'time_out'=>$TIME_OUT_RETRY,
-                'is_true'=>(boolean)($tmpRst['Status']==1),
-                'SerialNo' => $tmpRst['Data']['SerialNo'],
+                'is_true'=>(boolean)(($tmpRst['Status'] ?? 0)==1),
+                'SerialNo' => $tmpRst['Data']['SerialNo'] ?? '',
             ]);
-            if($tmpRst['Status'] == 1){
+            $tmpStatus = (int)($tmpRst['Status'] ?? 0);
+            $tmpCode = (int)($tmpRst['code'] ?? 0);
+            $tmpErrno = (int)($tmpRst['errno'] ?? 0);
+            if($tmpStatus == 1){
                 $status = 2;
                 $tmpRst['status'] = $status; # 下注成功
                 if(isset($tmpRst['Data']['SerialNo'])){
@@ -1656,38 +1667,37 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     Tool_Common::log('/bet/repeatErrorBet', 'INFO', '幸运五下注1', [$uid, $url, $post_data_1, $TzSystemsUsers->cookie, $TzSystemsUsers->ssc_domain, $_t, $TzSystemsUsers->user_agent, $rst1]);
                 }
                 Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '幸运-下注节点-4', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst, 'time_consume'=>($time11-$time1).'s', 'slow_seconds'=>$slow_seconds]);
-            }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [309])){
+            }elseif($tmpStatus == 0 && in_array($tmpCode, [309, 311, 312], true)){
                 $m->set($mkey, 1, 300);
-                //if($TIME_OUT_RETRY && !$open_retry ){
-                if($TIME_OUT_RETRY){
-                    $status = 1; # 失败重推
-                }else{
-                    $status = 2; # 超时不重复下
-                }
+                $status = 4; # 远程盘口请求异常，已重试3次
                 Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '幸运-下注节点-40', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst]);
-            }elseif($tmpRst['Status'] == 0 && in_array($tmpRst['code'], [302, 305, 307])){
-                $status = 4; # 不可再次下注：302余额不足305已关盘307网盘账号停押
-                throw_info(Json::encode($tmpRst));
-            }elseif($tmpRst['data'] == "Proxy Connect Error"){
+            }elseif($tmpStatus == 0 && in_array($tmpCode, [302, 303, 304, 305, 306, 307, 310, 313], true)){
+                $status = 4; # 明确业务失败，不自动重推
+                $tmpRst['status'] = $status;
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '幸运-下注节点-业务失败', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst]);
+            }elseif(($tmpRst['data'] ?? '') == "Proxy Connect Error"){
                 $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key, $id);
                 $m->delete($betKey); # 失败之后可重新下注的情况解锁
-                throw_info(Json::encode($tmpRst));
+                $status = 4; # 代理连接异常，已重试3次
             }else{
                 $betKey = BetService::buildLotteryBetKey($row->qihao, $row->plan_id, $row->bet_sort_key, $id);
                 $m->delete($betKey); # 失败之后可重新下注的情况解锁
-                throw_info('幸运-下注节点-异常');
+                $status = 3;
+                $tmpRst['status'] = $status;
+                $tmpRst['msg'] = $tmpRst['msg'] ?? '幸运-下注节点-异常';
+                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '幸运-下注节点-未知失败', ['task_id'=>$id, 'plan_id'=>$plan_id, 'account'=>$account, 'tmpRst'=>$tmpRst]);
             }
-            if($tmpRst['errno']>0 OR in_array($tmpRst['code'], [309,311])){ # 309,310,311   310有排查是已经换过代理IP,有待排查，为确保
+            if($tmpErrno>0 OR in_array($tmpCode, [309,311,312], true)){ # 309,310,311   310有排查是已经换过代理IP,有待排查，为确保
                 $status = 4; # 下注请求超时计划，后续可根据这个状态做是否重复下注处理，
                 $m->set($mkey_time_out, 1, 60);
-                throw_info('幸运-下注节点-44'.Json::encode($row->getFirstErrors()));
+                $tmpRst['msg'] = $tmpRst['msg'] ?? '远程盘口请求异常，已重试3次';
             }
 
             $time_consume = ($time2 - $time1).'s';
             $tmpRst['bet_time'] = date('Y-m-d H:i:s');
             $tmpRst['time_consume'] = $time_consume;
             $tmpRst['proxy_ip'] = ProxyBaseService::getCurrentValidProxyIp(); # 获取当前可用的代理IP;
-            $logArr = ['task_id'=>$id, 'uid'=>$uid, 'plan_id'=>$plan_id, 'account'=>$account, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'snInfo'=>$snInfo, 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
+            $logArr = ['task_id'=>$id, 'uid'=>$uid, 'plan_id'=>$plan_id, 'account'=>$account, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'snInfo'=>$snInfo??[], 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
             Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '幸运-下注节点-5', $logArr);
 
             $row->status = $status;

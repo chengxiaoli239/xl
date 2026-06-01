@@ -355,32 +355,51 @@ class NineNineNewService extends BaseTZService {
             $headers[] = "x-csrf-token: ".$xCsrf['Token'];
 
             $url = $row->bet_url;
-            $tmpRst = self::postBetCurl($url, $post_data, $headers);
+            $tmpRst = BetService::requestBetWithRetry(function () use ($url, $post_data, $headers) {
+                return self::postBetCurl($url, $post_data, $headers);
+            }, [
+                'platform' => 'ninenine',
+                'task_id' => $id,
+                'plan_id' => $plan_id,
+                'url' => $url,
+            ]);
 
             $logArr = ['task_id'=>$id, 'plan_id'=>$plan_id, 'uid'=>self::$user_id, 'url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$tmpRst];//p($logArr);
             Tool_Common::log('/repeatErrorBet/'.__FUNCTION__,'INFO','九九网下注节点-2', $logArr);
 
-            $rstData = $tmpRst['rstData'];
-            $xCsrf = $tmpRst['xCsrf'];
+            $rstData = $tmpRst['rstData'] ?? [];
+            $xCsrf = $tmpRst['xCsrf'] ?? [];
             if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
                 Tool_Common::log('/debug/bet_record', 'INFO', '投注继续', ['time'=>1, 'xCsrf'=>$xCsrf, 'tmpRst'=>$tmpRst]);
                 $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
                 $m->set($xCsrf_key, $xCsrf, 120);
             }
-            if($rstData['errorCode'] == 'FAIL' && $rstData['msg'] == 'Illegal X-Csrf-Token!!!'){
+            if(($rstData['errorCode'] ?? '') == 'FAIL' && ($rstData['msg'] ?? '') == 'Illegal X-Csrf-Token!!!'){
                 array_pop($headers); # 删除最后一个原始
                 array_pop($headers); # 删除最后一个原始
-                $headers[] = "x-csrf-index: ".$xCsrf['Index'];
-                $headers[] = "x-csrf-token: ".$xCsrf['Token'];
-                sleep(2);
-                $tmpRst = self::postBetCurl($url, $post_data, $headers);
-                $rstData = $tmpRst['rstData'];
-                $xCsrf = $tmpRst['xCsrf'];
-                Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '九九网重新下注-3',['plan_id'=>$plan_id, 'playway'=>$playway, 'rstData'=>$rstData, 'xCsrf'=>$xCsrf]);
-                if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
-                    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '九九网重新下注-4', ['time'=>2, 'xCsrf'=>$xCsrf, 'tmpRst'=>$tmpRst]);
-                    $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
-                    $m->set($xCsrf_key, $xCsrf, 120);
+                if(!empty($xCsrf['Index']) && !empty($xCsrf['Token'])){
+                    $headers[] = "x-csrf-index: ".$xCsrf['Index'];
+                    $headers[] = "x-csrf-token: ".$xCsrf['Token'];
+                    sleep(2);
+                    $tmpRst = BetService::requestBetWithRetry(function () use ($url, $post_data, $headers) {
+                        return self::postBetCurl($url, $post_data, $headers);
+                    }, [
+                        'platform' => 'ninenine',
+                        'task_id' => $id,
+                        'plan_id' => $plan_id,
+                        'url' => $url,
+                        'reason' => 'refresh_xcsrf',
+                    ]);
+                    $rstData = $tmpRst['rstData'] ?? [];
+                    $xCsrf = $tmpRst['xCsrf'] ?? [];
+                    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '九九网重新下注-3',['plan_id'=>$plan_id, 'playway'=>$playway, 'rstData'=>$rstData, 'xCsrf'=>$xCsrf]);
+                    if(isset($xCsrf['Token']) && !empty($xCsrf['Token'])){
+                        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '九九网重新下注-4', ['time'=>2, 'xCsrf'=>$xCsrf, 'tmpRst'=>$tmpRst]);
+                        $xCsrf_key = CommonService::buildXCsrfTokenKey($uid, $tz_system_id);
+                        $m->set($xCsrf_key, $xCsrf, 120);
+                    }
+                }else{
+                    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'ERR', '九九网重新下注缺少csrf', ['plan_id'=>$plan_id, 'playway'=>$playway, 'rstData'=>$rstData, 'xCsrf'=>$xCsrf]);
                 }
             }
             $snRst = NineNineNewService::getSnidBySn($uid, $tz_system_id, $row->lottery_type);
@@ -388,7 +407,7 @@ class NineNineNewService extends BaseTZService {
                 $snid = $snRst['list'][0]['orderNo']; // 获取方案内容
             }
             $tmpRst['bet_time'] = date('Y-m-d H:i:s');
-            $status = ($tmpRst['rstData']['code'] == 200) ? 2 : 3;
+            $status = (($tmpRst['rstData']['code'] ?? 0) == 200) ? 2 : 3;
 
             //$row = BetErrorPlansTask::findOne(['qihao'=>$qihao, 'plan_id'=>$plan_id]);
             $row->status = $status;

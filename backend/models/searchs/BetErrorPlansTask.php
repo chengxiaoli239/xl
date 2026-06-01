@@ -76,9 +76,10 @@ class BetErrorPlansTask extends BetErrorPlansTaskModel
             'created_at' => $this->created_at,
         ];
 
-        if($params['BetErrorPlansTask']['uid'] !==1){
-            $filterWhere['uid'] = $params['BetErrorPlansTask']['uid'];
-            $filterWhere['lottery_type'] = $params['BetErrorPlansTask']['lottery_type'];
+        $uid = $params['BetErrorPlansTask']['uid'] ?? 1;
+        if((int)$uid !== 1){
+            $filterWhere['uid'] = $uid;
+            $filterWhere['lottery_type'] = $params['BetErrorPlansTask']['lottery_type'] ?? null;
         }
         // grid filtering conditions
         $query->andFilterWhere($filterWhere);

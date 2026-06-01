@@ -18,7 +18,7 @@ class  CrontabIndexService{
                 ['=', 'u.is_auto_login', 1],
                 ['<>', 'u.ssc_domain', ''],
                 ['=', 's.status', 1],
-                ['=', 'u.is_local_bet', BetsBackend::BET_TYPE_SERVER_API],
+                ['IN', 'u.is_local_bet', [BetsBackend::BET_TYPE_SERVER_API, BetsBackend::BET_TYPE_LOCAL_API]],
             ]);
         //$sql = $query->createCommand()->getRawSql();p($sql);
         $TzSystemsUsers = $query->asArray()->all();

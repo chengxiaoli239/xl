@@ -249,7 +249,7 @@ class CurlService extends BaseService{
         }
         $data = json_decode($data, true);
 
-        if($data['Status'] == false){
+        if(isset($data['Status']) && $data['Status'] == false){
             //$data['headers'] = $header;
         }
 
@@ -341,7 +341,7 @@ class CurlService extends BaseService{
         }
         $data = json_decode($data, true);
 
-        if($data['Status'] == false){
+        if(isset($data['Status']) && $data['Status'] == false){
             //$data['headers'] = $header;
         }
 

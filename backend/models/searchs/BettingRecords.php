@@ -76,7 +76,8 @@ class BettingRecords extends BettingRecordsModel
             'is_simulate' => $this->is_simulate,
             'createtime' => $this->createtime,
         ];
-        if($params['BettingRecords']['uid'] !==1) $filterWhere['uid'] = $params['BettingRecords']['uid'];
+        $uid = $params['BettingRecords']['uid'] ?? 1;
+        if((int)$uid !== 1) $filterWhere['uid'] = $uid;
 
         if(!empty($params['BettingRecords']['plan_id'])){
             $ids = Tools::getQuerySplit($params['BettingRecords']['plan_id']);

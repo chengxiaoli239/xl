@@ -79,28 +79,29 @@ class DynamicFilterService extends BaseService {
         $codesArr = $allCodes;
         foreach ($dynamicTypes as $dynamic){
             self::$filterType = $dynamic['type'];
+            $filterDesc = self::getFilterDesc(self::$filterType);
             switch ($dynamic['type']){
                 case 1: # 两合上1
                     $codes = DynamicType2Service::filter1($plan, $dynamic);
                     break;
                 case 2: # 过滤近x天直码
-                    $codes = DynamicType2Service::filter2($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter2($plan, $dynamic, $filterDesc);
                     break;
                 case 3: # x(1234)位近y个码最多上z个
-                    $codes = DynamicType2Service::filter3($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter3($plan, $dynamic, $filterDesc);
                     break;
                 case 4: # 定x位号码y上期上两个则下期至少上1个
-                    $codes = DynamicType2Service::filter4($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter4($plan, $dynamic, $filterDesc);
                     break;
                 case 5: # 过滤1234最近x期开过号码全转
-                    $codes = DynamicType2Service::filter5($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter5($plan, $dynamic, $filterDesc);
                     break;
                 case 6: # 过滤1234前第x期同位置号码(6561)
                 case 8: # 过滤1234前第x-y期同位置号码
-                    $codes = DynamicType2Service::filter6($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter6($plan, $dynamic, $filterDesc);
                     break;
                 case 7: # 过滤最近x期开过号码全转
-                    $codes = DynamicType2Service::filter7($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter7($plan, $dynamic, $filterDesc);
                     break;
                 case 9: # 定位x或定位y合分为z
                 case 10: # 定位x或定位y合分为z
@@ -108,86 +109,86 @@ class DynamicFilterService extends BaseService {
                 case 20: # 定位x或定位y或定位j合分为z
                 case 25: # 定位x或定位y或定位j合分为z
                 case 26: # 定位x或定位y或定位j合分为z
-                    $codes = DynamicType2Service::filter9($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter9($plan, $dynamic, $filterDesc);
                     break;
                 case 11: # x位过滤上上期的y位+上期z位合数
                 case 13: # x位过滤上上期的y位+上期z位合数
-                    $codes = DynamicType2Service::filter11($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter11($plan, $dynamic, $filterDesc);
                     break;
                 case 12: # (x位+上期y位)!=(上上期z位+上期h位 合数)
                 case 14: # (x位+上期y位)!=(上上期z位+上期h位 合数)
-                    $codes = DynamicType2Service::filter12($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter12($plan, $dynamic, $filterDesc);
                     break;
                 case 15: # 定位x分别排除位置的对数
-                    $codes = DynamicType2Service::filter15($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter15($plan, $dynamic, $filterDesc);
                     break;
                 case 16: # 定位x排除对应位置的合分与对数值合分
-                    $codes = DynamicType2Service::filter16($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter16($plan, $dynamic, $filterDesc);
                     break;
                 case 17: # x位不等于上期y位合分
                 case 18: # x位不等于上期y位合分
-                    $codes = DynamicType2Service::filter17($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter17($plan, $dynamic, $filterDesc);
                     break;
                 case 21: # 过滤x个配数单双互排除及该位置号码(四定)
-                    $codes = DynamicType2Service::filter19($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter19($plan, $dynamic, $filterDesc);
                     break;
                 case 22: # x个位置配数单双互排除及该位置号码中奖
-                    $codes = DynamicType2Service::filter19($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType], $direct=1);
+                    $codes = DynamicType2Service::filter19($plan, $dynamic, $filterDesc, $direct=1);
                     break;
                 case 23: # x位或y位或z位上n配数单双互排及该位置号码则中
                 case 28: # x位或y位或z位上n配数大小互排及该位置号码则中
                     $opType = ($dynamic['type']==28) ? 'type_dx' : 'type_ds';
-                    $codes = DynamicType2Service::filter20($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType], $direct=1, $opType);
+                    $codes = DynamicType2Service::filter20($plan, $dynamic, $filterDesc, $direct=1, $opType);
                     break;
                 case 24: # x位或y位或z位上n配数单双互排及该位置号码则不中
                 case 29: # x位或y位或z位上n配数大小互排及该位置号码则不中
                     $opType = ($dynamic['type']==29) ? 'type_dx' : 'type_ds';
-                    $codes = DynamicType2Service::filter20($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType], $direct=0, $opType);
+                    $codes = DynamicType2Service::filter20($plan, $dynamic, $filterDesc, $direct=0, $opType);
                     break;
                 case 27: # x位或y位或z位上n配数单双互排及该位置号码则不中
-                    $codes = DynamicType2Service::filter21($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter21($plan, $dynamic, $filterDesc);
                     break;
                 case 30: # 过滤x位最新y期直码
-                    $codes = DynamicType2Service::filter30($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter30($plan, $dynamic, $filterDesc);
                     break;
                 case 31: # 上期开奖号码对数全倒
-                    $codes = DynamicType2Service::filter31($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter31($plan, $dynamic, $filterDesc);
                     break;
                 case 32: # 相邻两个相加合分有且只有x个相等
-                    $codes = DynamicType2Service::filter32($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter32($plan, $dynamic, $filterDesc);
                     break;
                 case 33: # 相邻两个相加合分至少只有x个相等
-                    $codes = DynamicType2Service::filter33($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter33($plan, $dynamic, $filterDesc);
                     break;
                 case 34: # 过滤上x期的和值
-                    $codes = DynamicType2Service::filter34($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter34($plan, $dynamic, $filterDesc);
                     break;
                 case 35: # 排除同位置最近n个号码复试
-                    $codes = DynamicType2Service::filter35($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter35($plan, $dynamic, $filterDesc);
                     break;
                 case 36: # 指定位置排除期号尾号
-                    $codes = DynamicType2Service::filter36($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter36($plan, $dynamic, $filterDesc);
                     break;
                 case 37: # 指定位置合分不等于上期对应位置合分
-                    $codes = DynamicType2Service::filter37($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter37($plan, $dynamic, $filterDesc);
                     break;
                 case 38: # 动态过滤2
-                    $codes = DynamicType2Service::filter38($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter38($plan, $dynamic, $filterDesc);
                     break;
                 case 39: # 过滤x范围直码
-                    $codes = DynamicType2Service::filter39($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter39($plan, $dynamic, $filterDesc);
                     break;
                 case 40: # 随机x组号码
-                    $codes = DynamicType2Service::filter40($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter40($plan, $dynamic, $filterDesc);
                     break;
                 case 41: # 随机位置号码个数
-                    $codes = DynamicType2Service::filter41($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter41($plan, $dynamic, $filterDesc);
                     break;
                 case 42: # 两数分离
-                    $codes = DynamicType2Service::filter42($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter42($plan, $dynamic, $filterDesc);
                     break;
                 case 43: # 取x位最近n个号码复式（与类型27排除相反）
-                    $codes = DynamicType2Service::filter43($plan, $dynamic, $filterDesc=self::DYNAMIC_FILTER_TYPES[self::$filterType]);
+                    $codes = DynamicType2Service::filter43($plan, $dynamic, $filterDesc);
                     break;
             }
             if(empty($codes)){
@@ -198,6 +199,17 @@ class DynamicFilterService extends BaseService {
         #p(['counts'=>count($codesArr), 'codesArr'=>$codesArr]);
 
         return $codesArr;
+    }
+
+    private static function getFilterDesc($type): array
+    {
+        foreach (self::DYNAMIC_FILTER_TYPES as $filterDesc) {
+            if((int)$filterDesc['type'] === (int)$type){
+                return $filterDesc;
+            }
+        }
+
+        return ['type'=>$type, 'label'=>'', 'params'=>[], 'desc'=>''];
     }
 
 }

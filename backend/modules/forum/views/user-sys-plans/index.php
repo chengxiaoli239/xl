@@ -338,16 +338,26 @@ $columns = array_merge(
         ['attribute' => 'hz_Arr','label'=>'扩展',#'headerOptions'=>['width'=>'5%'],
             'format'=>'raw',
             'value' => function($model) {
+                $str = '';
+                $title = '';
+                $desc_str = '';
+                $betStatusTxt = '等待中...';
+                $codes_hz = json_decode($model->hz_Arr, true);
+
                 if(\backend\service\BaseService::is_json($model->hz_Arr) OR in_array($model->tz_type, [18, 19, 20, 23, 25, 27, 28, 29, 30, 31, 32, 33, 34, 17,36,37])){
-                    $str = \backend\service\NumService::getDescByKuaixuan(json_decode($model->hz_Arr, true), $model->id);
+                    $str = is_array($codes_hz) ? \backend\service\NumService::getDescByKuaixuan($codes_hz, $model->id) : $model->hz_Arr;
                     $desc_str = $str;
                     if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
-                        $title = \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id])->codes;
+                        $importPlanCodes = \backend\models\ImportPlanCodes::findOne(['plan_id'=>$model->id]);
+                        $title = !empty($importPlanCodes) ? $importPlanCodes->codes : $model->hz_Arr;
                     }
-                    $codes_hz = json_decode($model->hz_Arr, true);
-                    $betStatusTxt = ($codes_hz['areaBetStatus']==1 OR $codes_hz['betStatus']==1) ? '正在下注...' : '等待中...';
+                    if(is_array($codes_hz)){
+                        $betStatusTxt = (($codes_hz['areaBetStatus'] ?? 0) == 1 OR ($codes_hz['betStatus'] ?? 0) == 1) ? '正在下注...' : '等待中...';
+                    }
                 }else{
                     $title = $model->hz_Arr;
+                    $str = $model->hz_Arr;
+                    $desc_str = $str;
                 }
                 $txt = BaseStringHelper::truncate($str,24);
                 $desc_str .= !empty($model->singles) ? '翻倍：'.$model->singles : '';

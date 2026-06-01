@@ -89,7 +89,7 @@ class SscStaticYl extends SscStaticYlModel
             'type_log' => $this->type_log,
             'type_4ds' => $this->type_4ds,
         ]);
-        if($params['SscStaticYl']['is_hots'] == 1){
+        if(($params['SscStaticYl']['is_hots'] ?? 0) == 1){
             $query->orderBy(['LENGTH(yl_records)'=>SORT_DESC]);
         }else{
             if($this->val)

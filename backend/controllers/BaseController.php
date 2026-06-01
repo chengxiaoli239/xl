@@ -38,7 +38,16 @@ class BaseController extends Controller
     }
 
     public function _initData(){
+        if (Yii::$app->user->isGuest || empty($this->_user_id)) {
+            return;
+        }
+
         $User = AdminModel::findOne($this->_user_id);
+        if (empty($User)) {
+            Yii::$app->user->logout();
+            return;
+        }
+
         $userLoginAccessTokenDatas = UserService::getUserLoginInfo($this->_user_id);
         $session_id = Yii::$app->getSession()->id;
         $this->user_type = $User->user_type;
@@ -49,9 +58,7 @@ class BaseController extends Controller
             }
         }
         Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '用户登陆access_token信息', ['uid'=>$this->_user_id, 'session_id'=>$session_id, 'userLoginAccessTokenDatas'=>$userLoginAccessTokenDatas]);
-        if(!empty($User)){
-            $this->_account = $User->username;
-        }
+        $this->_account = $User->username;
     }
 
     /**

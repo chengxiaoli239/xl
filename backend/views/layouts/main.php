@@ -25,6 +25,15 @@ use yii\widgets\PjaxAsset;
 PjaxAsset::register($this);
 
 $this->registerCssFile('@web/statics/css/slidebars.css', ['depends'=>'backend\assets\AppAsset']);
+$identity = Yii::$app->user->identity;
+$username = '';
+if ($identity !== null) {
+    if (is_array($identity) || $identity instanceof ArrayAccess) {
+        $username = isset($identity['username']) ? $identity['username'] : '';
+    } elseif (is_object($identity) && isset($identity->username)) {
+        $username = $identity->username;
+    }
+}
 
 function isSubUrl($menuArray, $route)
 {
@@ -364,7 +373,7 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
                 <li class="dropdown">
                     <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                         <img alt="" src="<?=Yii::getAlias('@web')?>/statics/img/avatar1_small.jpg">
-                        <span class="username"><?=Yii::$app->user->identity['username']?></span>
+                        <span class="username"><?=Html::encode($username)?></span>
                         <b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu extended logout">

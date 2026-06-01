@@ -783,6 +783,7 @@ class NumService extends BaseService {
         # 去除双重数字
         foreach ($codesArr as $key=>$codes){
             $len = strlen($codes);
+            $codesArrTmp = [];
             if($len == 1){
                 $codesArrTmp = NumService::getAllCombination1($codes, $type, $code_type);
                 # 一个码
@@ -1255,6 +1256,10 @@ class NumService extends BaseService {
     public static function getCodesKuaiXuan($codes_hz, $code_type = 4, $codes=[], $lottery_type='') {
         //p([$codes_hz, $code_type]);
         if(empty($codes_hz)) return [];
+        $codes_hz = is_array($codes_hz) ? $codes_hz : [];
+        $codes_hz['arise'] = $codes_hz['arise'] ?? '';
+        $codes_hz['arise_in'] = $codes_hz['arise_in'] ?? '';
+        $codes_hz['arise_in_sel'] = $codes_hz['arise_in_sel'] ?? 0;
 
         $where = ['AND', ['=', 'code_type', $code_type]];
         # 双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
@@ -1394,10 +1399,10 @@ class NumService extends BaseService {
         # 不定位合分(1两数、2三数) - 三定
         //if($code_type == 3 && !empty($codes_hz['no_fix_hefen']) && !empty($codes_hz['no_fix_hefen_pos'])){
         $newHefens = [];
-        if(!empty($codes_hz['no_fix_hefen2']) && $codes_hz['no_fix_hefen_pos_2'] == 1){
+        if(!empty($codes_hz['no_fix_hefen2']) && !empty($codes_hz['no_fix_hefen_pos_2']) && $codes_hz['no_fix_hefen_pos_2'] == 1){
             $newHefens[] = ['no_fix_hefen'=>$codes_hz['no_fix_hefen2'], 'no_fix_hefen_pos'=>$codes_hz['no_fix_hefen_pos_2']];
         }
-        if(!empty($codes_hz['no_fix_hefen3']) && $codes_hz['no_fix_hefen_pos_3'] == 2){
+        if(!empty($codes_hz['no_fix_hefen3']) && !empty($codes_hz['no_fix_hefen_pos_3']) && $codes_hz['no_fix_hefen_pos_3'] == 2){
             $newHefens[] = ['no_fix_hefen'=>$codes_hz['no_fix_hefen3'], 'no_fix_hefen_pos'=>$codes_hz['no_fix_hefen_pos_3']];
         }
         # 新
@@ -1498,7 +1503,7 @@ class NumService extends BaseService {
         }
 
         # 三定、四定 "含" 除、取
-        if(in_array($code_type, [3,4]) && !empty(trim($codes_hz['arise_in'])) && in_array($codes_hz['arise_in_sel'], [1, 2])){
+        if(in_array($code_type, [3,4]) && !empty(trim((string)$codes_hz['arise_in'])) && in_array($codes_hz['arise_in_sel'], [1, 2])){
             $lenAriseIn = strlen($codes_hz['arise_in']); # 含的个数
             $tmpAriseInType = $codes_hz['arise_in_sel'];
             if($tmpAriseInType == 1){ # 除
@@ -1866,7 +1871,7 @@ class NumService extends BaseService {
 
          # 上奖
         //if(isset($codes_hz['arise']) && !empty($codes_hz['arise'])){
-        if(in_array($code_type, [2,3,4]) && isset($codes_hz['arise'])){
+        if(in_array($code_type, [2,3,4]) && !empty($codes_hz['arise'])){
             $asises = explode(',', $codes_hz['arise']);
             $codesArr_arise = self::getCodesArise($asises, $type = 1, $code_type);
             //p(['code_type'=>$code_type, 'where'=>$where, 'codes_hz'=>$codes_hz, 'codesArr_arise'=>$codesArr_arise, 'codesArr'=>$codesArr]);
@@ -2190,7 +2195,7 @@ class NumService extends BaseService {
      * @return array
      */
     private static function getPosOddWhere($codes_hz=[], &$where=[]){
-        if(empty($codes_hz['odd_pos'])){
+        if(empty($codes_hz['odd_pos']) || !isset($codes_hz['odd_sel'])){
             return $where;
         }
         $poses = explode(',', $codes_hz['odd_pos']);
@@ -2219,7 +2224,7 @@ class NumService extends BaseService {
      * @return array
      */
     private static function getPosEvenWhere($codes_hz=[], &$where=[]){
-        if(empty($codes_hz['even_pos'])){
+        if(empty($codes_hz['even_pos']) || !isset($codes_hz['even_sel'])){
             return $where;
         }
         $poses = explode(',', $codes_hz['even_pos']);
@@ -2250,7 +2255,7 @@ class NumService extends BaseService {
      */
     private static function getPosBigWhere($codes_hz=[], &$where=[]){
         #p($codes_hz, 0);
-        if(empty($codes_hz['big_pos'])){
+        if(empty($codes_hz['big_pos']) || !isset($codes_hz['big_sel'])){
             return $where;
         }
         $poses = explode(',', $codes_hz['big_pos']);
@@ -2281,7 +2286,7 @@ class NumService extends BaseService {
      */
     private static function getPosSmallWhere($codes_hz=[], &$where=[]){
         #p($codes_hz, 0);
-        if(empty($codes_hz['small_pos'])){
+        if(empty($codes_hz['small_pos']) || !isset($codes_hz['small_sel'])){
             return $where;
         }
         $poses = explode(',', $codes_hz['small_pos']);
@@ -2525,6 +2530,7 @@ class NumService extends BaseService {
      */
     public static function getExcludeCodesWhere($codes_hz, &$where, $code_type=4){
         $codes_hz = \backend\service\NumService::getHefenInitData($codes_hz, $code_type);
+        $codes_hz['exclude_codes'] = $codes_hz['exclude_codes'] ?? '';
         if($codes_hz['exclude_codes'] !==0 && $codes_hz['exclude_codes'] !=='0' && empty($codes_hz['exclude_codes'])){
             return $where;
         }
@@ -2634,6 +2640,7 @@ class NumService extends BaseService {
      * @return array
      */
     public static function getFuShiWhere($codes_hz, &$where, $code_type=4){
+        $codes_hz['fushiCodes'] = $codes_hz['fushiCodes'] ?? '';
         if($codes_hz['fushiCodes'] !==0 && $codes_hz['fushiCodes'] !=='0' && empty($codes_hz['fushiCodes'])){
             return $where;
         }
@@ -2650,10 +2657,11 @@ class NumService extends BaseService {
         $allFsWhere[] = ['IN', 'code_4', $fsCodes];
 
         # 定位合分
-        if($codes_hz['fushi_sel'] == NumService::EXCLUDE){
+        $fushiSel = $codes_hz['fushi_sel'] ?? NumService::OBTAIN;
+        if($fushiSel == NumService::EXCLUDE){
             # 复式除，条件组装
             $where = array_merge($where, [['NOT', $allFsWhere]]);
-        }elseif($codes_hz['fushi_sel'] == NumService::OBTAIN){
+        }elseif($fushiSel == NumService::OBTAIN){
             # 取，条件组装
             $where[] = $allFsWhere;
         }
@@ -2991,10 +2999,10 @@ class NumService extends BaseService {
                 $desc .= ' 两不定合:'.$hz_Arr['no_fix_hefen'];
             }
         }
-        if($hz_Arr['no_fix_hefen_pos_2']==1 && $hz_Arr['no_fix_hefen2']){
+        if(!empty($hz_Arr['no_fix_hefen2']) && !empty($hz_Arr['no_fix_hefen_pos_2']) && $hz_Arr['no_fix_hefen_pos_2']==1){
             $desc .= ' 两不定合:'.$hz_Arr['no_fix_hefen2'];
         }
-        if($hz_Arr['no_fix_hefen_pos_3']==2 && $hz_Arr['no_fix_hefen3']){
+        if(!empty($hz_Arr['no_fix_hefen3']) && !empty($hz_Arr['no_fix_hefen_pos_3']) && $hz_Arr['no_fix_hefen_pos_3']==2){
             $desc .= ' 三不定合:'.$hz_Arr['no_fix_hefen3'];
         }
 

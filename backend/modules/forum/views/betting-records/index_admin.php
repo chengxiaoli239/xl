@@ -6,6 +6,7 @@ use yii\widgets\Pjax;
 use yii\helpers\BaseStringHelper;
 use backend\models\SscKjData;
 $newRecord = SscKjData::find()->select(['qihao','code_str'])->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->asArray()->limit(1)->one();
+$newRecordText = $newRecord ? '['.$newRecord['qihao'].':'.$newRecord['code_str'].']' : '';
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\searchs\BettingRecords */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -34,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <!-- page start-->
     <section class="panel">
         <header class="panel-heading">
-            <?= Html::encode($this->title);echo '['.$newRecord['qihao'].':'.$newRecord['code_str'].']'; ?>
+            <?= Html::encode($this->title);echo $newRecordText; ?>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">

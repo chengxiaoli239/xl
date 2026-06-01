@@ -550,6 +550,9 @@ class UserService extends BaseService {
      * @return array
      */
     public static function updateUserProfits($TzSystemsUsers){
+        $code = 0;
+        $current_profits = $TzSystemsUsers->current_profits ?? 0;
+
         try {
             if($TzSystemsUsers->take_profits>0 OR $TzSystemsUsers->stop_loss>0){
                 $current_profits = UserService::staticUserProfits($TzSystemsUsers->uid);

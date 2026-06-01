@@ -29,7 +29,7 @@ class OneNumYl extends BaseService
                     # 今日出现
                     'today_current' => $ylData['todayCurrent'][$code]??0,
                     # 当前遗漏
-                    'current_miss' => $ylData['maxIndexId'] - $ylData['currentIndexIds'][$code],
+                    'current_miss' => $ylData['maxIndexId'] - ($ylData['currentIndexIds'][$code] ?? 0),
                     # 今日遗漏
                     'today_miss' => $ylData['todayAllCount'] - ($ylData['todayMiss'][$code]??0),
                     # 本周遗漏
@@ -72,7 +72,7 @@ class OneNumYl extends BaseService
         # 当前遗漏
         $currentMiss = SscKjData::find()->select([$field, 'index_id'=>'MAX(index_id)'])->where($where)
             ->asArray()->groupBy([$field])->indexBy($field)->orderBy('MAX(index_id) DESC')->limit(1000)->all();
-        $maxIndexId = current($currentMiss)['index_id'];
+        $maxIndexId = current($currentMiss)['index_id'] ?? 0;
         //p([$currentMiss, $maxIndexId]);
         // 重构数组
         $currentIndexIds = array_map(function($item) {
