@@ -38,8 +38,17 @@ phpunit.phar
 /.vagrant
 
 # runtime
+backend/runtime/cache/*
 backend/runtime/captcha/*
 backend/runtime/logs/*
 backend/runtime/debug/*
 backend/web/assets/*
+backend/web/.well-known/acme-challenge/*
+backend/web/.user.ini
+backend/web/*.apk
+
+# local deploy/runtime wrappers
+deploy/
+/php74-yii
+/php84-yii
 
