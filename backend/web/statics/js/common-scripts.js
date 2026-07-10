@@ -78,9 +78,18 @@ var Script = function () {
     });
 
 // custom scrollbar
+    // 检测是否为触屏设备（移动端），触屏设备使用原生滚动以获得流畅体验
+    var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+
     $('#sidebar').niceScroll({styler:'fb',cursorcolor:'#e8403f', cursorwidth: '3', cursorborderradius: '10px', background: '#404040', spacebarenabled:false, cursorborder: ''});
 
-    $('html').niceScroll({styler:'fb',cursorcolor:'#e8403f', cursorwidth: '6', cursorborderradius: '10px', background: '#404040', spacebarenabled:false,  cursorborder: '', zindex: '1000'});
+    if (!isTouchDevice) {
+        // 桌面端：使用niceScroll自定义滚动条
+        $('html').niceScroll({styler:'fb',cursorcolor:'#e8403f', cursorwidth: '6', cursorborderradius: '10px', background: '#404040', spacebarenabled:false,  cursorborder: '', zindex: '1000'});
+    } else {
+        // 移动端：使用原生滚动，CSS已设置-webkit-overflow-scrolling: touch确保流畅
+        $('html').addClass('touch-scroll');
+    }
 
 // widget tools
 

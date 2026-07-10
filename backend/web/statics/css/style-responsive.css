@@ -591,6 +591,18 @@
     }
 }
 
+/* 移动端原生流畅滚动 */
+html.touch-scroll,
+html.touch-scroll body {
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: auto;
+}
 
-
+/* 修复niceScroll在移动端可能残留的overflow:hidden */
+html.touch-scroll #main-content,
+html.touch-scroll .wrapper,
+html.touch-scroll #container {
+    overflow: visible;
+}
 
