@@ -1218,13 +1218,96 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @param $tz_system_id
      * @return mixed|string
      */
+    /**
+     * @desc 从登录页面提取RSA公钥
+     * @param $uid
+     * @param $tz_system_id
+     * @return string
+     */
+    private static function getRsaPublicKey($uid, $tz_system_id){
+        $m = \Yii::$app->cache;
+        $mkey = 'rsa_public_key_'.$tz_system_id;
+        $publicKey = $m->get($mkey);
+        if($publicKey) return $publicKey;
+
+        $_t = microtime(true) * 10000;
+        $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/Login'.'?_='.$_t;
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $headers = [
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Encoding: gunzip, deflate',
+            'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+            'Upgrade-Insecure-Requests: 1',
+            'Cache-Control: max-age=0',
+            $TzSystemsUsers->user_agent,
+        ];
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
+        BaseService::setPoxy($ch, $url, $uid);
+
+        $html = curl_exec($ch);
+        curl_close($ch);
+
+        preg_match('/id="hd_publickey"\s+value="([^"]+)"/i', $html, $matches);
+        $publicKey = $matches[1] ?? '';
+        if($publicKey){
+            $m->set($mkey, $publicKey, 3600);
+        }
+        Tool_Common::log('/luckybase/'.__FUNCTION__, 'INFO', '获取RSA公钥', ['uid'=>$uid, 'publicKey'=>$publicKey ? 'found' : 'NOT FOUND']);
+
+        return $publicKey;
+    }
+
+    /**
+     * @desc RSA加密（模拟JSEncrypt行为，PKCS#1 v1.5填充，base64输出，避免末尾==）
+     * @param string $data
+     * @param string $publicKey
+     * @return string
+     */
+    private static function rsaEncrypt($data, $publicKey){
+        // 将原始base64公钥转换为PEM格式
+        $pemKey = "-----BEGIN PUBLIC KEY-----\n" . chunk_split($publicKey, 64, "\n") . "-----END PUBLIC KEY-----";
+        $key = openssl_pkey_get_public($pemKey);
+        if(!$key) return $data;
+
+        $result = '';
+        $maxRetries = 10;
+        $retryCount = 0;
+        while($retryCount < $maxRetries){
+            openssl_public_encrypt($data, $encrypted, $key, OPENSSL_PKCS1_PADDING);
+            $result = base64_encode($encrypted);
+            if(substr($result, -2) !== '=='){
+                break;
+            }
+            $retryCount++;
+        }
+
+        return $result;
+    }
+
     private static function loginRemote($uid, $tz_system_id){
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
-        $post_data['Account'] = $TzSystemsUsers->account;
-        $post_data['Password'] = $TzSystemsUsers->password;
-        //p($post_data);
+        # 获取RSA公钥并加密账号密码
+        $publicKey = self::getRsaPublicKey($uid, $tz_system_id);
+        if($publicKey){
+            $post_data['Account'] = self::rsaEncrypt($TzSystemsUsers->account, $publicKey);
+            $post_data['Password'] = self::rsaEncrypt($TzSystemsUsers->password, $publicKey);
+            Tool_Common::log('/luckybase/loginRemote', 'INFO', 'RSA加密登录', ['uid'=>$uid, 'account'=>$TzSystemsUsers->account]);
+        }else{
+            $post_data['Account'] = $TzSystemsUsers->account;
+            $post_data['Password'] = $TzSystemsUsers->password;
+            Tool_Common::log('/luckybase/loginRemote', 'INFO', '明文登录(未找到RSA公钥)', ['uid'=>$uid]);
+        }
 
         if(!$post_data['Account'] OR !$post_data['Password']) return ['status'=>300, 'msg'=>'账号或者密码不能为空'];
 
