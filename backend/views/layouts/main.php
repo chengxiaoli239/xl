@@ -428,6 +428,7 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
     <!--sidebar end-->
     <!--main content start-->
     <section id="main-content">
+        <script src="/statics/js/jquery-2.0.3.js"></script>
         <?=$content?>
     </section>
     <!--main content end-->
@@ -597,7 +598,6 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
 <div id="update-password-content">
 <?php Modal::end(); ?>
 
-<script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
 $('#updatePassword').click(function () {
     $('#update-password-modal').modal('show');
