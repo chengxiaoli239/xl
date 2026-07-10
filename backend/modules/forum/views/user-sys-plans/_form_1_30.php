@@ -138,16 +138,6 @@ $(function () {
         var name = $(this).attr('name');
         $('input[name="' + name + '"]').not(this).prop('checked', false);
     });
-    // Toggle dynamic filter 1
-    $('#toggleFilterDynamic1').click(function() {
-        $('#filterDynamic1Content').toggle();
-        $(this).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
-    });
-
-    // Toggle dynamic filter 2
-    $('#toggleFilterDynamic2').click(function() {
-        $('#filterDynamic2Content').toggle();
-        $(this).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
-    });
+    // 动态过滤按钮事件已在 filter_dynamic.php 中统一处理
 });
 </script>

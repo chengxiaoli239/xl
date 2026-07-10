@@ -179,85 +179,66 @@ $dynamics = array_column(\backend\service\numbers\DynamicFilterService::DYNAMIC_
     </div>
 </div>
 <script>
-$(document).ready(function() {
-    // Toggle dynamic filter 1
+$(function () {
+    // 动态过滤1 - 展开/折叠（带滑动特效）
     $('#toggleFilterDynamic1').click(function() {
-        $('#filterDynamic1Content').toggle();
+        $('#filterDynamic1Content').slideToggle('fast');
         $(this).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
     });
 
-    // Toggle dynamic filter 2
+    // 动态过滤2 - 展开/折叠（带滑动特效）
     $('#toggleFilterDynamic2').click(function() {
-        $('#filterDynamic2Content').toggle();
+        $('#filterDynamic2Content').slideToggle('fast');
         $(this).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
     });
 
-    // Show/hide dynamic filter 1 content based on checkbox selection
+    // 动态过滤1 - 根据复选框选中状态自动展开/折叠
     $('input[name="UserSysPlans[filter_dynamic_types][]"]').change(function() {
         if ($('input[name="UserSysPlans[filter_dynamic_types][]"]:checked').length > 0) {
-            $('#filterDynamic1Content').show();
+            $('#filterDynamic1Content').slideDown('fast');
         } else {
-            $('#filterDynamic1Content').hide();
+            $('#filterDynamic1Content').slideUp('fast');
         }
     }).trigger('change');
 
-    // Show/hide dynamic filter 2 content based on checkbox selection
+    // 动态过滤2 - 根据复选框选中状态自动展开/折叠
     $('input[name^="UserSysPlans[filter_dynamic_types2]"]').change(function() {
         if ($('input[name^="UserSysPlans[filter_dynamic_types2]"]:checked').length > 0) {
-            $('#filterDynamic2Content').show();
+            $('#filterDynamic2Content').slideDown('fast');
         } else {
-            $('#filterDynamic2Content').hide();
+            $('#filterDynamic2Content').slideUp('fast');
         }
     }).trigger('change');
-});
-// 监听动态过滤2中的复选框点击事件
-$('input[type="checkbox"][name^="UserSysPlans[filter_dynamic_types2]"]').click(function() {
-    // 获取提示框
-    var tooltip = $('.tooltip');
 
-    // 显示提示
-    tooltip.css({top: $(this).offset().top + 20, left: $(this).offset().left}).fadeIn();
+    // 动态过滤2复选框hover提示
+    $('input[type="checkbox"][name^="UserSysPlans[filter_dynamic_types2]"]').hover(
+        function() {
+            $(this).closest('div').find('.tooltip').fadeIn();
+        },
+        function() {
+            $(this).closest('div').find('.tooltip').fadeOut();
+        }
+    );
 
-    // 设置定时器，3秒后隐藏提示
-    setTimeout(function() {
-        tooltip.fadeOut();
-    }, 3000); // 3000毫秒 = 3秒
-});
-$(function () {
+    // 动态过滤类型说明弹窗
     $('#tag_filter_dynamic_type').click(function () {
         $('#exampleModal_msg_filter_dynamic_type').modal('show');
     });
-})
 
-// 监听所有 "查看详情" 按钮的点击事件
-document.addEventListener("DOMContentLoaded", function () {
-    const modal = document.getElementById("dynamicModal");
-    const modalTile = document.getElementById("dynamicModalLabel");
-    const modalDesc = document.getElementById("modalDesc");
-    const modalImage = document.getElementById("modalImage");
+    // "查看详情"按钮 - 弹窗展示过滤类型说明
+    $('.show-modal-btn').click(function () {
+        var title = $(this).data('label');
+        var desc = $(this).data('desc');
+        var imgUrl = $(this).data('img');
 
-    // 获取所有的按钮
-    document.querySelectorAll(".show-modal-btn").forEach(function (button) {
-        button.addEventListener("click", function () {
-            // 从按钮中获取数据
-            const title = this.getAttribute("data-label");
-            const desc = this.getAttribute("data-desc");
-            const imgUrl = this.getAttribute("data-img");
-
-
-            // 设置模态框内容
-            modalDesc.innerHTML = desc;
-            modalTile.textContent = title
-            if (imgUrl) {
-                modalImage.src = imgUrl;
-                modalImage.style.display = "block";
-            } else {
-                modalImage.style.display = "none";
-            }
-
-            // 显示模态框
-            $(modal).modal("show");
-        });
+        $('#dynamicModalLabel').text(title);
+        $('#modalDesc').html(desc);
+        if (imgUrl) {
+            $('#modalImage').attr('src', imgUrl).show();
+        } else {
+            $('#modalImage').hide();
+        }
+        $('#dynamicModal').modal('show');
     });
 });
 </script>
