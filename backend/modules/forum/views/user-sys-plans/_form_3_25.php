@@ -446,7 +446,7 @@ use yii\widgets\ActiveForm;
         </div>
     </div>
 </div>
-<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
+<!-- 布局已加载jQuery 2.0.3，无需重复加载 -->
 <?php include(dirname(__FILE__).'/query-profits.php');?>
 <script>
 $(function () {

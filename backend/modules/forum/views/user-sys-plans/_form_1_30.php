@@ -131,7 +131,7 @@ use yii\widgets\ActiveForm;
         </section>
     </div>
 </div>
-<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
+<!-- 布局已加载jQuery 2.0.3，无需重复加载 -->
 <script>
 $(function () {
     $('.checkbox-item').click(function() {

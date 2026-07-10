@@ -218,21 +218,11 @@ use yii\widgets\ActiveForm;
         </div>
     </div>
 </div>
-<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
+<!-- 布局已加载jQuery 2.0.3，无需重复加载 -->
 <?php include(dirname(__FILE__).'/query-profits.php');?>
 <script>
 $(function () {
-    // Toggle dynamic filter 1
-    $('#toggleFilterDynamic1').click(function() {
-        $('#filterDynamic1Content').toggle();
-        $(this).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
-    });
-
-    // Toggle dynamic filter 2
-    $('#toggleFilterDynamic2').click(function() {
-        $('#filterDynamic2Content').toggle();
-        $(this).find('span').toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
-    });
+    // 动态过滤按钮事件已在 filter_dynamic.php 中统一处理
     $('.checkbox-item').click(function() {
         var name = $(this).attr('name');
         $('input[name="' + name + '"]').not(this).prop('checked', false);

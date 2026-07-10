@@ -16,7 +16,6 @@
     </div>
 </div>
 <?}?>
-<script src="/chat_statics/js/jquery-1.8.0.min.js"></script>
 <script>
     $('#usersysplans-change_per').click(function () {
         $("[name='UserSysPlans[change_per][]']").each(function () {
