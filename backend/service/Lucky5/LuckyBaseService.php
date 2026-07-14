@@ -1262,8 +1262,13 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $html = curl_exec($ch);
         curl_close($ch);
 
-        preg_match('/id="hd_publickey"\s+value="([^"]+)"/i', $html, $matches);
+        // 先去除HTML注释，避免匹配到注释中的旧公钥
+        $htmlNoComment = preg_replace('/<!--.*?-->/s', '', $html);
+        preg_match('/id="hd_publickey"\s+value="([^"]+)"/i', $htmlNoComment, $matches);
         $publicKey = $matches[1] ?? '';
+        if(!empty($publicKey) && !preg_match('/^[A-Za-z0-9+\/=]+$/', $publicKey)){
+            $publicKey = '';
+        }
         if($publicKey){
             $m->set($mkey, $publicKey, 3600);
         }
