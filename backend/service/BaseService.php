@@ -59,9 +59,12 @@ class BaseService{
                 throw_info('账号或密码为空，不能自动登录', 304);
             }
 
-            # 密码或账号不正确
+            # 密码或账号不正确 - 自动登录时清除旧错误描述，允许重新尝试
             if($is_auto == 1 && (strpos($TzSystemsUser->desc, '用户名或密码不正确') !== false OR strpos($TzSystemsUser->desc, '您的访问过于频繁') !== false)){
-                throw_info($TzSystemsUser->desc, 305);
+                Tool_Common::log('/login/'.__FUNCTION__, 'INFO', '清除旧的登录错误描述，重新尝试', ['id'=>$id, 'old_desc'=>$TzSystemsUser->desc]);
+                $TzSystemsUser->desc = '';
+                $TzSystemsUser->save();
+                # 不清除的错误继续登录尝试（可能是用户已修改密码）
             }
 
             $not_need_login_tz_system_ids = explode(',', $val = SystemConfig::findOne(['key'=>'ssc_kj_time_period'])->value); # 开奖时间间隔:20分钟

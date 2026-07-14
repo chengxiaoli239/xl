@@ -105,8 +105,14 @@ class Lucky5Service { # 重庆7时彩登陆体系
      */
     public static function getTzSiteInfo($tz_system_id, $url_key = ''){
         $TzSystemUser = TzSystemsUsers::findOne(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
-        //p(['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id,$TzSystemUser->attributes]);
+        if(!$TzSystemUser){
+            Tool_Common::log('/lucky5/'.__FUNCTION__, 'ERR', '找不到站点信息', ['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
+            return [];
+        }
         $baseUrl = $TzSystemUser->ssc_domain;
+        if(empty($baseUrl)){
+            Tool_Common::log('/lucky5/'.__FUNCTION__, 'ERR', 'ssc_domain为空', ['uid'=>self::$user_id, 'tz_system_id'=>$tz_system_id]);
+        }
         self::$cookie = $TzSystemUser->cookie;
         \Yii::$app->params['baseUrl']  = $TzSystemUser->ssc_domain;
         \Yii::$app->params['domain']  = str_replace('http://','',str_replace('https', 'http', $TzSystemUser->ssc_domain));
