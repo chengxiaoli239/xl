@@ -1132,6 +1132,76 @@ class DynamicType2Service extends BaseService {
     }
 
     /**
+     * 过滤类型号码 - 取x位各取最近y个号码复式（每位独立取码）
+     * 与类型43不同：类型43是同一位置码池过滤全部四位，此类型是每个位置用自己的码池
+     * 相当于类型35（排除）的反选保留版本，但参数简化为 x:位置、y:统一码数
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     */
+    public static function filter44(object $plan, $dynamic=[], $filterDesc = []): array
+    {
+        $playway = $plan->playway;
+        $lottery_type = $plan->lottery_type;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+
+        $params = $dynamic['params'];
+        $x = (string)($params['x'] ?? '');
+        $y = (int)($params['y'] ?? 0);
+
+        if ($x === '' || $y < 1) {
+            Tool_Common::log('/data/'.__FUNCTION__, 'WARNING', '取x位各取最近y个号码复式参数无效', ['plan_id'=>$plan->id, 'params'=>$params]);
+            $NumTypes = Num4Type::find()->select(['code'])
+                ->where(['=', 'code_type', $playway + 1])
+                ->asArray()->all();
+            return ArrayHelper::getColumn($NumTypes, 'code');
+        }
+
+        $positions = str_split($x);
+        $posNameMap = ['1'=>'千', '2'=>'百', '3'=>'十', '4'=>'个'];
+
+        // 构建查询：每个指定位置用自己的独立码池过滤
+        $query = (new \yii\db\Query())
+            ->select(['code', 'code_type'])
+            ->from('lt_num4_type')
+            ->where(['code_type' => $playway + 1]);
+
+        $descParts = [];
+        foreach ($positions as $pos) {
+            if (!in_array($pos, ['1', '2', '3', '4'])) {
+                continue;
+            }
+            $posInt = (int)$pos;
+            $posCodes = NumService::getPosLatelyCode($posInt, $y, $lottery_type);
+            if (!empty($posCodes)) {
+                $query->andWhere(['IN', 'code_' . $posInt, $posCodes]);
+            }
+            $posName = $posNameMap[$pos] ?? $pos . '位';
+            $descParts[] = $posName . '近' . $y . '个码:' . implode('', $posCodes);
+        }
+
+        $sql = $query->createCommand()->getRawSql();
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+
+        $betDesc = $filterDesc['desc'] . '：保留' . implode('、', $descParts) . '，最终组数：' . count($codes);
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '取x位各取最近y个号码复式', [
+            'plan_id' => $plan->id,
+            'lottery_type' => $lottery_type,
+            'current_kj_qihao' => $currentKjQiHao,
+            'x' => $x,
+            'y' => $y,
+            'count' => count($codes),
+            'sql' => $sql,
+        ]);
+
+        return $codes;
+    }
+
+    /**
      * 获取查询对象
      * @param $where
      * @param $playway
