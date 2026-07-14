@@ -1089,6 +1089,11 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         if(isset($rst['status']) && $rst['status'] == 300) return $rst;
         # 第二步：账号、验证码登录
         $rst = self::loginRemote($uid, $tz_system_id);
+        if(isset($rst['Status']) && $rst['Status'] != 1){
+            Tool_Common::log('/luckybase/'.__FUNCTION__, 'INFO', '登陆失败(Status!=1)', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
+            $errorMsg = $rst['Data'] ?? '登录失败';
+            return ['status'=>301, 'msg'=>$errorMsg];
+        }
         # 第三步：同意
         if(isset($rst['Status']) && $rst['Status'] == 1){
             $rst = self::acceptAgreement($uid, $tz_system_id);
@@ -1114,6 +1119,11 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         if(isset($cookie_key['status']) && $cookie_key['status'] == 300) return $cookie_key;
         # 第二步：账号、验证码登录
         $rst = self::loginRemote($uid, $tz_system_id);
+        if(isset($rst['Status']) && $rst['Status'] != 1){
+            Tool_Common::log('/luckybase/'.__FUNCTION__, 'INFO', '登陆失败(Status!=1)', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
+            $errorMsg = $rst['Data'] ?? '登录失败';
+            return ['status'=>301, 'msg'=>$errorMsg];
+        }
         # 第三步：同意
         $rst = self::acceptAgreement($uid, $tz_system_id);
 

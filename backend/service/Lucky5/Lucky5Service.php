@@ -1281,9 +1281,15 @@ class Lucky5Service { # 重庆7时彩登陆体系
         # 第二步：账号、验证码登录
         $rst = self::loginRemote($uid, $tz_system_id);
         Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '登陆', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
+        // loginRemote返回 Status=1(成功) Status=2(失败)，检查大写Status
         if(isset($rst['status']) && $rst['status'] != 200){
             Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '登陆-错误', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
             return $rst;
+        }
+        if(isset($rst['Status']) && $rst['Status'] != 1){
+            Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '登陆失败(Status!=1)', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
+            $errorMsg = $rst['Data'] ?? '登录失败';
+            return ['status'=>301, 'msg'=>$errorMsg];
         }
         # 第三步：同意
         if(isset($rst['Status']) && $rst['Status'] == 1){
