@@ -32,7 +32,22 @@ class BetErrorPlansTaskService extends BaseService
         }
         $plan = UserSysPlans::findOne($plan_id);
 
-        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+        if(is_array($bet_url) || empty($bet_url)){
+            $msg = '下注URL无效:'.$uid.'_'.$tz_system_id.'_'.$plan_id.'_'.$qihao;
+            Tool_Common::log('/bet_errors/recordPlanTask', 'ERR', $msg, ['bet_url'=>$bet_url]);
+            throw_info($msg);
+        }
+
+        $userWhere = ['uid'=>$uid];
+        if($tz_system_id !== ''){
+            $userWhere['tz_system_id'] = $tz_system_id;
+        }
+        $TzSystemsUsers = TzSystemsUsers::findOne($userWhere);
+        if(!$TzSystemsUsers){
+            $msg = '找不到盘口账号配置:uid='.$uid.',tz_system_id='.$tz_system_id;
+            Tool_Common::log('/bet_errors/recordPlanTask', 'ERR', $msg, ['plan_id'=>$plan_id, 'qihao'=>$qihao]);
+            throw_info($msg);
+        }
         $where = ['uid'=>$uid, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'plan_id'=>$plan_id, 'bet_sort_key'=>$bet_sort_key];
         if(!$BetErrorPlansTask = BetErrorPlansTask::findOne($where)){
             $BetErrorPlansTask = new BetErrorPlansTask();

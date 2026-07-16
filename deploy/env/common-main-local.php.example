@@ -1,0 +1,40 @@
+<?php
+
+$dbName = getenv('XL_DB_NAME') ?: 'stock_datas';
+
+$config = [
+    'components' => [
+        'db' => [
+            'class' => 'yii\db\Connection',
+            'dsn' => 'mysql:host=' . (getenv('XL_DB_HOST') ?: '127.0.0.1') . ';dbname=' . $dbName,
+            'enableSchemaCache' => true,
+            'schemaCacheDuration' => 3600,
+            'username' => getenv('XL_DB_USER') ?: $dbName,
+            'tablePrefix' => 'lt_',
+            'password' => getenv('XL_DB_PASS') ?: '',
+            'charset' => 'utf8mb4',
+        ],
+        'redis' => [
+            'class' => '\yii\redis\Connection',
+            'hostname' => getenv('XL_REDIS_HOST') ?: '127.0.0.1',
+            'port' => (int)(getenv('XL_REDIS_PORT') ?: 6379),
+            'database' => (int)(getenv('XL_REDIS_DB') ?: 0),
+            'connectionTimeout' => 3,
+        ],
+        'commonRedis' => [
+            'class' => 'common\framework\Redis',
+            'hostname' => getenv('XL_REDIS_HOST') ?: '127.0.0.1',
+            'port' => (int)(getenv('XL_REDIS_PORT') ?: 6379),
+            'database' => (int)(getenv('XL_COMMON_REDIS_DB') ?: 1),
+            'connectionTimeout' => 3,
+        ],
+    ],
+];
+
+if (PHP_SAPI !== 'cli') {
+    $config['components']['request'] = [
+        'cookieValidationKey' => getenv('XL_COOKIE_VALIDATION_KEY') ?: 'change-this-key-on-target',
+    ];
+}
+
+return $config;

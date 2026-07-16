@@ -1396,9 +1396,20 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @param $tz_system_id
      * @return string
      */
+    private static function getRsaPublicKeyCacheKey($uid, $tz_system_id){
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $domain = $TzSystemsUsers ? trim((string)$TzSystemsUsers->ssc_domain, '/') : '';
+        $host = parse_url($domain, PHP_URL_HOST);
+        if(!$host){
+            $host = str_replace(['http://', 'https://'], '', $domain);
+        }
+
+        return 'rsa_public_key_'.$tz_system_id.'_'.md5(strtolower($host));
+    }
+
     private static function getRsaPublicKey($uid, $tz_system_id){
         $m = \Yii::$app->cache;
-        $mkey = 'rsa_public_key_'.$tz_system_id;
+        $mkey = self::getRsaPublicKeyCacheKey($uid, $tz_system_id);
         $publicKey = $m->get($mkey);
         if($publicKey) return $publicKey;
 
@@ -1478,9 +1489,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         # 获取RSA公钥并加密账号密码
         $publicKey = self::getRsaPublicKey($uid, $tz_system_id);
+        $useRsa = false;
         if($publicKey){
             $post_data['Account'] = self::rsaEncrypt($TzSystemsUsers->account, $publicKey);
             $post_data['Password'] = self::rsaEncrypt($TzSystemsUsers->password, $publicKey);
+            $useRsa = true;
             Tool_Common::log('/lucky5/loginRemote', 'INFO', 'RSA加密登录', ['uid'=>$uid, 'account'=>$TzSystemsUsers->account]);
         }else{
             $post_data['Account'] = $TzSystemsUsers->account;
@@ -1495,31 +1508,49 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $_t = microtime(true) * 10000;
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/DoLogin'.'?_='.$_t;
         $post_data = http_build_query($post_data);
-        $headers = [
-            'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
-            //'Accept-Language:zh-CN,zh;q=0.9,en;q=0.8',
-            'Accept-Language:zh-CN,zh;q=0.9',
-            'Connection:keep-alive',
-            'Accept-Encoding: gunzip, deflate',
-            'X-Requested-With: XMLHttpRequest',
-            "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-            "Cache-Control:max-age=0",
-            "Upgrade-Insecure-Requests:1",
-            "Content-Length:".strlen($post_data),
-            "Content-Type: application/x-www-form-urlencoded",
-            "Cookie: ".str_replace(';;', ';',trim($TzSystemsUsers->cookie)),
-            "Origin:".str_replace('www.','',self::$baseUrl),
-            "Host:".str_replace('www.','',self::$domain),
-            'sec-ch-ua: " Not;A Brand";v="24", "Google Chrome";v="113", "Chromium";v="113"',
-            'sec-ch-ua-mobile: ?0',
-            'sec-ch-ua-platform: "Windows"',
-            'Sec-Fetch-Dest: empty',
-            'Sec-Fetch-Mode: cors',
-            'Sec-Fetch-Site: same-origin',
-            "Referer:".$TzSystemsUsers->ssc_domain,
-        ];
+        $buildHeaders = function ($requestData) use ($TzSystemsUsers) {
+            return [
+                'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
+                //'Accept-Language:zh-CN,zh;q=0.9,en;q=0.8',
+                'Accept-Language:zh-CN,zh;q=0.9',
+                'Connection:keep-alive',
+                'Accept-Encoding: gunzip, deflate',
+                'X-Requested-With: XMLHttpRequest',
+                "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+                "Cache-Control:max-age=0",
+                "Upgrade-Insecure-Requests:1",
+                "Content-Length:".strlen($requestData),
+                "Content-Type: application/x-www-form-urlencoded",
+                "Cookie: ".str_replace(';;', ';',trim($TzSystemsUsers->cookie)),
+                "Origin:".str_replace('www.','',self::$baseUrl),
+                "Host:".str_replace('www.','',self::$domain),
+                'sec-ch-ua: " Not;A Brand";v="24", "Google Chrome";v="113", "Chromium";v="113"',
+                'sec-ch-ua-mobile: ?0',
+                'sec-ch-ua-platform: "Windows"',
+                'Sec-Fetch-Dest: empty',
+                'Sec-Fetch-Mode: cors',
+                'Sec-Fetch-Site: same-origin',
+                "Referer:".$TzSystemsUsers->ssc_domain,
+            ];
+        };
+        $headers = $buildHeaders($post_data);
 
         $data = self::httpPost($url,$post_data, $headers, $TzSystemsUsers->uid);
+        if($useRsa && isset($data['Status']) && $data['Status'] == 2 && strpos($data['Data'] ?? '', '用户名或密码不正确') !== false){
+            \Yii::$app->cache->delete(self::getRsaPublicKeyCacheKey($uid, $tz_system_id));
+            $plainPostData = http_build_query([
+                'Account' => $TzSystemsUsers->account,
+                'Password' => $TzSystemsUsers->password,
+            ]);
+            $plainHeaders = $buildHeaders($plainPostData);
+            $plainData = self::httpPost($url, $plainPostData, $plainHeaders, $TzSystemsUsers->uid);
+            Tool_Common::log('/lucky5/loginRemote', 'INFO', 'RSA失败后明文重试', ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'rsaData'=>$data, 'plainData'=>$plainData]);
+            if(isset($plainData['Status']) && $plainData['Status'] == 1){
+                $post_data = $plainPostData;
+                $headers = $plainHeaders;
+                $data = $plainData;
+            }
+        }
         $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];
         $desc = '';
         if(isset($data['Status']) && $data['Status'] == 2){
@@ -1667,6 +1698,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $rst = ['status'=>200, 'msg'=>'操作成功'];
         Tool_Common::log('/repeatErrorBet/'.__FUNCTION__,'INFO','幸运-下注节点-1', ['task_id'=>$id]);
         $row = BetErrorPlansTask::findOne($id);
+        if(!$row){
+            throw_info('找不到下注任务:'.$id);
+        }
         $url = $row->bet_url;
         //$headers = json_decode($row->bet_headers); # 含有cookie，如果是重新登陆 cookie要变动，待处理
         $uid = $row->uid;
@@ -1686,6 +1720,22 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $m = \Yii::$app->cache;
         $_t = round(microtime(true) * 1000);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        if(empty($url) || $url === 'Array' || is_array($url)){
+            $tmpRst = ['Status'=>0, 'code'=>314, 'msg'=>'下注URL无效', 'bet_url'=>$url, 'bet_time'=>date('Y-m-d H:i:s')];
+            $row->status = 3;
+            $row->post_desc = json_encode($tmpRst, 320);
+            $row->save();
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '下注URL无效', ['task_id'=>$id, 'uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url]);
+            return '';
+        }
+        if(!$TzSystemsUsers){
+            $tmpRst = ['Status'=>0, 'code'=>315, 'msg'=>'找不到盘口账号配置', 'uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'bet_time'=>date('Y-m-d H:i:s')];
+            $row->status = 3;
+            $row->post_desc = json_encode($tmpRst, 320);
+            $row->save();
+            Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '找不到盘口账号配置', ['task_id'=>$id, 'uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+            return '';
+        }
         $headers = [
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
             'Accept-Encoding: gunzip, deflate',
@@ -2293,6 +2343,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $data = ['status'=>200, 'msg'=>$qihao.'操作成功!', 'time'=>date('Y-m-d H:i:s')];
 
         $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL');//.'?'.http_build_query($post_data);
+        if(empty($url) || is_array($url)){
+            return ['status'=>300, 'msg'=>'下注URL无效:uid='.$plan->uid.',tz_system_id='.self::$tz_system_id];
+        }
         $way = self::getWay($tz_type);
         $snInfo_sn = '';
         $snInfo_snid = '';
@@ -2343,6 +2396,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
             $_t = round(microtime(true) * 1000);
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
+            if(!$TzSystemsUsers){
+                return ['status'=>300, 'msg'=>'找不到盘口账号配置:uid='.$plan->uid.',tz_system_id='.self::$tz_system_id];
+            }
             $need_money = count($tmpcodesArr) * $single;
             $left_money = $TzSystemsUsers->balance;
             if($key==0 && $need_money>$left_money){
@@ -2475,6 +2531,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $data = ['status'=>200, 'msg'=>$qihao.'操作成功!', 'time'=>date('Y-m-d H:i:s')];
 
         $url = self::getTzSiteInfo(self::$tz_system_id, 'MULBET_URL');//.'?'.http_build_query($post_data);
+        if(empty($url) || is_array($url)){
+            return ['status'=>300, 'msg'=>'下注URL无效:uid='.$uid.',tz_system_id='.self::$tz_system_id];
+        }
         $way = self::getWay($tz_type);
         $snInfo_sn = '';
         $snInfo_snid = '';
@@ -2509,6 +2568,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
             $_t = round(microtime(true) * 1000);
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>self::$tz_system_id]);
+            if(!$TzSystemsUsers){
+                return ['status'=>300, 'msg'=>'找不到盘口账号配置:uid='.$uid.',tz_system_id='.self::$tz_system_id];
+            }
             $need_money = count($tmpcodesArr) * $single;
             $left_money = $TzSystemsUsers->balance;
             if($key==0 && $need_money>$left_money){

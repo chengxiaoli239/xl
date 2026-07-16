@@ -1240,9 +1240,20 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @param $tz_system_id
      * @return string
      */
+    private static function getRsaPublicKeyCacheKey($uid, $tz_system_id){
+        $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+        $domain = $TzSystemsUsers ? trim((string)$TzSystemsUsers->ssc_domain, '/') : '';
+        $host = parse_url($domain, PHP_URL_HOST);
+        if(!$host){
+            $host = str_replace(['http://', 'https://'], '', $domain);
+        }
+
+        return 'rsa_public_key_'.$tz_system_id.'_'.md5(strtolower($host));
+    }
+
     private static function getRsaPublicKey($uid, $tz_system_id){
         $m = \Yii::$app->cache;
-        $mkey = 'rsa_public_key_'.$tz_system_id;
+        $mkey = self::getRsaPublicKeyCacheKey($uid, $tz_system_id);
         $publicKey = $m->get($mkey);
         if($publicKey) return $publicKey;
 
@@ -1320,9 +1331,11 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
 
         # 获取RSA公钥并加密账号密码
         $publicKey = self::getRsaPublicKey($uid, $tz_system_id);
+        $useRsa = false;
         if($publicKey){
             $post_data['Account'] = self::rsaEncrypt($TzSystemsUsers->account, $publicKey);
             $post_data['Password'] = self::rsaEncrypt($TzSystemsUsers->password, $publicKey);
+            $useRsa = true;
             Tool_Common::log('/luckybase/loginRemote', 'INFO', 'RSA加密登录', ['uid'=>$uid, 'account'=>$TzSystemsUsers->account]);
         }else{
             $post_data['Account'] = $TzSystemsUsers->account;
@@ -1336,25 +1349,43 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         $_t = microtime(true) * 10000;
         $url = self::getTzSiteInfo($tz_system_id,'SSC_INDEX').'/Member/DoLogin'.'?_='.$_t;
         $post_data = http_build_query($post_data);
-        $headers = [
-            'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
-            //'Accept-Language:zh-CN,zh;q=0.9,en;q=0.8',
-            'Accept-Language:zh-CN,zh;q=0.9',
-            'Connection:keep-alive',
-            'Accept-Encoding: gunzip, deflate',
-            'X-Requested-With: XMLHttpRequest',
-            "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
-            "Cache-Control:max-age=0",
-            "Upgrade-Insecure-Requests:1",
-            "Content-Length:".strlen($post_data),
-            "Content-Type: application/x-www-form-urlencoded",
-            "Cookie: ".str_replace(';;', ';',trim($TzSystemsUsers->cookie)),
-            "Origin:".str_replace('www.','',self::$baseUrl),
-            "Host:".str_replace('www.','',self::$domain),
-            "Referer:".$TzSystemsUsers->ssc_domain,
-        ];
+        $buildHeaders = function ($requestData) use ($TzSystemsUsers) {
+            return [
+                'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36',
+                //'Accept-Language:zh-CN,zh;q=0.9,en;q=0.8',
+                'Accept-Language:zh-CN,zh;q=0.9',
+                'Connection:keep-alive',
+                'Accept-Encoding: gunzip, deflate',
+                'X-Requested-With: XMLHttpRequest',
+                "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+                "Cache-Control:max-age=0",
+                "Upgrade-Insecure-Requests:1",
+                "Content-Length:".strlen($requestData),
+                "Content-Type: application/x-www-form-urlencoded",
+                "Cookie: ".str_replace(';;', ';',trim($TzSystemsUsers->cookie)),
+                "Origin:".str_replace('www.','',self::$baseUrl),
+                "Host:".str_replace('www.','',self::$domain),
+                "Referer:".$TzSystemsUsers->ssc_domain,
+            ];
+        };
+        $headers = $buildHeaders($post_data);
 
         $data = self::httpPost($url,$post_data, $headers, $TzSystemsUsers->uid);
+        if($useRsa && isset($data['Status']) && $data['Status'] == 2 && strpos($data['Data'] ?? '', '用户名或密码不正确') !== false){
+            \Yii::$app->cache->delete(self::getRsaPublicKeyCacheKey($uid, $tz_system_id));
+            $plainPostData = http_build_query([
+                'Account' => $TzSystemsUsers->account,
+                'Password' => $TzSystemsUsers->password,
+            ]);
+            $plainHeaders = $buildHeaders($plainPostData);
+            $plainData = self::httpPost($url, $plainPostData, $plainHeaders, $TzSystemsUsers->uid);
+            Tool_Common::log('/luckybase/loginRemote', 'INFO', 'RSA失败后明文重试', ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'rsaData'=>$data, 'plainData'=>$plainData]);
+            if(isset($plainData['Status']) && $plainData['Status'] == 1){
+                $post_data = $plainPostData;
+                $headers = $plainHeaders;
+                $data = $plainData;
+            }
+        }
         //sleep(10);
         //self::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'username'=>$TzSystemsUsers->username, 'tz_system_id'=>$tz_system_id, 'url'=>$url,'post_data'=>$post_data, 'headers'=>$headers,'data'=>$data];

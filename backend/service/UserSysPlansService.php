@@ -58,7 +58,18 @@ class UserSysPlansService extends BaseService {
         $post['UserSysPlans']['start_qihao'] = str_replace(' ', '', $post['UserSysPlans']['start_qihao']);
 
         $User = AdminModel::findOne($user_id);
-        $post['UserSysPlans']['tz_sites'] = implode(',',$post['UserSysPlans']['tz_sites']);
+        $tzSites = $post['UserSysPlans']['tz_sites'] ?? [];
+        if(!is_array($tzSites)){
+            $tzSites = trim((string)$tzSites) === '' ? [] : explode(',', (string)$tzSites);
+        }
+        $tzSites = array_values(array_filter(array_map('trim', $tzSites), 'strlen'));
+        if(empty($tzSites) && $id){
+            $oldPlan = UserSysPlans::findOne($id);
+            if($oldPlan && trim((string)$oldPlan->tz_sites) !== ''){
+                $tzSites = array_values(array_filter(array_map('trim', explode(',', $oldPlan->tz_sites)), 'strlen'));
+            }
+        }
+        $post['UserSysPlans']['tz_sites'] = implode(',', $tzSites);
 
         ################### 公共参数 - 开始 #########################
         $tmpFilter = []; # hz_Arr
@@ -758,8 +769,8 @@ class UserSysPlansService extends BaseService {
             $post['UserSysPlans']['singles'] = $singles;
         }
 
-        if(!$post['UserSysPlans']['id']){
-            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$user_id, 'tz_system_id'=>$post['UserSysPlans']['tz_sites'][0], 'status'=>1]);
+        if(empty($post['UserSysPlans']['id'])){
+            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$user_id, 'tz_system_id'=>$tzSites[0] ?? null, 'status'=>1]);
             $tz_sort = 99;
             if($TzSystemsUsers){
                 $TzSystemsUsers->tz_sort && $tz_sort = $TzSystemsUsers->tz_sort;

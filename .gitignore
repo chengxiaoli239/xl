@@ -47,8 +47,8 @@ backend/web/.well-known/acme-challenge/*
 backend/web/.user.ini
 backend/web/*.apk
 
-# local deploy/runtime wrappers
-deploy/
+# deploy templates are tracked; local dumps are not.
+deploy/backups/
 /php74-yii
 /php84-yii
 

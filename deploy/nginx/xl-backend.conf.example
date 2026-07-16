@@ -1,0 +1,42 @@
+server {
+    listen 80;
+    server_name example.com;
+    root /www/wwwroot/lt/lottery_xl/xl/backend/web;
+    index index.php index.html;
+
+    access_log /www/wwwlogs/xl-backend.access.log;
+    error_log /www/wwwlogs/xl-backend.error.log;
+
+    client_max_body_size 100m;
+
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_pass unix:/tmp/php-cgi-74.sock;
+        fastcgi_index index.php;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param SCRIPT_NAME $fastcgi_script_name;
+    }
+
+    location ~* /\.(git|svn|hg) {
+        deny all;
+    }
+
+    location ~* /(vendor|common|console|deploy|environments|tests|vagrant)/ {
+        deny all;
+    }
+
+    location ~* \.(log|sql|bak|env|ini|conf|sh)$ {
+        deny all;
+    }
+
+    location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 30d;
+        access_log off;
+        try_files $uri =404;
+    }
+}

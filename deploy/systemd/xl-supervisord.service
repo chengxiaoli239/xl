@@ -1,0 +1,16 @@
+[Unit]
+Description=XL lottery queue supervisord
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/www/server/supervisor/run/supervisord.pid
+ExecStart=/www/server/panel/pyenv/bin/supervisord -c /www/server/supervisor/supervisord.conf
+ExecStop=/www/server/panel/pyenv/bin/supervisorctl -c /www/server/supervisor/supervisord.conf shutdown
+ExecReload=/www/server/panel/pyenv/bin/supervisorctl -c /www/server/supervisor/supervisord.conf reload
+KillMode=process
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

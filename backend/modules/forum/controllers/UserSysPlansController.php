@@ -5,6 +5,7 @@ namespace backend\modules\forum\controllers;
 use backend\models\ImportPlanCodes;
 use backend\models\PlanPeriodProfits;
 use backend\models\PlanStaticProfits;
+use backend\models\TzSystems;
 use backend\models\TzSystemsAuth;
 use backend\models\TzSystemsUsers;
 use backend\service\BetService;
@@ -364,7 +365,15 @@ class UserSysPlansController extends BaseController
             return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$model->lottery_type]);
         }
         $tz_sites_Arr = TzService::getTzSites($this->_user_id);
-        $model->tz_sites = explode(',', $model->tz_sites);
+        $modelTzSites = array_values(array_filter(array_map('trim', explode(',', (string)$model->tz_sites)), 'strlen'));
+        $missingTzSites = array_diff($modelTzSites, array_keys($tz_sites_Arr));
+        if(!empty($missingTzSites)){
+            $sites = TzSystems::find()->select(['id', 'name'])->where(['id'=>$missingTzSites, 'status'=>1])->asArray()->all();
+            foreach($sites as $site){
+                $tz_sites_Arr[$site['id']] = $site['name'];
+            }
+        }
+        $model->tz_sites = $modelTzSites;
         if(in_array($model->tz_type, [22])){ # 和值、四定单双
             $model->hz_Arr = explode(',', $model->hz_Arr);
             /*

@@ -1,0 +1,14 @@
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/www/server/php/74/bin
+APP_ROOT=/www/wwwroot/lt/lottery_xl/xl
+PHP_BIN=/www/server/php/74/bin/php
+
+# Current source server backup job from root crontab.
+0 3 * * * /www/wwwroot/lt/zixun/zczx/scripts/db-backup.sh >> /www/wwwroot/lt/zixun/zczx/database/backups/backup.log 2>&1
+
+# Recommended console jobs. Enable only after checking they match production.
+*/1 * * * * flock -xn /tmp/xl-grab-kj-data.lock -c "cd $APP_ROOT && $PHP_BIN yii data/index/grab-kj-data" >> /www/log/lottery_xl/cron-grab-kj-data.log 2>&1
+*/1 * * * * flock -xn /tmp/xl-run-lottery.lock -c "cd $APP_ROOT && $PHP_BIN yii data/index/run-lottery" >> /www/log/lottery_xl/cron-run-lottery.log 2>&1
+*/1 * * * * flock -xn /tmp/xl-user-auto-login.lock -c "cd $APP_ROOT && $PHP_BIN yii user/index/auto-login" >> /www/log/lottery_xl/cron-user-auto-login.log 2>&1
+*/5 * * * * flock -xn /tmp/xl-syn-balance.lock -c "cd $APP_ROOT && $PHP_BIN yii data/index/syn-balance" >> /www/log/lottery_xl/cron-syn-balance.log 2>&1
+*/5 * * * * flock -xn /tmp/xl-cache-proxy-ip.lock -c "cd $APP_ROOT && $PHP_BIN yii data/index/cache-proxy-ip" >> /www/log/lottery_xl/cron-cache-proxy-ip.log 2>&1

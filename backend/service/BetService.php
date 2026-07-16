@@ -2057,7 +2057,7 @@ abstract class BetService extends BaseBetService {
             }
 
             $lottery_type = $plan->lottery_type;
-            $tz_system_id = $plan->tz_sites;
+            $tz_system_id = trim((string)$plan->tz_sites);
             $insert_mkey = CacheKeyService::insertPlanTaskKey($lottery_type, $qiHao, $plan->id);
 
             $TzSystemsUsersData = TzSystemsUsers::find()->where(['status'=>1])->indexBy('uid')->all();
@@ -2077,7 +2077,12 @@ abstract class BetService extends BaseBetService {
                     commonRedis()->setex($insert_mkey, 300, 1);
                 }
             }else{
-                $logArr = ['plan_id'=>$plan->id, 'is_local_bet'=>$TzSystemsUsers->is_local_bet, 'account'=>$TzSystemsUsers->account, 'lottery_type'=>$lottery_type, 'uid'=>$plan->uid];
+                $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id, 'status'=>1]);
+                if(!$TzSystemsUsers){
+                    throw_info('找不到盘口账号配置:uid='.$plan->uid.',tz_system_id='.$tz_system_id);
+                }
+
+                $logArr = ['plan_id'=>$plan->id, 'is_local_bet'=>$TzSystemsUsers->is_local_bet, 'account'=>$TzSystemsUsers->account, 'lottery_type'=>$lottery_type, 'uid'=>$plan->uid, 'tz_system_id'=>$tz_system_id];
                 Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '插入真实计划任务-1', $logArr);
 
                 $BetService = self::getBetObj($plan->uid, $tz_system_id, $lottery_type);
