@@ -458,7 +458,7 @@ $this->params['breadcrumbs'][] = $this->title;
             var up_name = $(this).attr('data-name');
             var token = $(this).attr('data-token');
             $("#copy_tip_msg_title").html("用户[<strong>"+up_name+"</strong>]游戏地址");
-            $("#copy_tip_msg").html('http://120.77.157.40:8090/chat/index/index?token='+ token );
+            $("#copy_tip_msg").html('http://18.163.69.56:8090/chat/index/index?token='+ token );
             $("#act").val('act-user-copy-url');
             $("#COPY_TipModal").modal('show');
         });

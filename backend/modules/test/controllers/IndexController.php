@@ -214,7 +214,7 @@ class IndexController extends Controller
     {
         $ch = curl_init();
         //$url = "http://localhost/ser.php";
-        $url = "http://120.77.157.40/test/index/test-bet";
+        $url = "http://18.163.69.56/test/index/test-bet";
         //声明伪造head请求头
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header = []);
@@ -813,7 +813,7 @@ class IndexController extends Controller
         $rst = PoxyIPService::getProxyUids();
         p($rst);
         p($rst);
-        $http = 'http://120.77.157.40:8090/forum/user/';
+        $http = 'http://18.163.69.56:8090/forum/user/';
         p(trim($http, '/'));
         $data = BingDao::getLotteryOne($type = 'json', $l_type = 6);
         p($data);

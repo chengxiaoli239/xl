@@ -105,7 +105,7 @@ $this->title = Yii::t('app', 'Chat Room');
 <script type="text/javascript">
     var token = $("#token").val();
     var uid = '1238120025638916098'
-    var url_domain = 'http://120.77.157.40:8090'
+    var url_domain = 'http://18.163.69.56:8090'
     $(function(){
         var buttonArray = [
             '查','上','下','二','三','四','定','现','←',
@@ -445,7 +445,7 @@ $this->title = Yii::t('app', 'Chat Room');
     var fp = new Fingerprint2();
     fp.get(function(result) {
         var uid = '1238120025638916098'
-        var domain = '120.77.157.40';
+        var domain = '18.163.69.56';
         var url = "http://"+domain+":8090/api/chat/get-user-info";
         console.log(result);
         $.post(url,{token:token}, function(ret){
