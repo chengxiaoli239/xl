@@ -1536,7 +1536,20 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $headers = $buildHeaders($post_data);
 
         $data = self::httpPost($url,$post_data, $headers, $TzSystemsUsers->uid);
-        if($useRsa && isset($data['Status']) && $data['Status'] == 2 && strpos($data['Data'] ?? '', '用户名或密码不正确') !== false){
+        // RSA登录失败时，尝试明文重试（部分盘口有RSA公钥但服务端未启用，如f1.w678bs21.xyz报"超过16位"）
+        $rsaFailMsgs = ['用户名或密码不正确', '用户名及密码不能超过16位'];
+        $shouldRetryPlain = $useRsa && isset($data['Status']) && $data['Status'] == 2;
+        if($shouldRetryPlain){
+            $errMsg = $data['Data'] ?? '';
+            $shouldRetryPlain = false;
+            foreach($rsaFailMsgs as $failMsg){
+                if(strpos($errMsg, $failMsg) !== false){
+                    $shouldRetryPlain = true;
+                    break;
+                }
+            }
+        }
+        if($shouldRetryPlain){
             \Yii::$app->cache->delete(self::getRsaPublicKeyCacheKey($uid, $tz_system_id));
             $plainPostData = http_build_query([
                 'Account' => $TzSystemsUsers->account,
