@@ -41,14 +41,14 @@ class BaseService{
             if(!$TzSystemsUser = TzSystemsUsers::findOne($id)){
                 throw_info('操作失败:找不到记录', 301);
             }
-            if(!$TzSystemsUser->is_auto_login){
+            if($is_auto == 1 && !$TzSystemsUser->is_auto_login){
                 throw_info('操作失败:账号没设置自动登陆', 302);
             }
 
             $tz_system_id = $TzSystemsUser->tz_system_id;
             $TzSystems = TzSystems::findOne($tz_system_id);
             if(!in_array($tz_system_id, [17, 18, 19]) && $TzSystems->system_type_id != TzSystemUsersService::TZ_SYSTEM_TYPES_OPTIONS[AdminModel::USER_TYPE_GUI_ALL]){
-                # 是否有激活的计划
+                # 是否有激活的计划（包含测试和真实计划）
                 $hasActivePlan = CommonService::hasPlansActiveSys($tz_system_id, $TzSystemsUser->uid);
                 if($is_auto == 1 && !$hasActivePlan){
                     throw_info('没有激活的投注计划', 303);
@@ -319,7 +319,7 @@ class BaseService{
     }
 
     /**
-     * @desc CURLOPT_SSLVERSION 为1的用户
+     * @desc 强制使用 TLS 1.2 的用户
      * @return false|string[]
      */
     public static function getSslVersionUids(){
@@ -333,11 +333,29 @@ class BaseService{
      * @param string $uid
      * @return int
      */
-    public static function getSslVersionByUid($uid=''){
-        $ssl_uids = BaseService::getSslVersionUids();
+    public static function getSslVersionByUid($uid='', $tzSystemId=''){
+        $query = TzSystemsUsers::find()->where(['uid'=>(int)$uid]);
+        if($tzSystemId !== '' && $tzSystemId !== null){
+            $query->andWhere(['tz_system_id'=>(int)$tzSystemId]);
+        }
+        $TzSystemsUser = $query->orderBy(['id'=>SORT_ASC])->one();
+        $sslMode = ($TzSystemsUser && $TzSystemsUser->hasAttribute('ssl_mode'))
+            ? (int)$TzSystemsUser->ssl_mode
+            : TzSystemsUsers::SSL_MODE_INHERIT;
 
-        $version = in_array($uid, $ssl_uids) ? 3 : 1;
-        return $version;
+        switch ($sslMode){
+            case TzSystemsUsers::SSL_MODE_AUTO:
+                return CURL_SSLVERSION_DEFAULT;
+            case TzSystemsUsers::SSL_MODE_TLS12:
+                return CURL_SSLVERSION_TLSv1_2;
+            case TzSystemsUsers::SSL_MODE_COMPATIBLE:
+                return CURL_SSLVERSION_TLSv1;
+            default:
+                $ssl_uids = BaseService::getSslVersionUids();
+                return in_array((string)$uid, $ssl_uids, true)
+                    ? CURL_SSLVERSION_TLSv1_2
+                    : CURL_SSLVERSION_TLSv1;
+        }
     }
 
     /**
