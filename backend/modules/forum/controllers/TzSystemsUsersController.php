@@ -27,6 +27,7 @@ class TzSystemsUsersController extends BaseController
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'set-ssl-mode' => ['POST'],
                 ],
             ],
         ];
@@ -65,6 +66,39 @@ class TzSystemsUsersController extends BaseController
         }
 
         return $rst;
+    }
+
+    public function actionSetSslMode()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $admin = \Yii::$app->user->identity;
+        if(!$admin || (int)$admin->status !== 10){
+            return ['status'=>403, 'msg'=>'无权限'];
+        }
+
+        $id = (int)\Yii::$app->request->post('id');
+        $sslMode = (int)\Yii::$app->request->post('ssl_mode');
+        if(!isset(TzSystemsUsers::SSL_MODE_OPTIONS[$sslMode])){
+            return ['status'=>400, 'msg'=>'TLS模式无效'];
+        }
+
+        $model = TzSystemsUsers::findOne($id);
+        if(!$model){
+            return ['status'=>404, 'msg'=>'盘口账号不存在'];
+        }
+
+        $model->ssl_mode = $sslMode;
+        $model->updated_at = time();
+        if(!$model->save(false, ['ssl_mode', 'updated_at'])){
+            return ['status'=>500, 'msg'=>'TLS模式保存失败'];
+        }
+
+        return [
+            'status'=>200,
+            'msg'=>'TLS模式已更新',
+            'ssl_mode'=>$sslMode,
+            'ssl_mode_label'=>TzSystemsUsers::SSL_MODE_OPTIONS[$sslMode],
+        ];
     }
 
     /**
