@@ -73,6 +73,7 @@ class TzSystemsUsersController extends BaseController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $admin = \Yii::$app->user->identity;
         if(!$admin || (int)$admin->status !== 10){
+            Tool_Common::log('/user/'.__FUNCTION__, 'ERR', '无权限', ['user_id'=>\Yii::$app->user->id, 'identity'=>$admin ? $admin->attributes : null]);
             return ['status'=>403, 'msg'=>'无权限'];
         }
 
@@ -84,14 +85,18 @@ class TzSystemsUsersController extends BaseController
 
         $model = TzSystemsUsers::findOne($id);
         if(!$model){
+            Tool_Common::log('/user/'.__FUNCTION__, 'ERR', '盘口账号不存在', ['id'=>$id]);
             return ['status'=>404, 'msg'=>'盘口账号不存在'];
         }
 
         $model->ssl_mode = $sslMode;
         $model->updated_at = time();
         if(!$model->save(false, ['ssl_mode', 'updated_at'])){
+            Tool_Common::log('/user/'.__FUNCTION__, 'ERR', '保存失败', ['id'=>$id, 'errors'=>$model->getErrors()]);
             return ['status'=>500, 'msg'=>'TLS模式保存失败'];
         }
+
+        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', 'TLS模式保存成功', ['id'=>$id, 'ssl_mode'=>$sslMode]);
 
         return [
             'status'=>200,
