@@ -2,7 +2,9 @@
 
 namespace backend\service\clients;
 
+use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
+use backend\service\PoxyIPService;
 use common\models\AdminModel;
 use Yii;
 
@@ -63,7 +65,17 @@ class ClientAuthService
 
         $account = TzSystemsUsers::find()
             ->alias('t')
-            ->select(['t.id', 't.uid', 't.username', 't.account', 't.sys_name', 't.access_token'])
+            ->select([
+                't.id',
+                't.uid',
+                't.username',
+                't.account',
+                't.sys_name',
+                't.access_token',
+                't.is_local_bet',
+                't.is_auto_login',
+                't.is_auto_bet',
+            ])
             ->innerJoin(['a' => AdminModel::tableName()], 'a.id = t.uid AND a.status = :adminStatus', [
                 ':adminStatus' => AdminModel::STATUS_ACTIVE,
             ])
@@ -75,13 +87,81 @@ class ClientAuthService
             return ['status' => 401, 'msg' => '登录凭证已失效，请重新登录'];
         }
 
+        foreach (['id', 'uid', 'is_local_bet', 'is_auto_login', 'is_auto_bet'] as $field) {
+            $account[$field] = (int)$account[$field];
+        }
+
         return ['status' => 200, 'msg' => '凭证有效', 'data' => ['account' => $account]];
+    }
+
+    public static function enableLocalBetting(string $accessToken): array
+    {
+        $accessToken = trim($accessToken);
+        if ($accessToken === '') {
+            return ['status' => 401, 'msg' => '登录凭证为空'];
+        }
+
+        $account = TzSystemsUsers::find()
+            ->alias('t')
+            ->innerJoin(['a' => AdminModel::tableName()], 'a.id = t.uid AND a.status = :adminStatus', [
+                ':adminStatus' => AdminModel::STATUS_ACTIVE,
+            ])
+            ->where(['t.access_token' => $accessToken, 't.status' => 1])
+            ->one();
+        if (!$account) {
+            return ['status' => 401, 'msg' => '登录凭证已失效，请重新登录'];
+        }
+
+        try {
+            TzSystemsUsers::updateAll([
+                'is_local_bet' => BetsBackend::BET_TYPE_LOCAL_API,
+                'is_auto_login' => 0,
+                'is_auto_bet' => 1,
+                'updated_at' => time(),
+            ], ['id' => (int)$account->id]);
+            PoxyIPService::delIsLocalBetKey();
+            $account->refresh();
+        } catch (\Throwable $exception) {
+            Yii::error([
+                'message' => $exception->getMessage(),
+                'account_id' => (int)$account->id,
+            ], __METHOD__);
+            return ['status' => 500, 'msg' => '切换失败，请稍后重试'];
+        }
+
+        return [
+            'status' => 200,
+            'msg' => '已切换为本地电脑下注',
+            'data' => [
+                'account' => [
+                    'id' => (int)$account->id,
+                    'uid' => (int)$account->uid,
+                    'username' => $account->username,
+                    'account' => $account->account,
+                    'sys_name' => $account->sys_name,
+                    'access_token' => $account->access_token,
+                    'is_local_bet' => (int)$account->is_local_bet,
+                    'is_auto_login' => (int)$account->is_auto_login,
+                    'is_auto_bet' => (int)$account->is_auto_bet,
+                ],
+            ],
+        ];
     }
 
     private static function getAccounts(int $uid): array
     {
         $accounts = TzSystemsUsers::find()
-            ->select(['id', 'uid', 'username', 'account', 'sys_name', 'access_token', 'is_auto_bet'])
+            ->select([
+                'id',
+                'uid',
+                'username',
+                'account',
+                'sys_name',
+                'access_token',
+                'is_local_bet',
+                'is_auto_login',
+                'is_auto_bet',
+            ])
             ->where(['uid' => $uid, 'status' => 1])
             ->andWhere(['<>', 'access_token', ''])
             ->orderBy(['is_auto_bet' => SORT_DESC, 'id' => SORT_ASC])
@@ -91,6 +171,8 @@ class ClientAuthService
         return array_map(static function (array $account): array {
             $account['id'] = (int)$account['id'];
             $account['uid'] = (int)$account['uid'];
+            $account['is_local_bet'] = (int)$account['is_local_bet'];
+            $account['is_auto_login'] = (int)$account['is_auto_login'];
             $account['is_auto_bet'] = (int)$account['is_auto_bet'];
             return $account;
         }, $accounts);

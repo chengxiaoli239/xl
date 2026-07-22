@@ -409,6 +409,9 @@ class UserService extends BaseService {
             'secure_code' => $TzSystemsUsers->secure_code,
             'access_token' => $TzSystemsUsers->access_token,
             'status' => $TzSystemsUsers->status,
+            'is_local_bet' => (int)$TzSystemsUsers->is_local_bet,
+            'is_auto_login' => (int)$TzSystemsUsers->is_auto_login,
+            'is_auto_bet' => (int)$TzSystemsUsers->is_auto_bet,
             'bet_status' => $TzSystemsUsers->is_auto_bet,
             'expire_time' => date('Y-m-d H:i:s', $TzSystemsUsers->expire_time),
         ];

@@ -20,6 +20,7 @@ class ClientAuthController extends Controller
                 'actions' => [
                     'login' => ['POST'],
                     'validate' => ['POST'],
+                    'enable-local-betting' => ['POST'],
                 ],
             ],
         ];
@@ -43,5 +44,15 @@ class ClientAuthController extends Controller
         $post = Yii::$app->request->post();
 
         return ClientAuthService::validateToken((string)($post['access_token'] ?? ''));
+    }
+
+    public function actionEnableLocalBetting(): array
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $post = Yii::$app->request->post();
+
+        return ClientAuthService::enableLocalBetting(
+            (string)($post['access_token'] ?? '')
+        );
     }
 }

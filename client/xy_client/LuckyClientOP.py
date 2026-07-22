@@ -14,6 +14,7 @@ import urllib3
 
 # 第三方库导入
 import requests
+from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QApplication
@@ -475,6 +476,7 @@ def is_scheduled_login_time():
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     process_num = 0
+    local_betting_updated = QtCore.pyqtSignal(bool, str, object)
 
     def __init__(self):
         print("🔄 开始初始化MainWindow...")
@@ -539,6 +541,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.account_display_name = os.environ.get(
                 'LUCKY5_ACCOUNT_DISPLAY_NAME', self.account_key
             )
+            self.local_betting_enabled = os.environ.get('LUCKY5_IS_LOCAL_BET') == '1'
             # print('accountInfo', self.wp_account, self.wp_domain, self.wp_password)
             
             # 初始化浏览器和端口管理器（在access_token设置后）
@@ -1723,22 +1726,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 print(f"⚠️ 获取期号定时器启动失败: {e}")
                 traceback.print_exc()
             
-            # 启动获取开奖数据定时器（如果启用）
-            # 注意：getNowKjDataTimer 和 getNowKjDataTimer2 只需 mainWindow 参数
-            try:
-                MyThreadingTimer.myTimer(30, SystemsUsers.getNowKjDataTimer, (self,))
-                print("✅ 获取开奖数据定时器启动成功")
-            except Exception as e:
-                print(f"⚠️ 获取开奖数据定时器启动失败: {e}")
-                traceback.print_exc()
-            
-            # 启动获取开奖数据2定时器（如果启用）
-            try:
-                MyThreadingTimer.myTimer(5, SystemsUsers.getNowKjDataTimer2, (self,))
-                print("✅ 获取开奖数据2定时器启动成功")
-            except Exception as e:
-                print(f"⚠️ 获取开奖数据2定时器启动失败: {e}")
-                traceback.print_exc()
+            # 开奖同步由主任务管理器持续执行，避免登录重试时重复创建定时器。
+            print("✅ 开奖数据同步由全局任务管理器持续执行")
             
             # 启动登录检测定时器（暂时禁用，避免登录成功后跳回登录页）
             # 已修复登录状态保护，但为了避免任何潜在问题，暂时禁用登录检测定时器
@@ -3722,6 +3711,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         )
         current_account.setEnabled(False)
         account_menu.addAction(current_account)
+
+        self.local_betting_action = QtWidgets.QAction(self)
+        self.local_betting_action.setIcon(
+            self.style().standardIcon(QtWidgets.QStyle.SP_DialogApplyButton)
+        )
+        self.local_betting_action.triggered.connect(self.enableLocalBetting)
+        account_menu.addAction(self.local_betting_action)
+        self.local_betting_updated.connect(self._finishLocalBettingUpdate)
+        self._refreshLocalBettingAction()
         account_menu.addSeparator()
 
         open_action = QtWidgets.QAction('打开其他账号', self)
@@ -3750,8 +3748,92 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         account_menu.addAction(exit_action)
 
         self.setWindowTitle(f"Lucky5 - {self.account_display_name}")
-        self.statusbar.showMessage(f"当前账号：{self.account_display_name}")
+        self._showAccountStatus()
         return True
+
+    def _refreshLocalBettingAction(self):
+        if not hasattr(self, 'local_betting_action'):
+            return
+        if self.local_betting_enabled:
+            self.local_betting_action.setText('下注位置：本地电脑')
+            self.local_betting_action.setEnabled(False)
+        else:
+            self.local_betting_action.setText('切换到本地电脑下注')
+            self.local_betting_action.setEnabled(True)
+
+    def _showAccountStatus(self, message=''):
+        location = '本地电脑' if self.local_betting_enabled else '云服务器'
+        text = f"当前账号：{self.account_display_name} | 下注位置：{location}"
+        if message:
+            text += ' | ' + message
+        self.statusbar.showMessage(text)
+
+    def enableLocalBetting(self):
+        if getattr(self, 'is_need_login', 0) != 1 or not getattr(
+            self, 'browser_cookies', None
+        ):
+            QMessageBox.warning(
+                self,
+                '切换到本地电脑下注',
+                '请先完成盘口登录，确认客户端已显示“已登录”后再切换。',
+            )
+            return
+
+        answer = QMessageBox.question(
+            self,
+            '切换到本地电脑下注',
+            '切换后后台将设置：\n\n'
+            '本地下：本地电脑\n'
+            '自动登：否\n'
+            '自动下：是\n\n'
+            '之后由当前客户端负责自动下注，确定继续吗？',
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if answer != QMessageBox.Yes:
+            return
+
+        self.local_betting_action.setEnabled(False)
+        self.local_betting_action.setText('正在切换...')
+        self._showAccountStatus('正在更新后台开关')
+
+        def update_server():
+            try:
+                from xy_client.services.auth.client_auth import ClientAuth
+                data = ClientAuth(config.get_config('robot_domain')).enable_local_betting(
+                    self.access_token
+                )
+                self.local_betting_updated.emit(True, '已切换为本地电脑下注', data)
+            except Exception as exc:
+                self.local_betting_updated.emit(False, str(exc), {})
+
+        Thread(target=update_server, daemon=True).start()
+
+    def _finishLocalBettingUpdate(self, success, message, data):
+        if not success:
+            self._refreshLocalBettingAction()
+            self._showAccountStatus('切换失败')
+            QMessageBox.critical(self, '切换失败', message)
+            return
+
+        account = (data or {}).get('account') or {}
+        self.local_betting_enabled = True
+        os.environ['LUCKY5_IS_LOCAL_BET'] = '1'
+        os.environ['LUCKY5_IS_AUTO_LOGIN'] = '0'
+        os.environ['LUCKY5_IS_AUTO_BET'] = '1'
+        try:
+            from xy_client.services.auth.credential_cache import CredentialCache
+            cache = CredentialCache()
+            profile = cache.get_account(self.account_key)
+            cached_account = dict(profile.get('account') or {})
+            cached_account.update(account)
+            cache.update_account(self.account_key, account=cached_account)
+        except Exception as exc:
+            print('更新本地账号状态失败：' + str(exc))
+
+        self._refreshLocalBettingAction()
+        self._showAccountStatus('后台开关已更新')
+        QMessageBox.information(self, '切换成功', message)
 
     def _selectOtherAccount(self):
         from xy_client.services.auth.login_dialog import select_client_account
@@ -5517,20 +5599,24 @@ def main(existing_app=None):
 
         ######################  监控开始  #############################
         manager = TaskManager()
-        # 暂时不添加任何任务，只保持UI可见，避免崩溃
+        mainWindow.task_manager = manager
         # manager.add_task('loginClient', createLoginClient(mainWindow, 60), 60)  # 检测掉线自动登陆 - 增加间隔避免冲突
         
-        print("⚠️ 警告：当前为最小配置，未启用任何后台任务")
-        print("⚠️ 程序只会显示UI界面，不会执行任何自动化操作")
-        print("⚠️ 如需启用功能，请逐步取消注释任务")
-        
-        # 暂时禁用所有任务，直到确认程序稳定
+        # 开奖同步使用盘口HTTP接口；无论是否打开浏览器都可以执行。
         # manager.add_task("syncBalance", createSyncBalance(mainWindow, 60), 30)
         # manager.add_task("betTasks", createBetTasks(mainWindow, 2), 5)  # 下注任务 - 优化间隔提高效率
         # manager.add_task("getNowBetQiHao", createGetNowBetQiHao(mainWindow, 10), 30)  # 获取正在进行的期号
         # manager.add_task("connectionMonitor", createConnectionMonitor(mainWindow, 60), 120)  # 连接监控任务
-        # manager.add_task("getNowKjData", createGetSiteNowKjData(mainWindow, 30), 30)  # 获取当前开奖号码 - 网盘接口
-        # manager.add_task("getNowKjData2", createGetNowKjData2(mainWindow, 5), 30)  # 获取当前开奖号码2，获取页面上的开奖号码 - 网盘页面
+        manager.add_task(
+            "drawDataSync",
+            lambda: SystemsUsers.getNowKjDataTimer(mainWindow),
+            30,
+        )
+        manager.add_task(
+            "drawPageSync",
+            lambda: SystemsUsers.getNowKjDataTimer2(mainWindow),
+            30,
+        )
         # manager.add_task('refreshTimer', createRefreshTimer(mainWindow, 300), 30)  # 定时刷新页面
         manager.add_task('getUserBetDescByApi', createGetUserBetDescByApi(mainWindow, 5), 30)  # 日志搜集 - 接口
         
@@ -5570,10 +5656,9 @@ def main(existing_app=None):
 
         # 启动所有任务
         print(f"🔄 准备启动 {len(manager.tasks)} 个任务...")
-        print("ℹ️ 注意：当前为最小配置，未启用任何后台任务")
-        print("   - 所有任务已暂时禁用，避免崩溃")
-        print("   - 程序只会显示UI界面，不会执行自动化操作")
-        print("   - 如需启用功能，请逐步取消注释任务")
+        print("ℹ️ 已启用开奖同步和必要的客户端维护任务")
+        print("   - 开奖同步每30秒检查一次")
+        print("   - 后台模式使用HTTP接口，不依赖浏览器驱动")
         for i, task_name in enumerate(manager.tasks):
             print(f'🔄 启动任务 {i+1}/{len(manager.tasks)}: {task_name}')
             try:
@@ -5598,9 +5683,7 @@ def main(existing_app=None):
         # SystemsUsers.getNowKjDataTimer2(5, mainWindow)  # 获取当前开奖号码2，获取页面上的开奖号码 - 网盘页面
         # SystemsUsers.loginClient(60, mainWindow)  # 检测掉线自动登陆
         # SystemsUsers.refreshTimer(300, mainWindow)  # 自动刷新
-        # 暂时禁用所有定时器，确保程序稳定运行
-        print("⚠️ 当前为最小化配置，已禁用所有定时器，确保程序稳定运行")
-        print("   如需启用功能，请逐步取消注释定时器")
+        print("✅ 客户端周期任务已交由统一任务管理器运行")
         """
         try:
             print("🔄 准备启动用户信息同步定时器...")

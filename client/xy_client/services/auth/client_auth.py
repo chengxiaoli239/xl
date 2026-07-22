@@ -23,6 +23,12 @@ class ClientAuth:
     def validate(self, access_token):
         return self._post("/api/client-auth/validate", {"access_token": access_token})
 
+    def enable_local_betting(self, access_token):
+        return self._post(
+            "/api/client-auth/enable-local-betting",
+            {"access_token": access_token},
+        )
+
     def _post(self, path, payload):
         try:
             response = requests.post(

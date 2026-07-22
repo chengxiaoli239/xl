@@ -18,7 +18,7 @@ from xy_client.services.auth.login_dialog import AccountSelectionDialog, authent
 from xy_client.services.auth.account_process import launch_client_process
 from xy_client.services.tools.Configs import Configs
 from xy_client.services.tools.ClientFriendlyAccountManager import ClientFriendlyAccountManager
-from xy_client.launcher import configure_standard_streams
+from xy_client.launcher import configure_account_environment, configure_standard_streams
 
 
 class ReconfigurableStream:
@@ -164,6 +164,9 @@ class AccountProcessTest(unittest.TestCase):
                 "LUCKY5_ACCESS_TOKEN": "old-token",
                 "LUCKY5_ACCOUNT_ID": "old-account",
                 "LUCKY5_ROBOT_DOMAIN": "http://old.example.com",
+                "LUCKY5_IS_LOCAL_BET": "1",
+                "LUCKY5_IS_AUTO_LOGIN": "0",
+                "LUCKY5_IS_AUTO_BET": "1",
             },
             clear=True,
         ):
@@ -176,6 +179,33 @@ class AccountProcessTest(unittest.TestCase):
         self.assertNotIn("LUCKY5_ACCESS_TOKEN", options["env"])
         self.assertNotIn("LUCKY5_ACCOUNT_ID", options["env"])
         self.assertNotIn("LUCKY5_ROBOT_DOMAIN", options["env"])
+        self.assertNotIn("LUCKY5_IS_LOCAL_BET", options["env"])
+        self.assertNotIn("LUCKY5_IS_AUTO_LOGIN", options["env"])
+        self.assertNotIn("LUCKY5_IS_AUTO_BET", options["env"])
+
+
+class LauncherEnvironmentTest(unittest.TestCase):
+    def test_account_switches_are_scoped_to_selected_account(self):
+        auth_data = {
+            "robot_domain": "http://18.163.69.56:8090",
+            "access_token": "token-value",
+            "account_key": "account-key",
+            "username": "admin",
+            "display_name": "admin / client-one",
+            "account": {
+                "is_local_bet": 1,
+                "is_auto_login": 0,
+                "is_auto_bet": 1,
+            },
+        }
+
+        with patch.dict(os.environ, {}, clear=True):
+            values = configure_account_environment(auth_data)
+
+            self.assertEqual(os.environ["LUCKY5_IS_LOCAL_BET"], "1")
+            self.assertEqual(os.environ["LUCKY5_IS_AUTO_LOGIN"], "0")
+            self.assertEqual(os.environ["LUCKY5_IS_AUTO_BET"], "1")
+            self.assertEqual(values["LUCKY5_ACCOUNT_KEY"], "account-key")
 
 
 class AccountInstanceLockTest(unittest.TestCase):
@@ -319,6 +349,32 @@ class ClientAuthTest(unittest.TestCase):
             ClientAuth("https://backend.example.com").login("demo", "bad-password")
 
         self.assertEqual(error.exception.status, 401)
+
+    @patch("xy_client.services.auth.client_auth.requests.post")
+    def test_enable_local_betting_uses_current_access_token(self, post):
+        response = Mock()
+        response.json.return_value = {
+            "status": 200,
+            "data": {
+                "account": {
+                    "is_local_bet": 1,
+                    "is_auto_login": 0,
+                    "is_auto_bet": 1,
+                }
+            },
+        }
+        post.return_value = response
+
+        data = ClientAuth("http://18.163.69.56:8090/").enable_local_betting(
+            "token-value"
+        )
+
+        self.assertEqual(data["account"]["is_local_bet"], 1)
+        post.assert_called_once_with(
+            "http://18.163.69.56:8090/api/client-auth/enable-local-betting",
+            json={"access_token": "token-value"},
+            timeout=(4, 12),
+        )
 
 
 if __name__ == "__main__":

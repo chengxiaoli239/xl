@@ -45,7 +45,7 @@ class PushCache:
         self.failed_cache = {}   # 失败推送的缓存
         self.last_push_time = {} # 最后推送时间
         self.min_interval = 8    # 最小推送间隔(秒)
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
     
     def is_successful(self, qihao):
         """检查是否已经成功推送过"""
@@ -504,10 +504,20 @@ def getUserData(mainWindow=None, cookies_str=None):
     global headerData
     try:
         headerData = getHeaderData()
-        if headerData['cookies'] is None:
+        if not headerData.get('cookies'):
             raise Exception('cookies为空')
         if cookies_str is None:
-            cookies_str = getCookiesStr(mainWindow.driver.get_cookies())
+            driver = getattr(mainWindow, 'driver', None)
+            if driver is not None:
+                cookies_str = getCookiesStr(driver.get_cookies())
+            else:
+                cookies_str = getattr(mainWindow, 'browser_cookies', None)
+        if not cookies_str:
+            cookies_str = headerData.get('cookies', '')
+        if isinstance(cookies_str, list):
+            cookies_str = getCookiesStr(cookies_str)
+        if not cookies_str:
+            raise Exception('cookies为空')
 
         now_time = str(int(float(time.time()) * 1000))
 
@@ -1047,53 +1057,39 @@ def getNowKjDataTimer(mainWindow):
             print(f"⚠️ [开奖采集] 时间段判断异常: {time_check_e}，继续执行采集")
             pass
         
-        # 检查登录状态
-        if not hasattr(mainWindow, 'driver') or mainWindow.driver is None:
-            print("⚠️ 浏览器驱动未初始化，跳过开奖数据获取")
-            return
-        
-        # 导入登录状态检查函数
-        try:
-            from xy_client.services.Lucky5.Lucky import check_login_status
-            login_status = check_login_status(mainWindow.driver)
-            #print(f"🔍 登录状态检查结果: {login_status}")
-            if not login_status:
-                print("⚠️ 未登录状态，跳过开奖数据获取")
-                return
-        except ImportError:
-            # 如果无法导入，使用简单的检查方式
-            if mainWindow.browser_cookies is None or mainWindow.browser_cookies == '':
-                print("⚠️ 未登录状态，跳过开奖数据获取")
-                return
-        
-        # 额外检查：如果仍在登录页面，说明登录失败，跳过数据获取
-        try:
-            current_url = mainWindow.driver.current_url
-            if 'Login' in current_url or '登录' in current_url:
-                print("⚠️ 当前在登录页面，未登录")
-                return
-            
-            # 进一步检查页面内容，确认是否真的在登录页面
+        driver = getattr(mainWindow, 'driver', None)
+        cookies_str = None
+        if driver is not None:
             try:
-                page_title = mainWindow.driver.title
-                print(f"🔍 页面标题: {page_title}")
+                from xy_client.services.Lucky5.Lucky import check_login_status
+                if not check_login_status(driver):
+                    print("⚠️ 未登录状态，跳过开奖数据获取")
+                    return
+            except ImportError:
+                pass
+
+            try:
+                current_url = driver.current_url
+                if 'Login' in current_url or '登录' in current_url:
+                    print("⚠️ 当前在登录页面，未登录")
+                    return
+                page_title = driver.title
                 if '登录' in page_title or 'Login' in page_title:
                     print("⚠️ 页面标题显示为登录页面，未登录")
                     return
-            except:
-                pass
-                
-        except Exception as e:
-            print(f"⚠️ 检查页面URL时发生异常: {e}")
-            return
-        
-        current_url = parse.unquote(mainWindow.driver.current_url)
-        isHasLoginCurrentUrl(current_url)
-        if not mainWindow.browser_cookies:
+                isHasLoginCurrentUrl(parse.unquote(current_url))
+                cookies_str = getCookiesStr(driver.get_cookies())
+            except Exception as e:
+                print(f"⚠️ 检查页面URL时发生异常: {e}")
+                return
+        else:
+            cookies_str = getattr(mainWindow, 'browser_cookies', None)
+
+        if not cookies_str:
             print("⚠️ 浏览器cookies无效，跳过开奖数据获取")
             return
 
-        rst, headerData, err_msg = getUserData(mainWindow)
+        rst, headerData, err_msg = getUserData(mainWindow, cookies_str=cookies_str)
         if rst is None:
             print(f'❌ [开奖采集] API接口返回None，错误: {err_msg}')
             raise Exception('开奖数据异常None1:')
@@ -1110,7 +1106,7 @@ def getNowKjDataTimer(mainWindow):
         
         print(f'🔍 [开奖采集] API返回数据: 上期状态={previous_period_status}, 上期号={previous_period_no}, 上期号码={previous_draw_no}, 当前期号={current_period_no}')
 
-        if previous_period_status == '3':  # 1封盘 3开盘
+        if str(previous_period_status) == '3':  # 1封盘 3开盘
             # previous_period_no 和 previous_draw_no 已在上面获取
             
             # 检查推送缓存，避免重复推送
@@ -1165,7 +1161,7 @@ def getNowKjDataTimer(mainWindow):
             mainWindow.current_qihao = rstData['Data']['period_no']
     except Exception as e:
         print('推送开奖数据异常：', e.args)
-        if '未登录' not in e.args[0]:
+        if '未登录' not in str(e):
             pushErrorLog('机器人网页获取开奖数据异常1：', access_token, lottery_type, str(e))
 
 
