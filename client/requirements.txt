@@ -1,0 +1,7 @@
+PyQt5>=5.15,<6
+requests>=2.31,<3
+selenium>=4.25,<5
+psutil>=5.9,<8
+urllib3>=2.2,<3
+websocket-client>=1.8,<2
+PyInstaller>=6.10,<7

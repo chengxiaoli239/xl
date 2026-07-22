@@ -52,3 +52,13 @@ deploy/backups/
 /php74-yii
 /php84-yii
 
+# Lucky5 local client build/runtime output
+/client/build/
+/client/dist/
+/client/*.spec
+/client/xy_client/data/*.db
+/client/**/__pycache__/
+/client/**/*.pyc
+/client/xy_client/logs/
+/client/xy_client/accounts_config.json
+
