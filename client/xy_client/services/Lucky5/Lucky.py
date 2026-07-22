@@ -341,7 +341,8 @@ def check_login_status(driver):
         return False
         
     except Exception as e:
-        print(f"❌ 检查登录状态时发生异常: {e}")
+        error_summary = str(e).splitlines()[0]
+        print(f"❌ 检查登录状态时发生异常: {error_summary}")
         return False
 
 def ensure_login_status(driver, max_retries=3):

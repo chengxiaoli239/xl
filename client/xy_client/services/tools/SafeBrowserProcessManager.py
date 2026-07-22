@@ -92,74 +92,30 @@ class SafeBrowserProcessManager:
         """判断进程是否由程序管理"""
         try:
             pid = proc.pid
-            
-            # 检查是否在管理列表中
-            if pid in self._managed_processes:
-                return True
-            
+
             # 检查进程是否还在运行
             if not proc.is_running():
+                self._managed_processes.discard(pid)
                 return False
-            
+
             # 检查进程命令行参数
             cmdline = ' '.join(proc.cmdline() or [])
-            
-            # 检查是否包含程序特有的参数（只使用当前程序的标识，避免误判其他程序的进程）
-            program_indicators = [
-                f'--user-data-dir={self._user_data_dir}',
-                f'--remote-debugging-port={self._debug_port}',
-                f'--profile={self._user_data_dir}',
-                # 关键修复：只使用当前程序的account_id和端口，不使用硬编码的端口
-                # 确保每个程序实例只管理自己的进程，不会误判其他程序的进程
-                f'--user-data-dir="C:\\.temp\\9222\\{self.account_id}"',
-                f'--user-data-dir="D:\\.temp\\9223\\{self.account_id}"',
-                f'--user-data-dir="/tmp/9222/{self.account_id}"',
-                f'--user-data-dir="/tmp/9223/{self.account_id}"',
-            ]
-            
-            # 关键修复：检查account_id是否在命令行中（但需要确保是完整的account_id，避免误判）
-            # 例如，如果account_id是"aa33"，不应该匹配"aa335"或"aa33abc"
-            if self.account_id and self.account_id != "default_account":
-                # 使用更严格的匹配：确保account_id是独立的标识符
-                account_patterns = [
-                    f'\\{self.account_id}',  # 在路径中
-                    f'/{self.account_id}',   # 在路径中
-                    f'={self.account_id}',    # 在参数中
-                    f'"{self.account_id}"',  # 在引号中
-                ]
-                for pattern in account_patterns:
-                    if pattern in cmdline:
-                        program_indicators.append(pattern)
-                        break
-            
-            # 关键修复：必须同时匹配account_id和端口/目录，确保只识别当前程序管理的进程
-            # 避免误判其他程序的进程（即使它们使用了相同的端口或目录结构）
-            matches_account = False
-            matches_port_or_dir = False
-            
-            # 检查是否匹配account_id（如果account_id不是默认值）
-            if self.account_id and self.account_id != "default_account":
-                for pattern in [f'\\{self.account_id}', f'/{self.account_id}', f'={self.account_id}', f'"{self.account_id}"']:
-                    if pattern in cmdline:
-                        matches_account = True
-                        break
-            else:
-                # 如果account_id是默认值，跳过account_id检查（兼容旧系统）
-                matches_account = True
-            
-            # 检查是否匹配端口或用户数据目录
-            for indicator in program_indicators:
-                if indicator in cmdline:
-                    matches_port_or_dir = True
-                    break
-            
-            # 只有同时匹配account_id和端口/目录，才认为是程序管理的进程
-            if matches_account and matches_port_or_dir:
+            normalized_cmdline = cmdline.replace('"', '').lower()
+            normalized_profile = self._user_data_dir.replace('"', '').lower()
+            matches_profile = normalized_profile in normalized_cmdline
+            matches_debug_port = (
+                f'--remote-debugging-port={self._debug_port}' in normalized_cmdline
+            )
+
+            # 已记录的 PID 也必须重新验证命令行，避免 PID 被其他
+            # Chrome 进程复用后误判。Chrome 子进程会继承账号专用 profile。
+            if matches_profile or matches_debug_port:
                 # 记录到管理列表
                 self._managed_processes.add(pid)
                 self._save_managed_processes()
                 return True
-            
+
+            self._managed_processes.discard(pid)
             return False
             
         except (psutil.NoSuchProcess, psutil.AccessDenied, AttributeError):
@@ -360,6 +316,10 @@ class SafeBrowserProcessManager:
             return response.status_code == 200
         except:
             return False
+
+    def is_browser_running(self) -> bool:
+        """检查当前账号的调试端口，不以 Chrome 子进程数量判断。"""
+        return self._is_browser_running()
     
     def kill_managed_processes(self):
         """终止程序管理的浏览器进程"""
@@ -471,7 +431,7 @@ class SafeBrowserProcessManager:
             for pid in list(self._managed_processes):
                 try:
                     proc = psutil.Process(pid)
-                    if proc.is_running():
+                    if proc.is_running() and self._is_managed_process(proc):
                         processes.append({
                             'pid': pid,
                             'name': proc.name(),

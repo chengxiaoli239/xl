@@ -749,9 +749,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def closeEvent(self, event):
         """优化后的关闭事件 - 在主线程中快速清理，避免跨线程问题"""
         print("🚪 [closeEvent] 开始关闭程序...")
-        import traceback
-        print("🔍 [closeEvent] 调用堆栈:")
-        traceback.print_stack()
+
+        # Qt 事件循环或清理任务卡住时，仍要释放单实例锁。
+        if not getattr(self, '_exit_watchdog_started', False):
+            self._exit_watchdog_started = True
+            exit_watchdog = threading.Timer(4, lambda: os._exit(0))
+            exit_watchdog.daemon = True
+            exit_watchdog.start()
         
         try:
             if ENABLE_DETAILED_LOGS:
@@ -774,6 +778,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             # 使用 QTimer.singleShot 延迟强制退出，确保清理完成
             from PyQt5.QtCore import QTimer
             QTimer.singleShot(1000, self._force_exit)
+
+            app = QApplication.instance()
+            if app:
+                app.quit()
             
             # 接受关闭事件
             event.accept()
@@ -4935,14 +4943,11 @@ def createBrowserWindowManager(mainWindow, inc):
                                 try:
                                     status = mainWindow.browser_window_manager.monitor_browser_processes()
                                     if not status['is_healthy']:
-                                        print(f"⚠️ [窗口管理-账户={account_id}] 浏览器进程状态异常，尝试恢复...")
-                                        mainWindow.browser_window_manager.kill_existing_browser_processes()
+                                        print(f"⚠️ [窗口管理-账户={account_id}] 浏览器连接不可用，已保留Cookie/API下注")
                                 except Exception as e:
                                     print(f"⚠️ [窗口管理-账户={account_id}] 监控浏览器进程异常: {e}")
                     except Exception as driver_e:
-                        # driver可能已断开，跳过本次检查
-                        if ENABLE_DETAILED_LOGS:
-                            print(f"⚠️ [窗口管理-账户={account_id}] 检查driver异常: {driver_e}")
+                        SystemsUsers.detachInvalidDriver(mainWindow, driver_e)
                 
                 time.sleep(inc)
             except Exception as e:

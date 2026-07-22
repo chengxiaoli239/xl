@@ -360,17 +360,15 @@ class BrowserWindowManager:
                     except (psutil.NoSuchProcess, psutil.AccessDenied):
                         continue
                 
-                # 如果程序管理的进程过多，尝试清理
-                if managed_count > 5:  # 每个账号最多5个程序管理的进程
-                    print(f"⚠️ 程序管理的{self.browser_type}进程过多({managed_count}个)，尝试清理...")
-                    self.kill_existing_browser_processes()
+                browser_reachable = self.safe_process_manager.is_browser_running()
                 
                 return {
                     'managed_process_count': managed_count,
                     'user_process_count': user_count,
                     'total_process_count': managed_count + user_count,
                     'memory_usage': total_memory / 1024 / 1024,  # MB
-                    'is_healthy': managed_count <= 5,
+                    'browser_reachable': browser_reachable,
+                    'is_healthy': browser_reachable,
                     'managed_processes': managed_processes,
                     'user_processes': user_processes
                 }
@@ -393,7 +391,8 @@ class BrowserWindowManager:
                     'user_process_count': 0,
                     'total_process_count': browser_count,
                     'memory_usage': total_memory / 1024 / 1024,  # MB
-                    'is_healthy': browser_count <= 5
+                    'browser_reachable': True,
+                    'is_healthy': True
                 }
             
         except Exception as e:
@@ -529,8 +528,7 @@ class MultiAccountBrowserManager:
                             # 监控进程状态
                             status = manager.monitor_browser_processes()
                             if not status['is_healthy']:
-                                print(f"⚠️ 账号 {account_id} 浏览器状态异常，尝试恢复...")
-                                manager.kill_existing_browser_processes()
+                                print(f"⚠️ 账号 {account_id} 浏览器连接不可用，保留进程并等待重新登录")
                                 
                         except Exception as e:
                             print(f"❌ 监控账号 {account_id} 异常: {e}")

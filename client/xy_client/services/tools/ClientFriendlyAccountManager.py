@@ -159,8 +159,26 @@ class ClientFriendlyAccountManager:
                     return None
 
                 if not self._acquire_instance_lock(account_id):
-                    self._show_duplicate_account_message(account_id)
-                    return None
+                    existing_info = self._running_accounts.get(account_id, {})
+                    existing_pid = existing_info.get('pid')
+                    if existing_pid and self._confirm_restart_hidden_instance(account_id):
+                        expected_executable = existing_info.get('executable', '')
+                        if self._close_existing_process(existing_pid, expected_executable):
+                            self._running_accounts.pop(account_id, None)
+                            self._save_account_configs()
+                            for _ in range(30):
+                                time.sleep(0.1)
+                                if self._acquire_instance_lock(account_id):
+                                    break
+                            else:
+                                self._show_duplicate_account_message(account_id)
+                                return None
+                        else:
+                            self._show_duplicate_account_message(account_id)
+                            return None
+                    else:
+                        self._show_duplicate_account_message(account_id)
+                        return None
                 
                 # 生成账号指纹
                 fingerprint = self._generate_account_fingerprint(account_id)
@@ -243,9 +261,29 @@ class ClientFriendlyAccountManager:
         print(f"⚠️ 账号 {account_id} 已在运行，拒绝重复启动")
         try:
             from PyQt5.QtWidgets import QMessageBox
-            QMessageBox.warning(None, '账号已运行', '所选账号已经在本机运行。')
+            QMessageBox.warning(
+                None,
+                '账号已运行',
+                '所选账号已经在本机运行，且无法显示原窗口。',
+            )
         except Exception:
             pass
+
+    @staticmethod
+    def _confirm_restart_hidden_instance(account_id: str) -> bool:
+        try:
+            from PyQt5.QtWidgets import QMessageBox
+            result = QMessageBox.question(
+                None,
+                '客户端在后台运行',
+                f'账号 {account_id} 的旧客户端仍在后台运行，但窗口无法显示。\n\n'
+                '是否关闭旧客户端并启动当前客户端？',
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No,
+            )
+            return result == QMessageBox.Yes
+        except Exception:
+            return False
 
     def _release_instance_lock(self):
         if self._instance_mutex is not None and sys.platform == 'win32':
@@ -304,10 +342,13 @@ class ClientFriendlyAccountManager:
             print(f"⚠️ 处理现有进程异常: {e}")
             return "close_old"
     
-    def _close_existing_process(self, pid: int):
+    def _close_existing_process(self, pid: int, expected_executable: str = '') -> bool:
         """关闭现有进程"""
         try:
             process = psutil.Process(pid)
+            if expected_executable and process.name().lower() != expected_executable.lower():
+                print(f"⚠️ 拒绝关闭PID {pid}：进程身份与账号记录不一致")
+                return False
             print(f"🔄 正在关闭旧程序 PID {pid}...")
             
             # 尝试优雅关闭
@@ -321,11 +362,14 @@ class ClientFriendlyAccountManager:
                 # 强制关闭
                 process.kill()
                 print(f"⚠️ 强制关闭旧程序 PID {pid}")
+            return True
                 
         except psutil.NoSuchProcess:
             print(f"ℹ️ 旧程序 PID {pid} 已不存在")
+            return True
         except Exception as e:
             print(f"❌ 关闭旧程序异常: {e}")
+            return False
     
     def _register_current_process(self, account_id: str, fingerprint: str, pid: int):
         """注册当前进程"""

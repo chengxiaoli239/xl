@@ -499,6 +499,31 @@ def getHttpStatus(browser):
     return None
 
 
+def detachInvalidDriver(mainWindow, reason=''):
+    """断开已失效的 WebDriver，保留 Cookie 供 HTTP 下注和开奖同步使用。"""
+    driver = getattr(mainWindow, 'driver', None)
+    if driver is None:
+        return False
+
+    mainWindow.driver = None
+    browser_manager = getattr(mainWindow, 'browser_window_manager', None)
+    if browser_manager is not None and getattr(browser_manager, 'driver', None) is driver:
+        browser_manager.driver = None
+
+    summary = str(reason).splitlines()[0] if reason else '浏览器连接已断开'
+    print(f'⚠️ 浏览器会话已断开，切换到Cookie/API模式: {summary}')
+    try:
+        driver.quit()
+    except Exception:
+        try:
+            service = getattr(driver, 'service', None)
+            if service is not None:
+                service.stop()
+        except Exception:
+            pass
+    return True
+
+
 # 获取用户信息数据
 def getUserData(mainWindow=None, cookies_str=None):
     global headerData
@@ -1063,25 +1088,31 @@ def getNowKjDataTimer(mainWindow):
             try:
                 from xy_client.services.Lucky5.Lucky import check_login_status
                 if not check_login_status(driver):
-                    print("⚠️ 未登录状态，跳过开奖数据获取")
-                    return
+                    cached_cookies = getattr(mainWindow, 'browser_cookies', None)
+                    if not cached_cookies:
+                        print("⚠️ 未登录状态，跳过开奖数据获取")
+                        return
+                    detachInvalidDriver(mainWindow, '浏览器登录状态检查失败')
+                    driver = None
+                    cookies_str = cached_cookies
             except ImportError:
                 pass
 
-            try:
-                current_url = driver.current_url
-                if 'Login' in current_url or '登录' in current_url:
-                    print("⚠️ 当前在登录页面，未登录")
-                    return
-                page_title = driver.title
-                if '登录' in page_title or 'Login' in page_title:
-                    print("⚠️ 页面标题显示为登录页面，未登录")
-                    return
-                isHasLoginCurrentUrl(parse.unquote(current_url))
-                cookies_str = getCookiesStr(driver.get_cookies())
-            except Exception as e:
-                print(f"⚠️ 检查页面URL时发生异常: {e}")
-                return
+            if driver is not None:
+                try:
+                    current_url = driver.current_url
+                    if 'Login' in current_url or '登录' in current_url:
+                        print("⚠️ 当前在登录页面，未登录")
+                        return
+                    page_title = driver.title
+                    if '登录' in page_title or 'Login' in page_title:
+                        print("⚠️ 页面标题显示为登录页面，未登录")
+                        return
+                    isHasLoginCurrentUrl(parse.unquote(current_url))
+                    cookies_str = getCookiesStr(driver.get_cookies())
+                except Exception as e:
+                    detachInvalidDriver(mainWindow, e)
+                    cookies_str = getattr(mainWindow, 'browser_cookies', None)
         else:
             cookies_str = getattr(mainWindow, 'browser_cookies', None)
 

@@ -230,6 +230,30 @@ class AccountInstanceLockTest(unittest.TestCase):
             first._release_instance_lock()
             second._release_instance_lock()
 
+    def test_hidden_instance_can_be_restarted_after_user_confirmation(self):
+        manager = ClientFriendlyAccountManager()
+        manager._current_account_id = "hidden-account"
+        manager._running_accounts = {
+            "hidden-account": {"pid": 12345, "executable": "Lucky5_Debug.exe"}
+        }
+
+        with patch.object(
+            manager, "_acquire_instance_lock", side_effect=[False, True]
+        ), patch.object(
+            manager, "_confirm_restart_hidden_instance", return_value=True
+        ), patch.object(
+            manager, "_close_existing_process", return_value=True
+        ) as close_process, patch.object(
+            manager, "_save_account_configs"
+        ), patch.object(
+            manager, "_register_current_process"
+        ) as register_process:
+            account_id = manager.check_and_register_account()
+
+        self.assertEqual(account_id, "hidden-account")
+        close_process.assert_called_once_with(12345, "Lucky5_Debug.exe")
+        register_process.assert_called_once()
+
 
 class ConfigTest(unittest.TestCase):
     @patch("xy_client.services.tools.Configs.application_dir")
