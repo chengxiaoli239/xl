@@ -1,4 +1,5 @@
 import json
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -8,6 +9,27 @@ from xy_client.services.auth.client_auth import ClientAuth, ClientAuthError
 from xy_client.services.auth.credential_cache import CredentialCache
 from xy_client.services.auth.login_dialog import authenticate_client
 from xy_client.services.tools.Configs import Configs
+from xy_client.launcher import configure_standard_streams
+
+
+class ReconfigurableStream:
+    def __init__(self):
+        self.options = None
+
+    def reconfigure(self, **options):
+        self.options = options
+
+
+class ConsoleEncodingTest(unittest.TestCase):
+    def test_unencodable_console_characters_are_escaped(self):
+        stdout = ReconfigurableStream()
+        stderr = ReconfigurableStream()
+
+        with patch.object(sys, "stdout", stdout), patch.object(sys, "stderr", stderr):
+            configure_standard_streams()
+
+        self.assertEqual(stdout.options, {"errors": "backslashreplace"})
+        self.assertEqual(stderr.options, {"errors": "backslashreplace"})
 
 
 class CredentialCacheTest(unittest.TestCase):

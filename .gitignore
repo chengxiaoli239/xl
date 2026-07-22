@@ -61,4 +61,5 @@ deploy/backups/
 /client/**/*.pyc
 /client/xy_client/logs/
 /client/xy_client/accounts_config.json
+/logs/
 

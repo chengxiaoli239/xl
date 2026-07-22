@@ -2,6 +2,19 @@ import os
 import sys
 from pathlib import Path
 
+
+def configure_standard_streams():
+    for stream in (sys.stdout, sys.stderr):
+        if stream is None or not hasattr(stream, "reconfigure"):
+            continue
+        try:
+            stream.reconfigure(errors="backslashreplace")
+        except (AttributeError, OSError, TypeError, ValueError):
+            pass
+
+
+configure_standard_streams()
+
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QApplication
 
