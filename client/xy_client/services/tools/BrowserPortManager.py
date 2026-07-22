@@ -19,7 +19,11 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
 
-from xy_client.services.tools.account_runtime import debug_port_for_account
+from xy_client.services.tools.account_runtime import (
+    browser_profile_dir,
+    chrome_launch_arguments,
+    debug_port_for_account,
+)
 
 
 class BrowserPortManager:
@@ -44,12 +48,7 @@ class BrowserPortManager:
     
     def _get_user_data_dir(self) -> str:
         """获取用户数据目录（兼容现有系统）"""
-        import platform
-        # 使用现有的用户目录结构，不改变现有用户的使用
-        if platform.system() == "Windows":
-            return f"C:\\.temp\\9222\\{self.account_id}"
-        else:
-            return f"/tmp/9222/{self.account_id}"
+        return browser_profile_dir(self.account_id)
     
     def is_port_available(self, port: int) -> bool:
         """检查端口是否可用"""
@@ -65,7 +64,9 @@ class BrowserPortManager:
         """检查指定端口是否有浏览器在运行"""
         try:
             # 尝试连接调试端口（使用本地复用Session，避免连接池满警告）
-            response = _get_local_http().get(f'http://127.0.0.1:{port}/json', timeout=2)
+            response = _get_local_http().get(
+                f'http://127.0.0.1:{port}/json', timeout=(0.5, 1)
+            )
             if response.status_code == 200:
                 data = response.json()
                 # 检查是否有浏览器标签页
@@ -77,7 +78,9 @@ class BrowserPortManager:
     def get_browser_tabs_info(self, port: int) -> List[Dict]:
         """获取浏览器标签页信息"""
         try:
-            response = _get_local_http().get(f'http://127.0.0.1:{port}/json', timeout=2)
+            response = _get_local_http().get(
+                f'http://127.0.0.1:{port}/json', timeout=(0.5, 1)
+            )
             if response.status_code == 200:
                 return response.json()
         except Exception:
@@ -125,12 +128,9 @@ class BrowserPortManager:
                 return False
             
             # 构建启动命令
-            cmd = [
-                chrome_path,
-                f"--remote-debugging-port={self.debug_port}",
-                f"--user-data-dir={self.user_data_dir}",
-                "--no-first-run",
-                "--no-default-browser-check",
+            cmd = chrome_launch_arguments(
+                chrome_path, self.debug_port, self.user_data_dir
+            ) + [
                 "--disable-extensions",
                 "--disable-plugins",
                 "--disable-web-security",
@@ -545,7 +545,9 @@ def _get_local_http():
     global _local_http
     if _local_http is None:
         session = requests.Session()
-        retry_strategy = Retry(total=2, backoff_factor=0.3)
+        retry_strategy = Retry(
+            total=0, connect=0, read=0, redirect=0, status=0
+        )
         adapter = HTTPAdapter(pool_connections=50, pool_maxsize=200, max_retries=retry_strategy, pool_block=False)
         session.mount('http://', adapter)
         session.mount('https://', adapter)

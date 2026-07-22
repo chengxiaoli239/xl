@@ -1117,8 +1117,14 @@ def getNowKjDataTimer(mainWindow):
             cookies_str = getattr(mainWindow, 'browser_cookies', None)
 
         if not cookies_str:
-            print("⚠️ 浏览器cookies无效，跳过开奖数据获取")
+            now = time.time()
+            last_log_time = getattr(mainWindow, '_last_invalid_cookie_log_time', 0)
+            if now - last_log_time >= 300:
+                print("⚠️ 浏览器cookies无效，跳过开奖数据获取（5分钟内不再重复提示）")
+                mainWindow._last_invalid_cookie_log_time = now
             return
+
+        mainWindow._last_invalid_cookie_log_time = 0
 
         rst, headerData, err_msg = getUserData(mainWindow, cookies_str=cookies_str)
         if rst is None:

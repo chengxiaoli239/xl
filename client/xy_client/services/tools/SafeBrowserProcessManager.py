@@ -14,7 +14,11 @@ import platform
 import json
 from typing import Dict, List, Optional, Set
 
-from xy_client.services.tools.account_runtime import debug_port_for_account
+from xy_client.services.tools.account_runtime import (
+    browser_profile_dir,
+    chrome_launch_arguments,
+    debug_port_for_account,
+)
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -46,11 +50,7 @@ class SafeBrowserProcessManager:
     
     def _get_user_data_dir(self) -> str:
         """获取用户数据目录（兼容现有系统）"""
-        # 使用现有的用户目录结构，不改变现有用户的使用
-        if platform.system() == "Windows":
-            return f"C:\\.temp\\9222\\{self.account_id}"
-        else:
-            return f"/tmp/9222/{self.account_id}"
+        return browser_profile_dir(self.account_id)
     
     def _get_debug_port(self) -> int:
         """获取调试端口"""
@@ -212,12 +212,9 @@ class SafeBrowserProcessManager:
                 return False
             
             # 构建启动命令（兼容现有系统）
-            cmd = [
-                chrome_path,
-                f"--remote-debugging-port={self._debug_port}",
-                f"--user-data-dir={self._user_data_dir}",
-                "--no-first-run",
-                "--no-default-browser-check",
+            cmd = chrome_launch_arguments(
+                chrome_path, self._debug_port, self._user_data_dir
+            ) + [
                 "--disable-extensions",
                 "--disable-plugins",
                 "--disable-web-security",
@@ -312,7 +309,9 @@ class SafeBrowserProcessManager:
     def _is_browser_running(self) -> bool:
         """检查浏览器是否在运行"""
         try:
-            response = _get_local_http().get(f'http://127.0.0.1:{self._debug_port}/json', timeout=2)
+            response = _get_local_http().get(
+                f'http://127.0.0.1:{self._debug_port}/json', timeout=(0.5, 1)
+            )
             return response.status_code == 200
         except:
             return False
@@ -320,6 +319,12 @@ class SafeBrowserProcessManager:
     def is_browser_running(self) -> bool:
         """检查当前账号的调试端口，不以 Chrome 子进程数量判断。"""
         return self._is_browser_running()
+
+    def register_process(self, pid: int) -> None:
+        """记录由客户端直接启动的浏览器主进程。"""
+        with self._lock:
+            self._managed_processes.add(int(pid))
+            self._save_managed_processes()
     
     def kill_managed_processes(self):
         """终止程序管理的浏览器进程"""
@@ -428,9 +433,26 @@ class SafeBrowserProcessManager:
         """获取程序管理的进程信息"""
         with self._lock:
             processes = []
+            candidates = {}
+            for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+                try:
+                    proc_name = str(proc.info.get('name') or '').lower()
+                    if any(
+                        browser_name in proc_name
+                        for browser_name in self.browser_process_names[self.browser_type]
+                    ):
+                        candidates[proc.pid] = proc
+                except (psutil.NoSuchProcess, psutil.AccessDenied, AttributeError):
+                    continue
+
             for pid in list(self._managed_processes):
                 try:
-                    proc = psutil.Process(pid)
+                    candidates.setdefault(pid, psutil.Process(pid))
+                except psutil.NoSuchProcess:
+                    self._managed_processes.discard(pid)
+
+            for pid, proc in candidates.items():
+                try:
                     if proc.is_running() and self._is_managed_process(proc):
                         processes.append({
                             'pid': pid,
@@ -509,7 +531,9 @@ def _get_local_http():
     global _local_http
     if _local_http is None:
         session = requests.Session()
-        retry_strategy = Retry(total=2, backoff_factor=0.3)
+        retry_strategy = Retry(
+            total=0, connect=0, read=0, redirect=0, status=0
+        )
         adapter = HTTPAdapter(pool_connections=50, pool_maxsize=200, max_retries=retry_strategy, pool_block=False)
         session.mount('http://', adapter)
         session.mount('https://', adapter)

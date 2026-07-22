@@ -12,6 +12,11 @@ from threading import Thread
 import psutil
 import urllib3
 
+from xy_client.services.tools.account_runtime import (
+    browser_profile_dir,
+    chrome_launch_arguments,
+)
+
 # 第三方库导入
 import requests
 from PyQt5 import QtCore
@@ -1538,9 +1543,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             print("🚀 [updateLoginStatus] 准备启动自动化任务...")
             self.start_automation_tasks()
         else:
-            # 登录失败，关闭所有浏览器窗口
-            print(f"🔐 [updateLoginStatus] 登录失败，准备关闭浏览器...")
-            self.closeAllBrowsers()
+            # A transient platform/API failure must not close the browser or
+            # discard cookies. The next login attempt can reuse the same CDP
+            # port and persistent profile.
+            print("⚠️ [updateLoginStatus] 登录未成功，保留浏览器窗口和Cookie等待重试")
             status_text = "未登录"
             print(f"🔐 [updateLoginStatus] 登录状态已更新: {status_text} (is_need_login = {self.is_need_login})")
     
@@ -2044,56 +2050,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                         self._original_port = self.port
                         print(f"🔄 生成新的浏览器端口: {self.port}")
                 
-                # 关键修复：启动浏览器前，先清理可能存在的旧浏览器进程（仅清理占用当前账户端口的进程）
-                # 确保不会关闭其他账户的浏览器进程
-                account_id = getattr(self, 'account_key', 'default')
-                try:
-                    import psutil
-                    import subprocess
-                    # 严格验证：只关闭占用当前账户端口的浏览器进程
-                    # 通过验证命令行参数中包含当前端口来确保是当前账户的进程
-                    closed_count = 0
-                    for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
-                        try:
-                            proc_name = proc.info['name'] or ''
-                            cmdline = ' '.join(proc.info['cmdline'] or [])
-                            
-                            # 关键验证：确保进程的命令行中包含当前账户的端口
-                            # 并且端口格式完全匹配（避免误匹配）
-                            port_pattern = f'--remote-debugging-port={self.port}'
-                            if ('chrome' in proc_name.lower() or 'firefox' in proc_name.lower()) and port_pattern in cmdline:
-                                # 额外验证：检查用户数据目录是否匹配（如果可能）
-                                # 这样可以进一步确保是当前账户的进程
-                                user_data_pattern = f'--user-data-dir='
-                                if user_data_pattern in cmdline:
-                                    # 提取用户数据目录
-                                    import re
-                                    user_data_match = re.search(r'--user-data-dir=([^\s]+)', cmdline)
-                                    if user_data_match:
-                                        user_data_dir = user_data_match.group(1)
-                                        # 检查是否包含当前账户ID（如果用户数据目录包含账户信息）
-                                        if account_id in user_data_dir or 'default' in user_data_dir:
-                                            print(f"🔄 [账户={account_id}] 发现占用端口 {self.port} 的浏览器进程（已验证用户目录），先关闭: PID={proc.pid}")
-                                        else:
-                                            print(f"⚠️ [账户={account_id}] 发现占用端口 {self.port} 的进程，但用户目录不匹配，跳过（避免关闭其他账户）")
-                                            continue
-                                
-                                print(f"🔄 [账户={account_id}] 发现占用端口 {self.port} 的浏览器进程，先关闭: PID={proc.pid}")
-                                proc.terminate()
-                                try:
-                                    proc.wait(timeout=2)
-                                except psutil.TimeoutExpired:
-                                    proc.kill()
-                                time.sleep(1)  # 等待进程完全关闭
-                                closed_count += 1
-                                print(f"✅ [账户={account_id}] 已关闭占用端口 {self.port} 的浏览器进程: PID={proc.pid}")
-                        except (psutil.NoSuchProcess, psutil.AccessDenied):
-                            continue
-                    
-                    if closed_count > 0:
-                        print(f"✅ [账户={account_id}] 共关闭 {closed_count} 个占用端口 {self.port} 的浏览器进程")
-                except Exception as cleanup_e:
-                    print(f"⚠️ [账户={account_id}] 清理旧浏览器进程时异常: {cleanup_e}")
+                # 自动登录不能先终止现有 Chrome。CDP 暂时不可达时保留
+                # 窗口和 profile，只有用户点击“重登/退出”才允许关闭进程。
+                print(f"🔄 [账户={self.account_key}] 将复用现有Chrome，或在确认无进程时启动新实例")
             else:
                 # 如果有已存在的浏览器，获取其实际端口
                 if hasattr(self, 'port_manager') and self.port_manager:
@@ -3002,45 +2961,49 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     return False
                 print(f"✅ 找到Chrome路径: {chrome_path}")
                 
-                # 构建启动命令
-                system = platform.system()
-                if system == "Windows":
-                    # ⚠️ 重要：浏览器缓存目录路径 - 不要轻易修改
-                    # 每个账号使用独立的缓存目录，确保缓存持久化
-                    # 目录结构：C:\.temp\9222\{profile_id}
-                    # 修改此路径会导致账号缓存丢失，需要重新登录
-                    user_data_dir = f"C:\\.temp\\9222\\{profile_id}"
-                    # 确保目录存在
-                    import os
-                    os.makedirs(user_data_dir, exist_ok=True)
-                    cmd_command = (
-                        f'"{chrome_path}" --remote-debugging-port={self.port} '
-                        f'--remote-allow-origins=* --user-data-dir="{user_data_dir}"'
+                account_id = getattr(self, 'account_key', None) or profile_id or 'default_account'
+                user_data_dir = browser_profile_dir(account_id)
+                os.makedirs(user_data_dir, exist_ok=True)
+                print(f"📁 [start_browser_process] 浏览器缓存目录: {user_data_dir}")
+
+                safe_process_manager = getattr(
+                    getattr(self, 'browser_window_manager', None),
+                    'safe_process_manager',
+                    None,
+                )
+                if safe_process_manager and safe_process_manager.is_browser_running():
+                    print(f"✅ [start_browser_process] 复用账号 {account_id} 已运行的Chrome")
+                    return True
+
+                managed_processes = (
+                    safe_process_manager.get_managed_processes()
+                    if safe_process_manager else []
+                )
+                if managed_processes:
+                    print(
+                        f"⚠️ [start_browser_process] 账号 {account_id} 的Chrome仍在运行，"
+                        "调试端口暂不可用；保留窗口并等待恢复"
                     )
-                    print(f"📁 [start_browser_process] 浏览器缓存目录: {user_data_dir}")
-                elif system == "Darwin":  # macOS
-                    # ⚠️ 重要：浏览器缓存目录路径 - 不要轻易修改
-                    # 目录结构：/tmp/9222/{profile_id}
-                    user_data_dir = f"/tmp/9222/{profile_id}"
-                    import os
-                    os.makedirs(user_data_dir, exist_ok=True)
-                    cmd_command = (
-                        f'"{chrome_path}" --remote-debugging-port={self.port} '
-                        f'--remote-allow-origins=* --user-data-dir="{user_data_dir}"'
-                    )
-                    print(f"📁 [start_browser_process] 浏览器缓存目录: {user_data_dir}")
-                else:
-                    print(f"❌ 不支持的操作系统: {system}")
                     return False
+
+                cmd_command = chrome_launch_arguments(
+                    chrome_path, self.port, user_data_dir
+                )
                 
                 print(f"🔧 [start_browser_process] 启动命令: {cmd_command}")
                 # 执行命令
-                process = subprocess.Popen(cmd_command, shell=True)
+                process = subprocess.Popen(
+                    cmd_command,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                )
                 print(f"✅ Chrome浏览器已启动，端口: {self.port}, PID: {process.pid}")
+
+                if safe_process_manager:
+                    safe_process_manager.register_process(process.pid)
                 
                 # 关键修复：将端口记录到全局端口集合中（用于早盘开盘前关闭所有浏览器）
                 try:
-                    account_id = getattr(self, 'account_key', None) or profile_id or 'default_account'
                     from xy_client.services.tools.BrowserPortManager import _add_port_to_account
                     _add_port_to_account(account_id, int(self.port))
                     if hasattr(self, 'agent_port'):

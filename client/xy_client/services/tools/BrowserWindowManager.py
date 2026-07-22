@@ -17,6 +17,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from .BrowserPortManager import BrowserPortManager
 from .SafeBrowserProcessManager import get_safe_process_manager, cleanup_safe_process_manager
+from .account_runtime import browser_profile_dir, debug_port_for_account
 
 
 class BrowserWindowManager:
@@ -29,6 +30,7 @@ class BrowserWindowManager:
         self._lock = threading.Lock()
         self._window_handles = set()
         self._browser_processes = set()
+        self._last_monitor_reachable = None
         self._user_data_dir = self._get_user_data_dir()
         self._debug_port = self._get_debug_port()
         
@@ -48,17 +50,11 @@ class BrowserWindowManager:
     
     def _get_user_data_dir(self) -> str:
         """获取用户数据目录（兼容现有系统）"""
-        if platform.system() == "Windows":
-            return f"C:\\.temp\\9222\\{self.account_id}"
-        else:
-            return f"/tmp/9222/{self.account_id}"
+        return browser_profile_dir(self.account_id)
     
     def _get_debug_port(self) -> int:
         """获取调试端口"""
-        # 基于账号ID生成唯一端口，避免冲突
-        base_port = 9000
-        port_offset = hash(self.account_id) % 1000
-        return base_port + port_offset
+        return debug_port_for_account(self.account_id)
     
     def kill_existing_browser_processes(self):
         """终止现有的浏览器进程（只终止程序管理的进程）"""
@@ -426,14 +422,10 @@ class BrowserWindowManager:
                 except Exception as e:
                     print(f"⚠️ 安全进程管理器清理失败: {e}")
             
-            # 清理用户数据目录（可选）
-            try:
-                if os.path.exists(self._user_data_dir):
-                    import shutil
-                    shutil.rmtree(self._user_data_dir, ignore_errors=True)
-                    print(f"✅ 已清理用户数据目录: {self._user_data_dir}")
-            except Exception as e:
-                print(f"⚠️ 清理用户数据目录失败: {e}")
+            # Chrome profile contains the account's first-run choice and login
+            # state. Keep it across normal exits, restarts, and account switches.
+            if os.path.exists(self._user_data_dir):
+                print(f"✅ 已保留浏览器缓存目录: {self._user_data_dir}")
             
             print(f"✅ 浏览器资源清理完成: {self.account_id}")
             
@@ -527,8 +519,13 @@ class MultiAccountBrowserManager:
                             
                             # 监控进程状态
                             status = manager.monitor_browser_processes()
-                            if not status['is_healthy']:
+                            reachable = bool(status.get('is_healthy'))
+                            previous = manager._last_monitor_reachable
+                            if not reachable and previous is not False:
                                 print(f"⚠️ 账号 {account_id} 浏览器连接不可用，保留进程并等待重新登录")
+                            elif reachable and previous is False:
+                                print(f"✅ 账号 {account_id} 浏览器连接已恢复")
+                            manager._last_monitor_reachable = reachable
                                 
                         except Exception as e:
                             print(f"❌ 监控账号 {account_id} 异常: {e}")
