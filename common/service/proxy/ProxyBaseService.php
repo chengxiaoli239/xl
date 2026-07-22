@@ -38,14 +38,7 @@ class ProxyBaseService {
      * @return bool
      */
     public static function clearProxyIpKey(){
-        $m = \Yii::$app->cache;
-        $mkey = self::builProxyIpKey();
-        $oldIP = $m->get($mkey);
-
-        $m->delete($mkey);
-        $newIP = self::getPoxyIp();
-
-        return ['status'=>200, 'data'=>['new_ip'=>$newIP, 'old_ip'=>$oldIP]];
+        return self::clearCurrentProxyIp();
     }
 
     /**
@@ -86,6 +79,7 @@ class ProxyBaseService {
      * @return bool
      */
     public static function setIpInvalid($ip_addr=''){
+        $flag = false;
         $row = ProxyIpRecords::findOne(['ip_addr'=>$ip_addr]);
         if(!empty($row)){
             $row->status = 0;
@@ -107,6 +101,33 @@ class ProxyBaseService {
         return $mkey;
     }
 
+    public static function clearCurrentProxyIp($proxy_type='', $ip_addr=''){
+        if(empty($proxy_type)){
+            $proxy_type = self::getProxyType();
+        }
+        $m = \Yii::$app->cache;
+        $mkey = self::buildProxyIpKey($proxy_type);
+        $cachedIp = $m->get($mkey);
+        $oldIp = $ip_addr ?: $cachedIp;
+        if(!empty($oldIp)){
+            self::setIpInvalid($oldIp);
+        }
+        $m->delete($mkey);
+        $fetchCacheCleared = false;
+        if((int)$proxy_type === 1){
+            $fetchCacheCleared = ProxyKuaiService::clearFetchCache();
+        }
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'WARN', '代理IP故障清理缓存', [
+            'proxy_type'=>$proxy_type,
+            'old_ip'=>$oldIp,
+            'cached_ip'=>$cachedIp,
+            'mkey'=>$mkey,
+            'fetch_cache_cleared'=>$fetchCacheCleared,
+        ]);
+
+        return ['status'=>200, 'data'=>['old_ip'=>$oldIp, 'cached_ip'=>$cachedIp, 'proxy_type'=>$proxy_type, 'fetch_cache_cleared'=>$fetchCacheCleared]];
+    }
+
     /**
      * @desc 获取可用ip
      * @param string $proxy_type
@@ -114,7 +135,7 @@ class ProxyBaseService {
      * @param integer $is_warnning 是否告警：0否1是  1的时候为即将过时临界点告警
      * @return mixed|string
      */
-    public static function getCurrentValidProxyIp($proxy_type='', $type=1, &$is_warnning=0){
+    public static function getCurrentValidProxyIp($proxy_type='', $type=1, &$is_warnning=0, $proxyScene = BaseService::PROXY_SCENE_BET){
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return []; # CURL 代理开关
 
@@ -126,10 +147,32 @@ class ProxyBaseService {
         $ip_addr = $m->get($mkey);
         #p(['proxy_type'=>$proxy_type, 'ip_addr'=>$ip_addr]);
         if(!$ip_addr){
-            $flag = ProxyIpRecords::updateAll(['status'=>0, 'updated_at'=>time()], ['AND', ['=', 'status', 1], ['<', 'expire_time', time()]]);
-            $where = ['AND', ['=', 'proxy_type', $proxy_type], ['=', 'status', 1]];
+            $min_left_seconds = 60;
+            $flag = ProxyIpRecords::updateAll(['status'=>0, 'updated_at'=>time()], [
+                'AND',
+                ['=', 'status', 1],
+                ['OR', ['<', 'expire_time', time() + $min_left_seconds], ['<', 'valid_time', time() + $min_left_seconds]],
+            ]);
+            $where = [
+                'AND',
+                ['=', 'proxy_type', $proxy_type],
+                ['=', 'status', 1],
+                ['>', 'expire_time', time() + $min_left_seconds],
+                ['>', 'valid_time', time() + $min_left_seconds],
+            ];
             $row = ProxyIpRecords::find()->where($where)->orderBy(['id'=>SORT_DESC])->one();
             if(empty($row)){
+                if($type == 1){
+                    $new_ip_addr_data = ProxyBaseService::getRemoteProxyIp($proxy_type, $proxyScene);
+                    if(!empty($new_ip_addr_data['ip_addr']) && isset($new_ip_addr_data['status']) && $new_ip_addr_data['status'] == 200){
+                        $ip_addr = $new_ip_addr_data['ip_addr'];
+                        $m->set($mkey, $ip_addr, 10);
+
+                        return $ip_addr;
+                    }
+                    Tool_Common::log('/proxy/'.__FUNCTION__, 'ERR', '代理IP为空且远程获取失败', ['proxy_type'=>$proxy_type, 'proxy_scene'=>$proxyScene, 'rst'=>$new_ip_addr_data]);
+                }
+
                 return '';
             }
             $ip_addr = $row->ip_addr;
@@ -139,9 +182,9 @@ class ProxyBaseService {
                 $is_warnning = 1;
             }
             $expire_time = $row->expire_time;
-            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP-1', ['ip_addr'=>$ip_addr, 'left_time'=>$left_time, 'proxy_type'=>$proxy_type, 'flag'=>$flag, 'expire_time'=>date('Y-m-d H:i:s', $expire_time)]);
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP-1', ['ip_addr'=>$ip_addr, 'left_time'=>$left_time, 'proxy_type'=>$proxy_type, 'proxy_scene'=>$proxyScene, 'flag'=>$flag, 'expire_time'=>date('Y-m-d H:i:s', $expire_time)]);
         }
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP2', ['ip_addr'=>$ip_addr, 'proxy_type'=>$proxy_type]);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP2', ['ip_addr'=>$ip_addr, 'proxy_type'=>$proxy_type, 'proxy_scene'=>$proxyScene]);
 
         return $ip_addr;
     }
@@ -201,10 +244,10 @@ class ProxyBaseService {
      * @desc 获取代理IP
      * @return array
      */
-    public static function getRemoteProxyIp($proxy_type=''){
+    public static function getRemoteProxyIp($proxy_type='', $proxyScene = BaseService::PROXY_SCENE_BET){
         $time_HI = date("H:i");
         //return ['status'=>300, 'msg'=>'调试'];
-        if('04:00'<$time_HI && $time_HI<'08:55'){
+        if($proxyScene !== BaseService::PROXY_SCENE_LOGIN && '04:00'<$time_HI && $time_HI<'08:55'){
             return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
         }
         if(!$proxy_type){
@@ -216,9 +259,9 @@ class ProxyBaseService {
         }elseif($proxy_type == 3){
             $ip_addr_data = ProxyDaiLiYunService::getRemoteProxyIp();
         }else{
-            $ip_addr_data = ProxyKuaiService::getRemoteProxyIp();
+            $ip_addr_data = ProxyKuaiService::getRemoteProxyIp(1, $proxyScene);
         }
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP', ['proxy_type'=>$proxy_type, 'ip_addr_data'=>$ip_addr_data]);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP', ['proxy_type'=>$proxy_type, 'proxy_scene'=>$proxyScene, 'ip_addr_data'=>$ip_addr_data]);
 
         return $ip_addr_data; # ['status'=>200, 'ip_addr'=>$ip_addr];
     }
@@ -279,7 +322,7 @@ class ProxyBaseService {
         $data = curl_exec($ch);
         $end_time = microtime(true);
         $errno = curl_errno( $ch );
-        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp();
+        $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp('', 2);
         $logArr = ['url'=>$url, 'errno'=>$errno, 'time_consume'=>($end_time-$start_time).'s', 'current_proxy_addr'=>$current_proxy_addr, 'ssl_version'=>BaseService::getSslVersionByUid()];
         Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', 'IP检测', $logArr);
         $flag = true;
@@ -316,16 +359,32 @@ class ProxyBaseService {
      * @param $ch
      * @return bool
      */
-    public static function setProxy($ch, $uid=0){
+    public static function setProxy($ch, $uid=0, $proxyScene = BaseService::PROXY_SCENE_BET, $tzSystemId = ''){
+        $proxy_type = 0;
         try {
+            $TzSystemsUsers = null;
+            if($uid){
+                $query = TzSystemsUsers::find()->where(['uid'=>(int)$uid, 'is_use_proxy'=>1]);
+                if($tzSystemId !== '' && $tzSystemId !== null){
+                    $query->andWhere(['tz_system_id'=>(int)$tzSystemId]);
+                }
+                $TzSystemsUsers = $query->one();
+                if(empty($TzSystemsUsers)){
+                    throw_info('无需代理IP的用户或uid为空');
+                }
+                if(!BaseService::isProxySceneOpen($TzSystemsUsers, $proxyScene)){
+                    throw_info('当前接口未开启代理');
+                }
+            }
             $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
             if(!$POXY_STATUS){# CURL 代理开关
                 throw_info('IP代理开关未开启2');
             }
-            $proxy_type = ProxyBaseService::getProxyTypeByUid($uid);
+            $proxy_type = $uid && !empty($TzSystemsUsers->proxy_type) ? (int)$TzSystemsUsers->proxy_type : ProxyBaseService::getProxyType();
 
-            $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp($proxy_type);
-            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设置全局代理-1', ['uid'=>$uid, 'proxy_type'=>$proxy_type, 'current_proxy_addr'=>$current_proxy_addr]);
+            $warnning = 0;
+            $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp($proxy_type, 1, $warnning, $proxyScene);
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设置全局代理-1', ['uid'=>$uid, 'tz_system_id'=>$tzSystemId, 'proxy_type'=>$proxy_type, 'proxy_scene'=>$proxyScene, 'current_proxy_addr'=>$current_proxy_addr]);
             if(empty($current_proxy_addr)){
                 throw_info('代理IP为空');
             }
@@ -352,23 +411,28 @@ class ProxyBaseService {
                 # 快代理
                 $username = \Yii::$app->params['KUAI_USERNAME'];
                 $password = \Yii::$app->params['KUAI_PASSWORD'];
-                Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设置全局代理-1', ['uid'=>$uid, 'proxy_type'=>$proxy_type, 'current_proxy_addr'=>$current_proxy_addr,
-                    'username'=>$username,'password'=>$password]);
+                $proxyAuth = ProxyKuaiService::getProxyAuth($current_proxy_addr);
+                if(!empty($proxyAuth['username']) && !empty($proxyAuth['password'])){
+                    $username = $proxyAuth['username'];
+                    $password = $proxyAuth['password'];
+                }
+                Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设置全局代理-1', ['uid'=>$uid, 'tz_system_id'=>$tzSystemId, 'proxy_type'=>$proxy_type, 'proxy_scene'=>$proxyScene, 'current_proxy_addr'=>$current_proxy_addr]);
                 if(!empty($current_proxy_addr)){
                     //设置代理
                     curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
                     curl_setopt($ch, CURLOPT_PROXY, $current_proxy_addr);
-                    //设置代理用户名密码（私密代理/独享代理）
-                    //如果是开放代理，请注释掉下面两句
-                    curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
-                    curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+                    if(!empty($proxyAuth) || ProxyKuaiService::isUseProxyAuth()){
+                        //设置代理用户名密码（私密代理/独享代理）
+                        curl_setopt($ch, CURLOPT_PROXYAUTH, CURLAUTH_BASIC);
+                        curl_setopt($ch, CURLOPT_PROXYUSERPWD, "{$username}:{$password}");
+                    }
                 }
             }
         }catch (\Exception $e){
-            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设置全局代理-异常', ['uid'=>$uid, 'proxy_type'=>$proxy_type, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '设置全局代理-异常', ['uid'=>$uid, 'tz_system_id'=>$tzSystemId, 'proxy_type'=>$proxy_type, 'proxy_scene'=>$proxyScene, 'err_msg'=>$e->getMessage()]);
             return false;
         }
 
-        return true;
+        return $current_proxy_addr;
     }
 }

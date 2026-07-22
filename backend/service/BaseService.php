@@ -30,6 +30,9 @@ use common\tools\Util;
 
 class BaseService{
 
+    const PROXY_SCENE_LOGIN = 'login';
+    const PROXY_SCENE_BET = 'bet';
+
 
     /**
      * @desc 登陆中转
@@ -87,7 +90,7 @@ class BaseService{
                     if($tz_system_id == 3){
                         $rst = SevenService::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
                     }else{
-                        $rst = Lucky5Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id);
+                        $rst = Lucky5Service::login($TzSystemsUser->uid, $TzSystemsUser->tz_system_id, $is_auto);
                     }
                     break;
                 case in_array($tz_system_id, [4, 5]):
@@ -118,7 +121,8 @@ class BaseService{
                     break;
             }
             if($rst['status'] != 200){
-                throw_info($rst['msg']);
+                $errMsg = $rst['msg'] ?? $rst['err_msg'] ?? $rst['curl_error'] ?? '登录失败';
+                throw_info($errMsg);
             }
         }catch (\Exception $e){
             Tool_Common::log('/login/'.__FUNCTION__, 'ERR', '自动登录异常', ['id'=>$id, 'err_msg'=>$e->getMessage(), 'balance'=>$TzSystemsUser->balance, 'account'=>$TzSystemsUser->account, 'username'=>$TzSystemsUser->username, 'file'=>$e->getFile().'_'.$e->getLine()]);
@@ -363,29 +367,44 @@ class BaseService{
      * @param $ch
      * @return bool|array
      */
-    public static function setPoxy($ch, $url='', $uid = 0){
+    public static function isProxySceneOpen($TzSystemsUsers, $proxyScene = self::PROXY_SCENE_BET){
+        if(empty($TzSystemsUsers) || !(int)$TzSystemsUsers->is_use_proxy){
+            return false;
+        }
+        if($proxyScene === self::PROXY_SCENE_LOGIN){
+            return !$TzSystemsUsers->hasAttribute('is_proxy_login') || (int)$TzSystemsUsers->is_proxy_login === 1;
+        }
+
+        return !$TzSystemsUsers->hasAttribute('is_proxy_bet') || (int)$TzSystemsUsers->is_proxy_bet === 1;
+    }
+
+    public static function setPoxy($ch, $url='', $uid = 0, $proxyScene = self::PROXY_SCENE_BET, $tzSystemId = ''){
         try {
-            $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid]);
+            $query = TzSystemsUsers::find()->where(['uid'=>(int)$uid]);
+            if($tzSystemId !== '' && $tzSystemId !== null){
+                $query->andWhere(['tz_system_id'=>(int)$tzSystemId]);
+            }
+            $TzSystemsUsers = $query->one();
             if(empty($TzSystemsUsers) OR !$TzSystemsUsers->is_use_proxy){
                 throw_info('无需代理IP的用户或uid为空');
+            }
+            if(!self::isProxySceneOpen($TzSystemsUsers, $proxyScene)){
+                throw_info('当前接口未开启代理');
             }
             $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
             if(!$POXY_STATUS){# CURL 代理开关
                 throw_info('IP代理开关未开启1');
             }
 
-            $uids = PoxyIPService::getProxyUids();
-            if(empty($uids) OR !in_array($uid, $uids) OR !$uid){
+            if(!$uid){
                 return ['status'=>200, 'msg'=>'无需代理IP的用户或uid为空'];
             }
-            Tool_Common::log('setPoxy', 'INFO', '设置全局代理2', ['url'=>$url, 'uid'=>$uid]);
+            Tool_Common::log('setPoxy', 'INFO', '设置全局代理2', ['url'=>$url, 'uid'=>$uid, 'tz_system_id'=>$tzSystemId, 'proxy_scene'=>$proxyScene]);
 
-            ProxyBaseService::setProxy($ch, $uid); # 设置全局代理
+            return ProxyBaseService::setProxy($ch, $uid, $proxyScene, $tzSystemId); # 设置全局代理
         }catch (\Exception $e){
-            Tool_Common::log('setPoxy', 'INFO', '设置全局代理3', ['url'=>$url, 'uid'=>$uid, 'err_msg'=>$e->getMessage()]);
+            Tool_Common::log('setPoxy', 'INFO', '设置全局代理3', ['url'=>$url, 'uid'=>$uid, 'tz_system_id'=>$tzSystemId, 'proxy_scene'=>$proxyScene, 'err_msg'=>$e->getMessage()]);
             return false;
         }
-
-        return true;
     }
 }

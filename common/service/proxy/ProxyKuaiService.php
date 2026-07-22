@@ -2,7 +2,9 @@
 namespace common\service\proxy;
 
 use backend\models\ProxyIpRecords;
+use backend\models\SystemConfig;
 use backend\models\TzSystemsUsers;
+use backend\service\BaseService;
 use backend\service\BetService;
 use backend\service\CurlService;
 use common\tools\RedisLock;
@@ -11,51 +13,272 @@ use  yii;
 
 class ProxyKuaiService {
 
+    const DPS_API = 'https://dps.kdlapi.com';
+    const DEV_API = 'https://dev.kdlapi.com';
+    const DEFAULT_VALID_SECONDS = 180;
+
+    private static function getConfig($key, $default = ''){
+        $row = SystemConfig::findOne(['key'=>$key]);
+        if(empty($row) || $row->value === null || $row->value === ''){
+            return $default;
+        }
+
+        return trim((string)$row->value);
+    }
+
+    private static function getOrderId(){
+        return self::getConfig('KUAI_POXY_ORDER_ID');
+    }
+
+    private static function getSecretId(){
+        return self::getConfig('KUAI_POXY_SECRET_ID');
+    }
+
+    private static function getSecretKey(){
+        return self::getConfig('KUAI_POXY_SECRET_KEY', self::getConfig('KUAI_POXY_API_KEY'));
+    }
+
+    private static function getDpsApi(){
+        return rtrim(\Yii::$app->params['KUAI_POXY_API'] ?? self::DPS_API, '/');
+    }
+
+    private static function getDefaultValidSeconds(){
+        $seconds = (int)self::getConfig('KUAI_POXY_DEFAULT_VALID_SECONDS', self::DEFAULT_VALID_SECONDS);
+
+        return $seconds > 0 ? $seconds : self::DEFAULT_VALID_SECONDS;
+    }
+
+    public static function isUseProxyAuth(){
+        return (int)self::getConfig('KUAI_POXY_USE_AUTH', 0) === 1;
+    }
+
+    private static function buildProxyAuthKey($ipAddr){
+        return 'kuai_proxy_auth_'.md5($ipAddr);
+    }
+
+    private static function buildFetchCacheKey(){
+        $secretId = self::getSecretId() ?: self::getOrderId();
+
+        return 'kuai_proxy_fetch_'.md5($secretId).'_last';
+    }
+
+    public static function clearFetchCache(){
+        return \Yii::$app->cache->delete(self::buildFetchCacheKey());
+    }
+
+    private static function setProxyAuth($ipAddr, $username, $password, $ttl){
+        if(!$ipAddr || !$username || !$password){
+            return false;
+        }
+        $ttl = max(60, (int)$ttl);
+
+        return \Yii::$app->cache->set(self::buildProxyAuthKey($ipAddr), [
+            'username'=>$username,
+            'password'=>$password,
+        ], $ttl);
+    }
+
+    public static function getProxyAuth($ipAddr){
+        if(!$ipAddr){
+            return [];
+        }
+        $auth = \Yii::$app->cache->get(self::buildProxyAuthKey($ipAddr));
+
+        return is_array($auth) ? $auth : [];
+    }
+
+    private static function buildApiUrl($baseUrl, $path, $params = []){
+        $baseUrl = rtrim($baseUrl, '/');
+        $secretId = self::getSecretId();
+        $secretKey = self::getSecretKey();
+
+        if($secretId && $secretKey){
+            $params['secret_id'] = $secretId;
+            $params['sign_type'] = 'hmacsha1';
+            $params['timestamp'] = time();
+            ksort($params);
+
+            $query = [];
+            foreach($params as $key=>$value){
+                $query[] = $key.'='.$value;
+            }
+            $raw = 'GET'.$path.'?'.implode('&', $query);
+            $params['signature'] = base64_encode(hash_hmac('sha1', $raw, $secretKey, true));
+
+            return $baseUrl.$path.'?'.http_build_query($params);
+        }
+
+        $params['orderid'] = self::getOrderId();
+        $params['signature'] = self::getConfig('KUAI_POXY_API_KEY');
+
+        return $baseUrl.$path.'?'.http_build_query($params);
+    }
+
+    private static function maskUrl($url){
+        $url = preg_replace('/(signature=)[^&]+/i', '$1***', $url);
+        $url = preg_replace('/(secret_id=)([^&]{4})[^&]+/i', '$1$2***', $url);
+
+        return $url;
+    }
+
+    private static function apiGet($baseUrl, $path, $params = [], $timeout = 10){
+        $url = self::buildApiUrl($baseUrl, $path, $params);
+        $rst = CurlService::getCurl($url, [], $timeout);
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '快代理接口请求', [
+            'api'=>$path,
+            'url'=>self::maskUrl($url),
+            'rst'=>$rst,
+        ]);
+
+        return $rst;
+    }
+
+    private static function isWhitelistError($rst){
+        $msg = $rst['msg'] ?? '';
+
+        return isset($rst['code']) && (int)$rst['code'] === -108
+            || stripos($msg, 'whitelist') !== false;
+    }
+
+    public static function getIpWhitelist(){
+        $rst = self::apiGet(self::DEV_API, '/api/getipwhitelist', [], 10);
+        if(isset($rst['code']) && (int)$rst['code'] === 0){
+            return ['status'=>200, 'data'=>$rst['data'], 'msg'=>'白名单获取成功'];
+        }
+
+        return ['status'=>300, 'data'=>$rst, 'msg'=>$rst['msg'] ?? '白名单获取失败'];
+    }
+
+    public static function addWhiteIp($iplist = ''){
+        $params = [];
+        if($iplist){
+            $params['iplist'] = $iplist;
+        }
+
+        $rst = self::apiGet(self::DEV_API, '/api/addwhiteip', $params, 10);
+        if(isset($rst['code']) && (int)$rst['code'] === 0){
+            return ['status'=>200, 'data'=>$rst['data'], 'msg'=>$rst['msg'] ?? '白名单添加成功'];
+        }
+
+        return ['status'=>300, 'data'=>$rst, 'msg'=>$rst['msg'] ?? '白名单添加失败'];
+    }
+
+    private static function parseProxyItem($proxyItem){
+        $data = [
+            'ip_addr' => '',
+            'valid_seconds' => 0,
+            'username' => '',
+            'password' => '',
+        ];
+
+        if(is_array($proxyItem)){
+            $ipAddr = $proxyItem['proxy'] ?? $proxyItem['ip_addr'] ?? '';
+            if(!$ipAddr && !empty($proxyItem['ip']) && !empty($proxyItem['port'])){
+                $ipAddr = $proxyItem['ip'].':'.$proxyItem['port'];
+            }
+            $data['ip_addr'] = $ipAddr;
+            $data['valid_seconds'] = (int)($proxyItem['valid_time'] ?? $proxyItem['et'] ?? $proxyItem['expire_time'] ?? 0);
+            $data['username'] = (string)($proxyItem['username'] ?? $proxyItem['user'] ?? '');
+            $data['password'] = (string)($proxyItem['password'] ?? $proxyItem['pass'] ?? '');
+
+            return $data;
+        }
+
+        $proxyItem = trim((string)$proxyItem);
+        $parts = explode(':', $proxyItem);
+        if(count($parts) >= 4 && filter_var($parts[0], FILTER_VALIDATE_IP)){
+            $data['ip_addr'] = $parts[0].':'.$parts[1];
+            $data['username'] = $parts[2];
+            $data['password'] = implode(':', array_slice($parts, 3));
+
+            return $data;
+        }
+
+        if(preg_match('/((?:\d{1,3}\.){3}\d{1,3}:\d{2,5})/', $proxyItem, $matches)){
+            $data['ip_addr'] = $matches[1];
+        }
+        if(preg_match('/(?:,|\s)(\d{2,6})$/', $proxyItem, $matches)){
+            $data['valid_seconds'] = (int)$matches[1];
+        }
+
+        return $data;
+    }
+
     /**
      * @desc 获取代理ip和接口
      * @param $num = 1; # 提取IP数量
      */
-    public static function getProxyRemoteIp($num = 1){
+    public static function getProxyRemoteIp($num = 1, $proxyScene = BaseService::PROXY_SCENE_BET){
         $time_HI = date("H:i");
-        if('04:00'<$time_HI && $time_HI<'08:55'){
+        if($proxyScene !== BaseService::PROXY_SCENE_LOGIN && '04:00'<$time_HI && $time_HI<'08:55'){
             return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
         }
-        $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
-        $API_KEY = BetService::getConfig('KUAI_POXY_API_KEY'); # 快代理 API Key
-        // https://dev.kdlapi.com/api/getorderexpiretime?orderid=938684913491492&signature=vdany88efprusvlm16cb0is9wr9smb4q
+        $secretId = self::getSecretId() ?: self::getOrderId();
         $RedisLock = new RedisLock();
-        $Rkey = $API_KEY.'_redis';
-        if(!$RedisLock->lock($Rkey.'_redis', 15)){
-            sleep(10);
+        $Rkey = 'kuai_proxy_fetch_'.md5($secretId);
+        $m = \Yii::$app->cache;
+        $cacheKey = self::buildFetchCacheKey();
+        if($cacheData = $m->get($cacheKey)){
+            return $cacheData;
         }
-        $query = [
-            'orderid' => $KUAI_POXY_ORDER_ID, # 快代理订单号
+        if(!$RedisLock->lock($Rkey.'_redis', 10)){
+            sleep(2);
+            if($cacheData = $m->get($cacheKey)){
+                return $cacheData;
+            }
+
+            return ['status'=>300, 'msg'=>'代理IP提取过于频繁，已限流'];
+        }
+
+        $baseQuery = [
             'num' => $num,
-            'pt' => 1, # 1、http/https,返回http代理的端口号 2、socks4/socks5,返回socks代理的端口号
-            'format' => 'json', # json、xml
+            'pt' => 1,
+            'format' => 'json',
             'sep' => 1,
-            'area' => '浙江,福建,江西,上海,湖北,江苏,广东',
-            //'area' => '广东',
-            'signature' => $API_KEY,
-            'carrier' => 2, # 0: 不筛选(默认) 1: 联通 2: 电信 ]  此参数仅支持按IP付费订单
+            'f_auth' => 1,
+            'generateType' => 1,
+            'carrier' => 2,
         ];
-        $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdps/?'.http_build_query($query);
-        $rst = CurlService::getCurl($url);
-        if(empty($rst['data'])){
-            $query['area'] = '广西,湖南,浙江,湖北';
-            $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdps/?'.http_build_query($query);
-            $rst = CurlService::getCurl($url);
+        $areas = [
+            '浙江,福建,江西,上海,湖北,江苏,广东',
+            '广西,湖南,浙江,湖北',
+            '',
+        ];
+
+        $rst = [];
+        $query = $baseQuery;
+        try {
+            foreach($areas as $area){
+                $query = $baseQuery;
+                if($area){
+                    $query['area'] = $area;
+                }
+                $rst = self::apiGet(self::getDpsApi(), '/api/getdps', $query, 10);
+                if(isset($rst['code']) && (int)$rst['code'] === 0 && !empty($rst['data']['proxy_list'])){
+                    $data = ['status'=>200, 'data'=>$rst['data']['proxy_list'], 'raw'=>$rst['data'], 'msg'=>'代理IP数据获取成功'];
+                    $m->set($cacheKey, $data, 5);
+
+                    return $data;
+                }
+                if(self::isWhitelistError($rst)){
+                    $addRst = self::addWhiteIp();
+                    Tool_Common::log('/proxy/'.__FUNCTION__, 'ERR', '快代理白名单未命中', [
+                        'query'=>$query,
+                        'proxy_scene'=>$proxyScene,
+                        'rst'=>$rst,
+                        'addWhiteIpRst'=>$addRst,
+                    ]);
+
+                    return ['status'=>300, 'msg'=>'快代理白名单未生效: '.($rst['msg'] ?? ''), 'data'=>$rst, 'addWhiteIpRst'=>$addRst];
+                }
+            }
+        }finally{
+            $RedisLock->unlock($Rkey.'_redis');
         }
 
-        if(empty($rst['data'])){
-            unset($query['area']);
-            $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdps/?'.http_build_query($query);
-            $rst = CurlService::getCurl($url);
-        }
+        Tool_Common::log('/proxy/'.__FUNCTION__, 'ERR', '代理IP获取-快代理失败', ['query'=>$query, 'proxy_scene'=>$proxyScene, 'rst'=>$rst]);
 
-        Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '代理IP获取-快代理', ['url'=>$url, 'query'=>$query, 'rst'=>$rst]);
-
-        return ['status'=>200, 'data'=>$rst['data']['proxy_list'], 'msg'=>'代理IP数据获取成功'];
+        return ['status'=>300, 'data'=>$rst, 'msg'=>$rst['msg'] ?? '代理IP数据获取失败'];
     }
 
     /**
@@ -63,15 +286,8 @@ class ProxyKuaiService {
      * @return array
      */
     public static function kuaiPoxyExpire(){
-        $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
-        $query = [
-            'orderid' => $KUAI_POXY_ORDER_ID, # 快代理订单号
-            'signature' => BetService::getConfig('KUAI_POXY_API_KEY'), # 配置
-        ];
-        $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getorderexpiretime/?'.http_build_query($query);
-
-        $rst = CurlService::getCurl($url);
-        if($rst['code'] != 0 OR $rst['data']['expire_time']<date("Y-m-d H:i:s")){
+        $rst = self::apiGet(self::DEV_API, '/api/getorderexpiretime', [], 10);
+        if(!isset($rst['code']) || $rst['code'] != 0 || empty($rst['data']['expire_time']) || $rst['data']['expire_time']<date("Y-m-d H:i:s")){
             return ['status'=>300, 'msg'=>'使用时间过期'];
         }
 
@@ -88,23 +304,19 @@ class ProxyKuaiService {
         $m = \Yii::$app->cache;
         $mkey = 'retry_kuaiIPValidTime_key';
 
-        $KUAI_POXY_ORDER_ID = BetService::getConfig('KUAI_POXY_ORDER_ID'); # 快代理 订单id
         $query = [
-            'orderid' => $KUAI_POXY_ORDER_ID, # 快代理订单号
             'proxy' => implode(',', $poxy_ips),
-            'signature' => BetService::getConfig('KUAI_POXY_API_KEY'), # 配置
         ];
-        $url = \Yii::$app->params['KUAI_POXY_API'].'/api/getdpsvalidtime/?'.http_build_query($query);
 
-        $rst = CurlService::getCurl($url, [], 6);
-        if($rst['errno']>0 && !$r = $m->get($mkey)){
+        $rst = self::apiGet(self::getDpsApi(), '/api/getdpsvalidtime', $query, 6);
+        if(isset($rst['errno']) && $rst['errno']>0 && !$r = $m->get($mkey)){
             $m->set($mkey, 1, 5);
             return self::kuaiIPValidTime($poxy_ips);
         }
-        $logArr = ['poxy_ips'=>$poxy_ips, 'url'=>$url, 'rst'=>$rst];
+        $logArr = ['poxy_ips'=>$poxy_ips, 'rst'=>$rst];
         Tool_Common::log('kuaiIPValidTime', 'INFO', '获取私密代理可用时长', $logArr);
-        if($rst['code'] != 0){ # 为确保稳定，使用时间少于60s则认为IP失效
-            return ['status'=>301, 'msg'=>'接口调用失败'];
+        if(!isset($rst['code']) || $rst['code'] != 0){ # 为确保稳定，使用时间少于60s则认为IP失效
+            return ['status'=>301, 'msg'=>$rst['msg'] ?? '接口调用失败'];
         }
 
         return ['status'=>200, 'data'=>$rst['data']];
@@ -115,27 +327,38 @@ class ProxyKuaiService {
      * @param int $type 1快代理2芝麻代理
      * @return array
      */
-    public static function getRemoteProxyIp($type=1){
+    public static function getRemoteProxyIp($type=1, $proxyScene = BaseService::PROXY_SCENE_BET){
         $time_HI = date("H:i");
-        if('04:00'<$time_HI && $time_HI<'08:55'){
+        if($proxyScene !== BaseService::PROXY_SCENE_LOGIN && '04:00'<$time_HI && $time_HI<'08:55'){
             return ['status'=>300, 'msg'=>'非下注时间段，不能获取IP'];
         }
 
+        $ip_addr = '';
         try {
             # 快代理
-            $data = self::getProxyRemoteIp($num=1);
+            $data = self::getProxyRemoteIp($num=1, $proxyScene);
             if($data['status'] != 200) {
-                return [];
+                return $data;
             }
-            $ip_addr = $data['data'][0]; # 110.86.176.46:15064
+            $proxyData = self::parseProxyItem($data['data'][0]);
+            $ip_addr = $proxyData['ip_addr']; # 110.86.176.46:15064
+            if(empty($ip_addr)){
+                throw_info('代理IP格式为空');
+            }
             $ProxyIpRecords = ProxyIpRecords::findOne(['ip_addr'=>$ip_addr]);
-            if(!empty($ProxyIpRecords)){
-                throw_info('代理IP记录已存在', 20000);
-            }
-            $ip_addr_datas = explode(':', $data['data'][0]);;
+            $ip_addr_datas = explode(':', $ip_addr);
             $ip = $ip_addr_datas[0];
             $port = $ip_addr_datas[1];
-            $valid_time = ProxyKuaiService::getProxyIpValidTime($ip_addr);
+            $valid_seconds = $proxyData['valid_seconds'];
+            if(!$valid_seconds){
+                $valid_time_from_api = ProxyKuaiService::getProxyIpValidTime($ip_addr);
+                $valid_seconds = max(0, $valid_time_from_api - time());
+            }
+            if($valid_seconds <= 0){
+                $valid_seconds = self::getDefaultValidSeconds();
+            }
+            $valid_time = time() + $valid_seconds;
+            self::setProxyAuth($ip_addr, $proxyData['username'], $proxyData['password'], $valid_seconds);
             $now_time = time();
             $setDatas = [
                 'ip_addr' => $ip_addr,
@@ -145,19 +368,41 @@ class ProxyKuaiService {
                 'proxy_type' => 1,
                 'valid_time' => $valid_time,
                 'expire_time' => $valid_time,
+                'status' => 1,
                 'created_at' => $now_time,
                 'updated_at' => $now_time,
             ];
-            $ProxyIpRecords = new ProxyIpRecords();
+            if(empty($ProxyIpRecords)){
+                $ProxyIpRecords = new ProxyIpRecords();
+            }else{
+                unset($setDatas['created_at']);
+            }
             $ProxyIpRecords->setAttributes($setDatas);
-            $flag = $ProxyIpRecords->save();
-            $logArr = ['data'=>$data, 'ip_addr'=>$ip_addr, 'setDatas'=>$setDatas, 'flag'=>$flag];
+            $saveExceptionMsg = '';
+            try {
+                $flag = $ProxyIpRecords->save();
+            } catch (\Throwable $saveException){
+                $flag = false;
+                $saveExceptionMsg = $saveException->getMessage();
+            }
+            $logArr = ['data'=>$data, 'ip_addr'=>$ip_addr, 'proxy_scene'=>$proxyScene, 'setDatas'=>$setDatas, 'flag'=>$flag];
             if(!$flag){
-                $logArr['err_msg'] = $ProxyIpRecords->getErrors();
+                $errors = $ProxyIpRecords->getErrors();
+                $errorText = json_encode($errors, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                if($saveExceptionMsg){
+                    $logArr['save_exception'] = $saveExceptionMsg;
+                }
+                if(stripos($errorText, 'Duplicate entry') !== false || stripos($errorText, '1062') !== false || (!empty($saveExceptionMsg) && stripos($saveExceptionMsg, 'Duplicate entry') !== false)){
+                    ProxyIpRecords::updateAll($setDatas, ['ip_addr'=>$ip_addr]);
+                    $flag = true;
+                    $logArr['duplicate_recovered'] = 1;
+                }else{
+                    $logArr['err_msg'] = $errors;
+                }
             }
             Tool_Common::log('/proxy/'.__FUNCTION__, 'INFO', '获取代理IP-快代理', $logArr);
         }catch (\Exception $exception){
-            Tool_Common::log('/proxy/'.__FUNCTION__, 'ERR', '获取代理IP-快代理-错误', ['type'=>$type, 'ip_addr'=>$ip_addr, 'err_msg'=>$exception->getMessage()]);
+            Tool_Common::log('/proxy/'.__FUNCTION__, 'ERR', '获取代理IP-快代理-错误', ['type'=>$type, 'proxy_scene'=>$proxyScene, 'ip_addr'=>$ip_addr, 'err_msg'=>$exception->getMessage()]);
             if($exception->getCode() != 20000){
                 return ['status'=>300, 'msg'=>$exception->getMessage()];
             }

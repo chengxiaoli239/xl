@@ -1043,6 +1043,17 @@ class  CommonService{
         return $flag;
     }
 
+    public static function hasRealPlansActiveSys($tz_system_id = 9, $uid=''){
+        return UserSysPlans::find()->where([
+            'uid'=>$uid,
+            'status'=>1,
+            'is_test'=>0,
+            'is_batch_simulate'=>0,
+        ])->andWhere('FIND_IN_SET(:tz_system_id, tz_sites)', [
+            ':tz_system_id'=>(int)$tz_system_id,
+        ])->exists();
+    }
+
     /**
      * @desc 是否有激活的正常计划， 主要用于判断是否要开启代理
      * @param int $lottery_types

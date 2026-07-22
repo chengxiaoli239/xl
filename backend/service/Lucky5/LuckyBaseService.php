@@ -1277,7 +1277,7 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
+        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid, self::$tz_system_id));
         BaseService::setPoxy($ch, $url, $uid);
 
         $html = curl_exec($ch);

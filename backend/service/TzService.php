@@ -14,6 +14,7 @@ use backend\models\SscKjData;
 use backend\models\SysPlansCodes;
 use backend\models\SystemConfig;
 use backend\models\TzSystemsAuth;
+use backend\models\TzSystemsUsers;
 use backend\models\UserCustomPlans;
 use common\service\jobs\kj_data\AfterRunSysPlansJob;
 use common\service\jobs\kj_data\UserBetTaskRecordJob;
@@ -440,9 +441,18 @@ class TzService extends BaseService {
     public static function getTzSites($admin_id = ''){
         $where = ['status'=>1];
         if($admin_id){
-            $tz_systems_ids = TzSystemsAuth::findOne(['uid'=>$admin_id])->tz_systems_ids;
-            $tz_systems_ids_Arr['id'] = explode(',', $tz_systems_ids);
-            $where = array_merge($where, $tz_systems_ids_Arr);
+            $auth = TzSystemsAuth::findOne(['uid'=>$admin_id]);
+            $tz_systems_ids = $auth ? (string)$auth->tz_systems_ids : '';
+            $siteIds = array_values(array_filter(array_map('trim', explode(',', $tz_systems_ids)), 'strlen'));
+            if(empty($siteIds)){
+                $siteIds = TzSystemsUsers::find()
+                    ->select(['tz_system_id'])
+                    ->where(['uid'=>(int)$admin_id, 'status'=>1])
+                    ->andWhere(['>', 'tz_system_id', 0])
+                    ->orderBy(['id'=>SORT_ASC])
+                    ->column();
+            }
+            $where = array_merge($where, ['id'=>$siteIds]);
         }
         //p([$where,$uid]);
         $sites = TzSystems::find()->where($where)->asArray()->all();

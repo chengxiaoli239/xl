@@ -3,6 +3,7 @@
 namespace backend\modules\forum\controllers;
 
 use backend\models\ImportPlanCodes;
+use backend\models\BettingRecords;
 use backend\models\PlanPeriodProfits;
 use backend\models\PlanStaticProfits;
 use backend\models\TzSystems;
@@ -222,8 +223,11 @@ class UserSysPlansController extends BaseController
                 UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)$this->_post['UserSysPlans']['change_per'][0], $this->_user_id);
             }
             if($model->status == 1) {
-                list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($model->lottery_type); # 期号数据
-                push_queue_fast(UserPlanBetJob::class, ['plan_id' => $model->id, 'qiHao' => $qiHao, 'business_id' => $model->id, 'msg' => '创建计划']);
+                UserSysPlansService::enableAutoLoginForRealPlan($model);
+                if((int)$model->is_batch_simulate === 0){
+                    list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($model->lottery_type); # 期号数据
+                    push_queue_fast(UserPlanBetJob::class, ['plan_id' => $model->id, 'qiHao' => $qiHao, 'business_id' => $model->id, 'msg' => '创建计划']);
+                }
             }
             return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$queryParams['lottery_type']]);
         }
@@ -350,17 +354,23 @@ class UserSysPlansController extends BaseController
             if(in_array($this->_post['UserSysPlans']['tz_type'], \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
                 UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)$this->_post['UserSysPlans']['change_per'][0], $this->_user_id);
             }
-            if($this->_post['UserSysPlans']['is_batch_simulate'] == 1){
-                $db = \Yii::$app->db;
-                # 批量模拟数据
-                $delete_sql = 'DELETE FROM {{%betting_records}} WHERE plan_id="'.$model->id.'"';
-                $rst_delete = $db->createCommand($delete_sql)->execute();
-                Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '模拟下注', ['plan_id'=>$model->id, 'delete_sql'=>$delete_sql, 'rst_delete'=>$rst_delete]);
+            if((int)$model->is_batch_simulate === 1){
+                # 重跑历史回测时只清理回测记录，保留真实和连续模拟记录。
+                $deleteWhere = [
+                    'plan_id'=>(int)$model->id,
+                    'is_simulate'=>1,
+                    'is_batch_simulate'=>1,
+                ];
+                $rst_delete = BettingRecords::deleteAll($deleteWhere);
+                Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '历史回测重置', ['plan_id'=>$model->id, 'delete_where'=>$deleteWhere, 'rst_delete'=>$rst_delete]);
             }
 
             if($model->status == 1){
-                list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($model->lottery_type); # 期号数据
-                push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$model->id, 'qiHao'=>$qiHao, 'business_id'=>$model->id, 'msg'=>'创建计划']);
+                UserSysPlansService::enableAutoLoginForRealPlan($model);
+                if((int)$model->is_batch_simulate === 0){
+                    list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($model->lottery_type); # 期号数据
+                    push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$model->id, 'qiHao'=>$qiHao, 'business_id'=>$model->id, 'msg'=>'创建计划']);
+                }
             }
             return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$model->lottery_type]);
         }
@@ -897,6 +907,9 @@ class UserSysPlansController extends BaseController
             $model = new UserSysPlans();
             $model->attributes = $suggestion;
             $model->uid = Yii::$app->user->id;
+            if(trim((string)$model->tz_sites) === ''){
+                $model->tz_sites = UserService::getUserDefaultSite($model->uid);
+            }
 
             if ($model->save()) {
                 return [

@@ -722,6 +722,7 @@ class HN0898Service extends BaseTZService {
 
         $rst = $UserSysPlans->save(false);
         if($status == 1){
+            UserSysPlansService::enableAutoLoginForRealPlan($UserSysPlans);
             list($currentKjQiHao, $qiHao) = QihaoService::getKjQiHao($UserSysPlans->lottery_type); # 期号数据
             push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$UserSysPlans->id, 'qiHao'=>$qiHao, 'business_id'=>$UserSysPlans->id]);
         }

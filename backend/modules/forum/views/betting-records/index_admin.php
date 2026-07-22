@@ -5,6 +5,7 @@ use yii\grid\GridView;
 use yii\widgets\Pjax;
 use yii\helpers\BaseStringHelper;
 use backend\models\SscKjData;
+use common\widgets\Alert;
 $newRecord = SscKjData::find()->select(['qihao','code_str'])->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->asArray()->limit(1)->one();
 $newRecordText = $newRecord ? '['.$newRecord['qihao'].':'.$newRecord['code_str'].']' : '';
 /* @var $this yii\web\View */
@@ -33,6 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
 </style>
 <section class="betting-records-index wrapper site-min-height">
     <!-- page start-->
+    <?= Alert::widget() ?>
     <section class="panel">
         <header class="panel-heading">
             <?= Html::encode($this->title);echo $newRecordText; ?>

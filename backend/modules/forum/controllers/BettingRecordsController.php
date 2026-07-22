@@ -187,11 +187,32 @@ class BettingRecordsController extends BaseController
         return $this->redirect(['index']);
     }
 
-    public function actionCancelOrder($bet_id){
+    public function actionCancelOrder($bet_id = 0){
+        $bet_id = (int)$bet_id;
+        $record = null;
+        if(!$bet_id){
+            $snid = Yii::$app->request->get('snid');
+            $tz_system_id = Yii::$app->request->get('tz_system_id');
+            if($snid){
+                $query = BettingRecords::find()->where(['snid'=>$snid]);
+                if($tz_system_id !== null && $tz_system_id !== ''){
+                    $query->andWhere(['tz_system_id'=>$tz_system_id]);
+                }
+                if($this->_user_id != 1){
+                    $query->andWhere(['uid'=>$this->_user_id]);
+                }
+                $record = $query->orderBy(['id'=>SORT_DESC])->one();
+                $bet_id = $record->id ?? 0;
+            }
+        }else{
+            $record = BettingRecords::findOne($bet_id);
+        }
 
-        $rst = BetService::cancelOrder($this->_user_id, $bet_id);
+        $uid = ($this->_user_id == 1 && $record) ? $record->uid : $this->_user_id;
+        $rst = $bet_id ? BetService::cancelOrder($uid, $bet_id) : ['status'=>300, 'msg'=>'找不到投注记录', 'lottery_type'=>0];
+        Yii::$app->session->setFlash(($rst['status'] ?? 0) == 200 ? 'success' : 'error', $rst['msg'] ?? '撤单失败');
 
-        return $this->redirect(['index', 'BettingRecords[lottery_type]'=>$rst['lottery_type']]);
+        return $this->redirect(Yii::$app->request->referrer ?: ['index', 'BettingRecords[lottery_type]'=>($rst['lottery_type'] ?? 0)]);
     }
 
     /**

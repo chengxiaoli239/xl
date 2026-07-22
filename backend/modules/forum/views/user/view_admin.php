@@ -1,6 +1,7 @@
 <?php
 
 use backend\models\thirdD\BetsBackend;
+use backend\models\TzSystemsUsers;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -54,6 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'data-username'=>$model->username, # 系统账号
                                     'data-account'=>$model->account, # 网盘账号
                                     'data-domain'=>$model->ssc_domain, # 网盘地址
+                                    'data-ssl-mode'=>TzSystemsUsers::SSL_MODE_OPTIONS[(int)$model->ssl_mode] ?? '继承全局',
                                 ];
                                 return Html::a($txt, 'javascript:;', $options);
                             },
@@ -132,6 +134,50 @@ $this->params['breadcrumbs'][] = $this->title;
                                 }
                                 $url = "/forum/user/switch-proxy?id=".$model->id."&status=".$val; #
                                 return Html::a($txt, $url, ['title' => '开通使用代理IP','alt'=>$alt]);
+                            }
+                        ],
+                        ['attribute' => 'is_proxy_login','label'=>'登录代理', 'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                if((int)$model->is_proxy_login === 1){
+                                    $txt = '<font color="green">是</font>';
+                                    $alt = '点击关闭登录代理';
+                                }else{
+                                    $txt = '<font color="red">否</font>';
+                                    $alt = '点击开启登录代理';
+                                }
+                                $url = "/forum/user/switch-proxy-scene?id=".$model->id."&field=is_proxy_login";
+                                return Html::a($txt, $url, ['title' => '登录接口是否走代理','alt'=>$alt]);
+                            }
+                        ],
+                        ['attribute' => 'is_proxy_bet','label'=>'接口代理', 'headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                if((int)$model->is_proxy_bet === 1){
+                                    $txt = '<font color="green">是</font>';
+                                    $alt = '点击关闭非登录代理';
+                                }else{
+                                    $txt = '<font color="red">否</font>';
+                                    $alt = '点击开启非登录代理';
+                                }
+                                $url = "/forum/user/switch-proxy-scene?id=".$model->id."&field=is_proxy_bet";
+                                return Html::a($txt, $url, ['title' => '非登录/下注接口是否走代理','alt'=>$alt]);
+                            }
+                        ],
+                        ['attribute' => 'ssl_mode','label'=>'TLS', 'headerOptions'=>['width'=>'8%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return Html::dropDownList(
+                                    'ssl_mode_'.$model->id,
+                                    (int)$model->ssl_mode,
+                                    TzSystemsUsers::SSL_MODE_OPTIONS,
+                                    [
+                                        'class'=>'form-control input-sm ssl-mode-select',
+                                        'data-id'=>$model->id,
+                                        'data-saved-value'=>(int)$model->ssl_mode,
+                                        'title'=>'该盘口账号的TLS连接模式',
+                                    ]
+                                );
                             }
                         ],
                         ['attribute' => 'is_local_bet','label'=>'本地下', 'headerOptions'=>['width'=>'5%'],
@@ -250,3 +296,33 @@ $this->params['breadcrumbs'][] = $this->title;
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <?php include(dirname(__FILE__).'/user-renew.php'); ?>
 <?php include(dirname(__FILE__).'/act-user-login.php'); ?>
+
+<?php
+$this->registerJs(<<<'JS'
+$(document).on('change', '.ssl-mode-select', function () {
+    var select = $(this);
+    var oldValue = select.data('saved-value');
+    select.prop('disabled', true);
+    $.post('/forum/tz-systems-users/set-ssl-mode', {
+        id: select.data('id'),
+        ssl_mode: select.val()
+    }, function (rst) {
+        if (rst.status === 200) {
+            select.data('saved-value', select.val());
+            $('.act-login[data-id="' + select.data('id') + '"]')
+                .data('ssl-mode', rst.ssl_mode_label)
+                .attr('data-ssl-mode', rst.ssl_mode_label);
+            return;
+        }
+        select.val(oldValue);
+        alert(rst.msg || 'TLS模式保存失败');
+    }, 'json').fail(function () {
+        select.val(oldValue);
+        alert('TLS模式保存失败');
+    }).always(function () {
+        select.prop('disabled', false);
+    });
+});
+JS
+);
+?>

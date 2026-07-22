@@ -31,8 +31,6 @@ use common\service\CaptchaCodeService;
 use common\service\proxy\ProxyBaseService;
 use common\tools\KjDataGet;
 use common\tools\Tool_Common;
-use GuzzleHttp\Client;
-use GuzzleHttp\RequestOptions;
 use yii\helpers\ArrayHelper;
 use  yii;
 use yii\helpers\Json;
@@ -831,9 +829,13 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @return mixed
      */
     public static function cancelOrder($id, $tz_system_id){
+        $rst = ['status'=>300, 'msg'=>'撤单失败'];
         try {
             $mkey = 'cancel_order_key_id_'.$id;
             $BettingRecords = BettingRecords::findOne($id);
+            if(!$BettingRecords){
+                return ['status'=>300, 'msg'=>'找不到投注记录'];
+            }
             $uid = $BettingRecords->uid;
             $snid = $BettingRecords->snid;
             $sn = $BettingRecords->sn;
@@ -844,41 +846,45 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $t2 = microtime(true);
 
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
-            $qihao = HN0898Service::getQihao($BettingRecords->lottery_type);
+            if(!$TzSystemsUsers){
+                return ['status'=>300, 'msg'=>'找不到盘口账号配置'];
+            }
+            $qihao = $BettingRecords->qihao;
             $counts = (int)round($BettingRecords->betting_money / $BettingRecords->single, 0);
+            if($counts <= 0){
+                return ['status'=>300, 'msg'=>'撤单注数无效'];
+            }
             $post_data = [ 'ids'=>"{".$snid."}|".$counts, 'period_no' => $qihao];
 
             $_t = round(microtime(true) * 1000);
             $headers = [
-                'Accept' => 'application/json, text/javascript, */*; q=0.01',
-                'Accept-Encoding' => 'gunzip, deflate',
-                'Accept-Language' => 'zh-CN,zh;q=0.9,en;q=0.8',
-                'Connection' => 'keep-alive',
-                'Content-Length' => strlen(http_build_query($post_data)),
-                'Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
-                'Cookie' => $TzSystemsUsers->cookie,
-                'Host' => str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
-                'Origin' => $TzSystemsUsers->ssc_domain,
-                'Referer' => $TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
-                'X-Requested-With' => 'XMLHttpRequest',
-                //$TzSystemsUsers->user_agent,
-                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
+                'Accept: application/json, text/javascript, */*; q=0.01',
+                'Accept-Encoding: gunzip, deflate',
+                'Accept-Language: zh-CN,zh;q=0.9,en;q=0.8',
+                'Connection: keep-alive',
+                'Content-Length:'.strlen(http_build_query($post_data)),
+                'Content-Type: application/x-www-form-urlencoded; charset=UTF-8',
+                'Cookie: '.$TzSystemsUsers->cookie,
+                'Host: '.str_replace('http://', '', str_replace('https:', 'http:', $TzSystemsUsers->ssc_domain)),
+                'Origin: '.$TzSystemsUsers->ssc_domain,
+                'Referer: '.$TzSystemsUsers->ssc_domain.'/App/Index?_='.$_t,
+                'X-Requested-With: XMLHttpRequest',
+                'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
             ];
 
             $url = self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER').'?'.http_build_query($post_data);
-
-            $options = [
-                RequestOptions::FORM_PARAMS => $post_data,
-                RequestOptions::HEADERS => $headers,
-            ];
-            $response = (new Client())->request('POST', self::getTzSiteInfo(self::$tz_system_id, 'CANCEL_ORDER'), $options);
-            $content = $response->getBody()->getContents();
-            $rst = Json::decode($content);
+            $rst = self::postBetCurl($url, $post_data, $headers, $TzSystemsUsers->uid);
+            $content = Json::encode($rst);
             $t3 = microtime(true);
 
-            if($rst['Status'] == 1 && strpos($rst['Data'], '退码成功')){
-                BettingRecords::updateAll(['cancel_status'=>1], ['snid' => $snid]);
+            $dataText = is_scalar($rst['Data'] ?? '') ? (string)($rst['Data'] ?? '') : Json::encode($rst['Data'] ?? []);
+            if(($rst['Status'] ?? 0) == 1 && strpos($dataText, '退码成功') !== false){
+                BettingRecords::updateAll(['cancel_status'=>1], ['id' => $id, 'uid'=>$uid]);
                 $rst['status'] = 200;
+                $rst['msg'] = $dataText ?: '撤单成功';
+            }else{
+                $rst['status'] = 300;
+                $rst['msg'] = $rst['msg'] ?? $rst['Message'] ?? ($dataText ?: '撤单失败');
             }
 
             $logArr = [
@@ -893,7 +899,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
             ];
             Tool_Common::log('cancelOrder','INFO','撤单记录', $logArr);
         }catch (\Exception $e){
-            Tool_Common::log('cancelOrder','ERR','撤单记录-失败', ['id'=>$id, 'tz_system_id'=>$tz_system_id, 'err'=>$e->getMessage(), 'option'=>$options??[], 'responseRst'=>$rst??[]]);
+            $rst = ['status'=>300, 'msg'=>$e->getMessage()];
+            Tool_Common::log('cancelOrder','ERR','撤单记录-失败', ['id'=>$id, 'tz_system_id'=>$tz_system_id, 'err'=>$e->getMessage(), 'responseRst'=>$rst]);
         }
 
         return $rst;
@@ -1162,8 +1169,14 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $TzSystemsUsers->user_agent,
         ];
         $robot7_session_id = self::getSessionId($url, $headers, $uid);
+        if(is_array($robot7_session_id) && isset($robot7_session_id['status']) && (int)$robot7_session_id['status'] != 200){
+            return $robot7_session_id;
+        }
         $headers[] = 'Cookie: '.$robot7_session_id;
         $cookie = self::curlGetSevenCookie($url, $headers, $uid);
+        if(is_array($cookie) && isset($cookie['status']) && (int)$cookie['status'] != 200){
+            return $cookie;
+        }
         $cookieData = $cookie;
         #if($uid == 12) p([$robot7_session_id, $cookieData, $cookie]);
         if($cookieData){
@@ -1183,87 +1196,268 @@ class Lucky5Service { # 重庆7时彩登陆体系
         return $cookie;
     }
 
+    private static function getProxyAccount($uid, $tz_system_id = ''){
+        if(!$uid){
+            return null;
+        }
+        $query = TzSystemsUsers::find()->where(['uid'=>(int)$uid]);
+        if($tz_system_id !== '' && $tz_system_id !== null){
+            $query->andWhere(['tz_system_id'=>(int)$tz_system_id]);
+        }
+
+        return $query->one();
+    }
+
+    private static function isProxyRequiredForScene($uid, $tz_system_id = '', $proxyScene = BaseService::PROXY_SCENE_BET){
+        return BaseService::isProxySceneOpen(self::getProxyAccount($uid, $tz_system_id), $proxyScene);
+    }
+
+    private static function setProxyForScene($ch, $url, $uid, $proxyScene = BaseService::PROXY_SCENE_BET, $tz_system_id = ''){
+        $proxyAddr = BaseService::setPoxy($ch, $url, $uid, $proxyScene, $tz_system_id);
+        if(self::isProxyRequiredForScene($uid, $tz_system_id, $proxyScene) && (!is_string($proxyAddr) || $proxyAddr === '')){
+            Tool_Common::log('/lucky5/loginProxy', 'ERR', '登录代理开启但代理IP为空', [
+                'url'=>$url,
+                'uid'=>$uid,
+                'tz_system_id'=>$tz_system_id,
+                'proxy_scene'=>$proxyScene,
+                'proxy_addr'=>$proxyAddr,
+            ]);
+
+            return false;
+        }
+
+        return $proxyAddr;
+    }
+
+    private static function buildProxyRequiredError($url, $uid, $tz_system_id, $proxyScene, $attempt = 1){
+        return [
+            'status'=>301,
+            'errno'=>0,
+            'msg'=>'登录代理已开启，但代理IP获取失败，已停止登录请求，避免使用服务器IP',
+            'curl_error'=>'代理IP为空',
+            'proxy_ip'=>'',
+            'proxy_scene'=>$proxyScene,
+            'uid'=>$uid,
+            'tz_system_id'=>$tz_system_id,
+            'attempt'=>$attempt,
+            'url'=>$url,
+        ];
+    }
+
+    private static function getProxyTypeForAccount($uid, $tz_system_id = ''){
+        $TzSystemsUsers = self::getProxyAccount($uid, $tz_system_id);
+        if(!empty($TzSystemsUsers->proxy_type)){
+            return (int)$TzSystemsUsers->proxy_type;
+        }
+
+        return $uid ? ProxyBaseService::getProxyTypeByUid($uid) : ProxyBaseService::getProxyType();
+    }
+
+    private static function isLoginProxyConnectFailure($response){
+        $text = is_array($response) ? json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : (string)$response;
+        $curlError = is_array($response) ? (string)($response['curl_error'] ?? '') : '';
+        $errno = is_array($response) ? (int)($response['errno'] ?? 0) : 0;
+        if($errno > 0 && stripos($curlError, 'CONNECT tunnel failed') !== false){
+            return true;
+        }
+        if($errno > 0 && stripos($curlError, 'from proxy after CONNECT') !== false){
+            return true;
+        }
+        if(preg_match('/CONNECT tunnel failed,\s*response\s+(449|466|407|5\d\d)/i', $text)){
+            return true;
+        }
+        if(preg_match('/HTTP code\s+(449|466|407|5\d\d)\s+from proxy after CONNECT/i', $text)){
+            return true;
+        }
+
+        return stripos($text, '代理IP网络故障') !== false
+            || stripos($text, 'Proxy Connect Error') !== false;
+    }
+
+    private static function isLoginProxyPolicyFailure($response){
+        return self::isProxyPolicyConnectFailure($response);
+    }
+
+    private static function isProxyPolicyConnectFailure($response){
+        $text = is_array($response) ? json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) : (string)$response;
+
+        return preg_match('/CONNECT tunnel failed,\s*response\s+(449|466)/i', $text)
+            || preg_match('/HTTP code\s+(449|466)\s+from proxy after CONNECT/i', $text);
+    }
+
+    private static function buildLoginProxyFailureResult($response, $maxAttempts = 1){
+        $rst = is_array($response) ? $response : ['status'=>301, 'msg'=>(string)$response];
+        $rst['status'] = $rst['status'] ?? 301;
+        $rst['login_proxy_attempts'] = $maxAttempts;
+        if(self::isLoginProxyPolicyFailure($rst)){
+            $rst['msg'] = '快代理拒绝连接当前盘口域名(449/466)，已停止登录请求，未使用服务器IP';
+        }elseif(self::isLoginProxyConnectFailure($rst)){
+            $rst['msg'] = '登录代理连接失败，已尝试切换代理后仍失败，未使用服务器IP';
+        }
+
+        return $rst;
+    }
+
+    private static function clearLoginProxyAfterFailure($uid, $tz_system_id, $proxyIp, array $context = []){
+        $proxyType = self::getProxyTypeForAccount($uid, $tz_system_id);
+        $clearRst = ProxyBaseService::clearCurrentProxyIp($proxyType, $proxyIp);
+        Tool_Common::log('/lucky5/loginProxy', 'WARN', '登录代理异常，清理并切换IP', array_merge($context, [
+            'uid'=>$uid,
+            'tz_system_id'=>$tz_system_id,
+            'proxy_type'=>$proxyType,
+            'proxy_ip'=>$proxyIp,
+            'clear_rst'=>$clearRst,
+        ]));
+
+        return $clearRst;
+    }
+
     public static function getSessionId($url, $header, $uid = 0){
+        $tzSystemId = self::$tz_system_id;
+        $proxyRequired = self::isProxyRequiredForScene($uid, $tzSystemId, BaseService::PROXY_SCENE_LOGIN);
+        $maxAttempts = $proxyRequired ? 3 : 1;
+        $lastError = [];
 
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($curl, CURLOPT_HEADER, 1);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        for($attempt = 1; $attempt <= $maxAttempts; $attempt++){
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+            curl_setopt($curl, CURLOPT_HEADER, 1);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
-        BaseService::setPoxy($curl, $url, $uid); # 设置代理
+            $proxyAddr = self::setProxyForScene($curl, $url, $uid, BaseService::PROXY_SCENE_LOGIN, $tzSystemId); # 设置代理
+            if($proxyRequired && (!is_string($proxyAddr) || $proxyAddr === '')){
+                curl_close($curl);
 
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($curl, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
+                return self::buildProxyRequiredError($url, $uid, $tzSystemId, BaseService::PROXY_SCENE_LOGIN, $attempt);
+            }
 
-        $content = curl_exec($curl);
-        if(strpos($content, 'Set-Cookie') !== false){
-            preg_match("/Set\-Cookie:([^\r\n]*)/i", $content, $matches);
-        }else{
-            preg_match("/document.cookie\=\'([^\r\n]*)\'/i", $content, $matches);
-        }
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+            curl_setopt($curl, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid, $tzSystemId));
 
-        $Arrs = explode('.', $url);
-        $domain = $Arrs[1];
-        if(strpos($matches[1], $domain) !== false){
-            $roboot_id = trim(str_replace('; path=/; domain=.'.$domain.'.xyz','', $matches[1]));
-            Tool_Common::log('getSessionId', 'INFO', '获取session_id', ['url'=>$url, 'domain'=>$domain, 'roboot_id'=>$roboot_id, 'content'=>$content]);
-        }
-        /*
-        if(strpos($matches[1], 'cq779835') !== false){
-            $roboot_id = trim(str_replace('; path=/; domain=.cq779835.xyz','', $matches[1]));
-        }
-        */
-        if(strpos($roboot_id, '您当前使用的浏览器不支持') !== false){
-            $tmp_roboot_id = explode('\';', $roboot_id);
-            if($tmp_roboot_id[0]) $roboot_id = $tmp_roboot_id[0];
-        }
-        $logArr = ['content'=>$content, 'roboot_id'=>$roboot_id];
-        Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
-        if(TRUE OR curl_error($curl)>0){
-            $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'roboot_id'=>$roboot_id]);
+            $content = curl_exec($curl);
+            $errno = curl_errno($curl);
+            $curlError = curl_error($curl);
+            if($errno){
+                $lastError = [
+                    'status'=>301,
+                    'errno'=>$errno,
+                    'curl_error'=>$curlError,
+                    'msg'=>$curlError,
+                    'proxy_ip'=>$proxyAddr,
+                    'proxy_scene'=>BaseService::PROXY_SCENE_LOGIN,
+                    'attempt'=>$attempt,
+                    'url'=>$url,
+                ];
+                Tool_Common::log('curl_get_cookie', 'ERR', '获取session_id失败', $lastError);
+                curl_close($curl);
+                if($proxyRequired && self::isLoginProxyConnectFailure($lastError) && !self::isLoginProxyPolicyFailure($lastError) && $attempt < $maxAttempts){
+                    self::clearLoginProxyAfterFailure($uid, $tzSystemId, $proxyAddr, ['url'=>$url, 'step'=>'getSessionId', 'attempt'=>$attempt, 'errno'=>$errno, 'curl_error'=>$curlError]);
+                    continue;
+                }
+
+                return self::buildLoginProxyFailureResult($lastError, $attempt);
+            }
+            curl_close($curl);
+
+            $matches = [];
+            if(strpos((string)$content, 'Set-Cookie') !== false){
+                preg_match("/Set\-Cookie:([^\r\n]*)/i", $content, $matches);
+            }else{
+                preg_match("/document.cookie\=\'([^\r\n]*)\'/i", $content, $matches);
+            }
+
+            $Arrs = explode('.', $url);
+            $domain = $Arrs[1] ?? '';
+            $roboot_id = '';
+            if(!empty($matches[1]) && $domain && strpos($matches[1], $domain) !== false){
+                $roboot_id = trim(str_replace('; path=/; domain=.'.$domain.'.xyz','', $matches[1]));
+                Tool_Common::log('getSessionId', 'INFO', '获取session_id', ['url'=>$url, 'domain'=>$domain, 'roboot_id'=>$roboot_id, 'content'=>$content, 'proxy_ip'=>$proxyAddr, 'attempt'=>$attempt]);
+            }elseif(!empty($matches[1])){
+                $roboot_id = trim($matches[1]);
+            }
+            if(strpos($roboot_id, '您当前使用的浏览器不支持') !== false){
+                $tmp_roboot_id = explode('\';', $roboot_id);
+                if($tmp_roboot_id[0]) $roboot_id = $tmp_roboot_id[0];
+            }
+            $logArr = ['content'=>$content, 'roboot_id'=>$roboot_id, 'proxy_ip'=>$proxyAddr, 'attempt'=>$attempt];
+            Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
             Tool_Common::log('roboot_id', 'INFO', '获取roboot_id', $logArr);
+
+            return $roboot_id;
         }
 
-        return $roboot_id;
-
+        return $lastError ? self::buildLoginProxyFailureResult($lastError, $maxAttempts) : self::buildProxyRequiredError($url, $uid, $tzSystemId, BaseService::PROXY_SCENE_LOGIN, $maxAttempts);
     }
 
     /**
      *curl get请求
      */
     public static function curlGetSevenCookie($url,$header = [], $uid = 0){
+        $tzSystemId = self::$tz_system_id;
+        $proxyRequired = self::isProxyRequiredForScene($uid, $tzSystemId, BaseService::PROXY_SCENE_LOGIN);
+        $maxAttempts = $proxyRequired ? 3 : 1;
+        $lastError = [];
 
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($curl, CURLOPT_HEADER, 1);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        for($attempt = 1; $attempt <= $maxAttempts; $attempt++){
+            $curl = curl_init();
+            curl_setopt($curl, CURLOPT_URL, $url);//登陆后要从哪个页面获取信息
+            curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
+            curl_setopt($curl, CURLOPT_HEADER, 1);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
-        BaseService::setPoxy($curl, $url, $uid); # 设置代理IP
+            $proxyAddr = self::setProxyForScene($curl, $url, $uid, BaseService::PROXY_SCENE_LOGIN, $tzSystemId); # 设置代理IP
+            if($proxyRequired && (!is_string($proxyAddr) || $proxyAddr === '')){
+                curl_close($curl);
 
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($curl, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
+                return self::buildProxyRequiredError($url, $uid, $tzSystemId, BaseService::PROXY_SCENE_LOGIN, $attempt);
+            }
 
-        $content = curl_exec($curl);
-        preg_match_all("/Set-Cookie: (.*)/i", $content, $matches);
-        //p($matches,0);
-        $cookies = $matches[1];
-        $logArr = ['cookies'=>$cookies, 'matches'=>$matches, 'content'=>$content];
-        //p(['url'=>$url, 'header'=>$header, 'matches'=>$matches, 'content'=>$content, 'errno'=>curl_error($curl)]);
-        if(curl_error($curl)>0){
-            $logArr = array_merge($logArr,[ 'errno'=>curl_error($curl), 'error'=>curl_error($curl)]);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+            curl_setopt($curl, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid, $tzSystemId));
+
+            $content = curl_exec($curl);
+            $errno = curl_errno($curl);
+            $curlError = curl_error($curl);
+            if($errno){
+                $lastError = [
+                    'status'=>301,
+                    'errno'=>$errno,
+                    'curl_error'=>$curlError,
+                    'msg'=>$curlError,
+                    'proxy_ip'=>$proxyAddr,
+                    'proxy_scene'=>BaseService::PROXY_SCENE_LOGIN,
+                    'attempt'=>$attempt,
+                    'url'=>$url,
+                ];
+                Tool_Common::log('curl_get_cookie', 'ERR', '获取登录cookie失败', $lastError);
+                curl_close($curl);
+                if($proxyRequired && self::isLoginProxyConnectFailure($lastError) && !self::isLoginProxyPolicyFailure($lastError) && $attempt < $maxAttempts){
+                    self::clearLoginProxyAfterFailure($uid, $tzSystemId, $proxyAddr, ['url'=>$url, 'step'=>'curlGetSevenCookie', 'attempt'=>$attempt, 'errno'=>$errno, 'curl_error'=>$curlError]);
+                    continue;
+                }
+
+                return self::buildLoginProxyFailureResult($lastError, $attempt);
+            }
+            curl_close($curl);
+
+            preg_match_all("/Set-Cookie: (.*)/i", (string)$content, $matches);
+            //p($matches,0);
+            $cookies = $matches[1] ?? [];
+            $logArr = ['cookies'=>$cookies, 'matches'=>$matches, 'content'=>$content, 'proxy_ip'=>$proxyAddr, 'attempt'=>$attempt];
             Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
-        }
-        $data = '';
-        foreach ($cookies as $cookie){
-            $data .= str_replace('; path=/; HttpOnly','',trim($cookie)).';';
+            $data = '';
+            foreach ($cookies as $cookie){
+                $data .= str_replace('; path=/; HttpOnly','',trim($cookie)).';';
+            }
+
+            $data = str_replace("; path=/; Httponly;",'',$data);
+            return $data;
         }
 
-        $data = str_replace("; path=/; Httponly;",'',$data);
-        return $data;
+        return $lastError ? self::buildLoginProxyFailureResult($lastError, $maxAttempts) : self::buildProxyRequiredError($url, $uid, $tzSystemId, BaseService::PROXY_SCENE_LOGIN, $maxAttempts);
     }
 
     /**
@@ -1272,7 +1466,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @param int $tz_system_id
      * @return array|bool|mixed|string
      */
-    public static function login($uid = 1, $tz_system_id = 1){
+    public static function login($uid = 1, $tz_system_id = 1, $is_auto = 1){
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
         # 第一步：获取cookie
@@ -1297,7 +1491,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }
 
         # 获取用户信息
-        $rst = BaseService::synBalance($TzSystemsUsers->id); # 同步余额
+        $rst = BaseService::synBalance($TzSystemsUsers->id, $is_auto); # 同步余额
         Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '获取用户信息', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'rst'=>$rst]);
 
         return $rst;
@@ -1339,49 +1533,82 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @decription 获取远程html内容
      * @param $url
      */
-    public static function getCurl($url,$header=[], $uid = 0){
+    public static function getCurl($url,$header=[], $uid = 0, $proxyScene = BaseService::PROXY_SCENE_BET){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         //$header = array_merge(self::$postHeaders,$header);
         //if(strpos($url, 'GetPeriodsQuery')){ p([$url, $header]); }
+        $tzSystemId = self::$tz_system_id;
+        $proxyRequired = self::isProxyRequiredForScene($uid, $tzSystemId, $proxyScene);
+        $maxAttempts = ($proxyScene === BaseService::PROXY_SCENE_LOGIN && $proxyRequired) ? 3 : 1;
+        $lastRst = [];
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
+        for($attempt = 1; $attempt <= $maxAttempts; $attempt++){
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
 
-        // 设置浏览器的特定header
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+            // 设置浏览器的特定header
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+            curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        BaseService::setPoxy($ch, $url, $uid); # 设置代理IP
+            $proxyAddr = self::setProxyForScene($ch, $url, $uid, $proxyScene, $tzSystemId); # 设置代理IP
+            if($proxyRequired && (!is_string($proxyAddr) || $proxyAddr === '')){
+                curl_close($ch);
 
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
-
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
-        //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
-        curl_setopt($ch, CURLOPT_HEADER,0);
-
-        $data = curl_exec($ch);
-        //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
-        $errno = curl_errno($ch);
-        if($errno>0) {
-            $str = 'Curl error: ' . curl_error($ch) . "&lt;br&gt;\n\r";
-            if(in_array($errno, [7, 28])){
-                $poxy_addr = \common\service\proxy\ProxyBaseService::getCurrentValidProxyIp();
+                return self::buildProxyRequiredError($url, $uid, $tzSystemId, $proxyScene, $attempt);
             }
-            Tool_Common::log('/error/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr]);
-            return $str;
-        }
-        if(!BaseService::is_json($data)){
+
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+            curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid, $tzSystemId));
+
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+            //curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);    # 302 redirect
+            curl_setopt($ch, CURLOPT_HEADER,0);
+
+            $data = curl_exec($ch);
+            //if(strpos($url, 'GetInfoByName') !== false){ p(['header'=>$header, 'url'=>$url, 'rst'=>$data]); }
+            $errno = curl_errno($ch);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+            if($errno>0) {
+                $lastRst = [
+                    'status'=>301,
+                    'errno'=>$errno,
+                    'curl_error'=>$curlError,
+                    'msg'=>$curlError,
+                    'proxy_ip'=>$proxyAddr,
+                    'proxy_scene'=>$proxyScene,
+                    'attempt'=>$attempt,
+                ];
+                $str = 'Curl error: ' . $curlError . "&lt;br&gt;\n\r";
+                $poxy_addr = $proxyAddr;
+                if(in_array($errno, [7, 28])){
+                    $poxy_addr = \common\service\proxy\ProxyBaseService::getCurrentValidProxyIp('', 2);
+                }
+                Tool_Common::log('/error/getCurl', 'ERR', 'getCurl获取', ['url'=>$url, 'postRst'=>$data, 'errno'=>$errno, 'curl_error'=>$curlError, 'poxy_addr'=>$poxy_addr, 'proxy_addr'=>$proxyAddr, 'proxy_scene'=>$proxyScene, 'attempt'=>$attempt]);
+                if($proxyRequired && self::isLoginProxyConnectFailure($lastRst) && !self::isLoginProxyPolicyFailure($lastRst) && $attempt < $maxAttempts){
+                    self::clearLoginProxyAfterFailure($uid, $tzSystemId, $proxyAddr, ['url'=>$url, 'step'=>'getCurl', 'attempt'=>$attempt, 'errno'=>$errno, 'curl_error'=>$curlError]);
+                    continue;
+                }
+
+                return $proxyRequired ? self::buildLoginProxyFailureResult($lastRst, $attempt) : $str;
+            }
+            if(!BaseService::is_json($data)){
+                return $data;
+            }
+            $data = json_decode($data, true);
+
+            if($data['Status'] == false){
+                //$data['headers'] = $header;
+            }
+            if(!empty($proxyAddr)){
+                $data['proxy_ip'] = $proxyAddr;
+            }
+
             return $data;
         }
-        $data = json_decode($data, true);
 
-        if($data['Status'] == false){
-            //$data['headers'] = $header;
-        }
-
-        return $data;
+        return $lastRst ? self::buildLoginProxyFailureResult($lastRst, $maxAttempts) : self::buildProxyRequiredError($url, $uid, $tzSystemId, $proxyScene, $maxAttempts);
     }
 
     /**
@@ -1404,7 +1631,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $host = str_replace(['http://', 'https://'], '', $domain);
         }
 
-        return 'rsa_public_key_'.$tz_system_id.'_'.md5(strtolower($host));
+        return 'rsa_public_key_v2_'.$tz_system_id.'_'.md5(strtolower($host));
     }
 
     private static function getRsaPublicKey($uid, $tz_system_id){
@@ -1424,35 +1651,93 @@ class Lucky5Service { # 重庆7时彩登陆体系
             'Cache-Control: max-age=0',
             $TzSystemsUsers->user_agent,
         ];
+        $proxyRequired = self::isProxyRequiredForScene($uid, $tz_system_id, BaseService::PROXY_SCENE_LOGIN);
+        $maxAttempts = $proxyRequired ? 3 : 1;
+        $lastError = '';
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
-        BaseService::setPoxy($ch, $url, $uid);
+        for($attempt = 1; $attempt <= $maxAttempts; $attempt++){
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid, self::$tz_system_id));
+            $proxyAddr = self::setProxyForScene($ch, $url, $uid, BaseService::PROXY_SCENE_LOGIN, $tz_system_id);
+            if($proxyRequired && (!is_string($proxyAddr) || $proxyAddr === '')){
+                curl_close($ch);
+                Tool_Common::log('/lucky5/'.__FUNCTION__, 'ERR', '登录代理为空，停止获取RSA公钥', [
+                    'uid'=>$uid,
+                    'tz_system_id'=>$tz_system_id,
+                    'url'=>$url,
+                    'attempt'=>$attempt,
+                ]);
 
-        $html = curl_exec($ch);
-        curl_close($ch);
+                return '';
+            }
 
-        // 先去除HTML注释，避免匹配到注释中的旧公钥（f2/f3等盘口存在此问题）
-        $htmlNoComment = preg_replace('/<!--.*?-->/s', '', $html);
-        preg_match('/id="hd_publickey"\s+value="([^"]+)"/i', $htmlNoComment, $matches);
-        $publicKey = $matches[1] ?? '';
-        // 公钥为空或非base64格式则不使用RSA加密
-        if(!empty($publicKey) && !preg_match('/^[A-Za-z0-9+\/=]+$/', $publicKey)){
-            $publicKey = '';
+            $html = curl_exec($ch);
+            $errno = curl_errno($ch);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+            if($errno){
+                $lastError = $curlError;
+                Tool_Common::log('/lucky5/'.__FUNCTION__, 'ERR', '获取RSA公钥失败', [
+                    'uid'=>$uid,
+                    'tz_system_id'=>$tz_system_id,
+                    'url'=>$url,
+                    'attempt'=>$attempt,
+                    'errno'=>$errno,
+                    'curl_error'=>$curlError,
+                    'proxy_ip'=>$proxyAddr,
+                ]);
+                $proxyError = ['errno'=>$errno, 'curl_error'=>$curlError, 'proxy_ip'=>$proxyAddr];
+                if($proxyRequired && self::isLoginProxyConnectFailure($proxyError) && !self::isLoginProxyPolicyFailure($proxyError) && $attempt < $maxAttempts){
+                    self::clearLoginProxyAfterFailure($uid, $tz_system_id, $proxyAddr, ['url'=>$url, 'step'=>'getRsaPublicKey', 'attempt'=>$attempt, 'errno'=>$errno, 'curl_error'=>$curlError]);
+                    continue;
+                }
+
+                return '';
+            }
+
+            // 先去除HTML注释，避免匹配到注释中的旧公钥（f2/f3等盘口存在此问题）
+            $htmlNoComment = preg_replace('/<!--.*?-->/s', '', $html);
+            preg_match('/id="hd_publickey"\s+value="([^"]+)"/i', $htmlNoComment, $matches);
+            $publicKey = $matches[1] ?? '';
+            // 公钥为空或非base64格式则不使用RSA加密
+            if(!empty($publicKey) && !preg_match('/^[A-Za-z0-9+\/=]+$/', $publicKey)){
+                $publicKey = '';
+            }
+            // 有些盘口保留了公钥和加密函数，但实际提交账号密码的加密调用已被注释。
+            if($publicKey && !self::isRsaLoginActive($htmlNoComment)){
+                Tool_Common::log('/lucky5/'.__FUNCTION__, 'INFO', '登录页RSA未启用，改用明文登录', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
+                $publicKey = '';
+            }
+            if($publicKey){
+                $m->set($mkey, $publicKey, 3600); # 缓存1小时
+            }
+            Tool_Common::log('/lucky5/'.__FUNCTION__, 'INFO', '获取RSA公钥', ['uid'=>$uid, 'publicKey'=>$publicKey ? 'found' : 'NOT FOUND', 'attempt'=>$attempt]);
+
+            return $publicKey;
         }
-        if($publicKey){
-            $m->set($mkey, $publicKey, 3600); # 缓存1小时
-        }
-        Tool_Common::log('/lucky5/'.__FUNCTION__, 'INFO', '获取RSA公钥', ['uid'=>$uid, 'publicKey'=>$publicKey ? 'found' : 'NOT FOUND']);
 
-        return $publicKey;
+        if($lastError){
+            Tool_Common::log('/lucky5/'.__FUNCTION__, 'ERR', '获取RSA公钥最终失败', ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'err_msg'=>$lastError]);
+        }
+
+        return '';
+    }
+
+    private static function isRsaLoginActive($html){
+        $script = preg_replace('/\/\*.*?\*\//s', '', $html);
+        $script = preg_replace('/(^|[\r\n])\s*\/\/[^\r\n]*/', '$1', $script);
+
+        preg_match_all('/getValidRSAString\s*\(/i', $script, $callMatches);
+        preg_match_all('/function\s+getValidRSAString\s*\(/i', $script, $definitionMatches);
+
+        return count($callMatches[0]) > count($definitionMatches[0]);
     }
 
     /**
@@ -1483,14 +1768,29 @@ class Lucky5Service { # 重庆7时彩登陆体系
         return $result;
     }
 
+    private static function shouldForcePlainLogin($TzSystemsUsers){
+        if(!$TzSystemsUsers){
+            return false;
+        }
+
+        // f1.w58x56s1.xyz exposes a public key, but its login page submits plaintext.
+        return (int)$TzSystemsUsers->id === 95
+            || (
+                (int)$TzSystemsUsers->uid === 81
+                && (int)$TzSystemsUsers->tz_system_id === 9
+                && (string)$TzSystemsUsers->account === 'wyx8989'
+            );
+    }
+
     private static function loginRemote($uid, $tz_system_id){
         self::__init($uid, $tz_system_id);
         $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$uid, 'tz_system_id'=>$tz_system_id]);
 
+        $forcePlainLogin = self::shouldForcePlainLogin($TzSystemsUsers);
         # 获取RSA公钥并加密账号密码
-        $publicKey = self::getRsaPublicKey($uid, $tz_system_id);
+        $publicKey = $forcePlainLogin ? '' : self::getRsaPublicKey($uid, $tz_system_id);
         $useRsa = false;
-        if($publicKey){
+        if($publicKey && !$forcePlainLogin){
             $post_data['Account'] = self::rsaEncrypt($TzSystemsUsers->account, $publicKey);
             $post_data['Password'] = self::rsaEncrypt($TzSystemsUsers->password, $publicKey);
             $useRsa = true;
@@ -1498,7 +1798,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }else{
             $post_data['Account'] = $TzSystemsUsers->account;
             $post_data['Password'] = $TzSystemsUsers->password;
-            Tool_Common::log('/lucky5/loginRemote', 'INFO', '明文登录(未找到RSA公钥)', ['uid'=>$uid]);
+            $plainMsg = $forcePlainLogin ? '明文登录(账号强制兼容)' : '明文登录(未找到RSA公钥)';
+            Tool_Common::log('/lucky5/loginRemote', 'INFO', $plainMsg, ['uid'=>$uid, 'account'=>$TzSystemsUsers->account]);
         }
         //p($post_data);
 
@@ -1535,7 +1836,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         };
         $headers = $buildHeaders($post_data);
 
-        $data = self::httpPost($url,$post_data, $headers, $TzSystemsUsers->uid);
+        $data = self::httpPost($url,$post_data, $headers, $TzSystemsUsers->uid, BaseService::PROXY_SCENE_LOGIN);
         // RSA登录失败时，尝试明文重试（部分盘口有RSA公钥但服务端未启用，如f1.w678bs21.xyz报"超过16位"）
         $rsaFailMsgs = ['用户名或密码不正确', '用户名及密码不能超过16位'];
         $shouldRetryPlain = $useRsa && isset($data['Status']) && $data['Status'] == 2;
@@ -1556,7 +1857,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 'Password' => $TzSystemsUsers->password,
             ]);
             $plainHeaders = $buildHeaders($plainPostData);
-            $plainData = self::httpPost($url, $plainPostData, $plainHeaders, $TzSystemsUsers->uid);
+            $plainData = self::httpPost($url, $plainPostData, $plainHeaders, $TzSystemsUsers->uid, BaseService::PROXY_SCENE_LOGIN);
             Tool_Common::log('/lucky5/loginRemote', 'INFO', 'RSA失败后明文重试', ['uid'=>$uid, 'account'=>$TzSystemsUsers->account, 'rsaData'=>$data, 'plainData'=>$plainData]);
             if(isset($plainData['Status']) && $plainData['Status'] == 1){
                 $post_data = $plainPostData;
@@ -1605,7 +1906,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             "Host:".str_replace('www.','',self::$domain),
         ];
 
-        $data = self::getCurl($url, $headers, $uid);
+        $data = self::getCurl($url, $headers, $uid, BaseService::PROXY_SCENE_LOGIN);
         //sleep(10);
         //HN0898Service::synBalance($TzSystemsUsers->id); # 同步余额
         $logArr = ['uid'=>$uid, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'headers'=>$headers,'data'=>$data];
@@ -1784,6 +2085,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 'platform' => 'lucky5',
                 'task_id' => $id,
                 'plan_id' => $plan_id,
+                'uid' => $uid,
                 'account' => $account,
                 'url' => $url,
             ]);
@@ -1862,7 +2164,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $time_consume = ($time2 - $time1).'s';
             $tmpRst['bet_time'] = date('Y-m-d H:i:s');
             $tmpRst['time_consume'] = $time_consume;
-            $tmpRst['proxy_ip'] = ProxyBaseService::getCurrentValidProxyIp(); # 获取当前可用的代理IP;
+            // postBetCurl 已记录本次请求实际使用的代理，不能用全局代理覆盖。
+            $tmpRst['proxy_ip'] = (string)($tmpRst['proxy_ip'] ?? '');
+            $tmpRst['proxy_used'] = $tmpRst['proxy_ip'] !== '' ? 1 : 0;
             $logArr = ['task_id'=>$id, 'uid'=>$uid, 'plan_id'=>$plan_id, 'account'=>$account, 'tz_system_id'=>$tz_system_id, 'url'=>$url, 'snInfo'=>$snInfo??[], 'tmpRst'=>$tmpRst, 'time_consume'=>$time_consume];
             Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '幸运-下注节点-5', $logArr);
 
@@ -2677,7 +2981,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if(!$timeout) $timeout = 30;
 
         //$cookie = dirname(__FILE__)."/cookie.txt";
-        $headers[] = ['Accept: application/json, text/javascript, */*; q=0.01'];
+        $headers[] = 'Accept: application/json, text/javascript, */*; q=0.01';
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -2688,13 +2992,28 @@ class Lucky5Service { # 重庆7时彩登陆体系
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
+        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid, self::$tz_system_id));
 
         if(strpos($url, 'ww662889') !== false){
             //curl_setopt($ch, CURLOPT_USERAGENT, ['Chrome 42.0.2311.135']);
         }
 
-        BaseService::setPoxy($ch, $url, $uid); # 设置代理IP
+        $poxy_addr = BaseService::setPoxy($ch, $url, $uid, BaseService::PROXY_SCENE_BET, self::$tz_system_id); # 设置代理IP
+        $proxyIp = is_string($poxy_addr) ? $poxy_addr : '';
+        $proxyRequired = self::isProxyRequiredForScene($uid, self::$tz_system_id, BaseService::PROXY_SCENE_BET);
+        if($proxyRequired && empty($proxyIp)){
+            curl_close($ch);
+
+            return [
+                'Status'=>0,
+                'code'=>315,
+                'msg'=>'下注代理已开启，但代理IP获取失败，已停止下注请求，避免使用服务器IP',
+                'proxy_ip'=>'',
+                'proxy_scene'=>BaseService::PROXY_SCENE_BET,
+                'proxy_required_stop'=>1,
+                'errno'=>0,
+            ];
+        }
 
         //设置post方式提交
         curl_setopt($ch, CURLOPT_POST, 1);
@@ -2708,9 +3027,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $end_time = microtime(true);
         //d($data);
         $errno = curl_errno( $ch );
+        $curl_error = curl_error($ch);
         //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno]; p($logArr);
         if($errno){
-            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno];
+            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$headers, 'rst'=>$data, 'errno'=>$errno, 'curl_error'=>$curl_error, 'proxy_ip'=>$proxyIp];
             //p($logArr);
             Tool_Common::log('httpPostError','INFO','httpPost请求-1-8', $logArr);
         }
@@ -2722,11 +3042,17 @@ class Lucky5Service { # 重庆7时彩登陆体系
             return 'ok';
         }
         $rstData = json_decode($data, true); # data : {"Status":1,"Data":{"CompletedStatus":1,"LackStatus":0}}
+        if(!is_array($rstData)){
+            $rstData = [];
+        }
         //p(['url'=>$url, 'rstData'=>$rstData, 'data'=>$data, 'post_data'=>$post_data, 'headers'=>$headers, 'errno'=>$errno]);
         $time_consume = ($end_time - $start_time).'s';
-        $logArr = ['uid'=>$uid, 'url'=>$url, 'headers'=>$headers, 'rstData'=>$rstData, 'SerialNo'=>$rstData['Data']['SerialNo']??'', 'errno'=>$errno, 'time_consume'=>$time_consume];
+        if(!empty($proxyIp)){
+            $rstData['proxy_ip'] = $proxyIp;
+        }
+        $logArr = ['uid'=>$uid, 'url'=>$url, 'headers'=>$headers, 'rstData'=>$rstData, 'SerialNo'=>$rstData['Data']['SerialNo']??'', 'errno'=>$errno, 'time_consume'=>$time_consume, 'proxy_ip'=>$proxyIp];
         Tool_Common::log('postBetCurl','INFO','httpPost下注结果', $logArr);
-        if($rstData['Status'] == 1){
+        if(($rstData['Status'] ?? 0) == 1){
             return $rstData; // 成功
         }
         if(strpos($data, "\"Status\":1") !== false && strpos($data, "\"CompletedStatus\":1") !== false){ # json解析异常处理
@@ -2744,13 +3070,24 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }elseif(strpos($data, '维护中') !== false){
             $rstData = ["Status"=>0, 'code'=>306, 'msg'=>'系统线路维护中'];
         }elseif($errno>0){
-            $rstData = ["Status"=>0, 'code'=>309, 'errno'=>$errno, 'msg'=>'网络超时'];
+            if(!empty($proxyIp) && self::isProxyPolicyConnectFailure(['errno'=>$errno, 'curl_error'=>$curl_error])){
+                $rstData = [
+                    "Status"=>0,
+                    'code'=>314,
+                    'errno'=>$errno,
+                    'curl_error'=>$curl_error,
+                    'msg'=>'快代理拒绝连接当前盘口域名(449/466)，已停止下注请求，未使用服务器IP',
+                    'proxy_policy_failure'=>1,
+                ];
+            }else{
+                $rstData = ["Status"=>0, 'code'=>309, 'errno'=>$errno, 'curl_error'=>$curl_error, 'msg'=>'网络超时'];
+            }
         }elseif(strpos($data, '停押') !== false){
             $rstData = ["Status"=>0, 'code'=>307, 'msg'=>'您的账号已被停押'];
         }elseif(strpos($data, '您当前使用的浏览器不支持cookie') !== false){
             $rstData = ["Status"=>0, 'code'=>310, 'msg'=>'您当前使用的浏览器不支持cookie'];
         }elseif(strpos($data, 'Bad Gateway') !== false OR strpos($data, 'Object moved') !== false){
-            $rstData = ["Status"=>0, 'code'=>311, 'msg'=>'代理IP网络故障'];
+            $rstData = ["Status"=>0, 'code'=>311, 'msg'=>!empty($proxyIp) ? '代理IP网络故障' : '盘口网络故障'];
         }elseif(strpos($data, 'Too Many Request') !== false){
             $rstData = ["Status"=>0, 'code'=>312, 'msg'=>'代理请求太频繁'];
         }elseif(strpos($data, 'ClearSession') !== false) {
@@ -2759,8 +3096,11 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $rstData = ['Status'=>1, 'Data'=>['CompletedStatus'=>1, 'LackStatus'=>0]];
         }else{
             $rstData = json_decode($data, TRUE);
+            if(!is_array($rstData)){
+                $rstData = [];
+            }
         }
-        if($errno OR in_array($rstData['code'], [302, 303, 304, 305, 306, 310, 311])){
+        if($errno OR in_array($rstData['code'] ?? null, [302, 303, 304, 305, 306, 310, 311])){
             if(isset($post_data['bet_number']) && strlen($post_data['bet_number'])>200) $post_data['bet_number'] = substr($post_data['bet_number'], 0, 300);
             $logArr = ['url'=>$url, 'post_data'=>$post_data, 'headers'=>$headers, 'rst'=>$data, 'errno'=>$errno];
             Tool_Common::log('httpPostError','INFO','httpPost请求-3', $logArr);
@@ -2770,6 +3110,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $rstData['post_data'] = $post_data;
         }
         $rstData['errno'] = $errno;
+        if(!empty($proxyIp)){
+            $rstData['proxy_ip'] = $proxyIp;
+        }
         $time_consume = ($end_time-$start_time).'s';
 
         $logArr = ['uid'=>$uid, 'url'=>$url, 'headers'=>$headers, 'rstData'=>$rstData, 'errno'=>$errno, 'time_consume'=>$time_consume];
@@ -2819,12 +3162,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header_modified);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        BaseService::setPoxy($ch, $url, $uid); # 设置代理IP
+        BaseService::setPoxy($ch, $url, $uid, BaseService::PROXY_SCENE_BET, self::$tz_system_id); # 设置代理IP
 
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
-        //curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
-        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
+        //curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid, self::$tz_system_id));
+        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid, self::$tz_system_id));
 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
         curl_setopt($ch, CURLOPT_HEADER, 1);  // 获取响应头以检查Content-Encoding
@@ -2879,55 +3222,86 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @decription 获取远程html内容
      * @param $url
      */
-    public static function httpPost($url,$post_data = [],$header=[], $uid = 0){
+    public static function httpPost($url,$post_data = [],$header=[], $uid = 0, $proxyScene = BaseService::PROXY_SCENE_BET){
         $timeout = SystemConfig::findOne(['key'=>'time_out_sec'])->value;
         if(!$timeout) $timeout = 15;
+        $tzSystemId = self::$tz_system_id;
+        $proxyRequired = self::isProxyRequiredForScene($uid, $tzSystemId, $proxyScene);
+        $maxAttempts = ($proxyScene === BaseService::PROXY_SCENE_LOGIN && $proxyRequired) ? 3 : 1;
+        $lastRst = [];
 
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
+        for($attempt = 1; $attempt <= $maxAttempts; $attempt++){
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
 
-        // 设置浏览器的特定header
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
+            // 设置浏览器的特定header
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+            curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);//设置超时限制，防止死循环
 
-        $poxy_addr = BaseService::setPoxy($ch, $url, $uid); # 设置代理IP
+            $poxy_addr = self::setProxyForScene($ch, $url, $uid, $proxyScene, $tzSystemId); # 设置代理IP
+            if($proxyRequired && (!is_string($poxy_addr) || $poxy_addr === '')){
+                curl_close($ch);
 
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid));
+                return self::buildProxyRequiredError($url, $uid, $tzSystemId, $proxyScene, $attempt);
+            }
 
-        //设置post方式提交
-        curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_SSLVERSION, BaseService::getSslVersionByUid($uid, $tzSystemId));
 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
-        curl_setopt($ch, CURLOPT_HEADER,0);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+            //设置post方式提交
+            curl_setopt($ch, CURLOPT_POST, 1);
 
-        $data = curl_exec($ch);
-        $errno = curl_errno( $ch );
-        //if($errno && strstr($url, 'BatchBet') OR strstr($url, 'MultipleBet')){
-        //$logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];p($logArr);
-        $curl_error = curl_error($ch);
-        curl_close($ch);
-        if($errno){
-            $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno, 'poxy_addr'=>$poxy_addr];
-            //p($logArr);
-            Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
-            return ['status'=>301, 'errno'=>$errno, 'curl_error'=>$curl_error];
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);    # 302 redirect
+            curl_setopt($ch, CURLOPT_HEADER,0);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+
+            $data = curl_exec($ch);
+            $errno = curl_errno($ch);
+            $curl_error = curl_error($ch);
+            curl_close($ch);
+
+            if($errno){
+                $lastRst = [
+                    'status'=>301,
+                    'errno'=>$errno,
+                    'curl_error'=>$curl_error,
+                    'msg'=>$curl_error,
+                    'proxy_ip'=>$poxy_addr,
+                    'proxy_scene'=>$proxyScene,
+                    'attempt'=>$attempt,
+                ];
+                $logArr = ['url'=>$url, 'post_data'=>$post_data, 'header'=>$header, 'rst'=>$data, 'errno'=>$errno, 'curl_error'=>$curl_error, 'poxy_addr'=>$poxy_addr, 'proxy_scene'=>$proxyScene, 'attempt'=>$attempt];
+                Tool_Common::log('httpPostError','INFO','httpPost请求', $logArr);
+                if($proxyRequired && self::isLoginProxyConnectFailure($lastRst) && !self::isLoginProxyPolicyFailure($lastRst) && $attempt < $maxAttempts){
+                    self::clearLoginProxyAfterFailure($uid, $tzSystemId, $poxy_addr, ['url'=>$url, 'step'=>'httpPost', 'attempt'=>$attempt, 'errno'=>$errno, 'curl_error'=>$curl_error]);
+                    continue;
+                }
+
+                return self::buildLoginProxyFailureResult($lastRst, $attempt);
+            }
+
+            //if(strpos($url, 'betNumber')){ p(['url'=>$url, 'header'=>$header,'post_data'=>$post_data,'rstData'=>$data,curl_close($ch),$errno]); }
+            if($data == 'ok'){
+                return 'ok';
+            }
+            $rstData = json_decode($data, TRUE);
+            if(empty($rstData)){
+                $rstData = ['status'=>401, 'msg'=>$data, 'proxy_ip'=>$poxy_addr, 'proxy_scene'=>$proxyScene, 'attempt'=>$attempt];
+                Tool_Common::log('httpPostError','INFO','httpPost请求', ['status'=>301, 'errno'=>$errno, 'curl_error'=>$curl_error, 'data'=>$data, 'proxy_ip'=>$poxy_addr, 'proxy_scene'=>$proxyScene, 'attempt'=>$attempt]);
+                if($proxyRequired && self::isLoginProxyConnectFailure($rstData) && !self::isLoginProxyPolicyFailure($rstData) && $attempt < $maxAttempts){
+                    self::clearLoginProxyAfterFailure($uid, $tzSystemId, $poxy_addr, ['url'=>$url, 'step'=>'httpPostBody', 'attempt'=>$attempt, 'data'=>$data]);
+                    continue;
+                }
+            }elseif(!empty($poxy_addr)){
+                $rstData['proxy_ip'] = $poxy_addr;
+            }
+            //p(['data'=>$data, 'rstData'=>$rstData, 'post_data'=>$post_data, 'header'=>$header]);
+
+            return $rstData;
         }
 
-        //if(strpos($url, 'betNumber')){ p(['url'=>$url, 'header'=>$header,'post_data'=>$post_data,'rstData'=>$data,curl_close($ch),$errno]); }
-        if($data == 'ok'){
-            return 'ok';
-        }
-        $rstData = json_decode($data, TRUE);
-        if(empty($rstData)){
-            $rstData = ['status'=>401, 'msg'=>$data];
-            Tool_Common::log('httpPostError','INFO','httpPost请求', ['status'=>301, 'errno'=>$errno, 'curl_error'=>$curl_error, 'data'=>$data]);
-        }
-        //p(['data'=>$data, 'rstData'=>$rstData, 'post_data'=>$post_data, 'header'=>$header]);
-
-        return $rstData;
+        return $lastRst ? self::buildLoginProxyFailureResult($lastRst, $maxAttempts) : self::buildProxyRequiredError($url, $uid, $tzSystemId, $proxyScene, $maxAttempts);
     }
 
     /**

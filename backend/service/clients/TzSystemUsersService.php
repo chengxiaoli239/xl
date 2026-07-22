@@ -7,6 +7,7 @@ use backend\models\SscKjData;
 use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
+use backend\models\thirdD\BetsBackend;
 use backend\service\BetService;
 use backend\service\Lucky5\Lucky5Service;
 use common\helpers\lottery\LotteryBet;
@@ -563,6 +564,9 @@ class TzSystemUsersService extends ClientsBaseService{
             if($lottery_type == LotteryType::AZ_LUCKY_5){
                 # 澳洲五
                 return AoZhou5BetService::getBetTasks($uid, $current_qihao);
+            }
+            if((int)$TzSystemsUsers->is_local_bet !== BetsBackend::BET_TYPE_LOCAL_API){
+                throw_info('当前账号由云服务下注，无需本地取任务');
             }
             $m = \Yii::$app->cache;
             $mkey = self::buildUserPlanTasksKey($access_token, $current_qihao);

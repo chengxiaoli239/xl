@@ -47,8 +47,11 @@ use Yii;
  * @property float $current_profits 当前盈利
  * @property int $is_auto_bet 自动下注
  * @property int $is_use_proxy 使用代理
+ * @property int $is_proxy_login 登录接口使用代理
+ * @property int $is_proxy_bet 非登录/下注接口使用代理
  * @property int $is_local_bet 是否本地
  * @property int $proxy_type 代理类型
+ * @property int $ssl_mode TLS模式
  * @property int $user_type 用户类型:0:管理员;1:七星;2:3d代理;3:3d总管
  * @property int $expire_time 到期时间
  * @property int $created_at 创建时间
@@ -62,11 +65,21 @@ class TzSystemsUsers extends \common\models\base\BaseModel
     const BET_TYPE_LOCAL_API = 1;
     const BET_TYPE_LOCAL_SELENIUM = 2;
     const BET_TYPE_SERVER = 3;
+    const SSL_MODE_INHERIT = 0;
+    const SSL_MODE_AUTO = 1;
+    const SSL_MODE_TLS12 = 2;
+    const SSL_MODE_COMPATIBLE = 3;
     # 下单模式选项
     const BET_TYPE_OPTIONS = [
         self::BET_TYPE_LOCAL_API => '本地api',
         self::BET_TYPE_LOCAL_SELENIUM => '本地selenium点击',
         self::BET_TYPE_SERVER => '服务器下单',
+    ];
+    const SSL_MODE_OPTIONS = [
+        self::SSL_MODE_INHERIT => '继承全局',
+        self::SSL_MODE_AUTO => '自动协商',
+        self::SSL_MODE_TLS12 => 'TLS 1.2',
+        self::SSL_MODE_COMPATIBLE => '兼容 TLS',
     ];
 
     /**
@@ -83,7 +96,8 @@ class TzSystemsUsers extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['uid', 'is_agent', 'tz_system_id', 'status', 'follow_status', 'is_auto_login', 'kj_num', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'user_type', 'is_local_bet', 'proxy_type', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            [['uid', 'is_agent', 'tz_system_id', 'status', 'follow_status', 'is_auto_login', 'kj_num', 'tz_sort', 'is_auto_bet', 'is_use_proxy', 'is_proxy_login', 'is_proxy_bet', 'user_type', 'is_local_bet', 'proxy_type', 'ssl_mode', 'expire_time', 'created_at', 'updated_at'], 'integer'],
+            ['ssl_mode', 'in', 'range' => array_keys(self::SSL_MODE_OPTIONS)],
             [['balance', 'flow_wp_player_bs', 'flow_op_player_bs', 'odds_2x', 'odds_3x', 'odds_4x', 'odds_2d', 'odds_3d', 'odds_4d', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
             [['secure_code', 'cookie', 'cookie_wx_web'], 'string'],
             [['updated_at'], 'required'],
@@ -176,8 +190,11 @@ class TzSystemsUsers extends \common\models\base\BaseModel
             'desc' => Yii::t('app', '盘口状态'),
             'is_auto_bet' => Yii::t('app', '自动下注'),
             'is_use_proxy' => Yii::t('app', '使用代理'),
+            'is_proxy_login' => Yii::t('app', '登录代理'),
+            'is_proxy_bet' => Yii::t('app', '非登录代理'),
             'is_local_bet' => Yii::t('app', '本地下注'),
             'proxy_type' => Yii::t('app', '代理类型'),
+            'ssl_mode' => Yii::t('app', 'TLS模式'),
             'user_type' => Yii::t('app', '用户类型:0:管理员;1:七星;2:3d代理;3:3d总管'),
             'expire_time' => Yii::t('app', '到期时间'),
             'created_at' => Yii::t('app', '创建时间'),

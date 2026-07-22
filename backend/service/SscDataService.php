@@ -2345,7 +2345,15 @@ class SscDataService extends BaseService {
                         continue;
                     }
                     \Yii::$app->redis->expire($Rkey, 120);
-                    $flag = SscDataService::isZjBefore($UserSysPlan->id);
+                    $recordData = [];
+                    $flag = SscDataService::isZjBefore($UserSysPlan->id, $recordData, $current_kj_qihao);
+                    if($flag === -1){
+                        Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '本期无投注记录，跳过倍数变更', [
+                            'plan_id'=>$UserSysPlan->id,
+                            'qihao'=>$current_kj_qihao,
+                        ]);
+                        continue;
+                    }
                     //$flag = SscDataService::isZjBeforeNew($bets[$UserSysPlan->id]??[]);
                     $flags[$UserSysPlan->uid][$UserSysPlan->id] = $flag;
                     $originSingle = $UserSysPlan->single;
@@ -2843,11 +2851,15 @@ class SscDataService extends BaseService {
      * @param int $plan_id
      * @return bool
      */
-    public static function isZjBefore($plan_id = 0, &$recordData = ''){
+    public static function isZjBefore($plan_id = 0, &$recordData = '', $qihao=''){
         if(empty($plan_id)) return false;
         # flag 是否中奖金，中的计划回0.1、不中的计划翻倍
-        $BettingRecords = BettingRecords::find()->select(['id', 'profits', 'qihao', 'status'])
-            ->where(['plan_id'=>$plan_id])->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
+        $query = BettingRecords::find()->select(['id', 'profits', 'qihao', 'status'])
+            ->where(['plan_id'=>$plan_id]);
+        if($qihao !== ''){
+            $query->andWhere(['qihao'=>(string)$qihao]);
+        }
+        $BettingRecords = $query->orderBy(['id'=>SORT_DESC])->limit(1)->asArray()->one();
 
         if(!empty($BettingRecords) && $BettingRecords['status'] != 1){
             //throw_info('未开奖暂不处理');

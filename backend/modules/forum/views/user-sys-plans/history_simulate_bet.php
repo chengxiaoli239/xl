@@ -10,7 +10,7 @@
     </div>
     -->
     <div class="col-lg-2 col-xs-5">
-        <?= $form->field($model, 'is_batch_simulate')->checkboxList($is_filter_dates)->label('模拟') ?>
+        <?= $form->field($model, 'is_batch_simulate')->checkboxList($is_filter_dates)->label('历史回测（不自动追期）') ?>
     </div>
     <!--
     <div class="col-lg-2 col-xs-7">
@@ -18,7 +18,7 @@
     </div>
     -->
     <div class="col-lg-2 col-xs-6">
-        <?= $form->field($model, 'start_qihao')->textInput()->label('开始期号') ?>
+        <?= $form->field($model, 'start_qihao')->textInput()->label('历史回测开始期号') ?>
     </div>
     <!--
     <div class="col-lg-2 col-xs-6">

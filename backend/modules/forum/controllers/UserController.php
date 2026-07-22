@@ -383,6 +383,17 @@ class UserController extends BaseController
                     if(!$TzSystemUsers->save()){
                         throw_info(Json::encode($TzSystemUsers->getErrors()));
                     }
+                    $TzSystemsAuth = TzSystemsAuth::findOne(['uid'=>$model->id]);
+                    if($TzSystemsAuth){
+                        $authSystemIds = array_values(array_filter(array_map('trim', explode(',', (string)$TzSystemsAuth->tz_systems_ids)), 'strlen'));
+                        $postSystemId = (string)$postData['tz_system_id'];
+                        if($postSystemId !== '' && !in_array($postSystemId, $authSystemIds, true)){
+                            $authSystemIds[] = $postSystemId;
+                            $TzSystemsAuth->tz_systems_ids = implode(',', $authSystemIds);
+                            $TzSystemsAuth->updated_at = $nowTime;
+                            $TzSystemsAuth->save(false, ['tz_systems_ids', 'updated_at']);
+                        }
+                    }
                     $new_access_token = UserService::resetToken($TzSystemUsers->uid);
                     \common\service\thirdD\Odds3dService::addUserOdds($model->id, $TzSystems->system_type_id); # 3d 用户添加赔率
                 }else{
@@ -531,6 +542,23 @@ class UserController extends BaseController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         if(\Yii::$app->user->id == 1){
             $rst = HN0898Service::updateStatus($id, $model = '\backend\models\TzSystemsUsers', 'is_use_proxy');
+            PoxyIPService::delProxyUidsKey();
+        }
+
+        return $this->redirect(['view']);
+    }
+
+    /**
+     * @desc 更新用户代理场景开关
+     * @param $id
+     * @param string $field
+     * @return \yii\web\Response
+     */
+    public function actionSwitchProxyScene($id, $field = 'is_proxy_login'){
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $allowFields = ['is_proxy_login', 'is_proxy_bet'];
+        if(\Yii::$app->user->id == 1 && in_array($field, $allowFields, true)){
+            HN0898Service::updateStatus($id, $model = '\backend\models\TzSystemsUsers', $field);
             PoxyIPService::delProxyUidsKey();
         }
 

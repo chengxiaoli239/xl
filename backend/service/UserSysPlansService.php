@@ -33,6 +33,30 @@ use  yii;
 
 class UserSysPlansService extends BaseService {
 
+    public static function enableAutoLoginForRealPlan($plan): int
+    {
+        if(!$plan
+            || (int)$plan->status !== 1
+            || (int)$plan->is_test !== 0
+            || (int)$plan->is_batch_simulate !== 0){
+            return 0;
+        }
+
+        $tzSystemIds = array_values(array_filter(array_map('intval', explode(',', (string)$plan->tz_sites))));
+        if(empty($tzSystemIds)){
+            return 0;
+        }
+
+        return TzSystemsUsers::updateAll([
+            'is_auto_login'=>1,
+            'updated_at'=>time(),
+        ], [
+            'uid'=>(int)$plan->uid,
+            'tz_system_id'=>$tzSystemIds,
+            'status'=>1,
+        ]);
+    }
+
     /**
      * @desc 预处理表单信息
      * @param $post
@@ -67,6 +91,20 @@ class UserSysPlansService extends BaseService {
             $oldPlan = UserSysPlans::findOne($id);
             if($oldPlan && trim((string)$oldPlan->tz_sites) !== ''){
                 $tzSites = array_values(array_filter(array_map('trim', explode(',', $oldPlan->tz_sites)), 'strlen'));
+            }
+        }
+        if(empty($tzSites)){
+            $tzSites = TzSystemsUsers::find()
+                ->select(['tz_system_id'])
+                ->where(['uid'=>(int)$user_id, 'status'=>1])
+                ->andWhere(['>', 'tz_system_id', 0])
+                ->orderBy(['id'=>SORT_ASC])
+                ->column();
+        }
+        if(empty($tzSites)){
+            $auth = TzSystemsAuth::findOne(['uid'=>(int)$user_id]);
+            if($auth && trim((string)$auth->tz_systems_ids) !== ''){
+                $tzSites = array_values(array_filter(array_map('trim', explode(',', $auth->tz_systems_ids)), 'strlen'));
             }
         }
         $post['UserSysPlans']['tz_sites'] = implode(',', $tzSites);
@@ -396,6 +434,9 @@ class UserSysPlansService extends BaseService {
             }
         }else{
             $post['UserSysPlans']['is_batch_simulate'] = 0;
+        }
+        if((int)$post['UserSysPlans']['is_batch_simulate'] === 1){
+            $post['UserSysPlans']['is_test'] = 1;
         }
 
         # 17、任意位置 是否包含

@@ -53,6 +53,7 @@ $(function () {
         $('#ApplyLoginConfirm').attr('data-op-id', op_id);
         username = $(this).data('username');
         account = $(this).data('account');
+        ssl_mode = $(this).data('ssl-mode');
         if(account == undefined || username == undefined){
             $('#txt_id').html('账号或密码不能为空');
             showTips('登录操作', '正在登录');
@@ -61,7 +62,8 @@ $(function () {
         }
         $("#act_login_status").val(1);
         txt = '系统账号:<strong><font color="green">' + username + '</font></strong> &nbsp;&nbsp;网盘账号:<strong><font color="green">'+ account + '</font></strong>'
-        + '&nbsp;&nbsp;网盘地址:<strong><font color="green">'+ $(this).data('domain') + '</font></strong>';
+        + '&nbsp;&nbsp;网盘地址:<strong><font color="green">'+ $(this).data('domain') + '</font></strong>'
+        + '&nbsp;&nbsp;TLS:<strong><font color="green">'+ ssl_mode + '</font></strong>';
         $('#txt_id').html(txt);
         showTips('登录操作', '正在登录');
     });

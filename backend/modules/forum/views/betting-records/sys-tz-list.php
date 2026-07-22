@@ -5,6 +5,7 @@ use yii\grid\GridView;
 use yii\widgets\Pjax;
 use yii\helpers\BaseStringHelper;
 use backend\models\SscKjData;
+use common\widgets\Alert;
 $newRecord = SscKjData::find()->select(['qihao','code_str'])->orderBy('id DESC')->asArray()->limit(1)->one();
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\searchs\BettingRecords */
@@ -15,6 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <section class="betting-records-index wrapper site-min-height">
     <!-- page start-->
+    <?= Alert::widget() ?>
     <section class="panel">
         <header class="panel-heading">
             <?= Html::encode($this->title);echo '['.$newRecord['qihao'].':'.$newRecord['code_str'].'] '; ?>
@@ -94,7 +96,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute'=>'snid', 'label'=>'操作',
                             'format'=>'raw',
                             'value'=>function($model){
-                                $url1 = "/forum/betting-records/cancel-order?snid=".$model->snid."&tz_system_id=".$model->tz_system_id;
+                                $url1 = "/forum/betting-records/cancel-order?bet_id=".$model->id;
                                 $url2 = "/forum/betting-records/tz-now?id=".$model->id; # 追加下注
                                 $url3 = "/forum/betting-records/reverse-tz-now?id=".$model->id; # 反买
                                 if($model->is_simulate){

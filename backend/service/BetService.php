@@ -34,6 +34,7 @@ use common\service\jobs\plan\UserPlanBetJob;
 use common\service\jobs\plan\UserTaskBetJob;
 use common\service\lottery\aozhou5\jobs\AoZhou5BetJobs;
 use common\service\lottery\LotteryTypeService;
+use common\service\proxy\ProxyBaseService;
 use common\service\ssc\QihaoService;
 use common\tools\RedisLock;
 use Yii;
@@ -202,6 +203,10 @@ abstract class BetService extends BaseBetService {
             $lastRst = self::normalizeBetRetryResponse($lastRst);
             $retryable = self::isRetryableBetResponse($lastRst);
             $timeConsume = sprintf('%.3fs', microtime(true) - $startTime);
+            $proxySwitchRst = $retryable ? self::switchProxyAfterBetFailure($lastRst, $context) : [];
+            if(is_array($lastRst) && !empty($proxySwitchRst)){
+                $lastRst['proxy_switch'] = $proxySwitchRst;
+            }
 
             if(!$retryable || $attempt >= $maxAttempts){
                 break;
@@ -211,6 +216,7 @@ abstract class BetService extends BaseBetService {
                 'attempt' => $attempt,
                 'max_attempts' => $maxAttempts,
                 'time_consume' => $timeConsume,
+                'proxy_switch' => $proxySwitchRst,
                 'rst' => self::getBetRetryLogSummary($lastRst),
             ]));
 
@@ -250,7 +256,10 @@ abstract class BetService extends BaseBetService {
         }
 
         $code = isset($response['code']) ? (int)$response['code'] : 0;
-        if(in_array($code, [302, 303, 304, 305, 306, 307, 310, 313], true)){
+        if(in_array($code, [302, 303, 304, 305, 306, 307, 310, 313, 314, 315], true)){
+            return false;
+        }
+        if(!empty($response['proxy_policy_failure']) || !empty($response['proxy_required_stop'])){
             return false;
         }
         if(isset($response['errno']) && (int)$response['errno'] > 0){
@@ -291,9 +300,86 @@ abstract class BetService extends BaseBetService {
         ];
     }
 
+    private static function switchProxyAfterBetFailure($response, array $context = []): array
+    {
+        if(!self::isProxyFailureBetResponse($response)){
+            return [];
+        }
+        if(is_array($response) && (!empty($response['proxy_policy_failure']) || !empty($response['proxy_required_stop']))){
+            return [];
+        }
+
+        $uid = (int)($context['uid'] ?? ($response['uid'] ?? 0));
+        $proxyType = $uid ? ProxyBaseService::getProxyTypeByUid($uid) : ProxyBaseService::getProxyType();
+        $proxyIp = is_array($response) ? (string)($response['proxy_ip'] ?? '') : '';
+        $responseText = is_array($response) ? json_encode($response, 320) : (string)$response;
+        $isProxyText = stripos($responseText, '代理') !== false || stripos($responseText, 'Proxy') !== false;
+        if($uid && !$proxyIp && !self::isRetryProxyOpen($uid)){
+            return [];
+        }
+        if(!$uid && !$proxyIp && !$isProxyText){
+            return [];
+        }
+        if(!$proxyIp){
+            $currentProxyIp = ProxyBaseService::getCurrentValidProxyIp($proxyType, 2);
+            $proxyIp = is_string($currentProxyIp) ? $currentProxyIp : '';
+        }
+        $clearRst = ProxyBaseService::clearCurrentProxyIp($proxyType, $proxyIp);
+
+        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'WARN', '代理IP异常切换', array_merge($context, [
+            'uid'=>$uid,
+            'proxy_type'=>$proxyType,
+            'proxy_ip'=>$proxyIp,
+            'clear_rst'=>$clearRst,
+            'rst'=>self::getBetRetryLogSummary($response),
+        ]));
+
+        return [
+            'status'=>200,
+            'proxy_type'=>$proxyType,
+            'old_proxy_ip'=>$proxyIp,
+            'clear_rst'=>$clearRst,
+        ];
+    }
+
+    private static function isRetryProxyOpen($uid): bool
+    {
+        if(!$uid){
+            return false;
+        }
+        $rows = TzSystemsUsers::find()->where(['uid'=>(int)$uid, 'is_use_proxy'=>1])->all();
+        foreach($rows as $TzSystemsUsers){
+            if(BaseService::isProxySceneOpen($TzSystemsUsers, BaseService::PROXY_SCENE_BET)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function isProxyFailureBetResponse($response): bool
+    {
+        if(!is_array($response)){
+            return self::containsRetryableBetText((string)$response);
+        }
+        if(!empty($response['proxy_switch']) || !empty($response['proxy_policy_failure']) || !empty($response['proxy_required_stop'])){
+            return false;
+        }
+
+        $code = isset($response['code']) ? (int)$response['code'] : 0;
+        if(in_array($code, [309, 311, 312], true)){
+            return true;
+        }
+        if(isset($response['errno']) && (int)$response['errno'] > 0){
+            return true;
+        }
+
+        return self::containsRetryableBetText(json_encode($response, 320));
+    }
+
     private static function containsRetryableBetText(string $text): bool
     {
-        $nonRetryableKeywords = ['余额不足', '已关盘', '停押', '重复提交', '请重新登录', 'cookie', '维护中', 'Illegal X-Csrf-Token'];
+        $nonRetryableKeywords = ['余额不足', '已关盘', '停押', '重复提交', '请重新登录', 'cookie', '维护中', 'Illegal X-Csrf-Token', '快代理拒绝连接当前盘口域名', '下注代理已开启，但代理IP获取失败'];
         foreach($nonRetryableKeywords as $keyword){
             if(stripos($text, $keyword) !== false){
                 return false;
@@ -1453,12 +1539,25 @@ abstract class BetService extends BaseBetService {
     public static function cancelOrder($uid, $bet_id){
         $BettingRecords = BettingRecords::findOne(['id'=>$bet_id, 'uid'=>$uid]);
         if(!$BettingRecords) return ['status'=>300, 'msg'=>'非法操作'];
+        if((int)$BettingRecords->is_simulate === 1 || empty($BettingRecords->snid) || $BettingRecords->snid === self::$test_true_snid){
+            return ['status'=>300, 'msg'=>'模拟记录或测试单号无需盘口撤单', 'lottery_type'=>$BettingRecords->lottery_type];
+        }
         $m = \Yii::$app->cache;
         $mkey = 'ORDER_CANCEL_'.$bet_id;
         if($isCanceled = $m->get($mkey)) return ['status'=>300, 'msg'=>'正在退单请稍等~'];
+        $m->set($mkey, 1, 15);
 
         $tz_system_id = $BettingRecords->tz_system_id;
+        if(!$tz_system_id){
+            $plan = UserSysPlans::findOne($BettingRecords->plan_id);
+            if($plan && trim((string)$plan->tz_sites) !== ''){
+                $tz_system_id = (int)trim((string)$plan->tz_sites);
+                $BettingRecords->tz_system_id = $tz_system_id;
+                $BettingRecords->save(false, ['tz_system_id']);
+            }
+        }
         $lottery_type = $BettingRecords->lottery_type;
+        $rst = ['status'=>300, 'msg'=>'暂不支持该盘口撤单', 'lottery_type'=>$lottery_type];
         if(in_array($tz_system_id, [1,2])){
             # 1、0898投注、2、99彩票网
             if($lottery_type == 5){ # 0898体系重庆
@@ -1500,9 +1599,14 @@ abstract class BetService extends BaseBetService {
 
         }
 
+        if(!is_array($rst)){
+            $rst = ['status'=>300, 'msg'=>is_scalar($rst) ? (string)$rst : '撤单失败'];
+        }
         $rst['lottery_type'] = $lottery_type;
-        if($rst['status'] == 200){
+        if(($rst['status'] ?? 0) == 200){
             $m->set($mkey, 1, 5);
+        }else{
+            $m->delete($mkey);
         }
 
 
