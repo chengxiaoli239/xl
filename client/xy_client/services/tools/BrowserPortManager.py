@@ -19,6 +19,8 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
 
+from xy_client.services.tools.account_runtime import debug_port_for_account
+
 
 class BrowserPortManager:
     """浏览器端口连接管理器"""
@@ -38,10 +40,7 @@ class BrowserPortManager:
     
     def _get_debug_port(self) -> int:
         """获取调试端口"""
-        # 基于账号ID生成唯一端口，避免冲突
-        base_port = 9000
-        port_offset = hash(self.account_id) % 1000
-        return base_port + port_offset
+        return debug_port_for_account(self.account_id)
     
     def _get_user_data_dir(self) -> str:
         """获取用户数据目录（兼容现有系统）"""

@@ -1,4 +1,5 @@
 import json
+import hashlib
 import os
 import platform
 import random
@@ -530,13 +531,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.agent_password = None  # 代理网盘密码
 
             self.access_token = access_token
+            self.account_key = (
+                os.environ.get('LUCKY5_ACCOUNT_KEY')
+                or os.environ.get('LUCKY5_ACCOUNT_ID')
+                or hashlib.sha256(str(self.access_token).encode('utf-8')).hexdigest()[:24]
+            )
+            self.account_display_name = os.environ.get(
+                'LUCKY5_ACCOUNT_DISPLAY_NAME', self.account_key
+            )
             # print('accountInfo', self.wp_account, self.wp_domain, self.wp_password)
             
             # 初始化浏览器和端口管理器（在access_token设置后）
             if get_account_browser_manager and get_port_manager:
                 try:
-                    # 使用access_token作为账号ID，确保每个账号独立管理
-                    account_id = self.access_token or "default_account"
+                    account_id = self.account_key or "default_account"
                     browser_type = self.getPreferredBrowser() or "chrome"
                     
                     # 初始化浏览器窗口管理器
@@ -984,7 +992,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             # 清理账号浏览器资源
             if cleanup_account_browser:
                 try:
-                    account_id = self.access_token or "default_account"
+                    account_id = self.account_key or "default_account"
                     cleanup_account_browser(account_id)
                     if ENABLE_DETAILED_LOGS:
                         print(f'✅ 账号 {account_id} 浏览器资源清理完成')
@@ -995,7 +1003,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             # 清理端口管理器
             if cleanup_port_manager:
                 try:
-                    account_id = self.access_token or "default_account"
+                    account_id = self.account_key or "default_account"
                     cleanup_port_manager(account_id)
                     if ENABLE_DETAILED_LOGS:
                         print(f'✅ 账号 {account_id} 端口管理器清理完成')
@@ -2018,7 +2026,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                             print(f"⚠️ 端口管理器端口({self.port_manager.debug_port})与实际端口({self.port})不一致，更新端口管理器")
                             # 重新创建端口管理器，使用正确的端口
                             from xy_client.services.tools.BrowserPortManager import BrowserPortManager
-                            account_id = getattr(self, 'access_token', 'default')
+                            account_id = getattr(self, 'account_key', 'default')
                             browser_type = self.getPreferredBrowser() or "chrome"
                             self.port_manager = BrowserPortManager(account_id, browser_type)
                             # 手动设置端口（如果端口管理器支持）
@@ -2041,7 +2049,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 
                 # 关键修复：启动浏览器前，先清理可能存在的旧浏览器进程（仅清理占用当前账户端口的进程）
                 # 确保不会关闭其他账户的浏览器进程
-                account_id = getattr(self, 'access_token', 'default')
+                account_id = getattr(self, 'account_key', 'default')
                 try:
                     import psutil
                     import subprocess
@@ -2235,7 +2243,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             print("🔄 [手动重登] 步骤1: 关闭浏览器...")
             
             # 关键修复：先关闭账户的所有端口对应的浏览器进程
-            account_id = getattr(self, 'access_token', None) or 'default_account'
+            account_id = getattr(self, 'account_key', None) or 'default_account'
             if hasattr(self, 'port_manager') and self.port_manager:
                 account_id = self.port_manager.account_id
             
@@ -2496,7 +2504,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             # 关键修复1：严格验证 driver 是否连接到了当前账户的端口
             # 获取当前账户的端口
             current_port = None
-            account_id = getattr(self, 'access_token', 'default')
+            account_id = getattr(self, 'account_key', 'default')
             
             if hasattr(self, 'port') and self.port:
                 current_port = self.port
@@ -2761,7 +2769,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             
             # 启动浏览器进程
             print("🔄 开始启动浏览器进程...")
-            browser_start_result = self.start_browser_process(selected_browser, username)
+            browser_start_result = self.start_browser_process(
+                selected_browser,
+                self.account_key,
+            )
             if not browser_start_result:
                 print("❌ 启动浏览器进程失败")
                 return False
@@ -2970,7 +2981,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             traceback.print_exc()
             return False
     
-    def start_browser_process(self, browser_type, username):
+    def start_browser_process(self, browser_type, profile_id):
         """启动浏览器进程"""
         try:
             # 关键修复：在启动浏览器进程之前，检查WebDriver连接失败标志
@@ -2999,9 +3010,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 if system == "Windows":
                     # ⚠️ 重要：浏览器缓存目录路径 - 不要轻易修改
                     # 每个账号使用独立的缓存目录，确保缓存持久化
-                    # 目录结构：C:\.temp\9222\{username}
+                    # 目录结构：C:\.temp\9222\{profile_id}
                     # 修改此路径会导致账号缓存丢失，需要重新登录
-                    user_data_dir = f"C:\\.temp\\9222\\{username}"
+                    user_data_dir = f"C:\\.temp\\9222\\{profile_id}"
                     # 确保目录存在
                     import os
                     os.makedirs(user_data_dir, exist_ok=True)
@@ -3012,8 +3023,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     print(f"📁 [start_browser_process] 浏览器缓存目录: {user_data_dir}")
                 elif system == "Darwin":  # macOS
                     # ⚠️ 重要：浏览器缓存目录路径 - 不要轻易修改
-                    # 目录结构：/tmp/9222/{username}
-                    user_data_dir = f"/tmp/9222/{username}"
+                    # 目录结构：/tmp/9222/{profile_id}
+                    user_data_dir = f"/tmp/9222/{profile_id}"
                     import os
                     os.makedirs(user_data_dir, exist_ok=True)
                     cmd_command = (
@@ -3032,7 +3043,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 
                 # 关键修复：将端口记录到全局端口集合中（用于早盘开盘前关闭所有浏览器）
                 try:
-                    account_id = getattr(self, 'access_token', None) or username or 'default_account'
+                    account_id = getattr(self, 'account_key', None) or profile_id or 'default_account'
                     from xy_client.services.tools.BrowserPortManager import _add_port_to_account
                     _add_port_to_account(account_id, int(self.port))
                     if hasattr(self, 'agent_port'):
@@ -3703,20 +3714,100 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     # 工具栏
     def initUiTools(self):
-        return True
-        # 用QtGui.QIcon做一个图标，
-        # 建立一个关联快捷键
-        exitAction.setShortcut('Ctrl+Q')
-        # 关联一个触发函数self.close
-        exitAction.triggered.connect(self.close)
-        # 建立一个工具栏
-        self.toolbar = self.addToolBar('Exit')
-        # 为工具栏添加动作
-        self.toolbar.addAction(exitAction)
+        account_menu = self.menubar.addMenu('账号')
 
-        self.setGeometry(300, 300, 350, 250)
-        self.setWindowTitle('Toolbar')
-        self.show()
+        current_account = QtWidgets.QAction(
+            f"当前账号：{self.account_display_name}",
+            self,
+        )
+        current_account.setEnabled(False)
+        account_menu.addAction(current_account)
+        account_menu.addSeparator()
+
+        open_action = QtWidgets.QAction('打开其他账号', self)
+        open_action.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_DialogOpenButton))
+        open_action.setShortcut('Ctrl+Shift+O')
+        open_action.triggered.connect(self.openOtherAccount)
+        account_menu.addAction(open_action)
+
+        switch_action = QtWidgets.QAction('切换账号', self)
+        switch_action.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_BrowserReload))
+        switch_action.setShortcut('Ctrl+Shift+S')
+        switch_action.triggered.connect(self.switchAccount)
+        account_menu.addAction(switch_action)
+
+        logout_action = QtWidgets.QAction('退出账号', self)
+        logout_action.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_DialogCloseButton))
+        logout_action.setShortcut('Ctrl+Shift+L')
+        logout_action.triggered.connect(self.logoutAccount)
+        account_menu.addAction(logout_action)
+        account_menu.addSeparator()
+
+        exit_action = QtWidgets.QAction('退出客户端', self)
+        exit_action.setIcon(self.style().standardIcon(QtWidgets.QStyle.SP_TitleBarCloseButton))
+        exit_action.setShortcut('Ctrl+Q')
+        exit_action.triggered.connect(self.close)
+        account_menu.addAction(exit_action)
+
+        self.setWindowTitle(f"Lucky5 - {self.account_display_name}")
+        self.statusbar.showMessage(f"当前账号：{self.account_display_name}")
+        return True
+
+    def _selectOtherAccount(self):
+        from xy_client.services.auth.login_dialog import select_client_account
+        return select_client_account(
+            config.get_config('robot_domain'),
+            parent=self,
+            config=config,
+            excluded_account_key=self.account_key,
+        )
+
+    def openOtherAccount(self):
+        selected = self._selectOtherAccount()
+        if not selected:
+            return
+        try:
+            from xy_client.services.auth.account_process import launch_client_process
+            launch_client_process(selected['account_key'])
+            self.statusbar.showMessage(
+                f"正在启动账号：{selected.get('display_name', selected['account_key'])}",
+                5000,
+            )
+        except Exception as exc:
+            QMessageBox.critical(self, '启动失败', '无法启动其他账号：' + str(exc))
+
+    def switchAccount(self):
+        selected = self._selectOtherAccount()
+        if not selected:
+            return
+        try:
+            from xy_client.services.auth.account_process import launch_client_process
+            launch_client_process(selected['account_key'])
+        except Exception as exc:
+            QMessageBox.critical(self, '切换失败', '无法启动所选账号：' + str(exc))
+            return
+        self.close()
+
+    def logoutAccount(self):
+        answer = QMessageBox.question(
+            self,
+            '退出账号',
+            '确定删除当前账号的本地登录凭证并退出吗？',
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if answer != QMessageBox.Yes:
+            return
+
+        try:
+            from xy_client.services.auth.credential_cache import CredentialCache
+            from xy_client.services.auth.account_process import launch_client_process
+            CredentialCache().remove(self.account_key)
+            launch_client_process()
+        except Exception as exc:
+            QMessageBox.critical(self, '退出失败', '无法退出当前账号：' + str(exc))
+            return
+        self.close()
 
     # 检测进程是否存在
     def checkProcessIsExist(self):
@@ -3729,9 +3820,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                         print(f"✅ 账号注册成功: {self.account_id}")
                         return True
                     else:
-                        print("⚠️ 账号注册失败，但继续运行程序")
-                        # 不退出程序，继续运行
-                        return True
+                        print("⚠️ 所选账号已在运行，退出当前重复实例")
+                        raise SystemExit(0)
                 except Exception as e:
                     print(f"⚠️ 账号注册异常: {e}，但继续运行程序")
                     # 不退出程序，继续运行
@@ -4696,7 +4786,7 @@ def createInputBufferMonitor(mainWindow, inc):
 def createBrowserWindowManager(mainWindow, inc):
     """浏览器窗口管理任务 - 确保只有一个浏览器窗口（只操作属于当前账户的窗口）"""
     def inner_browser_manager():
-        account_id = getattr(mainWindow, 'access_token', 'default')
+        account_id = getattr(mainWindow, 'account_key', 'default')
         while True:
             try:
                 # 关键修复：无论是否登录，都检查窗口数量

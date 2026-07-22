@@ -11,6 +11,8 @@ import threading
 import time
 from typing import Any, Optional, Union
 
+from xy_client.services.tools.Configs import application_dir
+
 
 class LogManager:
     """统一的日志管理类，避免在每个地方都判断开关"""
@@ -237,8 +239,11 @@ class LogManager:
         }
 
 
-# 创建默认实例
-default_log_manager = LogManager()
+# 创建按账号隔离的默认实例
+_default_account_key = os.environ.get('LUCKY5_ACCOUNT_KEY', 'default')
+default_log_manager = LogManager(
+    log_dir=str(application_dir() / 'logs' / _default_account_key)
+)
 
 
 # 便捷函数，用于快速记录日志

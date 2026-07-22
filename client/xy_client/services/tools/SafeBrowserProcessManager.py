@@ -13,6 +13,8 @@ import subprocess
 import platform
 import json
 from typing import Dict, List, Optional, Set
+
+from xy_client.services.tools.account_runtime import debug_port_for_account
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -52,9 +54,7 @@ class SafeBrowserProcessManager:
     
     def _get_debug_port(self) -> int:
         """获取调试端口"""
-        base_port = 9000
-        port_offset = hash(self.account_id) % 1000
-        return base_port + port_offset
+        return debug_port_for_account(self.account_id)
     
     def _get_process_log_file(self) -> str:
         """获取进程日志文件"""

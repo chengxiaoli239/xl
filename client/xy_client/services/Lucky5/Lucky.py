@@ -22,7 +22,7 @@ from xy_client.services.systems_users.SystemsUsers import checkUserLoginJob, use
     agent_login_job, pushTasksBetRst, updateRobotId, getBetPlanTasks
 from xy_client.services.systems_users.common import getAccountByToken, pushErrorLog
 from xy_client.services.tools import tools
-from xy_client.services.tools.Configs import Configs
+from xy_client.services.tools.Configs import Configs, application_dir
 from xy_client.services.tools.GlobalSession import GlobalSession
 from xy_client.services.tools.tools import getHostNameData
 
@@ -84,7 +84,8 @@ except Exception:
 def setup_logging():
     try:
         # 创建logs目录
-        log_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'logs')
+        account_key = os.environ.get('LUCKY5_ACCOUNT_KEY', 'default')
+        log_dir = os.path.join(str(application_dir()), 'logs', account_key)
         os.makedirs(log_dir, exist_ok=True)
         
         # 配置文件日志

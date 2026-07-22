@@ -12,6 +12,7 @@ import psutil
 import threading
 import hashlib
 import json
+import ctypes
 from typing import Dict, List, Optional, Set
 from pathlib import Path
 
@@ -24,6 +25,8 @@ class ClientFriendlyAccountManager:
         self._running_accounts: Dict[str, Dict] = {}
         self._account_config_file = self._get_account_config_file()
         self._current_account_id = None
+        self._instance_mutex = None
+        self._instance_lock_file = None
         
         # 加载现有账号配置
         self._load_account_configs()
@@ -62,6 +65,17 @@ class ClientFriendlyAccountManager:
     def _auto_detect_account(self) -> str:
         """自动检测当前账号"""
         try:
+            # The authenticated account key is authoritative. Directory-based
+            # detection cannot distinguish multiple accounts using one EXE.
+            env_account = (
+                os.environ.get('LUCKY5_ACCOUNT_ID')
+                or os.environ.get('LUCKY5_ACCOUNT_KEY')
+                or os.environ.get('LUCKY_ACCOUNT_ID')
+            )
+            if env_account:
+                print(f"🔍 从登录信息检测到账号: {env_account}")
+                return env_account
+
             # 方法1: 从当前目录名检测
             current_dir = os.path.basename(os.getcwd())
             if current_dir and current_dir not in ['python-tools', 'xy_client', '']:
@@ -87,12 +101,6 @@ class ClientFriendlyAccountManager:
             if config_account:
                 print(f"🔍 从配置文件检测到账号: {config_account}")
                 return config_account
-            
-            # 方法5: 从环境变量检测
-            env_account = os.environ.get('LUCKY_ACCOUNT_ID')
-            if env_account:
-                print(f"🔍 从环境变量检测到账号: {env_account}")
-                return env_account
             
             # 默认账号
             default_account = "default_account"
@@ -149,6 +157,10 @@ class ClientFriendlyAccountManager:
                 if not account_id:
                     print("❌ 无法确定账号ID")
                     return None
+
+                if not self._acquire_instance_lock(account_id):
+                    self._show_duplicate_account_message(account_id)
+                    return None
                 
                 # 生成账号指纹
                 fingerprint = self._generate_account_fingerprint(account_id)
@@ -193,6 +205,64 @@ class ClientFriendlyAccountManager:
         except Exception as e:
             print(f"❌ 检查账号注册异常: {e}")
             return None
+
+    def _acquire_instance_lock(self, account_id: str) -> bool:
+        """Keep one process per account while allowing different accounts."""
+        if self._instance_mutex is not None or self._instance_lock_file is not None:
+            return True
+
+        lock_name = hashlib.sha256(account_id.encode('utf-8')).hexdigest()
+        if sys.platform == 'win32':
+            kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
+            kernel32.CreateMutexW.argtypes = [ctypes.c_void_p, ctypes.c_bool, ctypes.c_wchar_p]
+            kernel32.CreateMutexW.restype = ctypes.c_void_p
+            kernel32.CloseHandle.argtypes = [ctypes.c_void_p]
+            kernel32.CloseHandle.restype = ctypes.c_bool
+            ctypes.set_last_error(0)
+            handle = kernel32.CreateMutexW(None, False, 'Local\\Lucky5_' + lock_name)
+            if not handle:
+                raise ctypes.WinError()
+            if ctypes.get_last_error() == 183:  # ERROR_ALREADY_EXISTS
+                kernel32.CloseHandle(handle)
+                return False
+            self._instance_mutex = handle
+            return True
+
+        try:
+            import fcntl
+            lock_path = os.path.join('/tmp', 'lucky5_' + lock_name + '.lock')
+            lock_file = open(lock_path, 'a+', encoding='utf-8')
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            self._instance_lock_file = lock_file
+            return True
+        except (ImportError, OSError):
+            return False
+
+    @staticmethod
+    def _show_duplicate_account_message(account_id: str):
+        print(f"⚠️ 账号 {account_id} 已在运行，拒绝重复启动")
+        try:
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.warning(None, '账号已运行', '所选账号已经在本机运行。')
+        except Exception:
+            pass
+
+    def _release_instance_lock(self):
+        if self._instance_mutex is not None and sys.platform == 'win32':
+            try:
+                kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
+                kernel32.CloseHandle.argtypes = [ctypes.c_void_p]
+                kernel32.CloseHandle.restype = ctypes.c_bool
+                kernel32.CloseHandle(ctypes.c_void_p(self._instance_mutex))
+            except Exception:
+                pass
+            self._instance_mutex = None
+        if self._instance_lock_file is not None:
+            try:
+                self._instance_lock_file.close()
+            except Exception:
+                pass
+            self._instance_lock_file = None
     
     def _handle_existing_process_client_friendly(self, account_id: str, existing_pid: int, current_pid: int) -> str:
         """客户友好的进程冲突处理"""
@@ -296,6 +366,8 @@ class ClientFriendlyAccountManager:
                     del self._running_accounts[account_id]
                     self._save_account_configs()
                     print(f"✅ 账号 {account_id} 已注销")
+                if account_id == self._current_account_id:
+                    self._release_instance_lock()
                     
         except Exception as e:
             print(f"❌ 注销账号异常: {e}")

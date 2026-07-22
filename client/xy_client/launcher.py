@@ -36,6 +36,13 @@ def main():
 
     os.environ['LUCKY5_ROBOT_DOMAIN'] = auth_data['robot_domain']
     os.environ['LUCKY5_ACCESS_TOKEN'] = auth_data['access_token']
+    os.environ['LUCKY5_ACCOUNT_KEY'] = auth_data['account_key']
+    os.environ['LUCKY5_ACCOUNT_ID'] = auth_data['account_key']
+    os.environ['LUCKY_ACCOUNT_ID'] = auth_data['account_key']
+    os.environ['LUCKY5_BACKEND_USERNAME'] = auth_data.get('username', '')
+    os.environ['LUCKY5_ACCOUNT_DISPLAY_NAME'] = auth_data.get(
+        'display_name', auth_data.get('username', '')
+    )
 
     from xy_client.LuckyClientOP import main as run_client
     run_client(existing_app=app)
