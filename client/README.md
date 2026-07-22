@@ -43,6 +43,13 @@ python -m pip install -r .\client\requirements.txt
 python .\client\xy_client\build.py --clean --name Lucky5
 ```
 
+For startup diagnostics, build a console variant without replacing the release
+executable:
+
+```powershell
+python .\client\xy_client\build.py --name Lucky5_Debug --console
+```
+
 Distribute `client/dist/Lucky5.exe`. The customer starts it directly; neither
 Python nor a configuration file is required.
 

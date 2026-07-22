@@ -11,6 +11,7 @@ def main():
     parser = argparse.ArgumentParser(description="Build the Lucky5 Windows client")
     parser.add_argument("--name", default=None, help="Executable name without .exe")
     parser.add_argument("--clean", action="store_true", help="Remove previous build output")
+    parser.add_argument("--console", action="store_true", help="Show a console for startup diagnostics")
     args = parser.parse_args()
 
     client_dir = Path(__file__).resolve().parent
@@ -34,7 +35,7 @@ def main():
         "--noconfirm",
         "--clean",
         "--onefile",
-        "--windowed",
+        "--console" if args.console else "--windowed",
         "--name",
         output_name,
         "--icon",
