@@ -2752,6 +2752,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             # 获取用户选择的浏览器类型
             selected_browser = self.getPreferredBrowser()
             print(f"🔍 用户选择的浏览器: {selected_browser}")
+
+            configured_driver = str(config.get_config('chromedriver_path') or '').strip().lower()
+            use_cdp_login = selected_browser == 'chrome' and configured_driver in ('', 'auto')
+            self._browser_automation_mode = 'cdp' if use_cdp_login else 'webdriver'
+            if use_cdp_login:
+                print("✅ ChromeDriver为自动模式，使用Chrome调试协议登录，避免驱动下载和版本不匹配")
             
             # 启动浏览器进程
             print("🔄 开始启动浏览器进程...")
@@ -2793,34 +2799,34 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             else:
                 print(f"✅ 端口 {self.port} 验证完成，准备连接WebDriver")
 
-            # 连接到调试端口并主动打开登录页
-            print("🔄 准备连接到浏览器并打开登录页...")
-            print(f"🔍 当前端口: {self.port}, 浏览器类型: {self.getPreferredBrowser() if hasattr(self, 'getPreferredBrowser') else 'chrome'}")
-            try:
-                attach_result = self.attach_webdriver_and_open_login()
-                print(f"🔍 attach_webdriver_and_open_login 返回: {attach_result}")
-                if not attach_result:
-                    print("❌ 连接浏览器失败，无法执行登录，暂停重试，避免创建多个窗口")
-                    # 如果attach_webdriver_and_open_login已经设置了连接失败标志，这里不需要重复设置
-                    # 但确保标志已设置
-                    if not hasattr(self, '_webdriver_connection_failed') or not self._webdriver_connection_failed:
+            # Auto mode uses Chrome DevTools directly and does not need ChromeDriver.
+            if use_cdp_login:
+                print(f"🔗 准备通过Chrome调试协议连接端口 {self.port}")
+                self.driver = None
+            else:
+                print("🔄 准备连接到浏览器并打开登录页...")
+                print(f"🔍 当前端口: {self.port}, 浏览器类型: {self.getPreferredBrowser() if hasattr(self, 'getPreferredBrowser') else 'chrome'}")
+                try:
+                    attach_result = self.attach_webdriver_and_open_login()
+                    print(f"🔍 attach_webdriver_and_open_login 返回: {attach_result}")
+                    if not attach_result:
+                        print("❌ 连接浏览器失败，无法执行登录，暂停重试，避免创建多个窗口")
+                        if not hasattr(self, '_webdriver_connection_failed') or not self._webdriver_connection_failed:
+                            self._webdriver_connection_failed = True
+                            self._webdriver_connection_failed_time = time.time()
+                        return False
+                    print("✅ 浏览器连接成功，准备执行登录")
+                except Exception as attach_e:
+                    error_str = str(attach_e).lower()
+                    if '10061' in error_str or 'refused' in error_str or '积极拒绝' in error_str or '无法连接' in error_str:
+                        print(f"❌ WebDriver连接失败（{attach_e}），暂停重试，避免创建多个窗口")
                         self._webdriver_connection_failed = True
                         self._webdriver_connection_failed_time = time.time()
+                    else:
+                        print(f"❌ 连接浏览器时发生异常: {attach_e}")
+                        import traceback
+                        traceback.print_exc()
                     return False
-                print("✅ 浏览器连接成功，准备执行登录")
-            except Exception as attach_e:
-                error_str = str(attach_e).lower()
-                # 检测连接失败错误（10061、连接被拒绝等）
-                if '10061' in error_str or 'refused' in error_str or '积极拒绝' in error_str or '无法连接' in error_str:
-                    print(f"❌ WebDriver连接失败（{attach_e}），暂停重试，避免创建多个窗口")
-                    # 设置连接失败标志
-                    self._webdriver_connection_failed = True
-                    self._webdriver_connection_failed_time = time.time()
-                else:
-                    print(f"❌ 连接浏览器时发生异常: {attach_e}")
-                    import traceback
-                    traceback.print_exc()
-                return False
 
             # 执行登录
             print("🔄 开始执行登录流程...")
@@ -2849,15 +2855,24 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     return False
                 
                 print(f"✅ 用户信息检查通过，账号: {account}")
-                # 调用原有的登录方法
-                print("🔄 准备调用actLogin方法...")
-                login_result = self.actLogin(
-                    access_token=self.access_token,
-                    ssc_domain=self.user_info.get('ssc_domain', ''),
-                    account=account,
-                    pwd=password
-                )
-                print(f"✅ actLogin方法调用完成，结果: {login_result}")
+                if use_cdp_login:
+                    print("🔄 准备通过Chrome调试协议执行自动登录...")
+                    login_result = Lucky.loginAWithCdp(account, password, self)
+                    print(f"✅ Chrome调试协议登录完成，结果: {login_result}")
+                    if login_result and login_result.get('status') == 200:
+                        try:
+                            self.balance.setText(str(login_result.get('balance', '0.00') or '0.00'))
+                        except Exception as balance_e:
+                            print(f"⚠️ 更新余额显示失败: {balance_e}")
+                else:
+                    print("🔄 准备调用actLogin方法...")
+                    login_result = self.actLogin(
+                        access_token=self.access_token,
+                        ssc_domain=self.user_info.get('ssc_domain', ''),
+                        account=account,
+                        pwd=password
+                    )
+                    print(f"✅ actLogin方法调用完成，结果: {login_result}")
                 
                 if login_result and login_result.get('status') == 200:
                     # 登录成功，设置全局状态和本地状态
@@ -2872,7 +2887,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     
                     # 登录成功后导航到盘口地址（取消注释，确保打开盘口）
                     try:
-                        if hasattr(self, 'driver') and self.driver:
+                        if use_cdp_login:
+                            print("✅ Chrome调试协议已完成登录和Cookie保存，无需WebDriver二次导航")
+                        elif hasattr(self, 'driver') and self.driver:
                             ssc_domain = self.user_info.get('ssc_domain', '')
                             if ssc_domain:
                                 # 确保URL格式正确
@@ -2988,7 +3005,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     # 确保目录存在
                     import os
                     os.makedirs(user_data_dir, exist_ok=True)
-                    cmd_command = f'"{chrome_path}" --remote-debugging-port={self.port} --user-data-dir="{user_data_dir}"'
+                    cmd_command = (
+                        f'"{chrome_path}" --remote-debugging-port={self.port} '
+                        f'--remote-allow-origins=* --user-data-dir="{user_data_dir}"'
+                    )
                     print(f"📁 [start_browser_process] 浏览器缓存目录: {user_data_dir}")
                 elif system == "Darwin":  # macOS
                     # ⚠️ 重要：浏览器缓存目录路径 - 不要轻易修改
@@ -2996,7 +3016,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                     user_data_dir = f"/tmp/9222/{username}"
                     import os
                     os.makedirs(user_data_dir, exist_ok=True)
-                    cmd_command = f'"{chrome_path}" --remote-debugging-port={self.port} --user-data-dir="{user_data_dir}"'
+                    cmd_command = (
+                        f'"{chrome_path}" --remote-debugging-port={self.port} '
+                        f'--remote-allow-origins=* --user-data-dir="{user_data_dir}"'
+                    )
                     print(f"📁 [start_browser_process] 浏览器缓存目录: {user_data_dir}")
                 else:
                     print(f"❌ 不支持的操作系统: {system}")
@@ -3141,6 +3164,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 print(f"🌐 [attach_webdriver_and_open_login] 准备打开登录页: {login_url}")
                 try:
                     # 使用安全的页面打开方法（支持超时控制和自动恢复）
+                    success = False
                     try:
                         from xy_client.services.tools.PageRefreshManager import get_refresh_manager
                         refresh_manager = get_refresh_manager(page_load_timeout=20, max_retry=2)
@@ -3150,11 +3174,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                         if success:
                             print(f"🌐 [attach_webdriver_and_open_login] 已打开登录页: {login_url}")
                         else:
-                            print(f"⚠️ [attach_webdriver_and_open_login] 打开登录页失败（已重试），但继续执行")
+                            print(f"⚠️ [attach_webdriver_and_open_login] 安全打开登录页失败，使用driver.get回退")
                     except ImportError:
-                        # 如果导入失败，使用原有的简单方式
+                        print("⚠️ [attach_webdriver_and_open_login] 页面刷新管理器不可用，使用driver.get回退")
+
+                    if not success:
                         self.driver.get(login_url)
-                        print(f"🌐 [attach_webdriver_and_open_login] 已打开登录页: {login_url}")
+                        print(f"🌐 [attach_webdriver_and_open_login] 已通过driver.get打开登录页: {login_url}")
                 except Exception as get_e:
                     print(f"❌ [attach_webdriver_and_open_login] 打开登录页失败: {get_e}")
                     import traceback

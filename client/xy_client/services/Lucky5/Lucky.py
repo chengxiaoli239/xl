@@ -483,6 +483,89 @@ def isElementExist(browser, ele, type='id'):
         return flag
 
 
+def loginAWithCdp(account='', pwd='', mainWindow=None):
+    """Log in through Chrome DevTools when no matching ChromeDriver is available."""
+    if mainWindow is None:
+        return {'status': 500, 'msg': 'Main window is unavailable', 'balance': '0.00'}
+
+    try:
+        from xy_client.services.tools.chrome_cdp import (
+            login_platform_via_cdp,
+            platform_base_url,
+        )
+
+        domain = ''
+        if hasattr(mainWindow, 'user_info') and isinstance(mainWindow.user_info, dict):
+            domain = mainWindow.user_info.get('ssc_domain', '')
+        if not domain and hasattr(mainWindow, 'domain_val'):
+            domain = mainWindow.domain_val.text().strip()
+        if not domain:
+            domain = getattr(mainWindow, 'wp_domain', '')
+
+        print(f"[CDP] Starting platform login on Chrome debug port {mainWindow.port}")
+        result = login_platform_via_cdp(
+            mainWindow.port,
+            domain,
+            account,
+            pwd,
+            timeout=30,
+        )
+        if result.get('status') != 200:
+            print(f"[CDP] Platform login failed: {result.get('msg', 'unknown error')}")
+            return result
+
+        cookies = result.get('cookies', [])
+        user_agent = result.get('user_agent', '')
+        current_url = result.get('current_url', '') or domain
+        try:
+            ssc_domain = platform_base_url(current_url)
+        except Exception:
+            ssc_domain = platform_base_url(domain)
+
+        if hasattr(mainWindow, 'domain_val'):
+            mainWindow.domain_val.setText(ssc_domain)
+        mainWindow.wp_domain = ssc_domain
+        mainWindow.browser_cookies = ''.join(
+            f"{cookie.get('name', '')}={cookie.get('value', '')};"
+            for cookie in cookies
+            if cookie.get('name')
+        )
+
+        update_url = robot_domain + '/api/index/update-user-cookies'
+        post_data = {
+            'url': update_url,
+            'account': account,
+            'password': pwd,
+            'ssc_domain': ssc_domain,
+            'cookies': cookies,
+            'user_agent': user_agent,
+            'access_token': getattr(mainWindow, 'access_token', '') or access_token,
+        }
+        response = globalSession.post(
+            update_url,
+            data=json.dumps(post_data),
+            headers={'content-type': 'application/json'},
+            timeout=12,
+        )
+        backend_result = response.json()
+        if backend_result.get('status') != 200:
+            print(f"[CDP] Failed to save platform cookies: {backend_result}")
+            return {
+                'status': 500,
+                'msg': backend_result.get('msg', 'Failed to save platform cookies'),
+                'balance': result.get('balance', '0.00'),
+            }
+
+        backend_result['balance'] = result.get('balance', '0.00') or '0.00'
+        print(f"[CDP] Platform login succeeded: {ssc_domain}")
+        return backend_result
+    except Exception as exc:
+        print(f"[CDP] Platform login exception: {exc}")
+        import traceback
+        traceback.print_exc()
+        return {'status': 500, 'msg': str(exc), 'balance': '0.00'}
+
+
 def loginA(account='', pwd='', mainWindow=None):
     # 初始化标志变量
     already_handled_agreement = False
