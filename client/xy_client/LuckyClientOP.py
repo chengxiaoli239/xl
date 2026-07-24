@@ -3339,11 +3339,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if ENABLE_DETAILED_LOGS:
             print(rstData)
         setDatas = rstData['datas']
-        columns = ['qihao', 'codes', 'betting_money', 'bonus', 'single', 'profits', 'kj_codes', 'snid', 'playway_name',
-                   'create_time']
+        columns = ['qihao', 'codes', 'a_hit', 'b_hit', 'bet_status', 'betting_money', 'bonus', 'single', 'profits',
+                   'kj_codes', 'snid', 'playway_name', 'strategy_action', 'create_time']
+        headers = ['期号', '实际投注B', 'A判断', 'B判断', 'B结果', '投注', '中奖', '倍', '利润', '开奖号码',
+                   '方案号', '方式', '策略动作', '时间']
         columns_len = len(columns)
         rows_len = len(setDatas)
         self.table.setColumnCount(columns_len)
+        self.table.setHorizontalHeaderLabels(headers)
         self.table.setRowCount(rows_len)
 
         i = 0  # 行号
@@ -3361,8 +3364,24 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 elif field in ['balance']:  # 同步余额
                     self.table.setCellWidget(i, column, self.setSyncBalanceBtn(data))
                 else:
-                    val = data[field]
-                    self.table.setItem(int(i), column, QTableWidgetItem(val))
+                    val = data.get(field, '')
+                    if field in ['a_hit', 'b_hit']:
+                        if not data.get('is_plan_ab'):
+                            val = ''
+                        elif val is None:
+                            val = '未判断'
+                        else:
+                            val = '中' if int(val) == 1 else '不中'
+                    elif field == 'bet_status':
+                        val = {
+                            0: '未下注',
+                            1: '待开奖',
+                            2: '中奖',
+                            3: '未中奖',
+                        }.get(int(val or 0), '') if data.get('is_plan_ab') else ''
+                    if val is None:
+                        val = ''
+                    self.table.setItem(int(i), column, QTableWidgetItem(str(val)))
             i += 1
 
         self.table.horizontalHeader().setStretchLastSection(True)

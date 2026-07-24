@@ -7,9 +7,9 @@
         <?= $form->field($model,"import_codes_txts[arise_B_codes]")->textarea([ 'autofocus' => false,'style'=>'height:150px' ])->label('号码B：多组英文逗号或空格隔开 2345,3456 或 2345 3456');?>
     </div>
     <div class="col-lg-6 col-xs-6">
-        <?= $form->field($model, 'arise_A_times')->textInput()->label('A出x次数') ?>
+        <?= $form->field($model, 'arise_A_times')->textInput(['type' => 'number', 'min' => 1])->label('A出x次数（至少1次）') ?>
     </div>
     <div class="col-lg-6 col-xs-6">
-        <?= $form->field($model, 'arise_B_times')->textInput()->label('B出y次数') ?>
+        <?= $form->field($model, 'arise_B_times')->textInput(['type' => 'number', 'min' => 0])->label('B出y次数（可填0）') ?>
     </div>
 </div>

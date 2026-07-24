@@ -708,6 +708,7 @@ class HN0898Service extends BaseTZService {
                 $code_hz['current_arise_B_times'] = 0;
                 $code_hz['current_yl_desc'] = '';
                 $code_hz['A_x_B_y_start_time'] = date('Y-m-d H:i:s');
+                $code_hz['type13_last_qihao'] = '';
             }
             if($plan_type == SscDataService::PLAN_TYPE_AREA_SINGLES_BET){ # 区间遗漏投
                 $code_hz['areaBetStatus'] = 0; # 计划内部下注状态

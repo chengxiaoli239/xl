@@ -111,7 +111,7 @@ class SscDataService extends BaseService {
         self::PLAN_TYPE_BT_SINGLES_BET => '中则波推倍投',
         //11=>'中则交叉正反',
         12=>'A出x次B出y次投B',
-        13=>'A出x次B出y次投B_2',
+        13=>'A出x次+B出y次投B（按A判断等待倍投）',
         self::PLAN_TYPE_AREA_SINGLES_BET => '区间遗漏投',
         self::PLAN_TYPE_SINGLES_BET_2 => '中则倍投',
         self::PLAN_TYPE_YL_BET_SINGLES_2 => '遗漏倍投2',
@@ -2624,7 +2624,7 @@ class SscDataService extends BaseService {
             $logArr['time_consume'] = ($t6-$t5).'s';
             Tool_Common::log('/plan/opProfitsPlans_'.$lottery_type, 'INFO', '处理止盈止损\倍投计划7', $logArr);
 
-            OperatePlanService::opProfitsPlans12_13($lottery_type); # A出x次B出y次投B、A出x次B出y次投B_2 计划处理
+            OperatePlanService::opProfitsPlans12_13($lottery_type, $current_kj_qihao); # A出x次B出y次投B、A出x次B出y次投B_2 计划处理
 
             OperatePlanService::opProfitsPlans14($lottery_type); # 区间遗漏投 止盈止损 计划处理
             $qihao = HN0898Service::getQihao($lottery_type);
@@ -3392,6 +3392,9 @@ class SscDataService extends BaseService {
                 return ['status'=>301, 'msg'=>'不是AB计划类型'];
             }
             $plan_type = $UserSysPlan->plan_type;
+            if($plan_type == 13){
+                return PlanType13Service::processPeriod($UserSysPlan, (string)$current_qihao);
+            }
             $lottery_type = $UserSysPlan->lottery_type;
             $hzArr = json_decode($UserSysPlan->hz_Arr, true);
             $zj_group = SscDataService::getNewZjGroupByPlanIdB($UserSysPlan->id, $current_qihao, $qihao, $zjResult);

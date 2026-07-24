@@ -137,6 +137,8 @@ class OpKjService extends BaseService {
                 if(!$BettingRecord->save()){
                     throw_info(yii\helpers\Json::encode($BettingRecord->getErrors()));
                 }
+                // 类型13的策略判断以A为准，开奖后的B结果只回填展示记录。
+                PlanType13Service::syncBetRecord($BettingRecord);
                 $t2 = microtime(true);
                 $time_consume = ($t2-$t1).'s';
                 Tool_Common::log('/kj_data/'.__FUNCTION__,'INFO','开奖处理结束', ['record_id'=>$record_id, 'time_consume'=>$time_consume]);

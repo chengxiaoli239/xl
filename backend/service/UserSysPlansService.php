@@ -468,12 +468,24 @@ class UserSysPlansService extends BaseService {
 
         # 21.1、A_x_arise_B_yarise_bet_B
         if(isset($post['UserSysPlans']['arise_A_times'])){
-            $tmpFilter['arise_A_times'] = $post['UserSysPlans']['arise_A_times'] ? (int)$post['UserSysPlans']['arise_A_times'] : 0;
+            $ariseATimes = $post['UserSysPlans']['arise_A_times'];
+            if(in_array($plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types) && (trim((string)$ariseATimes) === '' || (int)$ariseATimes < 1)){
+                throw_info('A出次数必须大于等于1');
+            }
+            $tmpFilter['arise_A_times'] = $ariseATimes !== '' ? (int)$ariseATimes : 0;
+        }elseif(in_array($plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types)){
+            throw_info('A出次数必须大于等于1');
         }
         unset($post['UserSysPlans']['arise_A_times']);
         # 21.2、A_x_arise_B_yarise_bet_B
         if(isset($post['UserSysPlans']['arise_B_times'])){
-            $tmpFilter['arise_B_times'] = $post['UserSysPlans']['arise_B_times'] ? (int)$post['UserSysPlans']['arise_B_times'] : 0;
+            $ariseBTimes = $post['UserSysPlans']['arise_B_times'];
+            if(in_array($plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types) && (trim((string)$ariseBTimes) !== '' && (int)$ariseBTimes < 0)){
+                throw_info('B出次数不能小于0');
+            }
+            $tmpFilter['arise_B_times'] = $ariseBTimes !== '' ? (int)$ariseBTimes : 0;
+        }elseif(in_array($plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types)){
+            $tmpFilter['arise_B_times'] = 0;
         }
         unset($post['UserSysPlans']['arise_B_times']);
 
@@ -705,17 +717,18 @@ class UserSysPlansService extends BaseService {
             $post['UserSysPlans']['hz_Arr'] && $post['UserSysPlans']['hz_Arr'] = trim($hz_Arr);
         }
 
-        if(!in_array($tz_type, [23]) && in_array($plan_type, [2,3,4,5,9, 12])){ # 翻倍计划
-            if($id && $plan = UserSysPlans::findOne($id)){
-                $tmpHzArr = json_decode($plan->hz_Arr, true);
+        if(!in_array($tz_type, [23]) && in_array($plan_type, [2,3,4,5,9, 12, 13])){ # 翻倍计划
+            $existingPlan = null;
+            if($id && ($existingPlan = UserSysPlans::findOne($id))){
+                $tmpHzArr = json_decode($existingPlan->hz_Arr, true);
                 $singles_key = $tmpHzArr['singles_key'] ?? 0;
                 $current_miss = $tmpHzArr['current_miss'] ?? 0;
             }else{
                 $singles_key = 0;
                 $current_miss = 0;
             }
-            if($plan->plan_type == 12){ # A_x_B_y_status
-                $tmpHzArr = json_decode($plan->hz_Arr, true);
+            if(in_array($plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types)){ # A_x_B_y_status
+                $tmpHzArr = $existingPlan ? json_decode($existingPlan->hz_Arr, true) : [];
                 $A_x_B_y_status = $tmpHzArr['A_x_B_y_status'] ?? 0;
                 $A_x_B_y_start_time = (isset($tmpHzArr['A_x_B_y_start_time']) && $tmpHzArr['A_x_B_y_start_time']) ? $tmpHzArr['A_x_B_y_start_time'] : date('Y-m-d H:i:s');
                 $tmpFilter['start_bet_yl_nums'] = 0;
@@ -725,6 +738,7 @@ class UserSysPlansService extends BaseService {
 
                 $tmpFilter['A_x_B_y_status'] = $A_x_B_y_status;
                 $tmpFilter['A_x_B_y_start_time'] = $A_x_B_y_start_time;
+                $tmpFilter['type13_last_qihao'] = '';
             }
 
             $tmpFilter['singles_key'] = $singles_key;
@@ -1034,7 +1048,10 @@ class UserSysPlansService extends BaseService {
             # {"arise_A_times":3,"arise_B_times":1,"current_arise_A_times":4, "current_arise_B_times":4, "A_x_B_y_start_time":"2022-03-06 14:00:00","filters":[],"filter_dates":[],"filter_qihaos":[]}
             $arise_codes = $codes_arises['arise_A_codes'];
             Tool_Common::log('/plan/'.__FUNCTION__, 'INFO', '号码获取', ['current_arise_A_times'=>$hzArr["current_arise_A_times"], 'arise_A_times'=>$hzArr['arise_A_times'], 'current_arise_B_times'=>$hzArr["current_arise_B_times"], 'arise_B_times'=>$hzArr['arise_B_times']]);
-            if($hzArr["current_arise_A_times"]>=$hzArr['arise_A_times'] && $hzArr["current_arise_B_times"]==$hzArr['arise_B_times']){
+            if($plan->plan_type == 13 && (int)($hzArr['A_x_B_y_status'] ?? 0) === \backend\service\PlanType13Service::STATUS_BET){
+                # 类型13由独立状态机决定下期是否投B
+                $arise_codes = $codes_arises['arise_B_codes'];
+            }elseif($hzArr["current_arise_A_times"]>=$hzArr['arise_A_times'] && $hzArr["current_arise_B_times"]==$hzArr['arise_B_times']){
                 # 符合下注条件 投B组号码
                 $arise_codes = $codes_arises['arise_B_codes'];
             }

@@ -1342,7 +1342,9 @@ abstract class BetService extends BaseBetService {
                 SscDataService::PLAN_TYPE_LOSS_MONEY_BET_SINGLES,
             ])) { # 中则投、中则投+翻倍梯度倍投、遗漏中则倍投
                 $flag = ($codes_hz['betStatus'] == SscDataService::PLAN_BET_STATUS_BETTING) ? 1 : 0;
-            }else if(in_array($plan->plan_type, UserSysPlans::$A_x_arise_B_y_arise_bet_B_types)) { # A出x次B出y次投B
+            }else if($plan->plan_type == 13) {
+                $flag = ((int)($codes_hz['A_x_B_y_status'] ?? 0) === \backend\service\PlanType13Service::STATUS_BET) ? 1 : 0;
+            }else if($plan->plan_type == 12) { # A出x次B出y次投B
                 $flag = 0;
                 if($codes_hz["current_arise_A_times"]>=$codes_hz['arise_A_times'] && $codes_hz["current_arise_B_times"]==$codes_hz['arise_B_times']){
                     $flag = 1;

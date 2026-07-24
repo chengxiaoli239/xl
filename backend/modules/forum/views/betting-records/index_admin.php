@@ -5,6 +5,7 @@ use yii\grid\GridView;
 use yii\widgets\Pjax;
 use yii\helpers\BaseStringHelper;
 use backend\models\SscKjData;
+use backend\models\PlanAbRecord;
 use common\widgets\Alert;
 $newRecord = SscKjData::find()->select(['qihao','code_str'])->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->asArray()->limit(1)->one();
 $newRecordText = $newRecord ? '['.$newRecord['qihao'].':'.$newRecord['code_str'].']' : '';
@@ -112,6 +113,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value' => function($model) {
                                 return $model->kj_codes ? $model->kj_codes : '待开奖';
+                            }
+                        ],
+                        ['label' => 'A判断','headerOptions'=>['width'=>'5%'],
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                $record = PlanAbRecord::findOne(['bet_record_id' => $model->id]);
+                                if (!$record) return '';
+                                return $record->a_hit ? '<font color="green">A中</font>' : '<font color="red">A不中</font>';
                             }
                         ],
                         //'position',

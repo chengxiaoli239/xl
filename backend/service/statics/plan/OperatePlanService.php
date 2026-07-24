@@ -6,6 +6,7 @@ use backend\models\PlanStaticProfits;
 use backend\models\UserSysPlans;
 use backend\service\BaseService;
 use backend\service\HN0898Service;
+use backend\service\PlanType13Service;
 use backend\service\SscDataService;
 use common\service\lottery\LotteryTypeService;
 use common\tools\RedisLock;
@@ -462,7 +463,7 @@ class OperatePlanService extends BaseService
      * @param int $lottery_type
      * @return bool
      */
-    public static function opProfitsPlans12_13(int $lottery_type = DEFAULT_LOTTERY_TYPE): bool
+    public static function opProfitsPlans12_13(int $lottery_type = DEFAULT_LOTTERY_TYPE, string $current_qihao = ''): bool
     {
         $RedisLock = new RedisLock();
         $Rkey = __FUNCTION__.'_redis_'.$lottery_type;
@@ -478,6 +479,10 @@ class OperatePlanService extends BaseService
             if($UserSysPlans = UserSysPlans::find()->where($where)->all()){
                 foreach ($UserSysPlans as $UserSysPlan){
                     $plan_type = $UserSysPlan->plan_type;
+                    if($plan_type == 13){
+                        PlanType13Service::processPeriod($UserSysPlan, $current_qihao);
+                        continue;
+                    }
                     $hzArr = json_decode($UserSysPlan->hz_Arr, true);
                     $zj_group = SscDataService::getNewZjGroupByPlanId($UserSysPlan->id, $hzArr['A_x_B_y_start_time'], $qihao, $zjResult);
                     $hzArr_update_before = $hzArr;
