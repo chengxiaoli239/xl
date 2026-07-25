@@ -710,6 +710,9 @@ class UserSysPlansController extends BaseController
     public function actionSwitchStatus($id,$status){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $rst = HN0898Service::updateSysPlansStatus($id, $status, $this->_user_id);
+        if(($rst['status'] ?? 200) != 200){
+            \Yii::$app->session->setFlash('error', $rst['msg'] ?? '计划状态更新失败');
+        }
 
         return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$rst['lottery_type']]);
     }
@@ -726,11 +729,15 @@ class UserSysPlansController extends BaseController
         $post = \Yii::$app->request->post();
 
         try {
-            HN0898Service::batchSwitchStatus($post['ids'], '\backend\models\UserSysPlans', $post['field'], $post['val'], $this->_user_id);
             if($post['field'] == 'status'){
                 foreach ($post['ids'] as $id){
-                    HN0898Service::updateSysPlansStatus($id, $post['val'], $this->_user_id);
+                    $rst = HN0898Service::updateSysPlansStatus($id, $post['val'], $this->_user_id);
+                    if(($rst['status'] ?? 200) != 200){
+                        throw_info($rst['msg'] ?? '计划状态更新失败');
+                    }
                 }
+            }else{
+                HN0898Service::batchSwitchStatus($post['ids'], '\backend\models\UserSysPlans', $post['field'], $post['val'], $this->_user_id);
             }
         }catch (\Exception $e){
             return ['status'=>300, 'msg'=>$e->getMessage()];

@@ -171,6 +171,7 @@ use yii\helpers\Url;
 use yii\grid\GridView;
 use yii\helpers\BaseStringHelper;
 use backend\service\PlanProfitStatGroupService;
+use common\widgets\Alert;
 
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\searchs\UserSysPlans */
@@ -399,6 +400,7 @@ $columns = array_merge(
 ?>
 <section class="user-sys-plans-index wrapper site-min-height">
     <!-- page start-->
+    <?= Alert::widget() ?>
     <section class="panel">
         <header class="panel-heading">
             <?= Html::encode($this->title); ?>
@@ -929,7 +931,7 @@ $columns = array_merge(
                         }, 1000); // 2000 milliseconds (2 seconds)
                     });
                 } else {
-                    layer.alert('批量操作失败.');
+                    layer.alert(response.msg || '批量操作失败.');
                 }
             }, 'json');
         }

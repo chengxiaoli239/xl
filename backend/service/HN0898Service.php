@@ -10,6 +10,7 @@
 namespace backend\service;
 use backend\models\BettingRecords;
 use backend\models\DataTime;
+use backend\models\ImportPlanCodes;
 use backend\models\KjConfig;
 use backend\models\SscDsYl;
 use backend\models\SscKjData;
@@ -653,7 +654,32 @@ class HN0898Service extends BaseTZService {
             $where = ['uid' => $uid, 'id' => $id];
         }
         $UserSysPlans = UserSysPlans::findOne($where);
+        if(empty($UserSysPlans)){
+            return ['status'=>300, 'msg'=>'找不到计划：'.$id, 'lottery_type'=>DEFAULT_LOTTERY_TYPE];
+        }
         if(!$uid) return ['status'=>300, 'msg'=>'用户id为空', 'lottery_type'=>$UserSysPlans->lottery_type];
+        if((int)$status === 1 && (int)$UserSysPlans->plan_type === 13){
+            $groupKeys = ImportPlanCodes::find()
+                ->select('plan_id_sort_key')
+                ->where([
+                    'uid'=>(int)$UserSysPlans->uid,
+                    'plan_id'=>(int)$UserSysPlans->id,
+                    'status'=>1,
+                    'plan_id_sort_key'=>['arise_A_codes', 'arise_B_codes'],
+                ])
+                ->column();
+            $missingGroups = array_diff(['arise_A_codes', 'arise_B_codes'], $groupKeys);
+            if(!empty($missingGroups)){
+                $missingNames = array_map(static function ($key) {
+                    return $key === 'arise_A_codes' ? 'A' : 'B';
+                }, $missingGroups);
+                return [
+                    'status'=>300,
+                    'msg'=>'类型13号码'.implode('、', $missingNames).'未配置，请先编辑计划并保存号码',
+                    'lottery_type'=>$UserSysPlans->lottery_type,
+                ];
+            }
+        }
         $m = \Yii::$app->cache;
         $mkey = 'updateSysPlansStatus_'.$id.'_'.$status;
         if($rst = $m->get($mkey)) ['lottery_type'=>$UserSysPlans->lottery_type];
@@ -728,7 +754,7 @@ class HN0898Service extends BaseTZService {
             push_queue_fast(UserPlanBetJob::class, ['plan_id'=>$UserSysPlans->id, 'qiHao'=>$qiHao, 'business_id'=>$UserSysPlans->id]);
         }
 
-        $rstData = ['rst'=>$rst, 'lottery_type'=>$UserSysPlans->lottery_type];
+        $rstData = ['status'=>200, 'msg'=>'状态更新成功', 'rst'=>$rst, 'lottery_type'=>$UserSysPlans->lottery_type];
 
         return $rstData;
     }
