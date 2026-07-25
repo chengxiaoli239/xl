@@ -12,6 +12,13 @@ $newRecordText = $newRecord ? '['.$newRecord['qihao'].':'.$newRecord['code_str']
 $planAbRecords = PlanAbRecord::findByBetRecordIds(array_map(function($model) {
     return $model->id;
 }, $dataProvider->getModels()));
+$type13PlanIds = array_flip(\backend\models\UserSysPlans::find()
+    ->select('id')
+    ->where([
+        'id' => array_map(function($model) { return $model->plan_id; }, $dataProvider->getModels()),
+        'plan_type' => 13,
+    ])
+    ->column());
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\searchs\BettingRecords */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -75,13 +82,23 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         ['attribute' => 'codes','headerOptions'=>['width'=>'20%'],
                             'format'=>'raw',
-                            'value' => function($model) {
+                            'value' => function($model) use ($planAbRecords, $type13PlanIds) {
                                 $txt = BaseStringHelper::truncate($model->codes,15);
-                                return Html::a($txt, 'javascript:;', [
+                                $content = Html::a($txt, 'javascript:;', [
                                     'class'=>'act-post-desc',
                                     'title'=>$model->post_desc,
                                     'alt'=>str_replace('@', ',',str_replace(',', '',$model->codes)),
                                 ]);
+                                if(isset($type13PlanIds[$model->plan_id])){
+                                    $record = $planAbRecords[$model->id] ?? null;
+                                    if($record){
+                                        $result = $record->a_hit
+                                            ? '<font color="green">A中</font>'
+                                            : '<font color="red">A不中</font>';
+                                        $content .= '<br>A判断：'.$result;
+                                    }
+                                }
+                                return $content;
                             }
                         ],
                         //'betting_money',
@@ -116,14 +133,6 @@ $this->params['breadcrumbs'][] = $this->title;
                             'format'=>'raw',
                             'value' => function($model) {
                                 return $model->kj_codes ? $model->kj_codes : '待开奖';
-                            }
-                        ],
-                        ['label' => 'A判断','headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) use ($planAbRecords) {
-                                $record = $planAbRecords[$model->id] ?? null;
-                                if (!$record) return '';
-                                return $record->a_hit ? '<font color="green">A中</font>' : '<font color="red">A不中</font>';
                             }
                         ],
                         //'position',
