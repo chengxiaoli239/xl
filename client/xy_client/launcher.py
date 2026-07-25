@@ -2,6 +2,11 @@ import os
 import sys
 from pathlib import Path
 
+# Lucky5 uses Chrome DevTools directly in the default mode. Keep Selenium
+# Manager offline so an accidental legacy WebDriver call can never download.
+os.environ.setdefault("SE_OFFLINE", "true")
+os.environ.setdefault("SE_AVOID_STATS", "true")
+
 
 def configure_standard_streams():
     for stream in (sys.stdout, sys.stderr):

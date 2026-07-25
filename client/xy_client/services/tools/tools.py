@@ -113,6 +113,16 @@ def getDriver(driver_name, port=9222):
     
     # 根据浏览器类型启动不同的浏览器
     if driver_name == "chrome":
+        config_driver_path = str(
+            config.get_config('chromedriver_path') or ''
+        ).strip()
+        if config_driver_path.lower() in ('', 'auto'):
+            print(
+                "ℹ️ ChromeDriver自动下载已禁用；当前使用CDP/HTTP模式，"
+                "不创建WebDriver连接"
+            )
+            return None
+
         # Chrome 浏览器启动逻辑
         # 关键优化：检查Chrome调试服务是否就绪（不仅仅是端口开放）
         # 人为操作浏览器很顺畅，但程序连接WebDriver却经常超时
@@ -186,7 +196,6 @@ def getDriver(driver_name, port=9222):
 
         # driver_path = r"D:\www\工具\chrome\125\chromedriver-win64\chromedriver.exe"
         # 优先使用配置文件中的chromedriver路径
-        config_driver_path = config.get_config('chromedriver_path')
         print(f"🔍 从配置文件读取的chromedriver_path: {config_driver_path}")
         print(f"🔍 配置文件路径类型: {type(config_driver_path)}")
         
@@ -247,8 +256,9 @@ def getDriver(driver_name, port=9222):
         if driver_path and not os.path.exists(driver_path):
             raise FileNotFoundError(f"找不到chromedriver，请确保文件存在于: {driver_path}")
 
-        # auto 模式交给 Selenium Manager 匹配当前浏览器版本。
-        service = ChromeService(executable_path=driver_path) if driver_path else ChromeService()
+        # Only an explicit local executable is allowed. Never invoke Selenium
+        # Manager, because customer networks may not reach its download sites.
+        service = ChromeService(executable_path=driver_path)
 
         # 创建 Chrome 浏览器选项
         chrome_options = ChromeOptions()

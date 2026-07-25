@@ -1,9 +1,6 @@
 import time
 import subprocess
 import psutil
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import WebDriverException, TimeoutException
 
 
@@ -163,27 +160,18 @@ class WebDriverRecovery:
         """创建新的WebDriver实例"""
         try:
             print("🔄 创建新的WebDriver实例...")
+
+            if getattr(mainWindow, '_browser_automation_mode', 'cdp') != 'webdriver':
+                print("ℹ️ CDP/HTTP模式已跳过WebDriver恢复，不需要下载ChromeDriver")
+                return False
             
-            # 设置Chrome选项
-            chrome_options = Options()
-            chrome_options.add_argument('--no-sandbox')
-            chrome_options.add_argument('--disable-dev-shm-usage')
-            chrome_options.add_argument('--disable-gpu')
-            chrome_options.add_argument('--disable-extensions')
-            chrome_options.add_argument('--disable-plugins')
-            chrome_options.add_argument('--disable-images')
-            chrome_options.add_argument('--disable-javascript')
-            chrome_options.add_argument('--disable-web-security')
-            chrome_options.add_argument('--allow-running-insecure-content')
-            chrome_options.add_argument('--disable-blink-features=AutomationControlled')
-            chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
-            chrome_options.add_experimental_option('useAutomationExtension', False)
-            
-            # 设置页面加载策略
-            chrome_options.page_load_strategy = 'eager'
-            
-            # 创建WebDriver
-            driver = webdriver.Chrome(options=chrome_options)
+            from xy_client.services.tools.tools import getDriver
+            driver = getDriver(
+                mainWindow.getPreferredBrowser(),
+                getattr(mainWindow, 'port', 9222),
+            )
+            if driver is None:
+                return False
             
             # 设置超时时间
             driver.set_page_load_timeout(30)

@@ -21,6 +21,7 @@ from base64 import b64encode
 
 import requests
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -431,9 +432,29 @@ def loginA(account='', pwd='', ssc_domain='', access_token=''):
     # browser_path = '/usr/bin/chromedriver'
     # print('browser_path', browser_path)
 
-    # 启动浏览器
-    # browser = webdriver.Firefox(options=chrome_options)
-    browser = webdriver.Chrome(chrome_options=chrome_options)
+    configured_driver = str(config.get_config('chromedriver_path') or '').strip()
+    if configured_driver.lower() in ('', 'auto'):
+        return {
+            'status': 500,
+            'msg': 'ChromeDriver自动下载已禁用，请使用默认CDP登录模式',
+            'balance': '0.00',
+        }
+    if not os.path.isabs(configured_driver):
+        xy_client_dir = os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        )
+        configured_driver = os.path.join(
+            xy_client_dir, configured_driver.lstrip('./')
+        )
+    if not os.path.isfile(configured_driver):
+        return {
+            'status': 500,
+            'msg': f'本地ChromeDriver不存在: {configured_driver}',
+            'balance': '0.00',
+        }
+
+    service = ChromeService(executable_path=configured_driver)
+    browser = webdriver.Chrome(service=service, options=chrome_options)
     # 请求百度首页
     url = ssc_domain + '/Member/Login?_=' + now_time
     # url = 'http://www.baidu.com'

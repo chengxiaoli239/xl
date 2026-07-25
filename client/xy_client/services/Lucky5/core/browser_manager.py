@@ -72,6 +72,14 @@ class BrowserManager:
         if getattr(self.main_window, 'runtime_mode', 'browser') == 'background':
             return True
 
+        if getattr(self.main_window, '_browser_automation_mode', 'cdp') == 'cdp':
+            if not silent:
+                optimized_print(
+                    "ℹ️ [BrowserManager] CDP/HTTP模式无需ChromeDriver，跳过WebDriver恢复",
+                    category='browser_check', level='DEBUG'
+                )
+            return True
+
         # 如果已经连接，直接返回
         if self.is_browser_connected():
             if not silent:

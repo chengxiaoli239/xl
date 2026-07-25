@@ -1,6 +1,7 @@
 import os
 
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
 
 
 class Bot:
@@ -43,11 +44,18 @@ from selenium import webdriver
 class Browser:
     def __init__(self, browser_type, executable_path=None):
         self.browser_type = browser_type
+        self.executable_path = executable_path
         self.driver = None
 
     def initialize_driver(self):
         if self.browser_type == 'chrome':
-            self.driver = webdriver.Chrome()
+            if not self.executable_path or not os.path.isfile(self.executable_path):
+                raise FileNotFoundError(
+                    '必须配置本地chromedriver.exe；自动下载已禁用'
+                )
+            self.driver = webdriver.Chrome(
+                service=ChromeService(executable_path=self.executable_path)
+            )
         elif self.browser_type == 'firefox':
             #self.driver = webdriver.Firefox()
             geckodriver_path = os.path.join(os.getcwd(), 'geckodriver.exe')

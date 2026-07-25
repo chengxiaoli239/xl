@@ -14,6 +14,8 @@ from xy_client.LuckyClientOP import MainWindow
 from xy_client.services.tools import BrowserPortManager as browser_port_module
 from xy_client.services.tools import SafeBrowserProcessManager as safe_process_module
 from xy_client.services.tools import account_runtime
+from xy_client.services.tools import tools as webdriver_tools
+from xy_client.services.Lucky5.core.browser_manager import BrowserManager
 from xy_client.services.tools.BrowserWindowManager import BrowserWindowManager
 from xy_client.services.tools.SafeBrowserProcessManager import SafeBrowserProcessManager
 from xy_client.services.tools.account_runtime import (
@@ -26,6 +28,34 @@ from xy_client.services.tools.account_runtime import (
 
 
 class BrowserProcessMonitorTest(unittest.TestCase):
+    def test_launcher_forces_selenium_manager_offline(self):
+        self.assertEqual(os.environ.get("SE_OFFLINE"), "true")
+        self.assertEqual(os.environ.get("SE_AVOID_STATS"), "true")
+
+    def test_auto_driver_mode_never_invokes_selenium_manager(self):
+        with patch.object(
+            webdriver_tools.config,
+            "get_config",
+            return_value="auto",
+        ), patch.object(webdriver_tools.webdriver, "Chrome") as create_driver:
+            driver = webdriver_tools.getDriver("chrome", 12000)
+
+        self.assertIsNone(driver)
+        create_driver.assert_not_called()
+
+    def test_cdp_browser_manager_never_attempts_webdriver_recovery(self):
+        window = SimpleNamespace(
+            runtime_mode="browser",
+            _browser_automation_mode="cdp",
+            driver=None,
+        )
+        manager = BrowserManager(window, Mock())
+
+        with patch.object(manager, "_reconnect_to_browser") as reconnect:
+            self.assertTrue(manager.check_and_recover_browser_connection())
+
+        reconnect.assert_not_called()
+
     def test_account_runtime_values_are_stable(self):
         first_port = debug_port_for_account("account-one")
         second_port = debug_port_for_account("account-one")
