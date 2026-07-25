@@ -219,8 +219,11 @@ class UserSysPlansController extends BaseController
 
         UserSysPlansService::preOpData($this->_post, $this->_user_id);
         if ($model->load($this->_post) && $model->save()) {
-            if(in_array($tz_type, \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
-                UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)$this->_post['UserSysPlans']['change_per'][0], $this->_user_id);
+            if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
+                $codesSaved = UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)($this->_post['UserSysPlans']['change_per'][0] ?? 0), $this->_user_id);
+                if(!$codesSaved){
+                    throw_info('导入号码保存失败，计划ID：'.$model->id);
+                }
             }
             if($model->status == 1) {
                 UserSysPlansService::enableAutoLoginForRealPlan($model);
@@ -351,8 +354,11 @@ class UserSysPlansController extends BaseController
         //p([$this->_post, $model->load($this->_post), $model->attributes, $model->save()]);
         if ($model->load($this->_post) && $model->save()) {
             //p([$this->_post, $model->load($this->_post), \Yii::$app->params['IMPORT_CODES_TYPES'], $model->attributes], 0);
-            if(in_array($this->_post['UserSysPlans']['tz_type'], \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
-                UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)$this->_post['UserSysPlans']['change_per'][0], $this->_user_id);
+            if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
+                $codesSaved = UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)($this->_post['UserSysPlans']['change_per'][0] ?? 0), $this->_user_id);
+                if(!$codesSaved){
+                    throw_info('导入号码保存失败，计划ID：'.$model->id);
+                }
             }
             if((int)$model->is_batch_simulate === 1){
                 # 重跑历史回测时只清理回测记录，保留真实和连续模拟记录。
@@ -495,7 +501,9 @@ class UserSysPlansController extends BaseController
                         $model->fenli_shu_code = $flsCodes;
                         break;
                     default:
-                        $model->$key = $val;
+                        if($model->canSetProperty($key)){
+                            $model->$key = $val;
+                        }
                         //if(in_array($key, ['hz', 'p1', 'p2', 'p3', 'p4', 'p5', 'bet_while_miss', 'status_val', 'type_4ds', 'code1', 'code2', 'arise', 'type_4d', 'type_4s', 'hefen', 'no_fix_hefen', 'arise_in', 'xhenfen','singles_key', 'ps_1', 'ps_2'])){
                         break;
 

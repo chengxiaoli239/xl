@@ -114,6 +114,15 @@ class UserSysPlansService extends BaseService {
         # 一、位置
         # 10、第1位
         $UserSysPlans = $post['UserSysPlans'];
+        if((int)$plan_type === 13){
+            $importCodes = $UserSysPlans['import_codes_txts'] ?? [];
+            if(trim((string)($importCodes['arise_A_codes'] ?? '')) === ''){
+                throw_info('类型13号码A不能为空');
+            }
+            if(trim((string)($importCodes['arise_B_codes'] ?? '')) === ''){
+                throw_info('类型13号码B不能为空');
+            }
+        }
         if(isset($UserSysPlans['p1']) && $UserSysPlans['p1'] !== ''){
             $tmpFilter['p1'] = (string)trim($UserSysPlans['p1']);
         }
@@ -946,6 +955,7 @@ class UserSysPlansService extends BaseService {
             $transaction = Yii::$app->db->beginTransaction();
             $isDeleteBefore && ImportPlanCodes::deleteRecord(['uid'=>$uid, 'plan_id'=>$plan_id]);
             foreach ($codes as $key=>$code){
+                $key = (string)$key;
                 $code = trim($code);
                 if(!$code){
                     ImportPlanCodes::deleteRecord(['uid'=>$uid, 'plan_id'=>$plan_id, 'plan_id_sort_key' => $key]);
@@ -954,8 +964,8 @@ class UserSysPlansService extends BaseService {
                 if($change_per==1 && strpos($key, 'arise') !== false){
                     continue;
                 }
-                $key = (string)$key;
-                $status = ($key == 0 OR $change_per == 1) ? 1 : 0;
+                $isAbGroup = in_array($key, ['arise_A_codes', 'arise_B_codes'], true);
+                $status = ($key === '0' OR $change_per == 1 OR $isAbGroup) ? 1 : 0;
                 $status = empty($code) ? 0 : $status;
 
                 if($isDeleteBefore OR !$ImportPlanCodes = ImportPlanCodes::find()->where(['uid'=>$uid, 'plan_id'=>$plan_id, 'plan_id_sort_key' => $key])->limit(1)->one()){
@@ -1000,6 +1010,7 @@ class UserSysPlansService extends BaseService {
                 }
             }
             $transaction->commit();
+            $flag = true;
         }catch (\Exception $exception){
             $transaction->rollBack();
             $msg = $exception->getMessage();
@@ -1019,6 +1030,29 @@ class UserSysPlansService extends BaseService {
     public static function getImportCodes($plan_id, $code_type=''){
         $plan = UserSysPlans::findOne($plan_id);
         $hzArr = json_decode($plan->hz_Arr, true);
+        if((int)$plan->plan_type === 13){
+            $groupKey = (int)($hzArr['A_x_B_y_status'] ?? 0) === PlanType13Service::STATUS_BET
+                ? 'arise_B_codes'
+                : 'arise_A_codes';
+            $group = ImportPlanCodes::find()
+                ->where([
+                    'plan_id'=>$plan_id,
+                    'plan_id_sort_key'=>$groupKey,
+                    'status'=>1,
+                ])
+                ->one();
+            if(empty($group) || empty($group->codes)){
+                Tool_Common::log('/error/'.__FUNCTION__, 'ERR', '类型13导入方案号码为空', [
+                    'plan_id'=>$plan_id,
+                    'plan_id_sort_key'=>$groupKey,
+                    'status'=>1,
+                ]);
+                return '';
+            }
+
+            return explode('@', $group->codes);
+        }
+
         $key = ($hzArr['change_per']==0 OR $hzArr['turn_key']==0) ? 0 : $hzArr['turn_key'];
         $data = ImportPlanCodes::find()->where(['plan_id'=>$plan_id, 'plan_id_sort_key'=>$key, 'status'=>1])->one();
         //p(['plan_id'=>$plan_id, 'plan_id_sort_key'=>$key, 'status'=>1, $data]);

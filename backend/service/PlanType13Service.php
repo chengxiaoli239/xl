@@ -132,6 +132,14 @@ class PlanType13Service extends BaseService
         }
 
         [$aCodes, $bCodes] = self::getGroups($plan->id);
+        if (trim($aCodes) === '' || trim($bCodes) === '') {
+            Tool_Common::log('/plan/type13', 'ERR', '类型13号码配置为空', [
+                'plan_id' => $plan->id,
+                'a_codes_empty' => trim($aCodes) === '' ? 1 : 0,
+                'b_codes_empty' => trim($bCodes) === '' ? 1 : 0,
+            ]);
+            return ['status' => 302, 'msg' => '类型13号码A或B未配置'];
+        }
         $aHit = OpKjService::opKjData4($aCodes, $kjData['code_str']) > 0;
         $bHit = OpKjService::opKjData4($bCodes, $kjData['code_str']) > 0;
         $before = $hz;
