@@ -19,7 +19,6 @@ class PlanType13Service extends BaseService
 {
     const STATUS_WAIT = 1;
     const STATUS_BET = 2;
-    private static $displayTableAvailable;
 
     public static function getSingles(UserSysPlans $plan): array
     {
@@ -174,7 +173,7 @@ class PlanType13Service extends BaseService
     public static function syncBetRecord(BettingRecords $betRecord): void
     {
         try {
-            if (!self::isDisplayTableAvailable()) {
+            if (!PlanAbRecord::isTableAvailable()) {
                 return;
             }
             PlanAbRecord::updateAll([
@@ -195,22 +194,6 @@ class PlanType13Service extends BaseService
                 'err_msg' => $e->getMessage(),
             ]);
         }
-    }
-
-    private static function isDisplayTableAvailable(): bool
-    {
-        if (self::$displayTableAvailable !== null) {
-            return self::$displayTableAvailable;
-        }
-        try {
-            self::$displayTableAvailable = (bool)\Yii::$app->db->schema->getTableSchema(
-                PlanAbRecord::tableName(),
-                true
-            );
-        } catch (\Throwable $e) {
-            self::$displayTableAvailable = false;
-        }
-        return self::$displayTableAvailable;
     }
 
     private static function normalizeState(array &$hz): void
@@ -258,7 +241,7 @@ class PlanType13Service extends BaseService
         $single = null
     ): void {
         // The migration is optional during rollout; never block strategy processing if it is pending.
-        if (!self::isDisplayTableAvailable()) {
+        if (!PlanAbRecord::isTableAvailable()) {
             return;
         }
         $qihao = (string)($kjData['qihao'] ?? '');

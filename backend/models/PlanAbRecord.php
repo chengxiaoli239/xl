@@ -2,6 +2,8 @@
 
 namespace backend\models;
 
+use Yii;
+
 /**
  * Per-period A signal and B betting display record for plan type 13.
  */
@@ -15,6 +17,28 @@ class PlanAbRecord extends \common\models\base\BaseModel
     public static function tableName()
     {
         return '{{%plan_ab_records}}';
+    }
+
+    public static function isTableAvailable(): bool
+    {
+        try {
+            return Yii::$app->db->schema->getTableSchema(self::tableName(), true) !== null;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    public static function findByBetRecordIds(array $ids): array
+    {
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
+        if (!$ids || !self::isTableAvailable()) {
+            return [];
+        }
+
+        return self::find()
+            ->where(['bet_record_id' => $ids])
+            ->indexBy('bet_record_id')
+            ->all();
     }
 
     public function rules()

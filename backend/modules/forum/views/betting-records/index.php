@@ -8,6 +8,9 @@ use backend\models\SscKjData;
 use backend\models\PlanAbRecord;
 use common\widgets\Alert;
 $newRecord = SscKjData::find()->select(['qihao','code_str'])->where(['lottery_type'=>$lottery_type])->orderBy('id DESC')->asArray()->limit(1)->one();
+$planAbRecords = PlanAbRecord::findByBetRecordIds(array_map(function($model) {
+    return $model->id;
+}, $dataProvider->getModels()));
 /* @var $this yii\web\View */
 /* @var $searchModel backend\models\searchs\BettingRecords */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -116,8 +119,8 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         ],
                         ['label' => 'A判断','headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
-                            'value' => function($model) {
-                                $record = PlanAbRecord::findOne(['bet_record_id' => $model->id]);
+                            'value' => function($model) use ($planAbRecords) {
+                                $record = $planAbRecords[$model->id] ?? null;
                                 if (!$record) return '';
                                 return $record->a_hit ? '<font color="green">A中</font>' : '<font color="red">A不中</font>';
                             }
