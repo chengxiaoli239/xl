@@ -2,6 +2,7 @@
 
 use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
+use common\widgets\Alert;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -14,6 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <section class="tz-systems-users-index wrapper site-min-height">
     <!-- page start-->
+    <?= Alert::widget() ?>
     <section class="panel">
         <header class="panel-heading">
             <?= Html::encode($this->title) ?>
@@ -180,24 +182,27 @@ $this->params['breadcrumbs'][] = $this->title;
                                 );
                             }
                         ],
-                        ['attribute' => 'is_local_bet','label'=>'本地下', 'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'is_local_bet','label'=>'下注位置', 'headerOptions'=>['width'=>'12%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                if($model->is_local_bet == BetsBackend::BET_TYPE_SERVER_API){
-                                    $txt = '<font color="green">'.BetsBackend::BET_TYPE_OPTIONS[BetsBackend::BET_TYPE_SERVER_API].'</font>';
-                                    $alt = '切换'.BetsBackend::BET_TYPE_OPTIONS[BetsBackend::BET_TYPE_LOCAL_API];
-                                    $val = BetsBackend::BET_TYPE_LOCAL_API;
-                                }elseif($model->is_local_bet == BetsBackend::BET_TYPE_LOCAL_API){
-                                    $txt = '<font color="green">'.BetsBackend::BET_TYPE_OPTIONS[BetsBackend::BET_TYPE_LOCAL_API].'</font>';
-                                    $alt = '切换'.BetsBackend::BET_TYPE_OPTIONS[BetsBackend::BET_TYPE_LOCAL_SELENIUM];
-                                    $val = BetsBackend::BET_TYPE_LOCAL_SELENIUM;
-                                }elseif($model->is_local_bet == BetsBackend::BET_TYPE_LOCAL_SELENIUM){
-                                    $txt = '<font color="green">'.BetsBackend::BET_TYPE_OPTIONS[BetsBackend::BET_TYPE_LOCAL_SELENIUM].'</font>';
-                                    $alt = '切换'.BetsBackend::BET_TYPE_OPTIONS[BetsBackend::BET_TYPE_SERVER_API];
-                                    $val = BetsBackend::BET_TYPE_SERVER_API;
-                                }
-                                $url = "/forum/user/switch-is-local-bet?id=".$model->id."&status=".$val; #
-                                return Html::a($txt, $url, ['title' => $alt,'alt'=>$alt]);
+                                $isLocal = (int)$model->is_local_bet !== BetsBackend::BET_TYPE_SERVER_API;
+                                $cloud = Html::a('云服务器', [
+                                    '/forum/user/switch-is-local-bet',
+                                    'id'=>$model->id,
+                                    'status'=>BetsBackend::BET_TYPE_SERVER_API,
+                                ], [
+                                    'class'=>'btn btn-xs '.(!$isLocal ? 'btn-success' : 'btn-default'),
+                                    'data'=>['method'=>'post', 'confirm'=>'确定切换到云服务器下注？'],
+                                ]);
+                                $local = Html::a('本地电脑', [
+                                    '/forum/user/switch-is-local-bet',
+                                    'id'=>$model->id,
+                                    'status'=>BetsBackend::BET_TYPE_LOCAL_API,
+                                ], [
+                                    'class'=>'btn btn-xs '.($isLocal ? 'btn-success' : 'btn-default'),
+                                    'data'=>['method'=>'post', 'confirm'=>'确定切换到本地电脑下注？'],
+                                ]);
+                                return Html::tag('div', $cloud.$local, ['class'=>'btn-group', 'role'=>'group']);
                             }
                         ],
                         ['attribute' => 'follow_status','label'=>'自动跟', 'headerOptions'=>['width'=>'5%'],

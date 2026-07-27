@@ -47,6 +47,7 @@ class UserController extends BaseController
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                    'switch-is-local-bet' => ['POST'],
                 ],
             ],
         ];
@@ -573,10 +574,20 @@ class UserController extends BaseController
      */
     public function actionSwitchIsLocalBet($id, $status = 1){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        if(\Yii::$app->user->id == 1){
-            $rst = HN0898Service::updateStatus($id, $model = '\backend\models\TzSystemsUsers', 'is_local_bet', $status);
-            PoxyIPService::delIsLocalBetKey();
+        $uid = (int)\Yii::$app->user->id;
+        $location = (int)$status;
+        if(!in_array($location, [\backend\models\thirdD\BetsBackend::BET_TYPE_SERVER_API, \backend\models\thirdD\BetsBackend::BET_TYPE_LOCAL_API], true)){
+            \Yii::$app->session->setFlash('error', '不支持的下注位置');
+            return $this->redirect(['view']);
         }
+
+        $where = $uid === 1 ? ['id'=>(int)$id] : ['id'=>(int)$id, 'uid'=>$uid];
+        $account = TzSystemsUsers::findOne($where);
+        if(empty($account)){
+            throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        }
+        $rst = TzSystemUsersService::switchBetLocation($account, $location);
+        \Yii::$app->session->setFlash(($rst['status'] ?? 500) === 200 ? 'success' : 'error', $rst['msg'] ?? '下注位置切换失败');
 
         return $this->redirect(['view']);
     }

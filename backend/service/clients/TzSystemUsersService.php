@@ -10,6 +10,7 @@ use backend\models\UserSysPlans;
 use backend\models\thirdD\BetsBackend;
 use backend\service\BetService;
 use backend\service\Lucky5\Lucky5Service;
+use backend\service\PoxyIPService;
 use common\helpers\lottery\LotteryBet;
 use common\helpers\LotteryType;
 use common\kj\ssc\Lucky5;
@@ -78,6 +79,79 @@ class TzSystemUsersService extends ClientsBaseService{
         $mkey = self::buildUserKey();
 
         $m->delete($mkey);
+    }
+
+    /**
+     * Switches an account between cloud and local-computer betting.
+     */
+    public static function switchBetLocation(TzSystemsUsers $account, int $location): array
+    {
+        if(!in_array($location, [BetsBackend::BET_TYPE_SERVER_API, BetsBackend::BET_TYPE_LOCAL_API], true)){
+            return ['status'=>422, 'msg'=>'不支持的下注位置'];
+        }
+
+        $before = [
+            'is_local_bet'=>(int)$account->is_local_bet,
+            'is_auto_login'=>(int)$account->is_auto_login,
+            'is_auto_bet'=>(int)$account->is_auto_bet,
+            'is_use_proxy'=>(int)$account->is_use_proxy,
+            'is_proxy_login'=>(int)$account->is_proxy_login,
+            'is_proxy_bet'=>(int)$account->is_proxy_bet,
+        ];
+        $attributes = [
+            'is_local_bet'=>$location,
+            'is_auto_bet'=>1,
+            'updated_at'=>time(),
+        ];
+        if($location === BetsBackend::BET_TYPE_LOCAL_API){
+            $attributes = array_merge($attributes, [
+                'is_auto_login'=>0,
+                'is_use_proxy'=>0,
+                'is_proxy_login'=>0,
+                'is_proxy_bet'=>0,
+            ]);
+        }else{
+            $attributes['is_auto_login'] = 1;
+        }
+
+        try {
+            $account->setAttributes($attributes, false);
+            if(!$account->save(false)){
+                throw new \RuntimeException('账号状态保存失败');
+            }
+            self::delTzSystemUserData();
+            PoxyIPService::delIsLocalBetKey();
+            PoxyIPService::delProxyUidsKey();
+        }catch (\Throwable $exception){
+            Tool_Common::log('/user/'.__FUNCTION__, 'ERR', '下注位置切换失败', [
+                'account_id'=>(int)$account->id,
+                'uid'=>(int)$account->uid,
+                'location'=>$location,
+                'err_msg'=>$exception->getMessage(),
+            ]);
+            return ['status'=>500, 'msg'=>'下注位置切换失败：'.$exception->getMessage()];
+        }
+
+        $after = [
+            'is_local_bet'=>(int)$account->is_local_bet,
+            'is_auto_login'=>(int)$account->is_auto_login,
+            'is_auto_bet'=>(int)$account->is_auto_bet,
+            'is_use_proxy'=>(int)$account->is_use_proxy,
+            'is_proxy_login'=>(int)$account->is_proxy_login,
+            'is_proxy_bet'=>(int)$account->is_proxy_bet,
+        ];
+        Tool_Common::log('/user/'.__FUNCTION__, 'INFO', '下注位置切换成功', [
+            'account_id'=>(int)$account->id,
+            'uid'=>(int)$account->uid,
+            'before'=>$before,
+            'after'=>$after,
+        ]);
+
+        return [
+            'status'=>200,
+            'msg'=>$location === BetsBackend::BET_TYPE_LOCAL_API ? '已切换到本地电脑' : '已切换到云服务器',
+            'data'=>$after,
+        ];
     }
 
     /**

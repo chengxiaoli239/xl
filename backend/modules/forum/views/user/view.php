@@ -1,5 +1,7 @@
 <?php
 
+use backend\models\thirdD\BetsBackend;
+use common\widgets\Alert;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\helpers\BaseStringHelper;
@@ -13,6 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2])->balance;
 ?>
 <section class="user-view wrapper site-min-height">
+    <?= Alert::widget() ?>
     <div class="row">
         <div class="col-lg-12">
             <?php foreach ($models as $model){?>
@@ -68,6 +71,29 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
                                         'format'=>'raw',
                                         'value'=>function($model){
                                             return $model->status ? '<font color="green">已激活</font>' : '<font color="red">已禁用</font>';
+                                        }
+                                    ],
+                                    [ 'attribute'=>'is_local_bet','label'=>'下注位置',
+                                        'format'=>'raw',
+                                        'value'=>function($model){
+                                            $isLocal = (int)$model->is_local_bet !== BetsBackend::BET_TYPE_SERVER_API;
+                                            $cloud = Html::a('云服务器', [
+                                                '/forum/user/switch-is-local-bet',
+                                                'id'=>$model->id,
+                                                'status'=>BetsBackend::BET_TYPE_SERVER_API,
+                                            ], [
+                                                'class'=>'btn btn-sm '.(!$isLocal ? 'btn-success' : 'btn-default'),
+                                                'data'=>['method'=>'post', 'confirm'=>'确定切换到云服务器下注？'],
+                                            ]);
+                                            $local = Html::a('本地电脑', [
+                                                '/forum/user/switch-is-local-bet',
+                                                'id'=>$model->id,
+                                                'status'=>BetsBackend::BET_TYPE_LOCAL_API,
+                                            ], [
+                                                'class'=>'btn btn-sm '.($isLocal ? 'btn-success' : 'btn-default'),
+                                                'data'=>['method'=>'post', 'confirm'=>'确定切换到本地电脑下注？'],
+                                            ]);
+                                            return Html::tag('div', $cloud.$local, ['class'=>'btn-group', 'role'=>'group']);
                                         }
                                     ],
                                     [ 'attribute'=>'is_auto_bet','label'=>'下注开关',

@@ -4,7 +4,6 @@ namespace backend\service\clients;
 
 use backend\models\thirdD\BetsBackend;
 use backend\models\TzSystemsUsers;
-use backend\service\PoxyIPService;
 use common\models\AdminModel;
 use Yii;
 
@@ -112,26 +111,14 @@ class ClientAuthService
             return ['status' => 401, 'msg' => '登录凭证已失效，请重新登录'];
         }
 
-        try {
-            TzSystemsUsers::updateAll([
-                'is_local_bet' => BetsBackend::BET_TYPE_LOCAL_API,
-                'is_auto_login' => 0,
-                'is_auto_bet' => 1,
-                'updated_at' => time(),
-            ], ['id' => (int)$account->id]);
-            PoxyIPService::delIsLocalBetKey();
-            $account->refresh();
-        } catch (\Throwable $exception) {
-            Yii::error([
-                'message' => $exception->getMessage(),
-                'account_id' => (int)$account->id,
-            ], __METHOD__);
-            return ['status' => 500, 'msg' => '切换失败，请稍后重试'];
+        $switchResult = TzSystemUsersService::switchBetLocation($account, BetsBackend::BET_TYPE_LOCAL_API);
+        if(($switchResult['status'] ?? 500) !== 200){
+            return $switchResult;
         }
 
         return [
             'status' => 200,
-            'msg' => '已切换为本地电脑下注',
+            'msg' => $switchResult['msg'],
             'data' => [
                 'account' => [
                     'id' => (int)$account->id,
