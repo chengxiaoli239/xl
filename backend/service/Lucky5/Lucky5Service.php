@@ -2694,6 +2694,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     $is_xian = in_array($tz_type, \Yii::$app->params['IS_XIAN']) ? 1 : 0;
                     // todo 防止盘口提示短时间重复注单，随机打乱
                     shuffle($tmpcodesArr);
+                    // 过滤空元素，防止产生",,"导致的"注单与类别不一致"错误
+                    $tmpcodesArr = array_filter($tmpcodesArr, function($v){return $v !== '' && $v !== null;});
                     $bet_codes = implode(',', $tmpcodesArr);
                     $post_data = [
                         'bet_number'=>$bet_codes,
