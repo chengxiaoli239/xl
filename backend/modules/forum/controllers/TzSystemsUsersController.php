@@ -28,6 +28,7 @@ class TzSystemsUsersController extends BaseController
                 'actions' => [
                     'delete' => ['POST'],
                     'set-ssl-mode' => ['POST'],
+                    'update-account' => ['POST'],
                 ],
             ],
         ];
@@ -104,6 +105,30 @@ class TzSystemsUsersController extends BaseController
             'ssl_mode'=>$sslMode,
             'ssl_mode_label'=>TzSystemsUsers::SSL_MODE_OPTIONS[$sslMode],
         ];
+    }
+
+    /**
+     * @desc 编辑盘口账号信息
+     */
+    public function actionUpdateAccount()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $id = (int)\Yii::$app->request->post('id');
+        $model = TzSystemsUsers::findOne($id);
+        if(!$model){
+            return ['status'=>404, 'msg'=>'盘口账号不存在'];
+        }
+        $model->account = \Yii::$app->request->post('account', $model->account);
+        $model->password = \Yii::$app->request->post('password', $model->password);
+        $model->ssc_domain = \Yii::$app->request->post('ssc_domain', $model->ssc_domain);
+        $model->desc = '';
+        $model->updated_at = time();
+        if(!$model->save(false)){
+            return ['status'=>500, 'msg'=>'保存失败'];
+        }
+        // 清空该账号的RSA公钥缓存
+        \Yii::$app->cache->delete('rsa_public_key_'.$model->tz_system_id);
+        return ['status'=>200, 'msg'=>'保存成功'];
     }
 
     /**

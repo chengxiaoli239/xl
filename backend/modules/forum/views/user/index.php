@@ -101,10 +101,21 @@ $columns = array_merge(
                 'label'=>'操作',
                 'format'=>'raw',
                 'value'=>function($model){
+                    $user = \Yii::$app->user;
+                    $tz = \backend\models\TzSystemsUsers::findOne(['uid'=>$model->id]);
+                    $accInfo = $tz ? "account:'{$tz->account}' pw_len:".strlen($tz->password?:'') : '';
                     return Html::a(Yii::t('app', 'edit'),  'javascript:void(0);', [
                             'class'=>'btn btn-xs btn-success edit-btn',
                             'style'=>'margin-bottom:15px;',
                             'data-url' => Yii::$app->urlManager->createUrl(['forum/user/create-user', 'id' => $model->id]),
+                        ]).' '
+                        .Html::a('账号编辑', 'javascript:void(0);', [
+                            'class'=>'btn btn-xs btn-info btn-edit-account',
+                            'style'=>'margin-bottom:15px;',
+                            'data-id'=>$tz->id??0,
+                            'data-account'=>$tz->account??'',
+                            'data-domain'=>$tz->ssc_domain??'',
+                            'data-title'=>($model->username).' - '.$accInfo,
                         ]).' '
                         .Html::a('删除', ['delete', 'id'=>$model->id], ['class'=>'btn btn-xs btn-warning', 'style'=>'margin-bottom:15px;']);
                 }
@@ -181,11 +192,74 @@ $this->registerJs($js);
     </div>
 </div>
 
+<!--盘口账号编辑弹窗-->
+<div class="modal fade" id="EditAccountModal" tabindex="-1" role="dialog"
+     style="display:none;left:50%;top:50%;transform:translate(-50%,-50%);min-width:50%;">
+    <div class="modal-dialog"><div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title" id="edit_account_title">编辑盘口账号</h4>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="edit_account_id">
+            <div class="form-group">
+                <label>盘口账号</label>
+                <input class="form-control" id="edit_account" placeholder="盘口登录账号">
+            </div>
+            <div class="form-group">
+                <label>盘口密码</label>
+                <input class="form-control" id="edit_password" placeholder="留空不修改，填'clear'清空">
+            </div>
+            <div class="form-group">
+                <label>网盘地址</label>
+                <input class="form-control" id="edit_domain" placeholder="https://f1.xxx.xyz">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+            <button type="button" class="btn btn-primary" id="save_account_btn">保存</button>
+        </div>
+    </div></div>
+</div>
+
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <!--script src="https://cdn.bootcss.com/jquery/2.0.3/jquery.js"></script-->
 <script src="/chat_statics/js/clipboard.min.js"></script>
 <script>
 $(function () {
+    // 盘口账号编辑
+    $('.btn-edit-account').click(function(){
+        var id = $(this).data('id');
+        var account = $(this).data('account');
+        var domain = $(this).data('domain');
+        var title = $(this).data('title');
+        $('#edit_account_title').text('编辑盘口账号 - ' + title);
+        $('#edit_account_id').val(id);
+        $('#edit_account').val(account);
+        $('#edit_password').val('');
+        $('#edit_domain').val(domain);
+        $('#EditAccountModal').modal('show');
+    });
+
+    $('#save_account_btn').click(function(){
+        var id = $('#edit_account_id').val();
+        var account = $('#edit_account').val();
+        var password = $('#edit_password').val();
+        var domain = $('#edit_domain').val();
+        var data = {id: id, account: account, ssc_domain: domain};
+        if(password !== ''){
+            data.password = (password === 'clear') ? '' : password;
+        }
+        $.post('/forum/tz-systems-users/update-account', data, function(rst){
+            if(rst.status == 200){
+                alert('保存成功');
+                location.reload();
+            }else{
+                alert(rst.msg || '保存失败');
+            }
+        }, 'json').fail(function(){ alert('请求失败'); });
+    });
+
     $('.act-user-copy').click(function () {
         var desc = $(this).data('desc');
         var username = $(this).data('username');
