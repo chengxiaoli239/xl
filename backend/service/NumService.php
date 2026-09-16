@@ -3850,33 +3850,49 @@ class NumService extends BaseService {
      * @param $pos
      * @param int $num
      * @param int $lottery_type
+     * @param string|null $maxQihao
      * @return array
      */
-    public static function getPosLatelyCode($pos, $num=9, $lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function getPosLatelyCode($pos, $num=9, $lottery_type=DEFAULT_LOTTERY_TYPE, $maxQihao=null){
 
-        $pos_field = 'code'.$pos;
-        // 执行子查询以获取要排除的记录的 ID
-        $excludedIds = SscKjData::find()
-            ->select([$pos_field])
-            ->where(['lottery_type' => $lottery_type])
-            ->orderBy(['id' => SORT_DESC])
-            ->limit(50)
-            ->asArray()
-            ->column();
-        // 对结果进行处理，确保至少包含9个不同的 code1 值
-        //p($excludedIds, 0);
-        $selectedCodes = [];
-        foreach ($excludedIds as $code) {
-            //p([$code, $selectedCodes, count($selectedCodes)], 0);
-            if (!in_array($code, $selectedCodes)) {
-                if (count($selectedCodes) >= $num) {
-                    //break; // 已经选够了9个不同的 code1 值
-                    return $selectedCodes;
-                }
-                $selectedCodes[] = $code;
-                $selectedCodes = array_unique($selectedCodes);
-            }
+        $num = (int)$num;
+        if($num < 1){
+            return [];
         }
+
+        $pos_field = 'code'.(int)$pos;
+        $selectedCodes = [];
+        $offset = 0;
+        $limit = 100;
+        do {
+            $query = SscKjData::find()
+                ->select([$pos_field])
+                ->where(['lottery_type' => $lottery_type]);
+            if($maxQihao){
+                $query->andWhere(['<=', 'qihao', (string)$maxQihao]);
+            }
+            $codes = $query->orderBy(['qihao' => SORT_DESC, 'id' => SORT_DESC])
+                ->offset($offset)
+                ->limit($limit)
+                ->asArray()
+                ->column();
+
+            foreach ($codes as $code) {
+                $code = (string)$code;
+                if ($code === '') {
+                    continue;
+                }
+                if (!in_array($code, $selectedCodes, true)) {
+                    $selectedCodes[] = $code;
+                    if (count($selectedCodes) >= $num) {
+                        return $selectedCodes;
+                    }
+                }
+            }
+
+            $offset += $limit;
+        } while (count($codes) === $limit);
+
         return $selectedCodes;
     }
 

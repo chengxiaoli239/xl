@@ -5,6 +5,7 @@ namespace backend\modules\forum\controllers;
 use backend\models\Admin;
 use backend\models\TzSystems;
 use backend\models\TzSystemsAuth;
+use backend\models\thirdD\BetsBackend;
 use backend\models\searchs\TzSystemsUsers as TzSystemsUsersSearch;
 use backend\models\TzSystemsUsers;
 use backend\service\BaseService;
@@ -359,20 +360,42 @@ class UserController extends BaseController
                             'uid' => $model->id,
                             'created_at' => $nowTime,
                             'expire_time' => $nowTime + 3600,
+                            'balance' => 0.00,
+                            'current_profits' => 0.00,
                         ];
                     }
                     $postData = current($this->_post);
-                    $TzSystems = TzSystems::findOne($postData['tz_system_id']);
+                    $isNewSiteAccount = $TzSystemUsers->isNewRecord;
+                    $postedSystemId = (int)($postData['tz_system_id'] ?? 0);
+                    if(!$isNewSiteAccount && (int)$TzSystemUsers->tz_system_id > 0){
+                        $postedSystemId = (int)$TzSystemUsers->tz_system_id;
+                    }
+                    $TzSystems = TzSystems::findOne($postedSystemId);
+                    if(!$TzSystems || ($isNewSiteAccount && (int)$TzSystems->status !== 1)){
+                        throw_info('请选择有效的盘口类型');
+                    }
+                    $siteDomain = rtrim(trim((string)($postData['ssc_domain'] ?? '')), '/');
+                    if($siteDomain === ''){
+                        $siteDomain = rtrim(trim((string)$TzSystems->ssc_domain), '/');
+                    }
+                    if($siteDomain !== '' && !preg_match('#^https?://#i', $siteDomain)){
+                        $siteDomain = 'https://'.$siteDomain;
+                    }
+                    if($siteDomain === '' || filter_var($siteDomain, FILTER_VALIDATE_URL) === false){
+                        throw_info('请填写有效的站点地址');
+                    }
+                    if($isNewSiteAccount){
+                        $betLocation = (int)($TzSystemUsers->is_local_bet ?? BetsBackend::BET_TYPE_LOCAL_API);
+                        $setData['is_auto_login'] = $nextUserType == AdminModel::USER_TYPE_GUI
+                            && $betLocation === BetsBackend::BET_TYPE_SERVER_API ? 1 : 0;
+                    }
                     $setData = array_merge($setData, [
                         'username' => $postData['username'],
                         'user_type' => $nextUserType,
-                        'tz_system_id' => $postData['tz_system_id'],
+                        'tz_system_id' => $postedSystemId,
                         'kj_num' => $postData['kj_num'],
-                        'is_auto_login' => $nextUserType==AdminModel::USER_TYPE_GUI?1:0,
                         'sys_name' => $TzSystems->name,
-                        'balance' => 0.00,
-                        'current_profits' => 0.00,
-                        'ssc_domain' => $TzSystems->ssc_domain??'',
+                        'ssc_domain' => $siteDomain,
                         'account' => $postData['site_account']?:'',
                         'password' => $postData['site_password']?:'',
                         'secure_code' => $postData['secure_code']?:'',
@@ -387,7 +410,7 @@ class UserController extends BaseController
                     $TzSystemsAuth = TzSystemsAuth::findOne(['uid'=>$model->id]);
                     if($TzSystemsAuth){
                         $authSystemIds = array_values(array_filter(array_map('trim', explode(',', (string)$TzSystemsAuth->tz_systems_ids)), 'strlen'));
-                        $postSystemId = (string)$postData['tz_system_id'];
+                        $postSystemId = (string)$postedSystemId;
                         if($postSystemId !== '' && !in_array($postSystemId, $authSystemIds, true)){
                             $authSystemIds[] = $postSystemId;
                             $TzSystemsAuth->tz_systems_ids = implode(',', $authSystemIds);
@@ -423,6 +446,15 @@ class UserController extends BaseController
         }
 
         $sites = TzSystemUsersService::getSites($currentUserType);
+        if(!$model->isNewRecord && (int)$model->tz_system_id > 0){
+            $siteIds = array_map('intval', array_column($sites, 'id'));
+            if(!in_array((int)$model->tz_system_id, $siteIds, true)){
+                $currentSite = TzSystems::find()->where(['id'=>(int)$model->tz_system_id])->asArray()->one();
+                if($currentSite){
+                    $sites[] = $currentSite;
+                }
+            }
+        }
         return $this->renderAjax('create_user', [
             'model' => $model,
             'sites' => $sites
@@ -516,16 +548,24 @@ class UserController extends BaseController
      * @param $status
      * @return \yii\web\Response
      */
-    public function actionSwitchAutoLogin($id){
+    public function actionSwitchAutoLogin($id, $status=null){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $is3dUser = false;
         if(\Yii::$app->user->id != 1){
             $is3dUser = UserService::is3dUser($this->_user_id);
             $model = TzSystemsUsers::find()->where(['uid'=>$this->_user_id, 'id'=>$id])->one();
             if(empty($model)){
                 return $this->redirect(['/wechat/robot-user/view']);
             }
+        }else{
+            $model = TzSystemsUsers::findOne((int)$id);
+            if(empty($model)){
+                throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+            }
         }
-        $rst = HN0898Service::updateStatus($id, $model = '\backend\models\TzSystemsUsers', 'is_auto_login');
+        $val = $status === null ? ((int)$model->is_auto_login ? 0 : 1) : (int)$status;
+        $rst = TzSystemUsersService::switchAutoLogin($model, $val);
+        \Yii::$app->session->setFlash(($rst['status'] ?? 500) === 200 ? 'success' : 'error', $rst['msg'] ?? '自动登切换失败');
         if($is3dUser){
             return $this->redirect(['/wechat/robot-user/view']);
         }

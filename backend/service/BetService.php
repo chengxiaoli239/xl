@@ -66,6 +66,8 @@ abstract class BetService extends BaseBetService {
     const CODES_FILTER_TYPES_2 = 2; # 过滤类型2
     const CODES_FILTER_TYPES_3 = 3; # 过滤类型3
     const STOP_BET_CODE = 30003; # 止盈止损code
+    const REPEAT_SUBMIT_MAX_ATTEMPTS = 3;
+    const REPEAT_SUBMIT_DELAY_SECONDS = 30;
 
     protected function __construct() {
         parent::__construct();
@@ -273,6 +275,113 @@ abstract class BetService extends BaseBetService {
         }
 
         return self::containsRetryableBetText(json_encode($response, 320));
+    }
+
+    /**
+     * @desc 判断是否为盘口短时间重复提交提示
+     * @param mixed $response
+     * @return bool
+     */
+    public static function isRepeatSubmitBetResponse($response): bool
+    {
+        if(!is_array($response)){
+            $text = (string)$response;
+            return strpos($text, '短时间内重复提交') !== false
+                || strpos($text, '重复提交相同的注单') !== false;
+        }
+
+        $code = isset($response['code']) ? (int)$response['code'] : 0;
+        if($code === 304){
+            return true;
+        }
+
+        $text = json_encode($response, 320);
+        return strpos($text, '短时间内重复提交') !== false
+            || strpos($text, '重复提交相同的注单') !== false;
+    }
+
+    public static function getBetTaskDelayLeftSeconds($taskId): int
+    {
+        $taskId = (int)$taskId;
+        if($taskId <= 0){
+            return 0;
+        }
+        $notBefore = (int)\Yii::$app->redis->get(self::buildRepeatSubmitDelayKey($taskId));
+
+        return max(0, $notBefore - time());
+    }
+
+    private static function buildRepeatSubmitAttemptsKey($taskId): string
+    {
+        return 'bet_repeat_submit_attempts_'.$taskId;
+    }
+
+    private static function buildRepeatSubmitDelayKey($taskId): string
+    {
+        return 'bet_repeat_submit_delay_'.$taskId;
+    }
+
+    private static function buildRepeatSubmitSplitGroupKey($uid, $lotteryType, $qihao, $planId): string
+    {
+        return 'bet_repeat_submit_split_group_'.$uid.'_'.$lotteryType.'_'.$qihao.'_'.$planId;
+    }
+
+    private static function buildRepeatSubmitSplitGroupDelayKey($uid, $lotteryType, $qihao, $planId): string
+    {
+        return self::buildRepeatSubmitSplitGroupKey($uid, $lotteryType, $qihao, $planId).'_delay';
+    }
+
+    public static function getRepeatSubmitDelaySeconds(): int
+    {
+        try {
+            $config = SystemConfig::findOne(['key'=>'BET_REPEAT_SUBMIT_DELAY_SECONDS']);
+            $delaySeconds = (int)($config->value ?? 0);
+        }catch (\Exception $e){
+            $delaySeconds = 0;
+        }
+
+        return $delaySeconds > 0 ? $delaySeconds : self::REPEAT_SUBMIT_DELAY_SECONDS;
+    }
+
+    public static function delayBetTaskPush($taskId, int $delaySeconds): int
+    {
+        $delaySeconds = max(1, $delaySeconds);
+        $notBefore = time() + $delaySeconds;
+        \Yii::$app->redis->setex(self::buildRepeatSubmitDelayKey($taskId), $delaySeconds + 300, $notBefore);
+
+        return $notBefore;
+    }
+
+    public static function markRepeatSubmitSplitGroup($uid, $lotteryType, $qihao, $planId, int $taskCount): void
+    {
+        \Yii::$app->redis->setex(self::buildRepeatSubmitSplitGroupKey($uid, $lotteryType, $qihao, $planId), 3600, max(1, $taskCount));
+    }
+
+    public static function isRepeatSubmitSplitGroup($uid, $lotteryType, $qihao, $planId): bool
+    {
+        return (bool)\Yii::$app->redis->get(self::buildRepeatSubmitSplitGroupKey($uid, $lotteryType, $qihao, $planId));
+    }
+
+    public static function getRepeatSubmitSplitGroupDelayLeftSeconds($uid, $lotteryType, $qihao, $planId): int
+    {
+        $notBefore = (int)\Yii::$app->redis->get(self::buildRepeatSubmitSplitGroupDelayKey($uid, $lotteryType, $qihao, $planId));
+
+        return max(0, $notBefore - time());
+    }
+
+    public static function delayRepeatSubmitSplitGroup($uid, $lotteryType, $qihao, $planId, int $delaySeconds): int
+    {
+        $delaySeconds = max(1, $delaySeconds);
+        $notBefore = time() + $delaySeconds;
+        \Yii::$app->redis->setex(self::buildRepeatSubmitSplitGroupDelayKey($uid, $lotteryType, $qihao, $planId), $delaySeconds + 300, $notBefore);
+
+        return $notBefore;
+    }
+
+    private static function clearRepeatSubmitState($taskId): void
+    {
+        \Yii::$app->redis->del(self::buildRepeatSubmitAttemptsKey($taskId));
+        \Yii::$app->redis->del(self::buildRepeatSubmitDelayKey($taskId));
     }
 
     private static function normalizeBetRetryResponse($response)
@@ -640,7 +749,7 @@ abstract class BetService extends BaseBetService {
      * @param string $qihao
      * @return bool|array
      */
-    public static function pushTasksBetRst($plan_id, $qihao='', $betRst=[], $access_token='', $lottery_type=DEFAULT_LOTTERY_TYPE){
+    public static function pushTasksBetRst($plan_id, $qihao='', $betRst=[], $access_token='', $lottery_type=DEFAULT_LOTTERY_TYPE, $task_id=0){
         try {
             if(empty($lottery_type)){
                 $lottery_type = DEFAULT_LOTTERY_TYPE;
@@ -654,6 +763,7 @@ abstract class BetService extends BaseBetService {
             }
 
             $betMsg = (string)($betRst['msg'] ?? $betRst['err_msg'] ?? '');
+            $task_id = (int)($task_id ?: ($betRst['task_id'] ?? 0));
             if(strpos($betMsg, '您当前使用的浏览器不支持cookie') !== false){
                 throw_info('下注失败，等待下注');
             }
@@ -666,8 +776,13 @@ abstract class BetService extends BaseBetService {
             #$BetErrorPlansTask = BetErrorPlansTask::findOne($where);
             $class = self::getBetModel($lottery_type);
             if($lottery_type == \common\helpers\LotteryType::LUCKY_5){
-                $where = ['uid'=>$TzSystemsUsers->uid, 'plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
-                $model = $class::find()->where($where)->orderBy(['id'=>SORT_DESC])->orderBy('status asc')->addOrderBy(['id'=>SORT_DESC])->one();
+                if($task_id > 0){
+                    $where = ['id'=>$task_id, 'uid'=>$TzSystemsUsers->uid, 'plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
+                    $model = $class::findOne($where);
+                }else{
+                    $where = ['uid'=>$TzSystemsUsers->uid, 'plan_id'=>$plan_id, 'qihao'=>$qihao, 'lottery_type'=>$lottery_type];
+                    $model = $class::find()->where($where)->orderBy('status asc')->addOrderBy(['id'=>SORT_DESC])->one();
+                }
                 if(empty($model)){
                     throw_info('任务记录找不到');
                 }
@@ -709,14 +824,29 @@ abstract class BetService extends BaseBetService {
                 Tool_Common::log('/client_xy/'.__FUNCTION__, 'WARN', '本地下注请求异常重试', ['username'=>$TzSystemsUsers->username, 'plan_id'=>$plan_id, 'qihao'=>$qihao, 'task_id'=>$model->id, 'retry_attempts'=>$retryAttempts, 'task_status'=>$task_status, 'betRst'=>$betRst]);
             }elseif((int)$task_status === BetErrorPlansTask::STATUS_SUCCESS){
                 \Yii::$app->redis->del($retryKey);
+                self::clearRepeatSubmitState($model->id);
             }
-            if($task_status == 3 && strpos($betRst['err_msg'] ?? '', '短时间内重复提交') !== false){
-                $num = \Yii::$app->redis->incr($mkey);
-                Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '重复提交', ['username'=>$TzSystemsUsers->username, 'plan_id'=>$plan_id, 'qihao'=>$qihao, 'betRst'=>$betRst]);
-                \Yii::$app->redis->expire($mkey, 120);
-                if($num<2){
-                    $task_status = 0;
+            if((int)$task_status === BetErrorPlansTask::STATUS_FAIL && self::isRepeatSubmitBetResponse($betRst)){
+                $repeatKey = self::buildRepeatSubmitAttemptsKey($model->id);
+                $num = (int)\Yii::$app->redis->incr($repeatKey);
+                \Yii::$app->redis->expire($repeatKey, 3600);
+                $betRst['repeat_submit_attempts'] = $num;
+                $betRst['repeat_submit_max_attempts'] = self::REPEAT_SUBMIT_MAX_ATTEMPTS;
+                if($num < self::REPEAT_SUBMIT_MAX_ATTEMPTS){
+                    $delaySeconds = self::getRepeatSubmitDelaySeconds();
+                    $nextPushTime = self::delayBetTaskPush($model->id, $delaySeconds);
+                    $task_status = BetErrorPlansTask::STATUS_WAIT;
+                    $betRst['task_status'] = $task_status;
+                    $betRst['repeat_submit_delay_seconds'] = $delaySeconds;
+                    $betRst['next_push_time'] = date('Y-m-d H:i:s', $nextPushTime);
+                    $betRst['retry_msg'] = '短时间重复提交，延后第'.($num + 1).'次重试';
+                }else{
+                    $task_status = BetErrorPlansTask::STATUS_CAN_NOT_RE_PUSH;
+                    $betRst['task_status'] = $task_status;
+                    $betRst['retry_msg'] = '短时间重复提交已达到3次，放弃该下注任务';
+                    \Yii::$app->redis->del(self::buildRepeatSubmitDelayKey($model->id));
                 }
+                Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '重复提交延后处理', ['username'=>$TzSystemsUsers->username, 'plan_id'=>$plan_id, 'qihao'=>$qihao, 'task_id'=>$model->id, 'attempts'=>$num, 'task_status'=>$task_status, 'betRst'=>$betRst]);
             }
             if($lottery_type == \common\helpers\LotteryType::LUCKY_5){
                 if($model->status == 2){

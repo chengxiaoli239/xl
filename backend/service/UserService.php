@@ -238,23 +238,22 @@ class UserService extends BaseService {
      * @return mixed
      */
     public static function getUserDefaultSite($uid){
-
-        $auth = TzSystemsAuth::findOne(['uid'=>$uid]);
-        $defaultSiteIds = $auth
-            ? array_values(array_filter(array_map('trim', explode(',', (string)$auth->tz_systems_ids)), 'strlen'))
-            : [];
-        if(!empty($defaultSiteIds[0])){
-            return $defaultSiteIds[0];
-        }
-
         $siteId = TzSystemsUsers::find()
             ->select(['tz_system_id'])
             ->where(['uid'=>(int)$uid, 'status'=>1])
             ->andWhere(['>', 'tz_system_id', 0])
             ->orderBy(['id'=>SORT_ASC])
             ->scalar();
+        if($siteId){
+            return $siteId;
+        }
 
-        return $siteId ?: DEFAULT_LOTTERY_TYPE;
+        $auth = TzSystemsAuth::findOne(['uid'=>$uid]);
+        $defaultSiteIds = $auth
+            ? array_values(array_filter(array_map('trim', explode(',', (string)$auth->tz_systems_ids)), 'strlen'))
+            : [];
+
+        return $defaultSiteIds[0] ?? DEFAULT_LOTTERY_TYPE;
     }
 
     /**

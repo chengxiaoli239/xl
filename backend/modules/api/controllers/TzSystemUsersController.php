@@ -254,7 +254,7 @@ class TzSystemUsersController extends Controller
             return ['status'=>301, 'msg'=>'缺少access_token参数'];
         }
 
-        $rst = BetService::pushTasksBetRst($post['plan_id'], $post['qihao'], $post['betRst'], $post['access_token'], $post['lottery_type']);
+        $rst = BetService::pushTasksBetRst($post['plan_id'], $post['qihao'], $post['betRst'], $post['access_token'], $post['lottery_type'], $post['task_id'] ?? 0);
         Tool_Common::log('/client_xy/'.__FUNCTION__, 'INFO', '游戏结果通知', ['account'=>$this->TzSystemsUsers['username'], 'post'=>$post, 'rst'=>$rst]);
 
         return $rst;

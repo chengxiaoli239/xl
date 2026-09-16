@@ -17,6 +17,7 @@ use backend\models\PlanStaticProfits;
 use backend\models\SscDsYl;
 use backend\models\SscKjData;
 use backend\models\SysPlansCodes;
+use backend\models\TzSystems;
 use backend\models\TzSystemsAuth;
 use backend\models\TzSystemsUsers;
 use backend\models\TzTypes;
@@ -33,12 +34,65 @@ use  yii;
 
 class UserSysPlansService extends BaseService {
 
+    public static function validateRealPlanAccounts($plan): array
+    {
+        if(!$plan || (int)$plan->is_test !== 0 || (int)$plan->is_batch_simulate !== 0){
+            return ['status'=>200, 'msg'=>'校验通过'];
+        }
+
+        $siteIds = array_values(array_unique(array_filter(array_map('intval', explode(',', (string)$plan->tz_sites)))));
+        if(empty($siteIds)){
+            return ['status'=>300, 'msg'=>'真实计划未选择投注站点，请先编辑计划'];
+        }
+
+        $configuredSiteIds = TzSystemsUsers::find()
+            ->select(['tz_system_id'])
+            ->where([
+                'uid'=>(int)$plan->uid,
+                'status'=>1,
+                'tz_system_id'=>$siteIds,
+            ])
+            ->column();
+        $configuredSiteIds = array_map('intval', $configuredSiteIds);
+        $missingSiteIds = array_values(array_diff($siteIds, $configuredSiteIds));
+        if(empty($missingSiteIds)){
+            return ['status'=>200, 'msg'=>'校验通过'];
+        }
+
+        $siteNames = ArrayHelper::map(
+            TzSystems::find()->select(['id', 'name'])->where(['id'=>$missingSiteIds])->asArray()->all(),
+            'id',
+            'name'
+        );
+        $missingSites = array_map(static function ($siteId) use ($siteNames) {
+            $name = trim((string)($siteNames[$siteId] ?? ''));
+            return $name !== '' ? $name.'('.$siteId.')' : (string)$siteId;
+        }, $missingSiteIds);
+
+        return [
+            'status'=>300,
+            'msg'=>'真实计划无法启用：投注站点'.implode('、', $missingSites).'没有启用的盘口账号，请先修改计划站点或添加账号',
+        ];
+    }
+
+    private static function getSingleCheckboxValue($value)
+    {
+        if(is_array($value)){
+            return count($value) === 1 ? $value[0] : null;
+        }
+
+        return isset($value) && $value !== '' ? $value : null;
+    }
+
     public static function enableAutoLoginForRealPlan($plan): int
     {
         if(!$plan
             || (int)$plan->status !== 1
             || (int)$plan->is_test !== 0
             || (int)$plan->is_batch_simulate !== 0){
+            return 0;
+        }
+        if((int)(self::validateRealPlanAccounts($plan)['status'] ?? 300) !== 200){
             return 0;
         }
 
@@ -152,26 +206,30 @@ class UserSysPlansService extends BaseService {
         }
 
         # 每天初始化
-        if($UserSysPlans['is_init_perdate'] && count($UserSysPlans['is_init_perdate']) == 1){
-            $post['UserSysPlans']['is_init_perdate'] = (int)$UserSysPlans['is_init_perdate'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['is_init_perdate'] ?? null);
+        if($singleCheckboxValue !== null){
+            $post['UserSysPlans']['is_init_perdate'] = (int)$singleCheckboxValue;
         }
         unset($UserSysPlans['is_init_perdate']);
 
         # 切换下方向
-        if($UserSysPlans['bet_direct'] && count($UserSysPlans['bet_direct']) == 1){
-            $post['UserSysPlans']['bet_direct'] = (int)$UserSysPlans['bet_direct'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['bet_direct'] ?? null);
+        if($singleCheckboxValue !== null){
+            $post['UserSysPlans']['bet_direct'] = (int)$singleCheckboxValue;
         }else{
             $post['UserSysPlans']['bet_direct'] = UserSysPlans::BET_DIRECT_Z;
         }
         unset($UserSysPlans['bet_direct']);
 
         # 定位置：千、百、十、个
-        if($UserSysPlans['fixed_pos_sel'] && count($UserSysPlans['fixed_pos_sel']) == 1){
-            $tmpFilter['fixed_pos_sel'] = (int)$UserSysPlans['fixed_pos_sel'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['fixed_pos_sel'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['fixed_pos_sel'] = (int)$singleCheckboxValue;
         }
         # 配数
-        if($UserSysPlans['ps_sel'] && count($UserSysPlans['ps_sel']) == 1){
-            $tmpFilter['ps_sel'] = (int)$UserSysPlans['ps_sel'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['ps_sel'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['ps_sel'] = (int)$singleCheckboxValue;
         }
         unset($post['UserSysPlans']['ps_sel']);
         # 15、配数1
@@ -201,8 +259,9 @@ class UserSysPlansService extends BaseService {
         unset($post['UserSysPlans']['fixed_sel_pos']);
 
         # 对数
-        if($UserSysPlans['log_sel'] && count($UserSysPlans['log_sel']) == 1){
-            $tmpFilter['log_sel'] = (int)$UserSysPlans['log_sel'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['log_sel'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['log_sel'] = (int)$singleCheckboxValue;
         }
         unset($post['UserSysPlans']['log_sel']);
         # 对数1
@@ -222,8 +281,9 @@ class UserSysPlansService extends BaseService {
         unset($post['UserSysPlans']['log_3']);
 
         # 筛选位置：单
-        if($UserSysPlans['odd_sel'] && count($UserSysPlans['odd_sel']) == 1){
-            $tmpFilter['odd_sel'] = (int)$UserSysPlans['odd_sel'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['odd_sel'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['odd_sel'] = (int)$singleCheckboxValue;
         }
         unset($post['UserSysPlans']['odd_sel']);
         if($UserSysPlans['odd_pos'] && count($UserSysPlans['odd_pos']) > 0){
@@ -231,8 +291,9 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['odd_pos']);
         # 筛选位置：双
-        if($UserSysPlans['even_sel'] && count($UserSysPlans['even_sel']) == 1){
-            $tmpFilter['even_sel'] = (int)$UserSysPlans['even_sel'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['even_sel'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['even_sel'] = (int)$singleCheckboxValue;
         }
         unset($post['UserSysPlans']['even_sel']);
         if($UserSysPlans['even_pos'] && count($UserSysPlans['even_pos']) > 0){
@@ -240,8 +301,9 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['even_pos']);
         # 筛选位置：大
-        if($UserSysPlans['big_sel'] && count($UserSysPlans['big_sel']) == 1){
-            $tmpFilter['big_sel'] = (int)$UserSysPlans['big_sel'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['big_sel'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['big_sel'] = (int)$singleCheckboxValue;
         }
         unset($post['UserSysPlans']['big_sel']);
         if($UserSysPlans['big_pos'] && count($UserSysPlans['big_pos']) > 0){
@@ -249,8 +311,9 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['big_pos']);
         # 筛选位置：小
-        if($UserSysPlans['small_sel'] && count($UserSysPlans['small_sel']) == 1){
-            $tmpFilter['small_sel'] = (int)$UserSysPlans['small_sel'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['small_sel'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['small_sel'] = (int)$singleCheckboxValue;
         }
         unset($post['UserSysPlans']['small_sel']);
         if($UserSysPlans['small_pos'] && count($UserSysPlans['small_pos']) > 0){
@@ -260,43 +323,51 @@ class UserSysPlansService extends BaseService {
 
         # 二、类型：双重:type_2、三重:type_3、四重:type_4、双双重:type_22、两兄弟:type_2b、三兄弟:type_3b、四兄弟:type_4b
         # 1、双重
-        if($UserSysPlans['type_2'] && count($UserSysPlans['type_2']) == 1){
-            $tmpFilter['type_2'] = $UserSysPlans['type_2'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['type_2'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['type_2'] = $singleCheckboxValue;
         }
         unset($post['UserSysPlans']['type_2']);
         # 2、三重
-        if($UserSysPlans['type_3'] && count($UserSysPlans['type_3']) == 1){
-            $tmpFilter['type_3'] = $UserSysPlans['type_3'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['type_3'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['type_3'] = $singleCheckboxValue;
         }
         unset($post['UserSysPlans']['type_3']);
         # 3、四重
-        if($UserSysPlans['type_4'] && count($UserSysPlans['type_4']) == 1){
-            $tmpFilter['type_4'] = $UserSysPlans['type_4'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['type_4'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['type_4'] = $singleCheckboxValue;
         }
         unset($post['UserSysPlans']['type_4']);
         # 4、双双重
-        if($UserSysPlans['type_22'] && count($UserSysPlans['type_22']) == 1){
-            $tmpFilter['type_22'] = $UserSysPlans['type_22'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['type_22'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['type_22'] = $singleCheckboxValue;
         }
         unset($post['UserSysPlans']['type_22']);
         # 5、两兄弟
-        if($UserSysPlans['type_2b'] && count($UserSysPlans['type_2b']) == 1){
-            $tmpFilter['type_2b'] = $UserSysPlans['type_2b'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['type_2b'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['type_2b'] = $singleCheckboxValue;
         }
         unset($post['UserSysPlans']['type_2b']);
         # 6、三兄弟
-        if($UserSysPlans['type_3b'] && count($UserSysPlans['type_3b']) == 1){
-            $tmpFilter['type_3b'] = $UserSysPlans['type_3b'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['type_3b'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['type_3b'] = $singleCheckboxValue;
         }
         unset($post['UserSysPlans']['type_3b']);
         # 7、四兄弟
-        if($UserSysPlans['type_4b'] && count($UserSysPlans['type_4b']) == 1){
-            $tmpFilter['type_4b'] = $UserSysPlans['type_4b'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['type_4b'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['type_4b'] = $singleCheckboxValue;
         }
         unset($post['UserSysPlans']['type_4b']);
         # 7、三现：双重+两兄
-        if($UserSysPlans['type_3n_2b'] && count($UserSysPlans['type_3n_2b']) == 1){
-            $tmpFilter['type_3n_2b'] = $UserSysPlans['type_3n_2b'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['type_3n_2b'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['type_3n_2b'] = $singleCheckboxValue;
         }
         unset($post['UserSysPlans']['type_3n_2b']);
         # 8、和值
@@ -314,15 +385,17 @@ class UserSysPlansService extends BaseService {
         }
         unset($post['UserSysPlans']['arise']);
         # 14、对数
-        if($UserSysPlans['type_log'] && count($UserSysPlans['type_log']) == 1){
-            $tmpFilter['type_log'] = $UserSysPlans['type_log'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['type_log'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['type_log'] = $singleCheckboxValue;
         }
         unset($post['UserSysPlans']['type_log']);
         # 14.1、双对数
-        if($UserSysPlans['type_2log'] && count($UserSysPlans['type_2log']) == 1){
-            $tmpFilter['type_2log'] = $UserSysPlans['type_2log'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['type_2log'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['type_2log'] = $singleCheckboxValue;
         }
-        unset($post['UserSysPlans']['type_log']);
+        unset($post['UserSysPlans']['type_2log']);
         # 15.1、单双类型:两双两单，四单，四双
         if(isset($UserSysPlans['type_4ds']) && $UserSysPlans['type_4ds']){
             $tmpFilter['type_4ds'] = $UserSysPlans['type_4ds'];
@@ -353,14 +426,16 @@ class UserSysPlansService extends BaseService {
 
         unset($post['UserSysPlans']['bet_while_miss']);
         # 16、双两兄弟
-        if($UserSysPlans['type_22b'] && count($UserSysPlans['type_22b']) == 1){
-            $tmpFilter['type_22b'] = $UserSysPlans['type_22b'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['type_22b'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['type_22b'] = $singleCheckboxValue;
         }
         unset($post['UserSysPlans']['type_22b']);
 
         # 反向打盘口
-        if($UserSysPlans['bet_op_to_wp'] && count($UserSysPlans['bet_op_to_wp']) == 1){
-            $tmpFilter['bet_op_to_wp'] = $UserSysPlans['bet_op_to_wp'][0];
+        $singleCheckboxValue = self::getSingleCheckboxValue($UserSysPlans['bet_op_to_wp'] ?? null);
+        if($singleCheckboxValue !== null){
+            $tmpFilter['bet_op_to_wp'] = $singleCheckboxValue;
             $tmpFilter['bet_op_to_wp_singles'] = $UserSysPlans['bet_op_to_wp_singles']??0.1;
         }
         unset($post['UserSysPlans']['bet_op_to_wp']);

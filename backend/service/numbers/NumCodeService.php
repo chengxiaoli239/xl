@@ -1707,7 +1707,7 @@ class NumCodeService extends BaseService
 
         list($current_kj_qihao, $next_qihao) = QihaoService::getKjQiHao($lottery_type);
 
-        $latelyCode = NumService::getPosLatelyCode($pos, $num=9, $lottery_type); # 最近9个热码
+        $latelyCode = NumService::getPosLatelyCode($pos, $num=9, $lottery_type, $current_kj_qihao); # 最近9个热码
         $filterCodes = array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode); # 一个冷码
         #p([\backend\service\NumService::$ALL_CODES, $latelyCode,  $filterCodes]);
         $andWhere = ['AND'];
@@ -1759,7 +1759,7 @@ class NumCodeService extends BaseService
         list($current_kj_qihao, $next_qihao) = QihaoService::getKjQiHao($lottery_type);
         $historyKjData = NumCodeService::getKjData($current_kj_qihao, $lottery_type);
 
-        $latelyCode = NumService::getPosLatelyCode($pos, $num=9, $lottery_type);
+        $latelyCode = NumService::getPosLatelyCode($pos, $num=9, $lottery_type, $current_kj_qihao);
         $filterCodes = array_values(array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode)); # 过滤1冷码
 
         $filterNum = (int)current($filterCodes);
@@ -2168,8 +2168,8 @@ class NumCodeService extends BaseService
             $latelyCode2Other = array_column($Ssc1numsYl2, 'code');
             //p(['Ssc1numsYl1'=>$Ssc1numsYl1, 'Ssc1numsYl2'=>$Ssc1numsYl2]);
         }else{
-            $latelyCode1 = NumService::getPosLatelyCode($positions[0], $num=8, $lottery_type); # 最近8个热码
-            $latelyCode2 = NumService::getPosLatelyCode($positions[1], $num=8, $lottery_type); # 最近8个热码
+            $latelyCode1 = NumService::getPosLatelyCode($positions[0], $num=8, $lottery_type, $current_kj_qihao); # 最近8个热码
+            $latelyCode2 = NumService::getPosLatelyCode($positions[1], $num=8, $lottery_type, $current_kj_qihao); # 最近8个热码
 
             $latelyCode1Other = array_values(array_diff(NumService::$ALL_CODES, $latelyCode1));
             $latelyCode2Other = array_values(array_diff(NumService::$ALL_CODES, $latelyCode2));
@@ -2219,7 +2219,7 @@ class NumCodeService extends BaseService
         list($current_kj_qihao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
 
         $num = 10 - $cNum;
-        $latelyCode = NumService::getPosLatelyCode($pos, $num, $lottery_type); # 最近9个热码
+        $latelyCode = NumService::getPosLatelyCode($pos, $num, $lottery_type, $current_kj_qihao); # 最近9个热码
         $filterCode = array_diff(\backend\service\NumService::$ALL_CODES, $latelyCode); # cNum个冷码
         #p([\backend\service\NumService::$ALL_CODES, $latelyCode,  $filterCodes]);
 

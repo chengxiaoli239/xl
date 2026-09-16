@@ -42,7 +42,7 @@ class  CrontabIndexService{
                 ['=', 'u.is_auto_login', 1],
                 ['<>', 'u.ssc_domain', ''],
                 ['=', 's.status', 1],
-                ['IN', 'u.is_local_bet', [BetsBackend::BET_TYPE_SERVER_API, BetsBackend::BET_TYPE_LOCAL_API]],
+                ['=', 'u.is_local_bet', BetsBackend::BET_TYPE_SERVER_API],
                 ['=', 'p.status', 1],
                 ['=', 'p.is_test', 0],
                 ['=', 'p.is_batch_simulate', 0],

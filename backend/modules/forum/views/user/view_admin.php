@@ -224,6 +224,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'is_auto_login','label'=>'自动登', 'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
+                                $isLocal = (int)$model->is_local_bet !== BetsBackend::BET_TYPE_SERVER_API;
                                 if($model->is_auto_login == 1){
                                     $txt = '<font color="green">是</font>';
                                     $alt = '点击关闭';
@@ -232,6 +233,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                     $txt = '<font color="red">否</font>';
                                     $val = 1;
                                     $alt = '点击启用';
+                                }
+                                if($isLocal && $val === 1){
+                                    return Html::tag('span', $txt, ['title'=>'本地电脑下注不启用自动登']);
                                 }
                                 $url = "/forum/user/switch-auto-login?id=".$model->id."&status=".$val; #
                                 return Html::a($txt, $url, ['title' => '自动登陆开启','alt'=>$alt]);

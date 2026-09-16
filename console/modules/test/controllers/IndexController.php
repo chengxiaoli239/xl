@@ -2,28 +2,33 @@
 namespace console\modules\test\controllers;
 
 use backend\models\TzSystemsUsers;
-use backend\service\Lucky5\Lucky5Service;
-use backend\service\BaseService;
 use yii\console\Controller;
 
 class IndexController extends Controller
 {
     public function actionLogin()
     {
-        $uid = 78;
-        $id = TzSystemsUsers::findOne(['uid'=>$uid])->id;
-
-        // 清除缓存
-        \Yii::$app->cache->delete('rsa_public_key_7');
-        echo "缓存已清除\n";
-
-        // 直接调用Lucky5Service::login (public)
-        echo "=== Lucky5Service::login ===\n";
-        $rst = Lucky5Service::login($uid, 7);
-        echo "结果: " . json_encode($rst, JSON_UNESCAPED_UNICODE) . "\n";
-
-        // 检查desc
-        $u = TzSystemsUsers::findOne(['uid'=>$uid]);
-        echo "desc: " . $u->desc . ", balance: " . $u->balance . "\n";
+        // 模拟 TLS 保存逻辑
+        $id = 91; // uid=78
+        $sslMode = 2; // TLS 1.2
+        
+        $model = TzSystemsUsers::findOne($id);
+        echo "model found: " . ($model ? "yes (uid={$model->uid})" : "no") . "\n";
+        
+        if($model){
+            echo "before: ssl_mode={$model->ssl_mode}, updated_at={$model->updated_at}\n";
+            $model->ssl_mode = $sslMode;
+            $model->updated_at = time();
+            
+            $rst = $model->save(false, ['ssl_mode', 'updated_at']);
+            echo "save result: " . ($rst ? 'SUCCESS' : 'FAILED') . "\n";
+            
+            if(!$rst){
+                echo "errors: " . json_encode($model->getErrors()) . "\n";
+            }
+            
+            $model->refresh();
+            echo "after: ssl_mode={$model->ssl_mode}, updated_at={$model->updated_at}\n";
+        }
     }
 }

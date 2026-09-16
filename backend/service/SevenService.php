@@ -21,6 +21,7 @@ use backend\models\UserFollowData;
 use backend\models\UserSysPlans;
 use common\models\AdminModel;
 use common\service\CaptchaCodeService;
+use common\service\proxy\ProxyBaseService;
 use common\tools\Tool_Common;
 use yii\helpers\ArrayHelper;
 use  yii;

@@ -2541,10 +2541,25 @@ class Lucky5Service { # 重庆7时彩登陆体系
      */
     public static function splitCodes($codes, $length = 300){
 
-        $diffArr = array_diff_assoc($codes, array_unique($codes)); # 重复号码
-        $codesArr = array_chunk(array_unique($codes), $length);
-        if(!empty($diffArr)){
-            $codesArr[] = $diffArr;
+        $length = max(1, (int)$length);
+        $codesArr = [];
+        $codeSets = [];
+        foreach ((array)$codes as $code){
+            $codeKey = 'c:'.(is_scalar($code) ? (string)$code : json_encode($code, 320));
+            $isPlaced = false;
+            foreach ($codesArr as $key=>$codesItem){
+                if(count($codesItem) >= $length || isset($codeSets[$key][$codeKey])){
+                    continue;
+                }
+                $codesArr[$key][] = $code;
+                $codeSets[$key][$codeKey] = true;
+                $isPlaced = true;
+                break;
+            }
+            if(!$isPlaced){
+                $codesArr[] = [$code];
+                $codeSets[] = [$codeKey=>true];
+            }
         }
 
         return $codesArr;
@@ -2649,6 +2664,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
         //p(['count1'=>$count, 'count2'=>count($codesArr)]);
 
         $betNums = self::getBetNumsPer($plan->uid);
+        $codeSignatures = array_map(function($code){
+            return is_scalar($code) ? (string)$code : json_encode($code, 320);
+        }, $codesArr);
+        $hasRepeatCodes = count($codeSignatures) > count(array_unique($codeSignatures));
         $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
 
         $single = floatval($single);
@@ -2667,6 +2686,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $snInfo_sn = '';
         $snInfo_snid = '';
         $rst = [];
+        if($hasRepeatCodes && count($codesArrs) > 1){
+            BetService::markRepeatSubmitSplitGroup($plan->uid, $lottery_type, $qihao, $plan_id, count($codesArrs));
+        }
         foreach ($codesArrs as $key=>$tmpcodesArr){
             $bet_log = self::getBetLog($tz_type, $plan_id);
             if($playway == 4){ # 一字定
@@ -2761,6 +2783,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 # is_task:1 默认为任务表下载
                 Tool_Common::log('afterPostBetCurl', 'INFO', '下注之后', ['account'=>$plan->account, 'uid'=>$plan->uid, 'plan_id'=>$plan->id, 'single'=>$single, 'left_money'=>$left_money, 'need_money'=>$need_money, 'lottery_type'=>$lottery_type, 'qihao'=>$qihao, 'tmpcodesArr'=>count($tmpcodesArr)]);
                 $taskId = BetErrorPlansTaskService::recordPlanTask($plan->uid, $plan->account, $plan_id, $qihao, $key, $tmpcodesArr, $tz_type, $url, $headers, json_encode($post_data,320), $single, count($tmpcodesArr)*$single, $playway,self::$tz_system_id, [], $lottery_type);
+                if($hasRepeatCodes && count($codesArrs) > 1 && is_numeric($taskId)){
+                    $delaySeconds = BetService::getRepeatSubmitDelaySeconds() * ($key + 1);
+                    BetService::delayBetTaskPush($taskId, $delaySeconds);
+                }
                 $data['task_id'] = $taskId;
                 $logArr1 = ['uid'=>self::$user_id, 'lottery_type'=>$lottery_type, 'key'=>$key, 'task_id'=>$taskId];
                 Tool_Common::log('recordBetPlansTaskLog', 'INFO', '拆分记录下注号码至推送表', $logArr1);

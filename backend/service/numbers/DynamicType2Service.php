@@ -1146,8 +1146,8 @@ class DynamicType2Service extends BaseService {
         $lottery_type = $plan->lottery_type;
         list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
 
-        $params = $dynamic['params'];
-        $x = (string)($params['x'] ?? '');
+        $params = $dynamic['params'] ?? [];
+        $x = preg_replace('/\s+/', '', (string)($params['x'] ?? ''));
         $y = (int)($params['y'] ?? 0);
 
         if ($x === '' || $y < 1) {
@@ -1158,7 +1158,15 @@ class DynamicType2Service extends BaseService {
             return ArrayHelper::getColumn($NumTypes, 'code');
         }
 
-        $positions = str_split($x);
+        $positions = [];
+        foreach (str_split($x) as $pos) {
+            if (in_array($pos, ['1', '2', '3', '4']) && !in_array($pos, $positions)) {
+                $positions[] = $pos;
+            }
+        }
+        if (empty($positions)) {
+            throw_info('取x位各取最近y个号码复式：参数x只能包含1、2、3、4');
+        }
         $posNameMap = ['1'=>'千', '2'=>'百', '3'=>'十', '4'=>'个'];
 
         // 构建查询：每个指定位置用自己的独立码池过滤
@@ -1173,9 +1181,17 @@ class DynamicType2Service extends BaseService {
                 continue;
             }
             $posInt = (int)$pos;
-            $posCodes = NumService::getPosLatelyCode($posInt, $y, $lottery_type);
+            $posCodes = NumService::getPosLatelyCode($posInt, $y, $lottery_type, $currentKjQiHao);
             if (!empty($posCodes)) {
-                $query->andWhere(['IN', 'code_' . $posInt, $posCodes]);
+                if ($playway == 3) {
+                    $query->andWhere(['IN', 'code_' . $posInt, $posCodes]);
+                } else {
+                    $query->andWhere([
+                        'OR',
+                        ['=', 'code_' . $posInt, 'X'],
+                        ['IN', 'code_' . $posInt, $posCodes],
+                    ]);
+                }
             }
             $posName = $posNameMap[$pos] ?? $pos . '位';
             $descParts[] = $posName . '近' . $y . '个码:' . implode('', $posCodes);
@@ -1194,6 +1210,100 @@ class DynamicType2Service extends BaseService {
             'current_kj_qihao' => $currentKjQiHao,
             'x' => $x,
             'y' => $y,
+            'count' => count($codes),
+            'sql' => $sql,
+        ]);
+
+        return $codes;
+    }
+
+    /**
+     * 自动过滤上期指定位置定位合分。
+     * @param object $plan
+     * @param array $dynamic
+     * @param array $filterDesc
+     * @return array
+     * @throws \common\exceptions\InfoException
+     */
+    public static function filter45(object $plan, $dynamic=[], $filterDesc = []): array
+    {
+        $lottery_type = $plan->lottery_type;
+        $playway = $plan->playway;
+        list($currentKjQiHao, $nextQiHao) = QihaoService::getKjQiHao($lottery_type);
+
+        $params = $dynamic['params'] ?? [];
+        $x = preg_replace('/\s+/', '', (string)($params['x'] ?? ''));
+        if ($x === '') {
+            throw_info('上期x位定位合分排除：参数x不能为空，如14');
+        }
+
+        $positions = [];
+        foreach (str_split($x) as $pos) {
+            if (in_array($pos, ['1', '2', '3', '4']) && !in_array($pos, $positions)) {
+                $positions[] = $pos;
+            }
+        }
+        if (count($positions) < 2) {
+            throw_info('上期x位定位合分排除：参数x至少填写两个位置，如14、123');
+        }
+
+        $historyKjData = NumCodeService::getKjData($currentKjQiHao, $lottery_type);
+        if (empty($historyKjData)) {
+            throw_info('上期开奖数据不存在');
+        }
+
+        $posNameMap = ['1'=>'千', '2'=>'百', '3'=>'十', '4'=>'个'];
+        $sourceCodes = [];
+        $positionNames = [];
+        $sum = 0;
+        foreach ($positions as $pos) {
+            $sourceCode = (int)$historyKjData['code' . $pos];
+            $sourceCodes[] = $sourceCode;
+            $sum += $sourceCode;
+            $positionNames[] = ($posNameMap[$pos] ?? $pos) . '位';
+        }
+
+        $hefen = $sum % 10;
+        $maxSum = count($positions) * 9;
+        $filterSums = [];
+        for ($filterSum = $hefen; $filterSum <= $maxSum; $filterSum += 10) {
+            $filterSums[] = $filterSum;
+        }
+        $keepHefens = array_values(array_diff(range(0, 9), [$hefen]));
+
+        $where = ['AND'];
+        if ($playway != 3) {
+            foreach ($positions as $pos) {
+                $where[] = ['<>', 'code_' . (int)$pos, 'X'];
+            }
+        }
+        $sumExpression = '(`code_' . implode('` + `code_', $positions) . '`)';
+        $where[] = ['NOT IN', $sumExpression, $filterSums];
+
+        $query = self::getBaseCodesQuery($where, $playway);
+        $sql = $query->createCommand()->getRawSql();
+        $results = $query->all();
+        $codes = ArrayHelper::getColumn($results, 'code');
+
+        $label = $filterDesc['label'] ?? '上期x位定位合分排除';
+        $betDesc = $label . ':上期' . $historyKjData['qihao'] . '[' . $historyKjData['code_str'] . ']，'
+            . implode('、', $positionNames) . '号码' . implode('+', $sourceCodes) . '合分' . $hefen
+            . '，过滤定位' . $x . '合分' . $hefen
+            . '，保留合分' . implode('', $keepHefens) . '，最终组数：' . count($codes);
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '上期x位定位合分排除', [
+            'plan_id' => $plan->id,
+            'lottery_type' => $lottery_type,
+            'current_kj_qihao' => $currentKjQiHao,
+            'next_qihao' => $nextQiHao,
+            'x' => $x,
+            'positions' => $positions,
+            'source_codes' => $sourceCodes,
+            'sum' => $sum,
+            'hefen' => $hefen,
+            'filter_sums' => $filterSums,
+            'keep_hefens' => $keepHefens,
             'count' => count($codes),
             'sql' => $sql,
         ]);
@@ -1857,10 +1967,10 @@ class DynamicType2Service extends BaseService {
         }
 
         // 获取每个位最近N个号码
-        $qArr = NumService::getPosLatelyCode(1, $x, $lottery_type);
-        $bArr = NumService::getPosLatelyCode(2, $y, $lottery_type);
-        $sArr = NumService::getPosLatelyCode(3, $z, $lottery_type);
-        $gArr = NumService::getPosLatelyCode(4, $n, $lottery_type);
+        $qArr = NumService::getPosLatelyCode(1, $x, $lottery_type, $currentKjQiHao);
+        $bArr = NumService::getPosLatelyCode(2, $y, $lottery_type, $currentKjQiHao);
+        $sArr = NumService::getPosLatelyCode(3, $z, $lottery_type, $currentKjQiHao);
+        $gArr = NumService::getPosLatelyCode(4, $n, $lottery_type, $currentKjQiHao);
 
         $query = (new \yii\db\Query())
             ->select(['code', 'code_type'])

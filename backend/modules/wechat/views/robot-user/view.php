@@ -175,7 +175,11 @@ $this->registerJs($js);
                             [ 'attribute'=>'is_auto_bet','label'=>'自动登',
                                 'format'=>'raw',
                                 'value'=>function($model){
+                                    $isLocal = (int)$model->is_local_bet !== \backend\models\thirdD\BetsBackend::BET_TYPE_SERVER_API;
                                     $txt = $model->is_auto_login ? '<font color="green">已开启</font>' : '<font color="red">已关闭</font>';
+                                    if($isLocal && !$model->is_auto_login){
+                                        return Html::tag('span', $txt, ['title'=>'本地电脑下注不启用自动登']);
+                                    }
                                     $url = '/forum/user/switch-auto-login?id='.$model->id.'&status='.($model->is_auto_login?0:1);
                                     return Html::a($txt, $url, ['title' => '点击切换','alt'=>'点击切换']);
                                 }

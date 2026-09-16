@@ -10,7 +10,7 @@ $this->title = '添加/编辑用户';
 $user = \Yii::$app->user;
 $sitesOptions = [];
 foreach ($sites as $site){
-    $sitesOptions[$site['id']] = $site['ssc_domain'].' ('.$site['kj_num'].'个数)'.$site['name'];
+    $sitesOptions[$site['id']] = $site['name'].'（ID '.$site['id'].'）';
 }
 $editing = isset($_GET['id']);
 
@@ -50,8 +50,14 @@ $editing = isset($_GET['id']);
                 <div class="col-lg-4 col-xs-12">
                     <?= $form->field($model, 'tz_system_id')->dropDownList(
                         $sitesOptions,
-                        ['prompt' => '-选择-'] // Optional: Add a prompt message
-                    )->label('盘口站点')?>
+                        ['prompt' => '-选择-', 'disabled' => $editing]
+                    )->label('盘口类型')?>
+                </div>
+                <div class="col-lg-4 col-xs-12">
+                    <?= $form->field($model, 'ssc_domain')->label('站点地址')->textInput([
+                        'maxlength' => true,
+                        'placeholder' => 'https://example.com',
+                    ]) ?>
                 </div>
                 <div class="col-lg-4 col-xs-6">
                     <?= $form->field($model, 'site_account')->label('盘口账号')->textInput(['maxlength' => true]) ?>

@@ -387,7 +387,7 @@ class BetExecutor:
                 'time_consume': f"{time.time() - start_time:.2f}s",
                 'now_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             })
-            pushTasksBetRst(data['plan_id'], data['qihao'], postRst)
+            self._push_bet_result(data, postRst)
             return {'success': True}
         else:
             # 下注失败
@@ -429,8 +429,14 @@ class BetExecutor:
                 'time_consume': f"{time.time() - start_time:.2f}s",
                 'now_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             })
-            pushTasksBetRst(data['plan_id'], data['qihao'], postRst)
+            self._push_bet_result(data, postRst)
             return {'success': False}
+
+    def _push_bet_result(self, data: Dict[str, Any], postRst: Dict[str, Any]):
+        task_id = data.get('task_id')
+        if task_id:
+            postRst['task_id'] = task_id
+        pushTasksBetRst(data['plan_id'], data['qihao'], postRst, task_id=task_id)
     
     def _handle_cookie_invalid(self, data: Dict[str, Any], postRst: Dict[str, Any], 
                               start_time: float):
@@ -460,7 +466,7 @@ class BetExecutor:
             'time_consume': f"{time.time() - start_time:.2f}s",
             'now_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         })
-        pushTasksBetRst(data['plan_id'], data['qihao'], postRst)
+        self._push_bet_result(data, postRst)
         
         # 立即触发登录（使用LoginStatusMonitor）
         self._trigger_immediate_login()
@@ -494,7 +500,7 @@ class BetExecutor:
             'time_consume': f"{time.time() - start_time:.2f}s",
             'now_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         })
-        pushTasksBetRst(data['plan_id'], data['qihao'], postRst)
+        self._push_bet_result(data, postRst)
         
         # 立即触发登录（使用LoginStatusMonitor）
         self._trigger_immediate_login()
@@ -671,4 +677,3 @@ class BetExecutor:
         except Exception:
             # 防踢机制失败不影响下注
             pass
-

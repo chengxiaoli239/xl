@@ -155,6 +155,43 @@ class TzSystemUsersService extends ClientsBaseService{
     }
 
     /**
+     * Switches cloud auto-login. Local-computer betting never enables auto-login.
+     */
+    public static function switchAutoLogin(TzSystemsUsers $account, int $status): array
+    {
+        $status = $status ? 1 : 0;
+        if($status === 1 && (int)$account->is_local_bet !== BetsBackend::BET_TYPE_SERVER_API){
+            if((int)$account->is_auto_login !== 0){
+                $account->setAttributes([
+                    'is_auto_login'=>0,
+                    'updated_at'=>time(),
+                ], false);
+                $account->save(false);
+                self::delTzSystemUserData();
+            }
+            return ['status'=>422, 'msg'=>'本地电脑下注不允许开启自动登，请先切换到云服务器'];
+        }
+
+        $account->setAttributes([
+            'is_auto_login'=>$status,
+            'updated_at'=>time(),
+        ], false);
+        if(!$account->save(false)){
+            return ['status'=>300, 'msg'=>current($account->getErrors())];
+        }
+        self::delTzSystemUserData();
+
+        return [
+            'status'=>200,
+            'msg'=>$status ? '自动登已开启' : '自动登已关闭',
+            'data'=>[
+                'is_local_bet'=>(int)$account->is_local_bet,
+                'is_auto_login'=>(int)$account->is_auto_login,
+            ],
+        ];
+    }
+
+    /**
      * @desc 获取系统授权access_tokens
      * @return array|mixed
      */
@@ -601,6 +638,7 @@ class TzSystemUsersService extends ClientsBaseService{
      */
     public static function getActivePlanTasksWhere($uid='', $current_qihao='', $direct=0, $lottery_type=DEFAULT_LOTTERY_TYPE){
         $RedisLock = new RedisLock();
+        $count = 0;
         $where = ['AND', ['=', 'lottery_type', $lottery_type], ['IN', 'status', [0, 1]]]; # 可重推的状态0:未推送1异常可重复处理2推送成功3推送失败不可重推
         if($uid){
             $where = array_merge($where, [['=', 'uid', $uid]]);
@@ -665,7 +703,7 @@ class TzSystemUsersService extends ClientsBaseService{
 
             $where = TzSystemUsersService::getActivePlanTasksWhere($uid, $current_qihao, $direct, $lottery_type);
             $BetErrorPlansTasksQuery = BetErrorPlansTask::find()->where($where);
-            $BetErrorPlansTasks = $BetErrorPlansTasksQuery->orderBy(['bet_money'=>SORT_DESC, 'id'=>SORT_DESC])->limit(1)->all();
+            $BetErrorPlansTasks = $BetErrorPlansTasksQuery->orderBy(['bet_money'=>SORT_DESC, 'id'=>SORT_DESC])->limit(20)->all();
             /*
             $sql = $BetErrorPlansTasksQuery->createCommand()->getRawSql();
             $log = ['uid'=>$uid, 'current_qihao'=>$current_qihao, 'count'=>count($BetErrorPlansTasks),'sql'=>$sql];
@@ -677,6 +715,18 @@ class TzSystemUsersService extends ClientsBaseService{
             $data = [];
             $_t = round(microtime(true) * 1000);
             foreach ($BetErrorPlansTasks as $row){
+                $delayLeftSeconds = BetService::getBetTaskDelayLeftSeconds($row->id);
+                if($delayLeftSeconds > 0){
+                    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '下注任务延后推送', ['uid'=>$uid, 'task_id'=>$row->id, 'plan_id'=>$row->plan_id, 'qihao'=>$row->qihao, 'delay_left_seconds'=>$delayLeftSeconds]);
+                    continue;
+                }
+                if(BetService::isRepeatSubmitSplitGroup($row->uid, $row->lottery_type, $row->qihao, $row->plan_id)){
+                    $groupDelayLeftSeconds = BetService::getRepeatSubmitSplitGroupDelayLeftSeconds($row->uid, $row->lottery_type, $row->qihao, $row->plan_id);
+                    if($groupDelayLeftSeconds > 0){
+                        Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '重复拆分任务组延后推送', ['uid'=>$uid, 'task_id'=>$row->id, 'plan_id'=>$row->plan_id, 'qihao'=>$row->qihao, 'delay_left_seconds'=>$groupDelayLeftSeconds]);
+                        continue;
+                    }
+                }
                 if($row->single<0.09) continue; // 异常倍数不下注
                 $plan_id = $row->plan_id;
                 $account = $row->account;
@@ -722,6 +772,13 @@ class TzSystemUsersService extends ClientsBaseService{
                     'post_data' => $post_data,
                     'headers' => $headers,
                 ];
+                if(BetService::isRepeatSubmitSplitGroup($row->uid, $row->lottery_type, $row->qihao, $row->plan_id)){
+                    BetService::delayRepeatSubmitSplitGroup($row->uid, $row->lottery_type, $row->qihao, $row->plan_id, BetService::getRepeatSubmitDelaySeconds());
+                }
+                break;
+            }
+            if(empty($data)){
+                throw_info('没有下注任务');
             }
             $m->set($mkey, 1, 3);
         }catch (\Exception $e){
@@ -740,13 +797,15 @@ class TzSystemUsersService extends ClientsBaseService{
      */
     public static function getSites(int $userType=0, int $useCache=1): array
     {
-        $mKey = CacheKeyService::manageSites($userType);
+        $mKey = CacheKeyService::manageSites($userType).':active-v2';
         $data = commonRedis()->get($mKey);
         if(empty($data) OR !$useCache){
             $TzSystemTypeId = TzSystemUsersService::TZ_SYSTEM_TYPES_OPTIONS[$userType]??0;
-            $TzSystemsQuery = TzSystems::find()->select(['id', 'name', 'ssc_domain', 'status', 'lottery_type', 'kj_num']);
+            $TzSystemsQuery = TzSystems::find()
+                ->select(['id', 'name', 'system_type_id', 'ssc_domain', 'status', 'lottery_type', 'kj_num'])
+                ->where(['status'=>1]);
             if(!empty($TzSystemTypeId)){
-                $TzSystemsQuery->where(['system_type_id'=>$TzSystemTypeId]);
+                $TzSystemsQuery->andWhere(['system_type_id'=>$TzSystemTypeId]);
             }
             $data = $TzSystemsQuery->asArray()->all();
             commonRedis()->setex($mKey, 1800, $data);

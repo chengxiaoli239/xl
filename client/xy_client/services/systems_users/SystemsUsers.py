@@ -890,12 +890,14 @@ def updateNewRobot7(new_robot7='', old_robot7=''):
     return data
 
 
-def pushTasksBetRst(plan_id, qihao, betRst):
+def pushTasksBetRst(plan_id, qihao, betRst, task_id=None):
     try:
         data = {}
         url = robot_domain + '/api/tz-system-users/push-tasks-bet-rst'
         post_data = {'access_token': access_token, 'plan_id': plan_id, 'qihao': qihao, 'betRst': betRst,
                      'lottery_type': lottery_type}
+        if task_id:
+            post_data['task_id'] = task_id
 
         headers = {'content-type': 'application/json'}
 

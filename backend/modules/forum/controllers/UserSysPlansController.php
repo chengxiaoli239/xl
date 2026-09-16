@@ -218,7 +218,7 @@ class UserSysPlansController extends BaseController
         }
 
         UserSysPlansService::preOpData($this->_post, $this->_user_id);
-        if ($model->load($this->_post) && $model->save()) {
+        if ($model->load($this->_post) && $this->savePlanWithAccountValidation($model)) {
             if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
                 $codesSaved = UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)($this->_post['UserSysPlans']['change_per'][0] ?? 0), $this->_user_id);
                 if(!$codesSaved){
@@ -352,7 +352,7 @@ class UserSysPlansController extends BaseController
         UserSysPlansService::preOpData($this->_post, $this->_user_id, $id);
         $this->_post['update_time'] = date('Y-m-d H:i:s');
         //p([$this->_post, $model->load($this->_post), $model->attributes, $model->save()]);
-        if ($model->load($this->_post) && $model->save()) {
+        if ($model->load($this->_post) && $this->savePlanWithAccountValidation($model)) {
             //p([$this->_post, $model->load($this->_post), \Yii::$app->params['IMPORT_CODES_TYPES'], $model->attributes], 0);
             if(in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES']) && $model->id){ # 导入号码保存
                 $codesSaved = UserSysPlansService::saveImportCodesTxt($model->id, $this->_post['UserSysPlans']['import_codes_txts'], (int)($this->_post['UserSysPlans']['change_per'][0] ?? 0), $this->_user_id);
@@ -484,8 +484,11 @@ class UserSysPlansController extends BaseController
                 switch (true){
                     case in_array($key, [
                         'hefen_pos1', 'hefen_pos2', 'hefen_pos3', 'hefen_pos4',
-                        'no_fix_henfen_pos', 'fixed_sel_pos',
-                        'arise_in_sel', 'odd_pos', 'even_pos', 'big_pos', 'small_pos'
+                        'no_fix_henfen_pos', 'no_fix_hefen_pos_2', 'no_fix_hefen_pos_3', 'fixed_sel_pos',
+                        'fixed_pos_sel', 'ps_sel', 'log_sel', 'type_log', 'type_2log',
+                        'type_2', 'type_3', 'type_4', 'type_22', 'type_2b', 'type_3b', 'type_4b', 'type_22b', 'type_3n_2b',
+                        'arise_in_sel', 'odd_sel', 'even_sel', 'big_sel', 'small_sel',
+                        'odd_pos', 'even_pos', 'big_pos', 'small_pos'
                     ]):
                         $model->$key = explode(',', $val);
                         break;
@@ -737,7 +740,22 @@ class UserSysPlansController extends BaseController
                     }
                 }
             }else{
+                $plansToEnableAutoLogin = [];
+                if($post['field'] === 'is_test' && (int)$post['val'] === 0){
+                    foreach ((array)$post['ids'] as $id){
+                        $plan = $this->findModel($id, $this->_user_id);
+                        $plan->is_test = 0;
+                        $accountValidation = UserSysPlansService::validateRealPlanAccounts($plan);
+                        if((int)($accountValidation['status'] ?? 300) !== 200){
+                            throw_info('计划'.$plan->id.'：'.$accountValidation['msg']);
+                        }
+                        $plansToEnableAutoLogin[] = $plan;
+                    }
+                }
                 HN0898Service::batchSwitchStatus($post['ids'], '\backend\models\UserSysPlans', $post['field'], $post['val'], $this->_user_id);
+                foreach ($plansToEnableAutoLogin as $plan){
+                    UserSysPlansService::enableAutoLoginForRealPlan($plan);
+                }
             }
         }catch (\Exception $e){
             return ['status'=>300, 'msg'=>$e->getMessage()];
@@ -790,9 +808,23 @@ class UserSysPlansController extends BaseController
 
     public function actionSwitchTest($id, $status){
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        HN0898Service::updateStatus($id, $model = '\backend\models\UserSysPlans', 'is_test');
+        $plan = $this->findModel($id, $this->_user_id);
+        $newIsTest = (int)$plan->is_test === 1 ? 0 : 1;
+        $plan->is_test = $newIsTest;
+        $accountValidation = UserSysPlansService::validateRealPlanAccounts($plan);
+        if((int)($accountValidation['status'] ?? 300) !== 200){
+            \Yii::$app->session->setFlash('error', $accountValidation['msg']);
+            return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$plan->lottery_type]);
+        }
 
-        return $this->redirect(['index']);
+        $rst = HN0898Service::updateStatus($id, '\backend\models\UserSysPlans', 'is_test', $newIsTest);
+        if((int)($rst['status'] ?? 300) !== 200){
+            \Yii::$app->session->setFlash('error', $rst['msg'] ?? '计划类型更新失败');
+        }elseif($newIsTest === 0){
+            UserSysPlansService::enableAutoLoginForRealPlan($plan);
+        }
+
+        return $this->redirect(['index', 'UserSysPlans[lottery_type]'=>$plan->lottery_type]);
     }
 
     /**
@@ -879,6 +911,17 @@ class UserSysPlansController extends BaseController
         }
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+    }
+
+    private function savePlanWithAccountValidation(UserSysPlans $model): bool
+    {
+        $accountValidation = UserSysPlansService::validateRealPlanAccounts($model);
+        if((int)($accountValidation['status'] ?? 300) !== 200){
+            $model->addError('tz_sites', $accountValidation['msg']);
+            return false;
+        }
+
+        return $model->save();
     }
 
     /**

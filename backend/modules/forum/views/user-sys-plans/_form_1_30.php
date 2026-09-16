@@ -64,6 +64,29 @@ use yii\widgets\ActiveForm;
                 <?php include(dirname(__FILE__).'/dw_hefen_form.php');?>
 
                 <div class="row">
+                    <div class="col-lg-2 col-xs-4">
+                        <?= $form->field($model, 'no_fix_hefen_pos_2')->checkboxList(
+                            [1=>'两数'],
+                            [
+                                'item' => function ($index, $label, $name, $checked, $value) {
+                                    $options = [
+                                        'class' => 'checkbox-item',
+                                        'label' => $label,
+                                        'value' => $value,
+                                        'checked' => $checked,
+                                    ];
+
+                                    return Html::checkbox($name, $checked, $options);
+                                }
+                            ]
+                        )->label('不定位合分') ?>
+                    </div>
+                    <div class="col-lg-2 col-xs-6">
+                        <?= $form->field($model, 'no_fix_hefen2')->textInput()->label('两数不定位合分:值')?>
+                    </div>
+                </div>
+
+                <div class="row">
                     <div class="col-lg-3 col-xs-4">
                         <!--?= $form->field($model, 'hz_Arr')->textInput()->label('上奖号码(四个数字一组)，多组英文逗号隔开') ?-->
                     <?= $form->field($model, 'type_2')->checkBoxList([

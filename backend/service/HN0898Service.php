@@ -680,6 +680,13 @@ class HN0898Service extends BaseTZService {
                 ];
             }
         }
+        if((int)$status === 1){
+            $accountValidation = UserSysPlansService::validateRealPlanAccounts($UserSysPlans);
+            if((int)($accountValidation['status'] ?? 300) !== 200){
+                $accountValidation['lottery_type'] = $UserSysPlans->lottery_type;
+                return $accountValidation;
+            }
+        }
         $m = \Yii::$app->cache;
         $mkey = 'updateSysPlansStatus_'.$id.'_'.$status;
         if($rst = $m->get($mkey)) ['lottery_type'=>$UserSysPlans->lottery_type];
