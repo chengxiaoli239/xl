@@ -7,6 +7,137 @@ use common\tools\Tool_Common;
 
 class DatasClearService extends BaseService{
 
+    private const EXPIRED_BET_DATA_BATCH_SIZE = 500;
+    private const EXPIRED_BET_DATA_LOCK_NAME = 'xl:expired-bet-data-cleanup';
+
+    /**
+     * 分批清理前天及更早的投注记录，保留昨天和今天的数据。
+     *
+     * @param string|null $cutoffTime
+     * @param int $batchSize
+     * @return array
+     * @throws \Throwable
+     */
+    public static function clearExpiredBetData(?string $cutoffTime = null, int $batchSize = self::EXPIRED_BET_DATA_BATCH_SIZE): array
+    {
+        $db = \Yii::$app->db;
+        $batchSize = max(1, min($batchSize, 5000));
+        $cutoffTime = $cutoffTime ?: $db->createCommand(
+            "SELECT DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 1 DAY), '%Y-%m-%d 00:00:00')"
+        )->queryScalar();
+
+        $hasLock = (int)$db->createCommand(
+            'SELECT GET_LOCK(:lockName, 0)',
+            [':lockName' => self::EXPIRED_BET_DATA_LOCK_NAME]
+        )->queryScalar();
+
+        if ($hasLock !== 1) {
+            return [
+                'status' => 409,
+                'msg' => '清理任务正在执行，本次跳过',
+                'cutoff_time' => $cutoffTime,
+                'deleted' => [],
+            ];
+        }
+
+        $deleted = [];
+        $startedAt = microtime(true);
+
+        try {
+            $db->createCommand('SET SESSION innodb_lock_wait_timeout = 5')->execute();
+            $targets = [
+                'betting_records' => 'create_time',
+                'bet_error_plans_task' => 'updated_time',
+            ];
+
+            foreach ($targets as $tableName => $timeColumn) {
+                $deleted[$tableName] = self::deleteExpiredRowsInBatches(
+                    $tableName,
+                    $timeColumn,
+                    $cutoffTime,
+                    $batchSize
+                );
+            }
+
+            $result = [
+                'status' => 200,
+                'msg' => '过期投注数据清理完成',
+                'cutoff_time' => $cutoffTime,
+                'deleted' => $deleted,
+                'elapsed_seconds' => round(microtime(true) - $startedAt, 2),
+            ];
+            Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '清理过期投注数据', $result);
+
+            return $result;
+        } catch (\Throwable $exception) {
+            Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '清理过期投注数据失败', [
+                'cutoff_time' => $cutoffTime,
+                'deleted' => $deleted,
+                'err_msg' => $exception->getMessage(),
+            ]);
+            throw $exception;
+        } finally {
+            try {
+                $db->createCommand(
+                    'SELECT RELEASE_LOCK(:lockName)',
+                    [':lockName' => self::EXPIRED_BET_DATA_LOCK_NAME]
+                )->queryScalar();
+            } catch (\Throwable $exception) {
+                Tool_Common::log('/datas/'.__FUNCTION__, 'ERR', '释放清理锁失败', [
+                    'err_msg' => $exception->getMessage(),
+                ]);
+            }
+        }
+    }
+
+    /**
+     * @param string $tableName
+     * @param string $timeColumn
+     * @param string $cutoffTime
+     * @param int $batchSize
+     * @return int
+     */
+    private static function deleteExpiredRowsInBatches(
+        string $tableName,
+        string $timeColumn,
+        string $cutoffTime,
+        int $batchSize
+    ): int {
+        $db = \Yii::$app->db;
+        $table = $db->quoteTableName($db->tablePrefix.$tableName);
+        $column = $db->quoteColumnName($timeColumn);
+        $lotteryTypes = $db->createCommand(
+            "SELECT DISTINCT lottery_type FROM {$table} WHERE {$column} < :cutoffTime",
+            [':cutoffTime' => $cutoffTime]
+        )->queryColumn();
+        $deleted = 0;
+
+        foreach ($lotteryTypes as $lotteryType) {
+            $typeCondition = $lotteryType === null ? 'lottery_type IS NULL' : 'lottery_type = :lotteryType';
+            $params = [':cutoffTime' => $cutoffTime];
+            if ($lotteryType !== null) {
+                $params[':lotteryType'] = $lotteryType;
+            }
+
+            do {
+                $affected = $db->createCommand(
+                    "DELETE FROM {$table}
+                     WHERE {$typeCondition} AND {$column} < :cutoffTime
+                     ORDER BY {$column}, id
+                     LIMIT {$batchSize}",
+                    $params
+                )->execute();
+                $deleted += $affected;
+
+                if ($affected === $batchSize) {
+                    usleep(100000);
+                }
+            } while ($affected === $batchSize);
+        }
+
+        return $deleted;
+    }
+
     /**
      * @return array
      */

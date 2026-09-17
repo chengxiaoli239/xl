@@ -8,6 +8,7 @@ use backend\service\BaseService;
 use backend\service\datas\DatasClearService;
 use backend\service\SscDataService;
 use common\service\proxy\ProxyBaseService;
+use common\service\jobs\datas\ClearExpiredBetDataJob;
 use common\service\thirdD\CommonBaseService;
 use common\service\thirdD\OperateLotteryService;
 use backend\service\OpKjService;
@@ -223,6 +224,26 @@ class IndexController extends Controller
         $rst = DatasClearService::deleteLatestRecords();
 
         return $rst;
+    }
+
+    /**
+     * 每日收盘后将过期投注数据清理任务放入队列。
+     *
+     * @return int
+     */
+    public function actionQueueExpiredBetDataClear(): int
+    {
+        $pushed = push_queue(ClearExpiredBetDataJob::class, [
+            'business_id' => date('Ymd'),
+        ]);
+
+        if (!$pushed) {
+            $this->stderr("过期投注数据清理任务入列失败\n");
+            return self::EXIT_CODE_ERROR;
+        }
+
+        $this->stdout("过期投注数据清理任务已入列\n");
+        return self::EXIT_CODE_NORMAL;
     }
 
 }
