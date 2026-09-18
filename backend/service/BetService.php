@@ -578,6 +578,20 @@ abstract class BetService extends BaseBetService {
         return $datas;
     }
 
+    private static function markBetExecutionStarted(BetErrorPlansTask $task): void
+    {
+        if(empty($task->bet_started_at)){
+            $task->bet_started_at = time();
+            $task->save(false, ['bet_started_at', 'updated_at']);
+        }
+    }
+
+    private static function markBetExecutionFinished(BetErrorPlansTask $task): void
+    {
+        $task->bet_finished_at = time();
+        $task->save(false, ['bet_finished_at', 'updated_at']);
+    }
+
     /**
      * 单个任务下注
      * @param $taskId
@@ -586,8 +600,14 @@ abstract class BetService extends BaseBetService {
      */
     public static function betUserOneTask($taskId, string $activeQiHao=''): string
     {
+        $executionTask = null;
+        $task_id = (int)$taskId;
+        $snId = '';
         try {
             $betErrorPlansTask = BetErrorPlansTask::findOne($taskId);
+            if(empty($betErrorPlansTask)){
+                throw new Exception('下注任务不存在:'.$taskId);
+            }
             $lottery_type = $betErrorPlansTask->lottery_type;
             if(empty($activeQiHao)){
                 list($currentKjQiHao, $activeQiHao) = QihaoService::getKjQiHao($lottery_type);
@@ -614,6 +634,8 @@ abstract class BetService extends BaseBetService {
                 }
 
                 $s_time = microtime(true);
+                self::markBetExecutionStarted($betErrorPlansTask);
+                $executionTask = $betErrorPlansTask;
                 Tool_Common::log('/repeatErrorBet/'.__FUNCTION__, 'INFO', '用户计划下注脚本-4', ['task_id'=>$task_id]);
                 $snId = $BetService->repeatErrorBet($task_id);
                 $e_time = microtime(true);
@@ -639,6 +661,14 @@ abstract class BetService extends BaseBetService {
         }catch (\Exception $e){
             Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_err', 'ERR', '下注错误', ['task_id'=>$task_id, $e->getMessage()]);
             return  $e->getMessage();
+        } finally {
+            if($executionTask instanceof BetErrorPlansTask){
+                try {
+                    self::markBetExecutionFinished($executionTask);
+                }catch (\Exception $finishException){
+                    Tool_Common::log('/repeatErrorBet/'.__FUNCTION__.'_finish_err', 'ERR', '下注结束时间保存异常', ['task_id'=>$task_id, 'error'=>$finishException->getMessage()]);
+                }
+            }
         }
 
         return '处理完成:'.($snId??'');
@@ -851,6 +881,14 @@ abstract class BetService extends BaseBetService {
             if($lottery_type == \common\helpers\LotteryType::LUCKY_5){
                 if($model->status == 2){
                     throw_info('已经下注成功无需修改');
+                }
+                $reportedStartedAt = (int)($betRst['bet_started_at'] ?? 0);
+                $reportedFinishedAt = (int)($betRst['bet_finished_at'] ?? 0);
+                if(empty($model->bet_started_at) && $reportedStartedAt > 0){
+                    $model->bet_started_at = $reportedStartedAt;
+                }
+                if((int)$task_status !== BetErrorPlansTask::STATUS_WAIT && $reportedFinishedAt > 0){
+                    $model->bet_finished_at = max((int)$model->bet_started_at, $reportedStartedAt, $reportedFinishedAt);
                 }
                 $model->status = $task_status;
                 $model->post_desc = json_encode($betRst, 320);

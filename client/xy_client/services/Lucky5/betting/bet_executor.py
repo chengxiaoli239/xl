@@ -207,6 +207,8 @@ class BetExecutor:
         # 优化：移除线程锁，因为外层已经有互斥锁保护（bet_task_manager中的_bet_task_lock）
         # 移除锁可以减少锁竞争，提高并发性能
         start_time = time.time()
+        bet_started_at = int(data.get('bet_started_at') or start_time)
+        data['_bet_started_at'] = bet_started_at
         
         # 准备请求头（记录准备时间）
         prepare_start = time.time()
@@ -225,7 +227,11 @@ class BetExecutor:
         
         # 执行下注
         if data['plan_type'] == 'local':
-            postRst = localBet(self.main_window, data['local_data'])
+            try:
+                postRst = localBet(self.main_window, data['local_data'])
+            except Exception as error:
+                self._push_bet_exception_result(data, error, start_time, bet_started_at)
+                raise
         else:
             # 只在有多个任务或首次执行时输出日志
             if total_count > 1 or index == 0:
@@ -266,7 +272,7 @@ class BetExecutor:
                             'code': 310,
                             'msg': f'HTTP {response.status_code}: 未登录或登录已过期'
                         }
-                        self._handle_cookie_invalid(data, error_postRst, start_time)
+                        self._handle_cookie_invalid(data, error_postRst, start_time, bet_started_at)
                         return {'success': False, 'cookie_invalid': True}
                     
                     # 网络请求完成后立即更新心跳
@@ -320,6 +326,7 @@ class BetExecutor:
                             continue
                         else:
                             # 已用完重试次数，抛出异常
+                            self._push_bet_exception_result(data, last_exception, start_time, bet_started_at)
                             raise
                     
                     # 优化：超时处理策略
@@ -334,6 +341,7 @@ class BetExecutor:
                             optimized_print(f"⚠️ [BetExecutor] 第{index+1}个下注任务长时间超时（耗时{elapsed:.2f}s），可能是盘口卡顿，不重试避免重复下注",
                                            category='bet_executor', level='WARNING', force=True)
                             # 不重试，直接抛出异常，让上层判断是否已经下注成功
+                            self._push_bet_exception_result(data, last_exception, start_time, bet_started_at)
                             raise
                         else:
                             # 超时时间较短（<12秒），可能是网络问题，可以重试
@@ -344,18 +352,20 @@ class BetExecutor:
                             continue
                     else:
                         # 非超时错误或已用完重试次数，抛出异常
+                        self._push_bet_exception_result(data, last_exception, start_time, bet_started_at)
                         raise
         
         # 处理结果
-        result = self._process_bet_result(postRst, data, start_time, direct)
+        result = self._process_bet_result(postRst, data, start_time, direct, bet_started_at)
         
         # 控制下注间隔
         self._wait_bet_interval(data)
         
         return result
     
-    def _process_bet_result(self, postRst: Dict[str, Any], data: Dict[str, Any], 
-                           start_time: float, direct: int) -> Dict[str, Any]:
+    def _process_bet_result(self, postRst: Dict[str, Any], data: Dict[str, Any],
+                           start_time: float, direct: int,
+                           bet_started_at: Optional[int] = None) -> Dict[str, Any]:
         """
         处理下注结果
         
@@ -385,7 +395,9 @@ class BetExecutor:
                 'sn': '6666666666',
                 'snid': '6666666666id',
                 'time_consume': f"{time.time() - start_time:.2f}s",
-                'now_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                'now_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                'bet_started_at': bet_started_at or int(start_time),
+                'bet_finished_at': int(time.time())
             })
             self._push_bet_result(data, postRst)
             return {'success': True}
@@ -401,7 +413,7 @@ class BetExecutor:
             
             # 检查是否是Cookie无效错误（post_code == 310）
             if post_code == 310:
-                self._handle_cookie_invalid(data, postRst, start_time)
+                self._handle_cookie_invalid(data, postRst, start_time, bet_started_at)
                 return {'success': False, 'cookie_invalid': True}
             
             # 检查响应消息中是否包含登录相关错误
@@ -419,7 +431,7 @@ class BetExecutor:
             if is_login_error:
                 optimized_print(f"⚠️ [BetExecutor] 检测到登录错误（下注响应）: {postRst.get('msg', '未知错误')}",
                                category='bet_executor', level='WARNING', force=True)
-                self._handle_login_error(data, postRst, start_time)
+                self._handle_login_error(data, postRst, start_time, bet_started_at)
                 return {'success': False, 'cookie_invalid': True}
             
             # 其他错误
@@ -427,7 +439,9 @@ class BetExecutor:
                 'task_status': 3,
                 'err_msg': postRst.get('msg', '未知错误'),
                 'time_consume': f"{time.time() - start_time:.2f}s",
-                'now_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                'now_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+                'bet_started_at': bet_started_at or int(start_time),
+                'bet_finished_at': int(time.time())
             })
             self._push_bet_result(data, postRst)
             return {'success': False}
@@ -438,8 +452,8 @@ class BetExecutor:
             postRst['task_id'] = task_id
         pushTasksBetRst(data['plan_id'], data['qihao'], postRst, task_id=task_id)
     
-    def _handle_cookie_invalid(self, data: Dict[str, Any], postRst: Dict[str, Any], 
-                              start_time: float):
+    def _handle_cookie_invalid(self, data: Dict[str, Any], postRst: Dict[str, Any],
+                              start_time: float, bet_started_at: Optional[int] = None):
         """
         处理Cookie无效错误（post_code == 310）
         
@@ -464,15 +478,17 @@ class BetExecutor:
             'task_status': 3,
             'err_msg': 'Cookie无效，已停止下注任务并触发自动登录',
             'time_consume': f"{time.time() - start_time:.2f}s",
-            'now_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            'now_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+            'bet_started_at': bet_started_at or int(start_time),
+            'bet_finished_at': int(time.time())
         })
         self._push_bet_result(data, postRst)
         
         # 立即触发登录（使用LoginStatusMonitor）
         self._trigger_immediate_login()
     
-    def _handle_login_error(self, data: Dict[str, Any], postRst: Dict[str, Any], 
-                            start_time: float):
+    def _handle_login_error(self, data: Dict[str, Any], postRst: Dict[str, Any],
+                            start_time: float, bet_started_at: Optional[int] = None):
         """
         处理登录相关错误（从响应消息中检测到）
         
@@ -498,12 +514,28 @@ class BetExecutor:
             'task_status': 3,
             'err_msg': f"登录错误：{postRst.get('msg', '未知错误')}，已停止下注任务并触发自动登录",
             'time_consume': f"{time.time() - start_time:.2f}s",
-            'now_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+            'now_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+            'bet_started_at': bet_started_at or int(start_time),
+            'bet_finished_at': int(time.time())
         })
         self._push_bet_result(data, postRst)
         
         # 立即触发登录（使用LoginStatusMonitor）
         self._trigger_immediate_login()
+
+    def _push_bet_exception_result(self, data: Dict[str, Any], error: Exception,
+                                   start_time: float, bet_started_at: Optional[int] = None):
+        """Persist timing even when the request fails before a platform response."""
+        post_rst = {
+            'Status': 0,
+            'task_status': 3,
+            'err_msg': str(error),
+            'time_consume': f"{time.time() - start_time:.2f}s",
+            'now_time': time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),
+            'bet_started_at': bet_started_at or int(start_time),
+            'bet_finished_at': int(time.time()),
+        }
+        self._push_bet_result(data, post_rst)
     
     def _trigger_immediate_login(self):
         """

@@ -19,7 +19,7 @@ class BetErrorPlansTask extends BetErrorPlansTaskModel
     public function rules()
     {
         return [
-            [['id', 'uid', 'agent_id', 'playway', 'tz_type', 'status', 'plan_id', 'is_local_bet', 'tz_system_id', 'lottery_type', 'updated_at', 'created_at'], 'integer'],
+            [['id', 'uid', 'agent_id', 'playway', 'tz_type', 'status', 'plan_id', 'is_local_bet', 'tz_system_id', 'lottery_type', 'updated_at', 'created_at', 'bet_started_at', 'bet_finished_at'], 'integer'],
             [['codes', 'account', 'bet_url', 'bet_headers', 'post_datas', 'playway_name', 'qihao', 'kj_codes', 'sn', 'snid', 'lotteryclass', 'post_desc', 'error_desc', 'updated_time'], 'safe'],
             [['bet_money', 'single'], 'number'],
         ];

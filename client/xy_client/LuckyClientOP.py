@@ -502,6 +502,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.account_status = 1
             self.current_qihao = ''
             self.browser_cookies = None
+            self.browser_user_agent = ''
             self.browser = None  # 用户浏览器
             self.domain = None  # 用户网盘地址
             self.port = random.randint(9000, 9999)  # 主浏览器调试端口
@@ -1335,11 +1336,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
             self.browser_cookies = cookies
             from xy_client.services.Lucky5.core.platform_api import check_login_status_by_api
-            if not check_login_status_by_api(self):
+            self.browser_user_agent = header_data.get('user_agent', '')
+            login_status = check_login_status_by_api(self)
+            if login_status is False:
                 self.browser_cookies = None
                 if show_message:
                     QMessageBox.warning(self, '盘口登录', '盘口会话已失效，请勾选“打开浏览器登录”后重试。')
                 return False
+            if login_status is None:
+                print('⚠️ 暂时无法确认后台HTTP会话，保留Cookie并等待下次检查')
 
             self.is_need_login = 1
             set_global_login_status(True)
@@ -2101,29 +2106,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 print("✅ 智能登录成功")
                 print(f"🔍 已设置 is_need_login = {self.is_need_login}")
                 
-                # 记录当前页面URL
-                try:
-                    current_url = self.driver.current_url
-                    print(f"🌐 [execute_smart_login] 登录成功后当前URL: {current_url}")
-                except Exception as url_e:
-                    print(f"⚠️ [execute_smart_login] 无法获取当前URL: {url_e}")
-                
-                # 确保只有一个浏览器窗口
-                self.ensure_single_browser_window()
-                
-                # 再次检查URL是否改变
-                try:
-                    final_url = self.driver.current_url
-                    print(f"🌐 [execute_smart_login] 确保单窗口后URL: {final_url}")
-                    
-                    # 检查是否被重定向到登录页
-                    if 'Login' in final_url or '登录' in final_url or 'Member/Login' in final_url:
-                        print(f"⚠️ [execute_smart_login] 警告：URL被重定向到登录页！")
-                        print(f"   - 可能原因：cookies未保存或页面刷新导致")
-                    else:
-                        print(f"✅ [execute_smart_login] 页面URL正常")
-                except Exception as url_e:
-                    print(f"⚠️ [execute_smart_login] 无法获取最终URL: {url_e}")
+                self._verify_successful_login_browser_state()
                 
                 return True
             else:
@@ -2138,6 +2121,34 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         finally:
             # 解锁逻辑由doLogin的finally块处理，这里不需要重复解锁
             pass
+
+    def _verify_successful_login_browser_state(self):
+        """Verify browser-only state after login; CDP mode has no WebDriver object."""
+        if getattr(self, '_browser_automation_mode', 'webdriver') == 'cdp':
+            print("✅ [execute_smart_login] CDP登录成功，跳过WebDriver URL和窗口检查")
+            return True
+        if not getattr(self, 'driver', None):
+            print("⚠️ [execute_smart_login] 登录成功但WebDriver不存在，跳过浏览器状态检查")
+            return False
+
+        try:
+            current_url = self.driver.current_url
+            print(f"🌐 [execute_smart_login] 登录成功后当前URL: {current_url}")
+        except Exception as url_e:
+            print(f"⚠️ [execute_smart_login] 无法获取当前URL: {url_e}")
+
+        self.ensure_single_browser_window()
+
+        try:
+            final_url = self.driver.current_url
+            print(f"🌐 [execute_smart_login] 确保单窗口后URL: {final_url}")
+            if 'Login' in final_url or '登录' in final_url or 'Member/Login' in final_url:
+                print("⚠️ [execute_smart_login] 警告：URL被重定向到登录页！")
+            else:
+                print("✅ [execute_smart_login] 页面URL正常")
+        except Exception as url_e:
+            print(f"⚠️ [execute_smart_login] 无法获取最终URL: {url_e}")
+        return True
     
     def force_close_all_browsers(self):
         """强制关闭所有浏览器窗口"""

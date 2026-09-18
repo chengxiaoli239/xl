@@ -1926,10 +1926,13 @@ def checkUserLoginJob(mainWindow):
         print("🔄 [checkUserLoginJob] 调用API检查登录状态...")
         is_logged_in = check_login_status_by_api(mainWindow)
         
-        if is_logged_in:
+        if is_logged_in is not False:
             # API检查成功，更新登录状态
             mainWindow.is_need_login = 1
-            print("✅ [checkUserLoginJob] API检查：已登录，更新is_need_login = 1，返回True")
+            if is_logged_in is None:
+                print("⚠️ [checkUserLoginJob] API暂时无法确认，保留Cookie和登录状态，返回True")
+            else:
+                print("✅ [checkUserLoginJob] API检查：已登录，更新is_need_login = 1，返回True")
             return True
         else:
             # API检查失败，需要登录
