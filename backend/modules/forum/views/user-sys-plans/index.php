@@ -179,18 +179,57 @@ use common\widgets\Alert;
 $this->title = Yii::t('app', 'User Sys Plans');
 $this->params['breadcrumbs'][] = $this->title;
 $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type);
+$planSummary = static function (array $rows) {
+    $content = '';
+    foreach ($rows as $row) {
+        $content .= Html::tag('div',
+            Html::tag('span', Html::encode($row[0]), ['class' => 'plan-summary-label']).
+            Html::tag('span', $row[1], ['class' => 'plan-summary-value']),
+            ['class' => 'plan-summary-line']
+        );
+    }
+    return Html::tag('div', $content, ['class' => 'plan-summary']);
+};
+$planValue = static function ($value) {
+    return trim((string)$value) === '' ? Html::tag('span', '-', ['class' => 'text-muted']) : Html::encode($value);
+};
+$isSuperAdmin = (int)Yii::$app->user->id === 1;
 $columns = array_merge(
     [
         ['class' => 'yii\grid\CheckboxColumn', 'headerOptions'=>['width'=>'2%']],
 
-        ['attribute' => 'playway','headerOptions'=>['width'=>'5%'],'label'=>'类型1',
+        ['attribute' => 'plan_summary','headerOptions'=>['width'=>'18%'],'label'=>'计划/类型',
             'format'=>'raw',
-            'value' => function($model) {
+            'contentOptions' => ['class'=>'plan-summary-cell'],
+            'value' => function($model) use ($planSummary, $planValue, $isSuperAdmin) {
                 $playWayArr = [1=>'二字定', 2=>'三字定', 3=>'四字定', 4=>'一字定', 6=>'X字现'];
-
                 $url = '/forum/betting-records/index?BettingRecords[plan_id]='.$model->id;
                 $remark = '<br>'.Html::a($model->remark?'[备:'.$model->remark.']':'[备注]', 'javascript:;', ['class'=>'set_remark_pop', 'id'=>'remark_plan_id_'.$model->id, 'data-id'=>$model->id, 'data-remark'=>$model->remark]);
-                return $playWayArr[$model->playway].'['.Html::a($model->id, $url).']'.$remark;
+                $plan = ($playWayArr[$model->playway] ?? '-').'['.Html::a($model->id, $url).']'.$remark;
+                $typeName = '';
+                if($model->playway == 2 && in_array($model->tz_type, [1,2,3])){
+                    $typeName = [1=>'大小单双三字定', 2=>'大小三字定', 3=>'单双三字定'][$model->tz_type];
+                }elseif(in_array($model->playway, [1,2,3,4]) || in_array($model->tz_type, Yii::$app->params['IMPORT_CODES_TYPES'])){
+                    $typeName = \backend\service\BetService::getTypeNameByTzType($model->tz_type);
+                }
+                if(in_array($model->tz_type, Yii::$app->params['IS_XIAN'])){
+                    $typeName = [36=>'二字现', 17=>'三字现', 37=>'四字现'][$model->tz_type] ?? $typeName;
+                }
+                $type = str_replace('三定-', '', str_replace('四定-', '', $typeName));
+                $planType = \backend\service\TzService::getTzPlanTypes($model->plan_type).'_';
+                $testUrl = "/forum/user-sys-plans/switch-test?id=".$model->id.'&status='.(int)$model->is_test;
+                $planType .= $model->is_test
+                    ? Html::a("<font color='gray'><strong>模拟</strong></font>", $testUrl, ['title' => '切换真实'])
+                    : Html::a("<font color='green'><strong>真实</strong></font>", $testUrl, ['title' => '切换模拟']);
+                $rows = [
+                    ['计划', $plan],
+                    ['类型', $planValue($type)],
+                    ['计划类', $planType],
+                ];
+                if($isSuperAdmin){
+                    $rows[] = ['账号', Html::a($planValue($model->account), '/forum/user-sys-plans/index?UserSysPlans[account]='.$model->account)];
+                }
+                return $planSummary($rows);
             }
         ],
         ['label' => '利润统计分组', 'headerOptions'=>['width'=>'8%'], 'format'=>'raw',
@@ -215,91 +254,49 @@ $columns = array_merge(
             }
         ],
 
-        ['attribute' => 'tz_type','label'=>'类型2', # 'headerOptions'=>['width'=>'5%'],
-            'value' => function($model) {
-                if($model->playway == 2 && in_array($model->tz_type, [1,2,3])){
-                    //投注类型:1大小单双三字定2大小三字定3单双三字定
-                    $tz_type_Arr = [1=>'大小单双三字定', 2=>'大小三字定', 3=>'单双三字定'];
-                    $typeName = $tz_type_Arr[$model->tz_type];
-                }elseif(in_array($model->playway, [1,2,3,4]) OR in_array($model->tz_type, \Yii::$app->params['IMPORT_CODES_TYPES'])){
-                    $typeName = \backend\service\BetService::getTypeNameByTzType($model->tz_type);
-                }
-                if(in_array($model->tz_type, \Yii::$app->params['IS_XIAN'])){
-                    $xians = [36=>'二字现', 17=>'三字现', 37=>'四字现'];
-                    return $xians[$model->tz_type];
-                }
-                return str_replace('三定-', '', str_replace('四定-', '', $typeName));
-            }
-        ],
-        //'buy_type',
-        ['attribute' => 'buy_type','label'=>'正/反',#'headerOptions'=>['width'=>'5%'],
+        ['attribute' => 'direction_status','label'=>'正/反/状态',
+            'contentOptions' => ['class'=>'plan-summary-cell'],
             'format'=>'raw',
-            'value' => function($model) {
+            'value' => function($model) use ($planSummary) {
                 $buy_type_Arr = [0=>'反买', 1=>'正买'];
                 $txt = $buy_type_Arr[$model->buy_type];
                 $url0 = "/forum/user-sys-plans/switch-buy-type?id=".$model->id.'&status=1'; # 切换正买
                 $url1 = "/forum/user-sys-plans/switch-buy-type?id=".$model->id.'&status=0'; # 切换反买
                 if($model->tz_type==22){  # 四定单双
-                    //return Html::a($txt, '#', ['title' => '正买']);
-                    return '';
-                }
-                if($model->buy_type == 1){
+                    $buyType = '';
+                }elseif($model->buy_type == 1){
                     $txt = "<font color='green'>$txt</font>" ;
-                    return Html::a($txt, $url1, ['title' => '切换反买']);
-                }
-                if(!$model->buy_type){
-                    $txt = "<font color='red'>$txt</font>";
-                    return Html::a($txt, $url0, ['title' => '切换正买']);
-                }
-            }
-        ],
-        ['attribute' => 'plan_type','label'=>'计划类型', 'headerOptions'=>['width'=>'5%'],
-            'format'=>'raw',
-            'value' => function($model) {
-                $txt = \backend\service\TzService::getTzPlanTypes($model->plan_type).'_';
-                $url0 = "/forum/user-sys-plans/switch-test?id=".$model->id.'&status=1'; # 切换真实
-                $url1 = "/forum/user-sys-plans/switch-test?id=".$model->id.'&status=0'; # 切换模拟
-                if($model->is_test) {
-                    $txt .= Html::a("<font color='gray'><strong>模拟</strong></font>", $url0, ['title' => '切换真实']);
+                    $buyType = Html::a($txt, $url1, ['title' => '切换反买']);
                 }else{
-                    $txt .= Html::a("<font color='green'><strong>真实</strong></font>", $url1, ['title' => '切换模拟']);
+                    $txt = "<font color='red'>$txt</font>";
+                    $buyType = Html::a($txt, $url0, ['title' => '切换正买']);
                 }
-                return $txt;
-            }
-        ],
-        //'status',
-        ['attribute'=>'status', 'label'=>'状态',#'headerOptions'=>['width'=>'5%'],
-            'format'=>'raw',
-            'value'=>function($model){
-                $url0 = "/forum/user-sys-plans/switch-status?id=".$model->id.'&status=1'; # 点击开启
-                $url1 = "/forum/user-sys-plans/switch-status?id=".$model->id.'&status=0'; # 点击关闭
+                $statusUrl = "/forum/user-sys-plans/switch-status?id=".$model->id.'&status='.(int)!$model->status;
                 if($model->status == 1){
-                    $txt = "<font color='green'>已开启</font>";
-                    return Html::a($txt, $url1, ['title' => '点击关闭']).'<i class="icon-refresh"></i>';
+                    $status = Html::a("<font color='green'>已开启</font>", $statusUrl, ['title' => '点击关闭']);
+                }else{
+                    $status = Html::a("<font color='red'>已关闭</font>", $statusUrl, ['title' => '点击开启']);
                 }
-                if(!$model->status){
-                    $txt = "<font color='red'>已关闭</font>";
-                    return Html::a($txt, $url0, ['title' => '点击开启']).'<i class="icon-refresh"></i>';
-                }
-                //return $model->snid;
+                return $planSummary([
+                    ['方向', $buyType],
+                    ['状态', $status.'<i class="icon-refresh"></i>'],
+                ]);
             }
         ],
-        //'single',
-        ['attribute' => 'single','headerOptions'=>['width'=>'5%'],'label'=>'倍(元)',
-            'value' => function($model) {
-                return $model->single;
-            }
-        ],
-        ['attribute' => 'current_profits','label'=>'当前',
+        ['attribute' => 'money_profit','headerOptions'=>['width'=>'14%'],'label'=>'倍数/盈利',
+            'contentOptions' => ['class'=>'plan-summary-cell'],
             'format'=>'raw',
-            'value' => function($model) {
+            'value' => function($model) use ($planSummary, $planValue) {
                 if(in_array($model->plan_type,[1, 3]) OR ($model->take_profits>0 OR $model->stop_loss)){
                     $currentProfits = PlanStaticProfits::find()->select(['cut_profits'])->where(['plan_id'=>$model->id])->scalar()?:0.00;
                     $txt = '止盈:'.floatval($model->take_profits)." 止损:".floatval($model->stop_loss) .' 当前:<font data-profits="'.$currentProfits.'" color="'.(($model->current_profits>0)?'green':($model->current_profits<0?'red':'')).'">'.round($currentProfits, 2).'</font>' ;
                 }else{
                     $txt = '';
                 }
-                return $txt;
+                return $planSummary([
+                    ['倍数', $planValue($model->single)],
+                    ['盈利', $txt === '' ? $planValue('') : $txt],
+                ]);
             }
         ],
         ['attribute' => 'tz_type','label'=>'操作', # 'headerOptions'=>['width'=>'5%'],
@@ -327,18 +324,11 @@ $columns = array_merge(
             }
         ]
     ],
-    \Yii::$app->user->identity['user_type']!=\common\models\AdminModel::USER_TYPE_SUPER_ADMIN?[]:[
-        ['attribute' => 'account','headerOptions'=>['width'=>'5%'],'label'=>'账号',
-            'format'=>'raw',
-            'value' => function($model) {
-                return Html::a($model->account, '/forum/user-sys-plans/index?UserSysPlans[account]='.$model->account);
-            }
-        ],
-    ],
     [
-        ['attribute' => 'hz_Arr','label'=>'扩展',#'headerOptions'=>['width'=>'5%'],
+        ['attribute' => 'extension_time','label'=>'扩展/时间',
+            'contentOptions' => ['class'=>'plan-summary-cell'],
             'format'=>'raw',
-            'value' => function($model) {
+            'value' => function($model) use ($planSummary, $planValue) {
                 $str = '';
                 $title = '';
                 $desc_str = '';
@@ -366,12 +356,10 @@ $columns = array_merge(
                 if(!empty($model->singles) OR in_array($model->plan_type,[2, 3, 4, 5, 9, 10])){
                     $str .= '翻倍梯度:'.$model->singles;
                 }
-                return $str;
-            }
-        ],
-        ['attribute' => 'updated_at','label'=>'时间',
-            'value' => function($model) {
-                return date('m-d H:i', $model->updated_at);
+                return $planSummary([
+                    ['扩展', $str],
+                    ['时间', $planValue(date('m-d H:i', $model->updated_at))],
+                ]);
             }
         ],
         /*
@@ -398,6 +386,58 @@ $columns = array_merge(
     ]
 );
 ?>
+<?php $this->registerCss(<<<'CSS'
+.user-sys-plans-index .grid-view {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.user-sys-plans-index .grid-view th,
+.user-sys-plans-index .grid-view td {
+    vertical-align: top;
+}
+.user-sys-plans-index .plan-summary-cell {
+    min-width: 142px;
+}
+.user-sys-plans-index .plan-summary {
+    line-height: 1.55;
+    min-width: 124px;
+}
+.user-sys-plans-index .plan-summary-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    white-space: normal;
+}
+.user-sys-plans-index .plan-summary-label {
+    color: #888;
+    flex: 0 0 46px;
+    white-space: nowrap;
+}
+.user-sys-plans-index .plan-summary-value {
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+@media (max-width: 767px) {
+    .user-sys-plans-index .panel-body {
+        padding: 10px;
+    }
+    .user-sys-plans-index .grid-view table {
+        min-width: 900px;
+        margin-bottom: 0;
+        font-size: 12px;
+    }
+    .user-sys-plans-index .grid-view th,
+    .user-sys-plans-index .grid-view td {
+        padding: 6px 5px;
+    }
+    .user-sys-plans-index .plan-summary-cell {
+        min-width: 150px;
+        max-width: 240px;
+    }
+}
+CSS
+); ?>
 <section class="user-sys-plans-index wrapper site-min-height">
     <!-- page start-->
     <?= Alert::widget() ?>
