@@ -69,6 +69,13 @@ class TzSystemsUsers extends \common\models\base\BaseModel
     const SSL_MODE_AUTO = 1;
     const SSL_MODE_TLS12 = 2;
     const SSL_MODE_COMPATIBLE = 3;
+    const PROXY_TYPE_OPTIONS = [
+        0 => '继承全局',
+        1 => '快代理',
+        2 => '芝麻代理',
+        3 => '代理云',
+        4 => 'Clash / Mihomo（独立节点）',
+    ];
     # 下单模式选项
     const BET_TYPE_OPTIONS = [
         self::BET_TYPE_LOCAL_API => '本地api',

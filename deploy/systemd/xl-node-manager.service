@@ -1,0 +1,25 @@
+[Unit]
+Description=Lottery XL isolated per-node proxy manager
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+StateDirectory=xl-node-manager
+StateDirectoryMode=0700
+LoadCredential=api-secret:/etc/xl-node-manager/api-secret
+ExecStart=/opt/xl-node-manager/venv/bin/python /opt/xl-node-manager/node_manager.py --secret-file %d/api-secret
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+CapabilityBoundingSet=
+TasksMax=256
+
+[Install]
+WantedBy=multi-user.target

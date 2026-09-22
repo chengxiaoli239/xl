@@ -1760,6 +1760,16 @@ class SevenService extends BaseTZService {
      * @return bool
      */
     public static function setPoxy($ch, $url = '', $uid = 0){
+        // Some all-lottery sites share IDs with Lucky5, but this legacy adapter
+        // still uses the global purchased-IP pool. Never silently use that pool
+        // (or DIRECT) for an account explicitly assigned to Mihomo.
+        if($uid && in_array((int)self::$tz_system_id, [9, 10], true)){
+            $proxyAccount = TzSystemsUsers::findOne(['uid'=>(int)$uid, 'tz_system_id'=>(int)self::$tz_system_id]);
+            if($proxyAccount && (int)$proxyAccount->proxy_type === \common\service\proxy\ProxyMihomoService::TYPE
+                && (int)$proxyAccount->is_use_proxy === 1){
+                throw new \RuntimeException('此账号的 Mihomo 代理仅支持幸运五星彩接口，请先切回原代理商再使用旧七时彩接口');
+            }
+        }
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return []; # CURL 代理开关
 

@@ -1250,7 +1250,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             return (int)$TzSystemsUsers->proxy_type;
         }
 
-        return $uid ? ProxyBaseService::getProxyTypeByUid($uid) : ProxyBaseService::getProxyType();
+        return ProxyBaseService::getProxyType();
     }
 
     private static function isLoginProxyConnectFailure($response){
@@ -2083,6 +2083,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                 return self::postBetCurl($url, $post_data, $headers, $uid);
             }, [
                 'platform' => 'lucky5',
+                'tz_system_id' => self::$tz_system_id,
                 'task_id' => $id,
                 'plan_id' => $plan_id,
                 'uid' => $uid,
