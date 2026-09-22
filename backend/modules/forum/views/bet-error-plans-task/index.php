@@ -139,6 +139,22 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::a($txt, 'javascript:;', $options);
                             }
                         ],
+                        ['attribute' => 'bet_started_at','label' => '下注开始',
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return $model->bet_started_at ? date('m-d H:i:s', $model->bet_started_at) : '-';
+                            }
+                        ],
+                        ['attribute' => 'bet_finished_at','label' => '下注结束',
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                if(!$model->bet_finished_at){
+                                    return '-';
+                                }
+                                $duration = $model->bet_started_at ? max(0, $model->bet_finished_at - $model->bet_started_at) : null;
+                                return date('m-d H:i:s', $model->bet_finished_at).($duration === null ? '' : '<br><small>耗时 '.$duration.' 秒</small>');
+                            }
+                        ],
                         //'sn',
                         //'snid',
                         /*
