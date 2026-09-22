@@ -105,6 +105,10 @@ class ProxyBaseService {
         if(empty($proxy_type)){
             $proxy_type = self::getProxyType();
         }
+        if((int)$proxy_type === ProxyMihomoService::TYPE || ProxyMihomoService::isNodeAddress($ip_addr)){
+            // A fixed node has no purchased-IP pool to expire or rotate.
+            return ['status'=>200, 'data'=>['proxy_type'=>ProxyMihomoService::TYPE, 'fetch_cache_cleared'=>false]];
+        }
         $m = \Yii::$app->cache;
         $mkey = self::buildProxyIpKey($proxy_type);
         $cachedIp = $m->get($mkey);
@@ -138,6 +142,11 @@ class ProxyBaseService {
     public static function getCurrentValidProxyIp($proxy_type='', $type=1, &$is_warnning=0, $proxyScene = BaseService::PROXY_SCENE_BET){
         $POXY_STATUS = BetService::getConfig('CURL_POXY_STATUS');
         if(!$POXY_STATUS) return []; # CURL 代理开关
+
+        if((int)$proxy_type === ProxyMihomoService::TYPE){
+            $is_warnning = 0;
+            return ProxyMihomoService::ADDRESS;
+        }
 
         $m = \Yii::$app->cache;
         if(empty($proxy_type)){
@@ -245,6 +254,9 @@ class ProxyBaseService {
      * @return array
      */
     public static function getRemoteProxyIp($proxy_type='', $proxyScene = BaseService::PROXY_SCENE_BET){
+        if((int)$proxy_type === ProxyMihomoService::TYPE){
+            return ['status'=>200, 'ip_addr'=>ProxyMihomoService::ADDRESS];
+        }
         $time_HI = date("H:i");
         //return ['status'=>300, 'msg'=>'调试'];
         if($proxyScene !== BaseService::PROXY_SCENE_LOGIN && '04:00'<$time_HI && $time_HI<'08:55'){
@@ -381,6 +393,12 @@ class ProxyBaseService {
                 throw_info('IP代理开关未开启2');
             }
             $proxy_type = $uid && !empty($TzSystemsUsers->proxy_type) ? (int)$TzSystemsUsers->proxy_type : ProxyBaseService::getProxyType();
+
+            if($proxy_type === ProxyMihomoService::TYPE){
+                $port = $TzSystemsUsers && $TzSystemsUsers->hasAttribute('proxy_node_port')
+                    ? (int)$TzSystemsUsers->proxy_node_port : 0;
+                return ProxyMihomoService::setProxy($ch, $port);
+            }
 
             $warnning = 0;
             $current_proxy_addr = ProxyBaseService::getCurrentValidProxyIp($proxy_type, 1, $warnning, $proxyScene);

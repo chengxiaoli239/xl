@@ -17,6 +17,15 @@ use yii\filters\VerbFilter;
  */
 class TzSystemsUsersController extends BaseController
 {
+    public function beforeAction($action)
+    {
+        if($action->id === 'set-proxy-type'){
+            Yii::$app->request->enableCsrfValidation = true;
+            foreach(Yii::$app->log->targets as $target){ $target->logVars = []; }
+        }
+        return parent::beforeAction($action);
+    }
+
     /**
      * @inheritdoc
      */
@@ -28,6 +37,7 @@ class TzSystemsUsersController extends BaseController
                 'actions' => [
                     'delete' => ['POST'],
                     'set-ssl-mode' => ['POST'],
+                    'set-proxy-type' => ['POST'],
                     'update-account' => ['POST'],
                 ],
             ],
@@ -67,6 +77,84 @@ class TzSystemsUsersController extends BaseController
         }
 
         return $rst;
+    }
+
+    public function actionSetProxyType()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        if(Yii::$app->user->isGuest || (int)Yii::$app->user->id !== 1
+            || !Yii::$app->user->identity || (int)Yii::$app->user->identity->status !== 10){
+            return ['status'=>403, 'msg'=>'仅管理员可切换代理商'];
+        }
+        $id = filter_var(Yii::$app->request->post('id'), FILTER_VALIDATE_INT);
+        $type = filter_var(Yii::$app->request->post('proxy_type'), FILTER_VALIDATE_INT);
+        if(!$id || $type === false || !isset(TzSystemsUsers::PROXY_TYPE_OPTIONS[$type])){
+            return ['status'=>400, 'msg'=>'账号或代理商无效'];
+        }
+        $model = TzSystemsUsers::findOne($id);
+        if(!$model){
+            return ['status'=>404, 'msg'=>'盘口账号不存在'];
+        }
+        $fields = ['proxy_type', 'updated_at'];
+        $enabled = Yii::$app->request->post('is_use_proxy');
+        if($enabled !== null){
+            if(!in_array($enabled, [0, 1, '0', '1'], true)){
+                return ['status'=>400, 'msg'=>'代理开关无效'];
+            }
+            $model->is_use_proxy = (int)$enabled;
+            $fields[] = 'is_use_proxy';
+        }
+        if($type === \common\service\proxy\ProxyMihomoService::TYPE && (int)$model->is_use_proxy === 1){
+            $site = \backend\models\TzSystems::findOne($model->tz_system_id);
+            if((int)$model->is_local_bet !== \backend\models\thirdD\BetsBackend::BET_TYPE_SERVER_API
+                || !in_array((int)$model->tz_system_id, [9, 10], true)
+                || !$site || !in_array((int)$site->lottery_type, [0, 8], true)){
+                return ['status'=>400, 'msg'=>'Mihomo 当前支持幸运五星彩的云服务器账号'];
+            }
+            if(!$model->hasAttribute('proxy_node_port')){
+                return ['status'=>400, 'msg'=>'请先完成节点字段迁移'];
+            }
+            $port = filter_var(Yii::$app->request->post('proxy_node_port'), FILTER_VALIDATE_INT);
+            if($port === false || \common\service\proxy\ProxyMihomoService::address($port) === \common\service\proxy\ProxyMihomoService::ADDRESS){
+                return ['status'=>400, 'msg'=>'请选择此账号使用的节点'];
+            }
+            try{
+                $result = \common\service\proxy\ProxyMihomoService::manager('list');
+                $ready = false;
+                foreach($result['nodes'] ?? [] as $node){
+                    if((int)$node['port'] === $port && !empty($node['running'])){
+                        $ready = true;
+                    }
+                }
+                if(!$ready || !\common\service\proxy\ProxyMihomoService::isListening($port)){
+                    return ['status'=>400, 'msg'=>'请先在节点管理页启动并测试该节点'];
+                }
+            }catch(\RuntimeException $e){
+                return ['status'=>400, 'msg'=>$e->getMessage()];
+            }
+            $model->proxy_node_port = $port;
+            $fields[] = 'proxy_node_port';
+        }
+        foreach(['is_proxy_login', 'is_proxy_bet'] as $field){
+            $value = Yii::$app->request->post($field);
+            if($value !== null){
+                if(!in_array($value, [0, 1, '0', '1'], true)){
+                    return ['status'=>400, 'msg'=>'场景开关无效'];
+                }
+                $model->$field = (int)$value;
+                $fields[] = $field;
+            }
+        }
+        // Update only routing choice; preserve all account switches, sessions and balances.
+        $model->proxy_type = $type;
+        $model->updated_at = time();
+        if(!$model->save(false, $fields)){
+            return ['status'=>500, 'msg'=>'代理商保存失败'];
+        }
+        Yii::$app->cache->delete('getProxyTypeByUid_'.$model->uid);
+        \backend\service\clients\TzSystemUsersService::delTzSystemUserData();
+        \backend\service\PoxyIPService::delProxyUidsKey();
+        return ['status'=>200, 'msg'=>'代理商已更新，原代理开关保持不变', 'proxy_type'=>$type];
     }
 
     public function actionSetSslMode()

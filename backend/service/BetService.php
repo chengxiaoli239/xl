@@ -419,13 +419,34 @@ abstract class BetService extends BaseBetService {
         }
 
         $uid = (int)($context['uid'] ?? ($response['uid'] ?? 0));
-        $proxyType = $uid ? ProxyBaseService::getProxyTypeByUid($uid) : ProxyBaseService::getProxyType();
+        $tzSystemId = (int)($context['tz_system_id'] ?? ($response['tz_system_id'] ?? 0));
+        $proxyType = null;
+        if($uid){
+            $query = TzSystemsUsers::find()->where(['uid'=>$uid]);
+            if($tzSystemId){
+                $query->andWhere(['tz_system_id'=>$tzSystemId]);
+            }
+            $accounts = $query->limit(2)->all();
+            // Never infer one site's routing from a sibling account for the same user.
+            if(count($accounts) !== 1){
+                return [];
+            }
+            $account = $accounts[0];
+            if(!(int)$account->is_use_proxy
+                || !BaseService::isProxySceneOpen($account, BaseService::PROXY_SCENE_BET)){
+                return [];
+            }
+            $proxyType = (int)$account->proxy_type ?: ProxyBaseService::getProxyType();
+            if($proxyType === \common\service\proxy\ProxyMihomoService::TYPE){
+                return []; // Immutable account node has no purchased-IP pool to rotate.
+            }
+        }
+        if($proxyType === null){
+            $proxyType = ProxyBaseService::getProxyType();
+        }
         $proxyIp = is_array($response) ? (string)($response['proxy_ip'] ?? '') : '';
         $responseText = is_array($response) ? json_encode($response, 320) : (string)$response;
         $isProxyText = stripos($responseText, '代理') !== false || stripos($responseText, 'Proxy') !== false;
-        if($uid && !$proxyIp && !self::isRetryProxyOpen($uid)){
-            return [];
-        }
         if(!$uid && !$proxyIp && !$isProxyText){
             return [];
         }
@@ -449,21 +470,6 @@ abstract class BetService extends BaseBetService {
             'old_proxy_ip'=>$proxyIp,
             'clear_rst'=>$clearRst,
         ];
-    }
-
-    private static function isRetryProxyOpen($uid): bool
-    {
-        if(!$uid){
-            return false;
-        }
-        $rows = TzSystemsUsers::find()->where(['uid'=>(int)$uid, 'is_use_proxy'=>1])->all();
-        foreach($rows as $TzSystemsUsers){
-            if(BaseService::isProxySceneOpen($TzSystemsUsers, BaseService::PROXY_SCENE_BET)){
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private static function isProxyFailureBetResponse($response): bool

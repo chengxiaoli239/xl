@@ -166,6 +166,16 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::a($txt, $url, ['title' => '非登录/下注接口是否走代理','alt'=>$alt]);
                             }
                         ],
+                        ['attribute'=>'proxy_type', 'label'=>'代理商', 'format'=>'raw',
+                            'visible'=>(int)Yii::$app->user->id === 1
+                                && Yii::$app->user->identity && (int)Yii::$app->user->identity->status === 10,
+                            'value'=>function($model) {
+                                $label = (int)$model->is_use_proxy === 0 ? '直连' :
+                                    (TzSystemsUsers::PROXY_TYPE_OPTIONS[(int)$model->proxy_type] ?? '原代理');
+                                return Html::encode($label).' '.Html::a('代理设置',
+                                    ['/forum/proxy-nodes/index', 'id'=>$model->id], ['class'=>'btn btn-default btn-xs']);
+                            }
+                        ],
                         ['attribute' => 'ssl_mode','label'=>'TLS', 'headerOptions'=>['width'=>'8%'],
                             'format'=>'raw',
                             'value' => function($model) {
