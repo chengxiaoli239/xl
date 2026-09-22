@@ -1,11 +1,13 @@
 # Mihomo account proxy handoff — 2026-09-22
 
 - Checkout: `/Users/wangyegao/.codex/worktrees/lottery-xl-mihomo-20260921`, branch
-  `codex/lottery-xl-mihomo`, base `1d0895ab`. Task changes uncommitted; no push or deployment.
+  `codex/lottery-xl-mihomo`. Runtime implementation commit `31f3e84d0`; status update is
+  committed separately after deployment. No external Git push was performed.
 - Production `/www/wwwroot/lt/lottery_xl/xl`: preserve existing edits in
   `deploy/scripts/backup-production.sh`, `install-runtime-dirs.sh`, `restore-target.sh`,
-  and `yii`. No live source/config/account/database changes or restarts in proxy work.
-  Latest read-only local HTTP check on cp01 returned 302; PHP CLI is 7.4.33.
+  and `yii`. Runtime files and migration were deployed from `31f3e84d0`; the four existing
+  production edits remain uncommitted and untouched. PHP-FPM was reloaded, and the site
+  returned 302 for anonymous requests; PHP CLI is 7.4.33.
 - Admin UID 1 imports selected nodes from HTTPS Clash YAML direct URL or YAML upload.
   Only `proxies:` entries are imported; raw node URIs/provider-only YAML not supported.
   Loopback manager 17990; immutable per-node listeners 18100–18115; max16 stored/8 running.
@@ -22,13 +24,15 @@
 - Verification: PHP32 routing/authorization/fail-closed assertions +10 retry assertions
   pass locally and under cp01 PHP7.4 in isolated `/tmp/xl-mihomo-regression.Ki9oZt`.
   Changed PHP files lint clean. Local Python8 tests pass with actual Mihomo v1.19.31;
-  cp01 Python7 input tests pass, core test skipped because Linux core is not installed.
+  cp01 Python7 input tests pass before deployment; Linux amd64 Mihomo v1.19.31 was installed
+  with verified release digest, and the manager service is active with no nodes configured.
   Real dual-node fixture verifies upstream separation, import/start/failure isolation.
   Synthetic Yii browser verified link preview/import/start/bind/save; local HTTP verifies
   YAML multipart upload and CSRF rejection. No production DB or credentials used.
 - Read-only PHP/UI/Python reviews completed, identified blockers fixed. git diff --check
   passes. No actual HK node or authenticated remote portal test yet.
-- Deployment outstanding: explicit authorization/window, reviewed release, Linux core,
-  service credential/install, additive migration/schema refresh, PHP and workers adopting
-  code before account activation. Keep all accounts unchanged initially, then explicitly
-  test one selected account after user supplies private YAML and verifies HK egress.
+- Deployment completed without account activation: additive migration applied, PHP-FPM
+  reloaded, existing `xl_queue`, `xl_queue_fast`, and `xl_queue_open` listeners running,
+  and `xl-node-manager.service` listening only on 127.0.0.1:17990. The manager has no
+  imported nodes and no account uses provider4. Next step is user-supplied private YAML,
+  one-node HK egress test, then explicit one-account activation.
