@@ -278,7 +278,7 @@ $columns = array_merge(
                 }
                 return $planSummary([
                     ['方向', $buyType],
-                    ['状态', $status.'<i class="icon-refresh"></i>'],
+                    ['状态<br>', $status.'<i class="icon-refresh"></i>'],
                 ]);
             }
         ],
