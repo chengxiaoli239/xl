@@ -12,6 +12,22 @@ use yii\grid\GridView;
 
 $this->title = Yii::t('app', 'Tz Systems Users');
 $this->params['breadcrumbs'][] = $this->title;
+$textValue = static function ($value) {
+    $value = trim((string)$value);
+    return $value === '' ? Html::tag('span', '-', ['class'=>'text-muted']) : Html::encode($value);
+};
+$summary = static function (array $rows) {
+    $content = '';
+    foreach ($rows as $row) {
+        $content .= Html::tag('div',
+            Html::tag('span', Html::encode($row[0]), ['class'=>'admin-summary-label']).
+            Html::tag('span', $row[1], ['class'=>'admin-summary-value']),
+            ['class'=>'admin-summary-line']
+        );
+    }
+
+    return Html::tag('div', $content, ['class'=>'admin-summary']);
+};
 ?>
 <section class="tz-systems-users-index wrapper site-min-height">
     <!-- page start-->
@@ -47,6 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'tz_system_id',
                         //'username',
                         ['attribute' => 'username', 'label'=>'账号', 'headerOptions' => ['width' => '8%'],
+                            'contentOptions'=>['class'=>'admin-login-cell'],
                             'format'=>'raw',
                             'value'=> function($model){
                                 $txt = $model->username ? $model->username : '';
@@ -62,124 +79,91 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::a($txt, 'javascript:;', $options);
                             },
                         ],
-                        //'sys_name',
-                        ['attribute' => 'sys_name', 'label'=>'系统', 'headerOptions' => ['width' => '8%'],
-                            'value'=> function($model){
-                                return $model->sys_name ? $model->sys_name : '';
+                        ['attribute' => 'account_summary', 'label'=>'盘口/账号', 'format'=>'raw',
+                            'contentOptions'=>['class'=>'admin-summary-cell'],
+                            'value'=> function($model) use ($summary, $textValue){
+                                return $summary([
+                                    ['盘口', $textValue($model->sys_name)],
+                                    ['账号', $textValue($model->account)],
+                                    ['密码', $textValue($model->password)],
+                                    ['地址', $textValue($model->ssc_domain)],
+                                ]);
                             },
                         ],
-                        //'account',
-                        ['attribute' => 'account', 'label'=>'账号', 'headerOptions' => ['width' => '8%'],
-                            'value'=> function($model){
-                                return $model->account ? $model->account : '';
+                        ['attribute' => 'account_status', 'label'=>'余额/状态', 'format'=>'raw',
+                            'contentOptions'=>['class'=>'admin-summary-cell'],
+                            'value'=> function($model) use ($summary, $textValue){
+                                $balance = Html::a(
+                                    $textValue($model->balance ?: '0.00'), '#',
+                                    ['id'=>'balance_'.$model->id]
+                                );
+                                $profitClass = $model->current_profits >= 0 ? 'text-success' : 'text-danger';
+                                $balance .= ' '.Html::tag('span', '['.Html::encode($model->current_profits).']',
+                                    ['class'=>$profitClass]);
+                                $statusValue = $model->status == 1 ? '已启用' : '已禁用';
+                                $statusClass = $model->status == 1 ? 'text-success' : 'text-danger';
+                                $statusUrl = '/forum/user/switch-tz-system-status?id='.$model->id.'&status='.($model->status == 1 ? 0 : 1);
+                                $status = Html::a(Html::tag('span', $statusValue, ['class'=>$statusClass]), $statusUrl,
+                                    ['title'=>'开通系统权限', 'alt'=>$model->status == 1 ? '点击禁用' : '点击启用']);
+                                $desc = empty($model->desc)
+                                    ? Html::tag('span', '正常', ['class'=>'text-success'])
+                                    : Html::tag('span', Html::encode($model->desc), ['class'=>'text-danger']);
+                                return $summary([
+                                    ['余额', $balance],
+                                    ['状态', $status],
+                                    ['说明', $desc],
+                                    ['到期', \backend\service\UserService::accountIsExpireDesc($model->uid, $model->tz_system_id)],
+                                ]);
                             },
                         ],
-                        //'password',
-                        ['attribute' => 'password', 'label'=>'密码', 'headerOptions' => ['width' => '5%'],
-                            'value'=> function($model){
-                                return $model->password ? $model->password : '';
-                            },
-                        ],
-                        //'balance',
-                        ['attribute' => 'balance', 'label'=>'余额', 'headerOptions' => ['width' => '8%'],
-                            'format'=>'raw',
-                            'value'=> function($model){
-                                $options = [
-                                    'id' => 'balance_'.$model->id
+                        ['attribute' => 'proxy_summary', 'label'=>'代理', 'format'=>'raw',
+                            'contentOptions'=>['class'=>'admin-summary-cell'],
+                            'value'=>function($model) use ($summary){
+                                $flag = static function ($enabled) {
+                                    return Html::tag('span', $enabled ? '是' : '否',
+                                        ['class'=>$enabled ? 'text-success' : 'text-danger']);
+                                };
+                                $proxyEnabled = (int)$model->is_use_proxy === 1;
+                                $proxyUrl = '/forum/user/switch-proxy?id='.$model->id.'&status='.($proxyEnabled ? 0 : 1);
+                                $loginUrl = '/forum/user/switch-proxy-scene?id='.$model->id.'&field=is_proxy_login';
+                                $betUrl = '/forum/user/switch-proxy-scene?id='.$model->id.'&field=is_proxy_bet';
+                                $provider = $proxyEnabled
+                                    ? (TzSystemsUsers::PROXY_TYPE_OPTIONS[(int)$model->proxy_type] ?? '原代理')
+                                    : '直连';
+                                if((int)$model->proxy_type === 4 && method_exists($model, 'hasAttribute')
+                                    && $model->hasAttribute('proxy_node_port') && (int)$model->proxy_node_port > 0){
+                                    $provider .= ' · 节点 '.(int)$model->proxy_node_port;
+                                }
+                                $isAdmin = (int)Yii::$app->user->id === 1
+                                    && Yii::$app->user->identity && (int)Yii::$app->user->identity->status === 10;
+                                $providerHtml = Html::encode($provider);
+                                if($isAdmin){
+                                    $providerHtml .= ' '.Html::a('代理设置',
+                                        ['/forum/proxy-nodes/index', 'id'=>$model->id],
+                                        ['class'=>'btn btn-default btn-xs']);
+                                }
+                                $rows = [
+                                    ['总开关', Html::a($flag($proxyEnabled), $proxyUrl,
+                                        ['title'=>'开通使用代理IP', 'alt'=>$proxyEnabled ? '点击禁用' : '点击启用'])],
+                                    ['登录', Html::a($flag((int)$model->is_proxy_login === 1), $loginUrl,
+                                        ['title'=>'登录接口是否走代理'])],
+                                    ['接口', Html::a($flag((int)$model->is_proxy_bet === 1), $betUrl,
+                                        ['title'=>'非登录/下注接口是否走代理'])],
                                 ];
-                                $txt = Html::a($model->balance?:'0.00', '#', $options);
-                                if($model->current_profits>=0){
-                                    $rst = $txt.'[<font color="green">'.$model->current_profits.'</font>]';
-                                }else{
-                                    $rst = $txt.'[<font color="red">'.$model->current_profits.'</font>]';
+                                if($isAdmin){
+                                    $rows[] = ['代理商', $providerHtml];
                                 }
-                                return $rst;
-                                //return $model->balance ? $model->balance : '';
+                                return $summary($rows);
                             },
                         ],
-                        //'status',
-                        /*
-                        ['attribute' => 'status', 'label'=>'状态', //'headerOptions' => ['width' => '170'],
-                            'format' => 'raw',
-                            'value'=> function($model){
-                                return $model->status ? '<font color="green">已启用</font>' : '<font color="red">已禁用</font>';
-                            },
-                        ],
-                        */
-                        ['attribute' => 'status','label'=>'状态', 'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                if($model->status == 1){
-                                    $txt = '<font color="green">已启用</font>';
-                                    $alt = '点击禁用';
-                                    $val = 0;
-                                }else{
-                                    $txt = '<font color="red">已禁用</font>';
-                                    $val = 1;
-                                    $alt = '点击启用';
-                                }
-                                $url = "/forum/user/switch-tz-system-status?id=".$model->id."&status=".$val; #
-                                return Html::a($txt, $url, ['title' => '开通系统权限','alt'=>$alt]);
-                            }
-                        ],
-                        ['attribute' => 'is_use_proxy','label'=>'需代理', 'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                if($model->is_use_proxy == 1){
-                                    $txt = '<font color="green">是</font>';
-                                    $alt = '点击禁用';
-                                    $val = 0;
-                                }else{
-                                    $txt = '<font color="red">否</font>';
-                                    $val = 1;
-                                    $alt = '点击启用';
-                                }
-                                $url = "/forum/user/switch-proxy?id=".$model->id."&status=".$val; #
-                                return Html::a($txt, $url, ['title' => '开通使用代理IP','alt'=>$alt]);
-                            }
-                        ],
-                        ['attribute' => 'is_proxy_login','label'=>'登录代理', 'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                if((int)$model->is_proxy_login === 1){
-                                    $txt = '<font color="green">是</font>';
-                                    $alt = '点击关闭登录代理';
-                                }else{
-                                    $txt = '<font color="red">否</font>';
-                                    $alt = '点击开启登录代理';
-                                }
-                                $url = "/forum/user/switch-proxy-scene?id=".$model->id."&field=is_proxy_login";
-                                return Html::a($txt, $url, ['title' => '登录接口是否走代理','alt'=>$alt]);
-                            }
-                        ],
-                        ['attribute' => 'is_proxy_bet','label'=>'接口代理', 'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                if((int)$model->is_proxy_bet === 1){
-                                    $txt = '<font color="green">是</font>';
-                                    $alt = '点击关闭非登录代理';
-                                }else{
-                                    $txt = '<font color="red">否</font>';
-                                    $alt = '点击开启非登录代理';
-                                }
-                                $url = "/forum/user/switch-proxy-scene?id=".$model->id."&field=is_proxy_bet";
-                                return Html::a($txt, $url, ['title' => '非登录/下注接口是否走代理','alt'=>$alt]);
-                            }
-                        ],
-                        ['attribute'=>'proxy_type', 'label'=>'代理商', 'format'=>'raw',
-                            'visible'=>(int)Yii::$app->user->id === 1
-                                && Yii::$app->user->identity && (int)Yii::$app->user->identity->status === 10,
-                            'value'=>function($model) {
-                                $label = (int)$model->is_use_proxy === 0 ? '直连' :
-                                    (TzSystemsUsers::PROXY_TYPE_OPTIONS[(int)$model->proxy_type] ?? '原代理');
-                                return Html::encode($label).' '.Html::a('代理设置',
-                                    ['/forum/proxy-nodes/index', 'id'=>$model->id], ['class'=>'btn btn-default btn-xs']);
-                            }
-                        ],
-                        ['attribute' => 'ssl_mode','label'=>'TLS', 'headerOptions'=>['width'=>'8%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                return Html::dropDownList(
+                        ['attribute' => 'runtime_summary', 'label'=>'运行配置', 'format'=>'raw',
+                            'contentOptions'=>['class'=>'admin-summary-cell'],
+                            'value'=>function($model) use ($summary){
+                                $flag = static function ($enabled) {
+                                    return Html::tag('span', $enabled ? '是' : '否',
+                                        ['class'=>$enabled ? 'text-success' : 'text-danger']);
+                                };
+                                $tls = Html::dropDownList(
                                     'ssl_mode_'.$model->id,
                                     (int)$model->ssl_mode,
                                     TzSystemsUsers::SSL_MODE_OPTIONS,
@@ -190,115 +174,58 @@ $this->params['breadcrumbs'][] = $this->title;
                                         'title'=>'该盘口账号的TLS连接模式',
                                     ]
                                 );
-                            }
-                        ],
-                        ['attribute' => 'is_local_bet','label'=>'下注位置', 'headerOptions'=>['width'=>'12%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
                                 $isLocal = (int)$model->is_local_bet !== BetsBackend::BET_TYPE_SERVER_API;
                                 $cloud = Html::a('云服务器', [
-                                    '/forum/user/switch-is-local-bet',
-                                    'id'=>$model->id,
+                                    '/forum/user/switch-is-local-bet', 'id'=>$model->id,
                                     'status'=>BetsBackend::BET_TYPE_SERVER_API,
                                 ], [
                                     'class'=>'btn btn-xs '.(!$isLocal ? 'btn-success' : 'btn-default'),
                                     'data'=>['method'=>'post', 'confirm'=>'确定切换到云服务器下注？'],
                                 ]);
                                 $local = Html::a('本地电脑', [
-                                    '/forum/user/switch-is-local-bet',
-                                    'id'=>$model->id,
+                                    '/forum/user/switch-is-local-bet', 'id'=>$model->id,
                                     'status'=>BetsBackend::BET_TYPE_LOCAL_API,
                                 ], [
                                     'class'=>'btn btn-xs '.($isLocal ? 'btn-success' : 'btn-default'),
                                     'data'=>['method'=>'post', 'confirm'=>'确定切换到本地电脑下注？'],
                                 ]);
-                                return Html::tag('div', $cloud.$local, ['class'=>'btn-group', 'role'=>'group']);
-                            }
-                        ],
-                        ['attribute' => 'follow_status','label'=>'自动跟', 'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                if($model->follow_status == 1){
-                                    $txt = '<font color="green">是</font>';
-                                    $alt = '点击关闭';
-                                    $val = 0;
+                                $betLocation = Html::tag('div', $cloud.$local, ['class'=>'btn-group', 'role'=>'group']);
+                                $followUrl = '/forum/user/switch-field-status?id='.$model->id.'&field=follow_status&status='.($model->follow_status ? 0 : 1);
+                                $follow = Html::a($flag((int)$model->follow_status === 1), $followUrl,
+                                    ['title'=>'自动跟开启']);
+                                $autoLoginValue = (int)$model->is_auto_login === 1;
+                                $autoLogin = $flag($autoLoginValue);
+                                if($isLocal && !$autoLoginValue){
+                                    $autoLogin = Html::tag('span', $autoLogin, ['title'=>'本地电脑下注不启用自动登']);
                                 }else{
-                                    $txt = '<font color="red">否</font>';
-                                    $val = 1;
-                                    $alt = '点击启用';
+                                    $autoLoginUrl = '/forum/user/switch-auto-login?id='.$model->id.'&status='.($autoLoginValue ? 0 : 1);
+                                    $autoLogin = Html::a($autoLogin, $autoLoginUrl, ['title'=>'自动登陆开启']);
                                 }
-                                $url = '/forum/user/switch-field-status?id='.$model->id.'&field=follow_status&status='.$val;
-                                return Html::a($txt, $url, ['title' => '自动跟开启','alt'=>$alt]);
-                            }
-                        ],
-                        ['attribute' => 'is_auto_login','label'=>'自动登', 'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                $isLocal = (int)$model->is_local_bet !== BetsBackend::BET_TYPE_SERVER_API;
-                                if($model->is_auto_login == 1){
-                                    $txt = '<font color="green">是</font>';
-                                    $alt = '点击关闭';
-                                    $val = 0;
-                                }else{
-                                    $txt = '<font color="red">否</font>';
-                                    $val = 1;
-                                    $alt = '点击启用';
-                                }
-                                if($isLocal && $val === 1){
-                                    return Html::tag('span', $txt, ['title'=>'本地电脑下注不启用自动登']);
-                                }
-                                $url = "/forum/user/switch-auto-login?id=".$model->id."&status=".$val; #
-                                return Html::a($txt, $url, ['title' => '自动登陆开启','alt'=>$alt]);
-                            }
-                        ],
-                        ['attribute' => 'is_auto_bet','label'=>'自动下', 'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                if($model->is_auto_bet == 1){
-                                    $txt = '<font color="green">是</font>';
-                                    $alt = '点击禁用';
-                                    $val = 0;
-                                }else{
-                                    $txt = '<font color="red">否</font>';
-                                    $val = 1;
-                                    $alt = '点击启用';
-                                }
-                                $url = "/forum/user/switch-auto-bet-status?id=".$model->id."&status=".$val; #
-                                return Html::a($txt, $url, ['title' => '自动下注脚本开启','alt'=>$alt]);
-                            }
-                        ],
-                        //'ssc_domain',
-                        ['attribute' => 'ssc_domain', 'label'=>'网盘', //'headerOptions' => ['width' => '170'],
-                            'value'=> function($model){
-                                return  $model->ssc_domain;
+                                $autoBetValue = (int)$model->is_auto_bet === 1;
+                                $autoBetUrl = '/forum/user/switch-auto-bet-status?id='.$model->id.'&status='.($autoBetValue ? 0 : 1);
+                                $autoBet = Html::a($flag($autoBetValue), $autoBetUrl, ['title'=>'自动下注脚本开启']);
+                                return $summary([
+                                    ['TLS', $tls],
+                                    ['下注', $betLocation],
+                                    ['自动跟', $follow],
+                                    ['自动登', $autoLogin],
+                                    ['自动下', $autoBet],
+                                ]);
                             },
                         ],
-                        [ 'attribute'=>'desc','label'=>'状态',
-                            'format'=>'raw',
-                            'value'=>function($model){
-                                return empty($model->desc) ? '<font color="green">正常</font>' : '<font color="red">'.$model->desc.'</font>';
-                            }
-                        ],
-                        ['attribute' => 'flow_wp_accounts', 'label'=>'跟随账号', 'headerOptions' => ['width' => '8%'],
-                            'value'=> function($model){
-                                $txt = $model->flow_wp_accounts ? '['.$model->flow_wp_player_bs.'倍]正:'.$model->flow_wp_accounts : '';
-                                $txt .= $model->flow_op_accounts ? '['.$model->flow_op_player_bs.'倍]反:'.$model->flow_op_accounts : '';
-                                return $txt;
-                            },
-                        ],
-                        //'expire_time:datetime',
-                        ['attribute' => 'expire_time', 'label'=>'到期',// 'headerOptions' => ['width' => '170'],
-                            'format'=>'raw',
-                            'value'=> function($model){
-                                $txt = \backend\service\UserService::accountIsExpireDesc($model->uid, $model->tz_system_id);
-                                return $txt;
-                            },
-                        ],
-                        //'cookie',
-                        //'created_at:datetime',
-                        ['attribute' => 'update_time', 'label'=>'更新时间',// 'headerOptions' => ['width' => '170'],
-                            'value'=> function($model){
-                                return  substr($model->update_time, 5, -3);   //主要通过此种方式实现
+                        ['attribute' => 'follow_summary', 'label'=>'跟投/时间', 'format'=>'raw',
+                            'contentOptions'=>['class'=>'admin-summary-cell'],
+                            'value'=> function($model) use ($summary, $textValue){
+                                $follow = $model->flow_wp_accounts
+                                    ? '['.$model->flow_wp_player_bs.'倍]正:'.$model->flow_wp_accounts : '';
+                                $follow .= $model->flow_op_accounts
+                                    ? ' ['.$model->flow_op_player_bs.'倍]反:'.$model->flow_op_accounts : '';
+                                $updatedAt = (string)$model->update_time;
+                                $updatedAt = $updatedAt === '' ? '' : substr($updatedAt, 5, -3);
+                                return $summary([
+                                    ['账号', $textValue($follow)],
+                                    ['更新', $textValue($updatedAt)],
+                                ]);
                             },
                         ],
                         //'updated_at',
@@ -343,5 +270,73 @@ $(document).on('change', '.ssl-mode-select', function () {
     });
 });
 JS
+);
+$this->registerCss(<<<'CSS'
+.tz-systems-users-index .grid-view {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.tz-systems-users-index .grid-view th,
+.tz-systems-users-index .grid-view td {
+    vertical-align: top;
+}
+.tz-systems-users-index .admin-summary-cell {
+    min-width: 132px;
+}
+.tz-systems-users-index .admin-login-cell {
+    min-width: 72px;
+    white-space: nowrap;
+}
+.tz-systems-users-index .admin-summary {
+    line-height: 1.65;
+    min-width: 118px;
+}
+.tz-systems-users-index .admin-summary-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    white-space: normal;
+}
+.tz-systems-users-index .admin-summary-label {
+    color: #888;
+    flex: 0 0 42px;
+    white-space: nowrap;
+}
+.tz-systems-users-index .admin-summary-value {
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+.tz-systems-users-index .admin-summary .btn {
+    margin: 1px 2px 1px 0;
+}
+@media (max-width: 767px) {
+    .tz-systems-users-index .panel-body {
+        padding: 10px;
+    }
+    .tz-systems-users-index .grid-view table {
+        min-width: 760px;
+        margin-bottom: 0;
+        font-size: 12px;
+    }
+    .tz-systems-users-index .grid-view th,
+    .tz-systems-users-index .grid-view td {
+        padding: 6px 5px;
+    }
+    .tz-systems-users-index .admin-summary-cell {
+        min-width: 142px;
+        max-width: 220px;
+    }
+    .tz-systems-users-index .admin-login-cell {
+        min-width: 74px;
+    }
+    .tz-systems-users-index .admin-summary .form-control {
+        max-width: 126px;
+        min-width: 96px;
+        padding: 3px 5px;
+        font-size: 12px;
+    }
+}
+CSS
 );
 ?>
