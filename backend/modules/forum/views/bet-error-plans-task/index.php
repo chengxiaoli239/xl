@@ -10,6 +10,20 @@ use yii\grid\GridView;
 
 $this->title = Yii::t('app', 'Bet Error Plans Tasks');
 $this->params['breadcrumbs'][] = $this->title;
+$taskSummary = static function (array $rows) {
+    $content = '';
+    foreach ($rows as $row) {
+        $content .= Html::tag('div',
+            Html::tag('span', Html::encode($row[0]), ['class' => 'task-summary-label']).
+            Html::tag('span', $row[1], ['class' => 'task-summary-value']),
+            ['class' => 'task-summary-line']
+        );
+    }
+    return Html::tag('div', $content, ['class' => 'task-summary']);
+};
+$taskValue = static function ($value) {
+    return trim((string)$value) === '' ? Html::tag('span', '-', ['class' => 'text-muted']) : Html::encode($value);
+};
 ?>
 <input type="hidden" id="currentQihao" value="<?php echo $currentQihao;?>">
 <section class="bet-error-plans-task-index wrapper site-min-height">
@@ -52,10 +66,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         //],
                         //'agent_id',
                         //'account',
-                        ['attribute' => 'plan_id','label' => 'planid',
+                        ['attribute' => 'plan_summary','label' => '计划/类型',
+                            'contentOptions' => ['class' => 'task-summary-cell'],
                             'format'=>'raw',
-                            'value' => function($model) {
-                                return $model->plan_id.'_'.$model->bet_sort_key;
+                            'value' => function($model) use ($taskSummary, $taskValue) {
+                                return $taskSummary([
+                                    ['计划', $taskValue($model->plan_id.'_'.$model->bet_sort_key)],
+                                    ['类型', $taskValue(\backend\service\BetService::getTypeNameByTzType($model->tz_type))],
+                                ]);
                             }
                         ],
                         //'bet_url:url',
@@ -85,25 +103,22 @@ $this->params['breadcrumbs'][] = $this->title;
                             //'filter' => \backend\service\FilterEnumeRateService::getPlayWays()
                         //],
                         //'tz_type',
-                        ['attribute' => 'tz_type','label' => '类型',
-                            'format'=>'raw',
-                            'value' => function($model) {
-                                return \backend\service\BetService::getTypeNameByTzType($model->tz_type);
-                            }
-                        ],
                         //'playway_name',
                         //'bet_money',
-                        ['attribute' => 'bet_money','label' => '金额',
+                        ['attribute' => 'amount_period','label' => '金额/期号',
+                            'contentOptions' => ['class' => 'task-summary-cell'],
                             'format'=>'raw',
-                            'value' => function($model) {
-                                return '['.$model->single.'元]'.$model->bet_money;
+                            'value' => function($model) use ($taskSummary, $taskValue) {
+                                return $taskSummary([
+                                    ['金额', $taskValue('['.$model->single.'元]'.$model->bet_money)],
+                                    ['期号', $taskValue($model->qihao)],
+                                ]);
                             }
                         ],
-                        //'single',
-                        'qihao',
-                        ['attribute' => 'post_desc','label' => '结果',
+                        ['attribute' => 'result_status','label' => '结果/状态',
+                            'contentOptions' => ['class' => 'task-summary-cell'],
                             'format'=>'raw',
-                            'value' => function($model) {
+                            'value' => function($model) use ($taskSummary) {
                                 $txt = BaseStringHelper::truncate($model->post_desc,15);
                                 $opions = [
                                     'class' => 'act-post-desc',
@@ -113,48 +128,52 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'data-content' => $model->post_datas,
                                     'data-error' => $model->post_desc,
                                 ];
-                                return Html::a((!$model->status)?'<strong><font color="#696969">等待推送</font></strong>':$txt, 'javascript:;', $opions);
-                            }
-                        ],
-                        //'kj_codes',
-                        //'status',
-                        ['attribute' => 'status','label' => '状态',
-                            'format'=>'raw',
-                            'value' => function($model) {
+                                $result = Html::a((!$model->status)?'<strong><font color="#696969">等待推送</font></strong>':$txt, 'javascript:;', $opions);
                                 $options = ['title' => '更新状态'.$model->status];
                                 if($model->status==2){
-                                    $txt = '<strong><font color="green">推送成功</font><strong>';
+                                    $status = '<strong><font color="green">推送成功</font></strong>';
                                 }elseif($model->status == 3){
-                                    $txt = '<strong><font color="red">推送失败</font></strong>';
+                                    $status = '<strong><font color="red">推送失败</font></strong>';
                                     $options['class'] = 'act-re-bet';
                                     $options['data-rebet-url'] = "/forum/bet-error-plans-task/switch-status";
                                     $options['data-id'] = $model->id;
                                     $options['data-qihao'] = $model->qihao;
                                     $options['id'] = 'act_'.$model->id;
                                 }elseif($model->status == 4){
-                                    $txt = '<strong><font color="red">推送超时</font></strong>';
+                                    $status = '<strong><font color="red">推送超时</font></strong>';
                                 }else{
-                                    $txt = '<strong><font color="#696969">等待推送</font></strong>';
+                                    $status = '<strong><font color="#696969">等待推送</font></strong>';
                                 }
-                                return Html::a($txt, 'javascript:;', $options);
+                                return $taskSummary([
+                                    ['结果', $result],
+                                    ['状态', Html::a($status, 'javascript:;', $options)],
+                                ]);
                             }
                         ],
-                        ['attribute' => 'bet_started_at','label' => '下注开始',
+                        ['attribute' => 'execution_summary','label' => '下注时间',
+                            'contentOptions' => ['class' => 'task-summary-cell'],
                             'format'=>'raw',
-                            'value' => function($model) {
-                                return $model->bet_started_at ? date('m-d H:i:s', $model->bet_started_at) : '-';
+                            'value' => function($model) use ($taskSummary, $taskValue) {
+                                $finished = $model->bet_finished_at ? date('m-d H:i:s', $model->bet_finished_at) : '-';
+                                if($model->bet_finished_at && $model->bet_started_at){
+                                    $finished .= '<br><small>耗时 '.max(0, $model->bet_finished_at - $model->bet_started_at).' 秒</small>';
+                                }
+                                return $taskSummary([
+                                    ['开始', $taskValue($model->bet_started_at ? date('m-d H:i:s', $model->bet_started_at) : '-')],
+                                    ['结束', $finished === '-' ? $taskValue($finished) : $finished],
+                                ]);
                             }
                         ],
+                        /*
                         ['attribute' => 'bet_finished_at','label' => '下注结束',
                             'format'=>'raw',
                             'value' => function($model) {
-                                if(!$model->bet_finished_at){
-                                    return '-';
-                                }
+                                if(!$model->bet_finished_at){ return '-'; }
                                 $duration = $model->bet_started_at ? max(0, $model->bet_finished_at - $model->bet_started_at) : null;
                                 return date('m-d H:i:s', $model->bet_finished_at).($duration === null ? '' : '<br><small>耗时 '.$duration.' 秒</small>');
                             }
                         ],
+                        */
                         //'sn',
                         //'snid',
                         /*
@@ -168,24 +187,26 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'plan_id',
                         //'tz_system_id',
                         //'lotteryclass',
-                        //'lottery_type',
-                        ['attribute' => 'lottery_type','label' => '种类',
+                        ['attribute' => 'record_summary','label' => '种类/时间',
+                            'contentOptions' => ['class' => 'task-summary-cell'],
                             'format'=>'raw',
-                            'value' => function($model) {
-                                return \backend\service\BetService::getLotteryName($model->lottery_type);
+                            'value' => function($model) use ($taskSummary, $taskValue) {
+                                return $taskSummary([
+                                    ['种类', $taskValue(\backend\service\BetService::getLotteryName($model->lottery_type))],
+                                    ['记录', $taskValue(date('m-d H:i', $model->created_at))],
+                                ]);
                             }
                         ],
                         //'post_desc',
                         //'error_desc',
                         //'updated_time',
                         //'updated_at',
-                        //'created_at',
-                        ['attribute' => 'created_at','label' => '时间',
+                        /* ['attribute' => 'created_at','label' => '时间',
                             'format'=>'raw',
                             'value' => function($model) {
                                 return date('m-d H:i', $model->created_at);
                             }
-                        ],
+                        ], */
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
@@ -195,6 +216,58 @@ $this->params['breadcrumbs'][] = $this->title;
     </section>
     <!-- page end-->
 </section>
+<?php $this->registerCss(<<<'CSS'
+.bet-error-plans-task-index .grid-view {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.bet-error-plans-task-index .grid-view th,
+.bet-error-plans-task-index .grid-view td {
+    vertical-align: top;
+}
+.bet-error-plans-task-index .task-summary-cell {
+    min-width: 132px;
+}
+.bet-error-plans-task-index .task-summary {
+    line-height: 1.55;
+    min-width: 112px;
+}
+.bet-error-plans-task-index .task-summary-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    white-space: normal;
+}
+.bet-error-plans-task-index .task-summary-label {
+    color: #888;
+    flex: 0 0 38px;
+    white-space: nowrap;
+}
+.bet-error-plans-task-index .task-summary-value {
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+@media (max-width: 767px) {
+    .bet-error-plans-task-index .panel-body {
+        padding: 10px;
+    }
+    .bet-error-plans-task-index .grid-view table {
+        min-width: 700px;
+        margin-bottom: 0;
+        font-size: 12px;
+    }
+    .bet-error-plans-task-index .grid-view th,
+    .bet-error-plans-task-index .grid-view td {
+        padding: 6px 5px;
+    }
+    .bet-error-plans-task-index .task-summary-cell {
+        min-width: 142px;
+        max-width: 220px;
+    }
+}
+CSS
+); ?>
 <!--提示框-start-->
 <div class="modal fade " id="exampleModal_msg" tabindex="-1" role="dialog" aria-labelledby="ModalLabel" >
     <div class="modal-dialog modal-lg" role="document" style="width: 800px;margin: 100px auto;">

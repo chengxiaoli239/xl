@@ -54,19 +54,11 @@ $summary = static function (array $rows) {
                         ['class' => 'yii\grid\SerialColumn'],
 
                         //'id',
-                        //'uid',
-                        ['attribute' => 'uid', 'label'=>'uid', 'headerOptions' => ['width' => '5%'],
-                            'value'=> function($model){
-                                return $model->uid ? $model->uid : '';
-                            },
-                        ],
                         //'tz_system_id',
-                        //'username',
-                        ['attribute' => 'username', 'label'=>'账号', 'headerOptions' => ['width' => '8%'],
-                            'contentOptions'=>['class'=>'admin-login-cell'],
+                        ['attribute' => 'uid_username', 'label'=>'UID/账号', 'headerOptions' => ['width' => '10%'],
+                            'contentOptions'=>['class'=>'admin-summary-cell admin-login-cell'],
                             'format'=>'raw',
-                            'value'=> function($model){
-                                $txt = $model->username ? $model->username : '';
+                            'value'=> function($model) use ($summary, $textValue){
                                 $options = [
                                     'class' => 'act-login',
                                     'data-id'=>$model->id,
@@ -76,7 +68,11 @@ $summary = static function (array $rows) {
                                     'data-domain'=>$model->ssc_domain, # 网盘地址
                                     'data-ssl-mode'=>TzSystemsUsers::SSL_MODE_OPTIONS[(int)$model->ssl_mode] ?? '继承全局',
                                 ];
-                                return Html::a($txt, 'javascript:;', $options);
+                                $login = Html::a($textValue($model->username), 'javascript:;', $options);
+                                return $summary([
+                                    ['UID', $textValue($model->uid)],
+                                    ['账号', $login],
+                                ]);
                             },
                         ],
                         ['attribute' => 'account_summary', 'label'=>'盘口/账号', 'format'=>'raw',
