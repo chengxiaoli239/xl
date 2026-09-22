@@ -56,6 +56,42 @@ class BrowserProcessMonitorTest(unittest.TestCase):
 
         reconnect.assert_not_called()
 
+    def test_cdp_login_success_does_not_touch_webdriver(self):
+        window = SimpleNamespace(
+            _browser_automation_mode="cdp",
+            driver=None,
+            ensure_single_browser_window=Mock(),
+        )
+
+        self.assertTrue(MainWindow._verify_successful_login_browser_state(window))
+
+        window.ensure_single_browser_window.assert_not_called()
+
+    def test_background_session_keeps_cookie_when_probe_is_indeterminate(self):
+        window = SimpleNamespace(
+            browser_cookies=None,
+            browser_user_agent="",
+            is_need_login=0,
+        )
+        header_data = {
+            "cookies": "session=cached",
+            "user_agent": "Cached Chrome",
+        }
+
+        with patch(
+            "xy_client.LuckyClientOP.SystemsUsers.getHeaderData",
+            return_value=header_data,
+        ), patch(
+            "xy_client.services.Lucky5.core.platform_api.check_login_status_by_api",
+            return_value=None,
+        ), patch("xy_client.LuckyClientOP.set_global_login_status"):
+            result = MainWindow.restore_background_session(window, show_message=False)
+
+        self.assertTrue(result)
+        self.assertEqual(window.browser_cookies, "session=cached")
+        self.assertEqual(window.browser_user_agent, "Cached Chrome")
+        self.assertEqual(window.is_need_login, 1)
+
     def test_account_runtime_values_are_stable(self):
         first_port = debug_port_for_account("account-one")
         second_port = debug_port_for_account("account-one")

@@ -37,6 +37,8 @@ use Yii;
  * @property string $updated_time 更新时间
  * @property int $updated_at 更新时间
  * @property int $created_at 创建时间
+ * @property int|null $bet_started_at 下注执行开始时间
+ * @property int|null $bet_finished_at 下注执行结束时间
  */
 class BetErrorPlansTask extends \common\models\base\BaseModel
 {
@@ -68,7 +70,7 @@ class BetErrorPlansTask extends \common\models\base\BaseModel
     {
         return [
             [['codes', 'bet_headers', 'post_datas', 'post_desc', 'error_desc'], 'string'],
-            [['uid', 'agent_id', 'playway', 'tz_type', 'status', 'plan_id', 'is_local_bet', 'bet_direct', 'tz_system_id', 'lottery_type', 'bet_sort_key', 'updated_at', 'created_at'], 'integer'],
+            [['uid', 'agent_id', 'playway', 'tz_type', 'status', 'plan_id', 'is_local_bet', 'bet_direct', 'tz_system_id', 'lottery_type', 'bet_sort_key', 'updated_at', 'created_at', 'bet_started_at', 'bet_finished_at'], 'integer'],
             [['bet_money', 'single'], 'number'],
             [['updated_time'], 'safe'],
             [['account', 'kj_codes'], 'string', 'max' => 24],
@@ -116,6 +118,8 @@ class BetErrorPlansTask extends \common\models\base\BaseModel
             'updated_time' => Yii::t('app', '更新时间'),
             'updated_at' => Yii::t('app', '更新时间'),
             'created_at' => Yii::t('app', '创建时间'),
+            'bet_started_at' => Yii::t('app', '下注开始时间'),
+            'bet_finished_at' => Yii::t('app', '下注结束时间'),
         ];
     }
 

@@ -527,6 +527,7 @@ def loginAWithCdp(account='', pwd='', mainWindow=None):
         if hasattr(mainWindow, 'domain_val'):
             mainWindow.domain_val.setText(ssc_domain)
         mainWindow.wp_domain = ssc_domain
+        mainWindow.browser_user_agent = user_agent
         mainWindow.browser_cookies = ''.join(
             f"{cookie.get('name', '')}={cookie.get('value', '')};"
             for cookie in cookies

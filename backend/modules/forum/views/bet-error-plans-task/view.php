@@ -61,6 +61,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                     'updated_time',
                                     'updated_at',
                                     'created_at',
+                                    ['attribute' => 'bet_started_at', 'format' => ['date', 'php:Y-m-d H:i:s']],
+                                    ['attribute' => 'bet_finished_at', 'format' => ['date', 'php:Y-m-d H:i:s']],
                                 ],
                             ]) ?>
                         </div>

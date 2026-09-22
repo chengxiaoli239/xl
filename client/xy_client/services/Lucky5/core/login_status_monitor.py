@@ -26,6 +26,8 @@ class LoginStatusMonitor:
         self._check_interval = 60  # 1分钟检查一次
         self._last_check_time = 0
         self._last_login_status = None
+        self._consecutive_login_failures = 0
+        self._required_login_failures = 2
         self._last_window_cleanup_time = 0
         self._window_cleanup_interval = 600  # 10分钟清理一次窗口
     
@@ -98,18 +100,38 @@ class LoginStatusMonitor:
             if not cookies:
                 optimized_print("⚠️ [LoginStatusMonitor] 无cookie，跳过登录状态检查",
                                category='login_monitor', level='DEBUG')
-                # 无cookie时，设置为未登录状态
-                if hasattr(self.main_window, 'is_need_login'):
-                    self.main_window.is_need_login = 0
+                self._consecutive_login_failures += 1
+                if self._consecutive_login_failures < self._required_login_failures:
+                    self._last_login_status = False
+                    return
+                self._last_login_status = False
+                self._trigger_auto_login(force_login=True)
                 return
             
             # 使用API检查登录状态
             is_logged_in = check_login_status_by_api(self.main_window)
+
+            if is_logged_in is None:
+                self._consecutive_login_failures = 0
+                self._last_check_time = current_time
+                self._last_login_status = None
+                optimized_print("⏸️ [LoginStatusMonitor] 本次无法确认登录状态，保留当前状态",
+                               category='login_monitor', level='WARNING', force=True)
+                return
+
+            if is_logged_in:
+                self._consecutive_login_failures = 0
+            else:
+                self._consecutive_login_failures += 1
             
             # 更新登录状态（同时更新本地状态和全局状态，确保同步）
             if hasattr(self.main_window, 'is_need_login'):
                 old_status = self.main_window.is_need_login
-                new_status = 1 if is_logged_in else 0
+                confirmed_logout = (
+                    not is_logged_in
+                    and self._consecutive_login_failures >= self._required_login_failures
+                )
+                new_status = 0 if confirmed_logout else old_status
                 
                 if old_status != new_status:
                     self.main_window.is_need_login = new_status
@@ -129,7 +151,8 @@ class LoginStatusMonitor:
                         optimized_print(f"⚠️ [LoginStatusMonitor] 同步全局状态异常: {sync_e}",
                                        category='login_monitor', level='WARNING')
                 else:
-                    optimized_print(f"✅ [LoginStatusMonitor] 登录状态检查: {'已登录' if is_logged_in else '未登录'}",
+                    status_text = '已登录' if is_logged_in else f'未登录（第{self._consecutive_login_failures}次确认）'
+                    optimized_print(f"✅ [LoginStatusMonitor] 登录状态检查: {status_text}",
                                    category='login_monitor', level='DEBUG')
             
             # 记录最后检查时间和状态
@@ -137,7 +160,7 @@ class LoginStatusMonitor:
             self._last_login_status = is_logged_in
             
             # 如果未登录，触发自动登录
-            if not is_logged_in:
+            if not is_logged_in and self._consecutive_login_failures >= self._required_login_failures:
                 # 关键修复：检查WebDriver连接失败标志，如果连接失败，暂停触发登录
                 if hasattr(self.main_window, '_webdriver_connection_failed') and self.main_window._webdriver_connection_failed:
                     failed_time = getattr(self.main_window, '_webdriver_connection_failed_time', 0)
@@ -152,7 +175,7 @@ class LoginStatusMonitor:
                         optimized_print("🔄 [LoginStatusMonitor] WebDriver连接失败已超过5分钟，清除失败标志，允许再次尝试",
                                        category='login_monitor', level='INFO', force=True)
                 
-                optimized_print("⚠️ [LoginStatusMonitor] 检测到未登录状态（API明确返回未登录），准备触发自动登录",
+                optimized_print("⚠️ [LoginStatusMonitor] 连续两次确认未登录，准备触发自动登录",
                                category='login_monitor', level='WARNING', force=True)
                 # 关键优化：API明确检测到未登录时，使用强制登录模式，跳过冷却时间和时间间隔检查
                 self._trigger_auto_login(force_login=True)
@@ -240,4 +263,3 @@ class LoginStatusMonitor:
     def get_last_check_time(self) -> float:
         """获取最后一次检查的时间"""
         return self._last_check_time
-

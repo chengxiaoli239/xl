@@ -137,6 +137,22 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return Html::a('<strong>'.$txt.'</strong>['.$model->id.']&nbsp;&nbsp;<span id="re_set_'.$model->id.'" data-rid="'.$model->id.'">重置</span>', 'javascript:;', ['title' => '更新状态'.$model->status]);
                             }
                         ],
+                        ['attribute' => 'bet_started_at','label' => '下注开始',
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                return $model->bet_started_at ? date('m-d H:i:s', $model->bet_started_at) : '-';
+                            }
+                        ],
+                        ['attribute' => 'bet_finished_at','label' => '下注结束',
+                            'format'=>'raw',
+                            'value' => function($model) {
+                                if(!$model->bet_finished_at){
+                                    return '-';
+                                }
+                                $duration = $model->bet_started_at ? max(0, $model->bet_finished_at - $model->bet_started_at) : null;
+                                return date('m-d H:i:s', $model->bet_finished_at).($duration === null ? '' : '<br><small>耗时 '.$duration.' 秒</small>');
+                            }
+                        ],
                         //'sn',
                         //'snid',
                         /*
