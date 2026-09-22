@@ -63,3 +63,6 @@ deploy/backups/
 /client/xy_client/accounts_config.json
 /logs/
 
+CLAUDE.md
+AGENTS.md
+.cursor
