@@ -201,7 +201,7 @@ $columns = array_merge(
         ['attribute' => 'plan_summary','headerOptions'=>['width'=>'18%'],'label'=>'计划/类型',
             'format'=>'raw',
             'contentOptions' => ['class'=>'plan-summary-cell'],
-            'value' => function($model) use ($planSummary, $planValue, $isSuperAdmin) {
+            'value' => function($model) use ($planSummary, $planValue, $isSuperAdmin, $statOwnerUid, $planGroupUiByPlanId, $statIndexBase, $currentIdsNorm) {
                 $playWayArr = [1=>'二字定', 2=>'三字定', 3=>'四字定', 4=>'一字定', 6=>'X字现'];
                 $url = '/forum/betting-records/index?BettingRecords[plan_id]='.$model->id;
                 $remark = '<br>'.Html::a($model->remark?'[备:'.$model->remark.']':'[备注]', 'javascript:;', ['class'=>'set_remark_pop', 'id'=>'remark_plan_id_'.$model->id, 'data-id'=>$model->id, 'data-remark'=>$model->remark]);
@@ -229,33 +229,32 @@ $columns = array_merge(
                 if($isSuperAdmin){
                     $rows[] = ['账号', Html::a($planValue($model->account), '/forum/user-sys-plans/index?UserSysPlans[account]='.$model->account)];
                 }
+                if ($statOwnerUid !== null) {
+                    $groupInfo = $planGroupUiByPlanId[$model->id] ?? null;
+                    if (!$groupInfo) {
+                        $rows[] = ['分组', Html::tag('span', '—', ['class' => 'text-muted'])];
+                    } else {
+                        $groupActive = $currentIdsNorm !== '' && $currentIdsNorm === $groupInfo['ids_normalized'];
+                        $groupParams = $statIndexBase;
+                        if (!$groupActive && $groupInfo['ids_normalized'] !== '') {
+                            $groupParams['UserSysPlans[ids]'] = $groupInfo['ids_normalized'];
+                        }
+                        $groupLink = Html::a(Html::encode($groupInfo['name']), Url::to($groupParams), [
+                            'title' => $groupActive ? '再次点击取消分组筛选' : '按该分组内计划在列表中筛选',
+                        ]);
+                        $groupLink .= ' '.Html::a('×', 'javascript:;', [
+                            'class' => 'profit-stat-remove-plan text-danger',
+                            'data-plan-id' => (int)$model->id,
+                            'title' => '移出分组',
+                        ]);
+                        $rows[] = ['分组', $groupLink];
+                    }
+                }
                 return $planSummary($rows);
             }
         ],
-        ['label' => '利润统计分组', 'headerOptions'=>['width'=>'8%'], 'format'=>'raw',
-            'value' => function($model) use ($planGroupUiByPlanId, $statIndexBase, $currentIdsNorm, $statOwnerUid) {
-                if ($statOwnerUid === null) {
-                    return '';
-                }
-                $info = $planGroupUiByPlanId[$model->id] ?? null;
-                if (!$info) {
-                    return Html::tag('span', '—', ['class'=>'text-muted']);
-                }
-                $active = $currentIdsNorm !== '' && $currentIdsNorm === $info['ids_normalized'];
-                $urlParams = $statIndexBase;
-                if (!$active && $info['ids_normalized'] !== '') {
-                    $urlParams['UserSysPlans[ids]'] = $info['ids_normalized'];
-                }
-                $u = Url::to($urlParams);
-                $link = Html::a(Html::encode($info['name']), $u, [
-                    'title' => $active ? '再次点击取消分组筛选' : '按该分组内计划在列表中筛选',
-                ]);
-                return $link . ' <a href="javascript:;" class="profit-stat-remove-plan text-danger" data-plan-id="' . (int)$model->id . '" title="移出分组">×</a>';
-            }
-        ],
-
         ['attribute' => 'direction_status','label'=>'正/反/状态',
-            'contentOptions' => ['class'=>'plan-summary-cell'],
+            'contentOptions' => ['class'=>'plan-summary-cell direction-status-summary'],
             'format'=>'raw',
             'value' => function($model) use ($planSummary) {
                 $buy_type_Arr = [0=>'反买', 1=>'正买'];
@@ -299,17 +298,18 @@ $columns = array_merge(
                 ]);
             }
         ],
-        ['attribute' => 'tz_type','label'=>'操作', # 'headerOptions'=>['width'=>'5%'],
+        ['attribute' => 'tz_type','label'=>'操作', 'headerOptions'=>['width'=>'18%'],
+            'contentOptions' => ['class'=>'plan-operation-cell'],
             'format'=>'raw',
             'value' => function($model) {
                 $url = "/forum/user-sys-plans/tz-now?id=".$model->id; # 立即下注
-                $txt = Html::a('立即下注', $url, ['title' => '立即下注'.$model->id,'alt'=>$model->id]);
+                $links = [Html::a('立即下注', $url, ['title' => '立即下注'.$model->id,'alt'=>$model->id])];
                 if(in_array($model->plan_type,[1, 3]) OR ($model->take_profits>0 OR $model->stop_loss)){
                     $url1 = "/forum/user-sys-plans/re-calculate-profits?id=".$model->id; # 重新计算盈利
-                    $txt .= ' | '.Html::a('重算盈利', $url1, ['title' => '重算盈利'.$model->id,'alt'=>$model->id]);
+                    $links[] = Html::a('重算盈利', $url1, ['title' => '重算盈利'.$model->id,'alt'=>$model->id]);
                 }
-                $txt .= ' | '.Html::a('每期盈利', ['period-profits', 'id' => $model->id], ['title' => '查看计划每期盈利记录', 'target' => '_blank']);
-                return $txt;
+                $links[] = Html::a('每期盈利', ['period-profits', 'id' => $model->id], ['title' => '查看计划每期盈利记录', 'target' => '_blank']);
+                return Html::tag('div', implode('<br>', $links), ['class' => 'plan-operation-links']);
             }
         ],
         //'tz_sites',
@@ -417,6 +417,17 @@ $columns = array_merge(
     min-width: 0;
     white-space: normal;
     overflow-wrap: anywhere;
+}
+.user-sys-plans-index .direction-status-summary .plan-summary-line:first-child {
+    margin-bottom: 12px;
+}
+.user-sys-plans-index .plan-operation-cell {
+    min-width: 180px;
+    white-space: normal;
+}
+.user-sys-plans-index .plan-operation-links {
+    line-height: 1.8;
+    white-space: normal;
 }
 @media (max-width: 767px) {
     .user-sys-plans-index .panel-body {
