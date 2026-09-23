@@ -7,6 +7,13 @@ use common\service\jobs\CommonJob;
 
 class StaticHzProfitsJob extends CommonJob {
 
+    public $retryCount = 1;
+
+    public function getTtr(): int
+    {
+        return 180;
+    }
+
     public static function getName($params) {
         self::$name = '23四定和值利润';
         return self::$name;
@@ -22,20 +29,24 @@ class StaticHzProfitsJob extends CommonJob {
     }
 
     public static function handle($params){
-        try {
-            self::_init();
-            $lottery_type = $params['lottery_type'];
-            $qihao = $params['qihao'];
-            if(!self::$staticStatus) return '数据统计开关已关闭';
-            if($lottery_type == 23){
-                $rst = '高频不处理该数据类型的统计';
-            }else{
-                $rst = StaticService::opStatic($lottery_type, $qihao); # 和值、四定利润统计
-            }
-        }catch (\Exception $e){
-            return $e->getMessage();
+        self::_init();
+        $lottery_type = (int)$params['lottery_type'];
+        $qihao = (string)$params['qihao'];
+        if(!self::$staticStatus) return '数据统计开关已关闭';
+        if($lottery_type == 23){
+            return '高频不处理该数据类型的统计';
         }
-        return $rst;
+
+        $lockKey = 'static-hz-profits-job:'.$lottery_type.':'.$qihao;
+        if (!\Yii::$app->cache->add($lockKey, 1, 300)) {
+            return '四定和值利润统计正在执行，本次跳过';
+        }
+
+        try {
+            return StaticService::opStatic($lottery_type, $qihao); # 和值、四定利润统计
+        } finally {
+            \Yii::$app->cache->delete($lockKey);
+        }
     }
 
 }

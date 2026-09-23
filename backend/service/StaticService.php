@@ -677,17 +677,17 @@ class StaticService extends BaseService {
         if($month != date('Y-m') && $allStatic = $m->get($mkey)){
             return $allStatic;
         }
-        $where = ['LEFT(date, 7)'=>$month, 'lottery_type'=>$lottery_type];
-        $allCounts = SscKjData::find()->select(['month'=>'LEFT(date, 7)', 'nums'=>'COUNT(id)'])->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->count();
-        //p($SscKjData);
+        $monthStart = $month.'-01';
+        $monthEnd = date('Y-m-t', strtotime($monthStart));
+        $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>=', 'date', $monthStart], ['<=', 'date', $monthEnd]];
+        $hzCounts = self::getFourDigitHzCounts($where);
+        $allCounts = array_sum($hzCounts);
+        $num4HzCounts = self::getNum4HzCounts();
 
         $allStatic = [];
         foreach ($typeArr as $k=>$hzArr){
-
-            $where = ['LEFT(date, 7)'=>$month, 'codes_4nums_hz'=> $hzArr, 'lottery_type'=>$lottery_type];
-            $zJcounts = SscKjData::find()->select(['id'])->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 中奖次数
-            $where = ['codes_hz'=>$hzArr, 'code_type'=>4];
-            $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 期数
+            $zJcounts = self::sumHzCounts($hzCounts, $hzArr);
+            $NumCounts = self::sumHzCounts($num4HzCounts, $hzArr);
 
             $profits = $zJcounts * 995 - $allCounts * $NumCounts * 0.1;
             //p([$zJcounts, $allCounts, $NumCounts, $profits]);
@@ -888,14 +888,14 @@ class StaticService extends BaseService {
 
         if($allStatic = $m->get($mkey)) return $allStatic;
 
-        $allCounts = SscKjData::find()->where(['date'=>$date, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_ASC])->count();
+        $hzCounts = self::getFourDigitHzCounts(['date'=>$date, 'lottery_type'=>$lottery_type]);
+        $allCounts = array_sum($hzCounts);
         if(!$allCounts) return [];
+        $num4HzCounts = self::getNum4HzCounts();
         $allStatic = [];
         foreach ($typeArr as $k=>$hzArr){
-            $where = ['date' => $date, 'lottery_type'=>$lottery_type, 'codes_4nums_hz'=> $hzArr];
-            $zJcounts = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->count(); # 中奖次数
-            $where = ['codes_hz'=>$hzArr, 'code_type'=>4];
-            $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count();
+            $zJcounts = self::sumHzCounts($hzCounts, $hzArr);
+            $NumCounts = self::sumHzCounts($num4HzCounts, $hzArr);
 
             $profits = $zJcounts * 999.5 - $allCounts * $NumCounts * 0.1;
             //p([$zJcounts, $NumCounts, $profits]);
@@ -934,20 +934,13 @@ class StaticService extends BaseService {
 
         if($allStatic = $m->get($mkey)) return $allStatic;
 
-        //$allCounts = SscKjData::find()->where(['date'=>$date])->orderBy(['id'=>SORT_ASC])->count();
-        $SscKjDatas = SscKjData::find()->where(['date'=>$date, 'lottery_type'=>$lottery_type])->orderBy(['id'=>SORT_ASC])->all(); # 中奖次数
-        $allQishus = count($SscKjDatas);
+        $hzCounts = self::getFourDigitHzCounts(['date'=>$date, 'lottery_type'=>$lottery_type]);
+        $allQishus = array_sum($hzCounts);
+        $num4HzCounts = self::getNum4HzCounts();
         $allStatic = [];
-        foreach ($SscKjDatas as $SscKjData){
-            if(!isset($allStatic[$SscKjData->codes_4nums_hz]) OR !$allStatic[$SscKjData->codes_4nums_hz]){
-                //$hzArr[$SscKjData->codes_4nums_hz] = 0;
-            }
-            $hzArr[$SscKjData->codes_4nums_hz]++;
-        }
-        //p($hzArr);
-        foreach ($hzArr as $hz=>$zjCounts){
-            $where = ['codes_hz'=>$hz, 'code_type'=>4];
-            $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count(); # 该和值号码组数
+        foreach ($hzArr as $hz=>$unused){
+            $zjCounts = $hzCounts[$hz] ?? 0;
+            $NumCounts = $num4HzCounts[$hz] ?? 0;
 
             $tzMoney = $allQishus * $NumCounts * 0.1; # 投注本金
             $profits = $zjCounts * 999.5 - $tzMoney; # 利润/天
@@ -989,16 +982,17 @@ class StaticService extends BaseService {
         if($month != date('Y-m') && $allStatic = $m->get($mkey)){
             //return $allStatic;
         }
-        $where = ['LEFT(date, 7)'=>$month, 'lottery_type'=>$lottery_type];
-        $allCounts = SscKjData::find()->select(['month'=>'LEFT(date, 7)', 'nums'=>'COUNT(id)'])->where($where)->orderBy(['id'=>SORT_DESC])->asArray()->count();
+        $monthStart = $month.'-01';
+        $monthEnd = date('Y-m-t', strtotime($monthStart));
+        $where = ['AND', ['=', 'lottery_type', $lottery_type], ['>=', 'date', $monthStart], ['<=', 'date', $monthEnd]];
+        $hzCounts = self::getFourDigitHzCounts($where);
+        $allCounts = array_sum($hzCounts);
+        $num4HzCounts = self::getNum4HzCounts();
 
         $allStatic = [];
-        foreach ($hzArr as $k=>$hz){
-
-            $where = ['LEFT(date, 7)'=>$month, 'codes_4nums_hz'=> $k, 'lottery_type'=>$lottery_type];
-            $zJcounts = SscKjData::find()->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 中奖次数
-            $where = ['codes_hz'=>$k, 'code_type'=>4];
-            $NumCounts = Num4Type::find()->where($where)->orderBy(['id'=>SORT_ASC])->count('id'); # 期数
+        foreach ($hzArr as $k=>$unused){
+            $zJcounts = $hzCounts[$k] ?? 0;
+            $NumCounts = $num4HzCounts[$k] ?? 0;
 
             $profits = $zJcounts * 995 - $allCounts * $NumCounts * 0.1;
             //p([$zJcounts, $allCounts, $NumCounts, $profits],0);
@@ -1018,6 +1012,62 @@ class StaticService extends BaseService {
 
         //echo $date.'月份：';
         return $allStatic;
+    }
+
+    /**
+     * 一次分组读取指定范围内每个四定和值的开奖次数。
+     */
+    private static function getFourDigitHzCounts(array $where): array
+    {
+        $counts = array_fill(0, 37, 0);
+        $rows = SscKjData::find()
+            ->select(['codes_4nums_hz', 'nums' => 'COUNT(id)'])
+            ->where($where)
+            ->groupBy(['codes_4nums_hz'])
+            ->asArray()
+            ->all();
+        foreach ($rows as $row) {
+            $counts[(int)$row['codes_4nums_hz']] = (int)$row['nums'];
+        }
+
+        return $counts;
+    }
+
+    /**
+     * 四定每个和值的理论号码组数固定不变，集中查询并缓存。
+     */
+    private static function getNum4HzCounts(): array
+    {
+        $cache = \Yii::$app->cache;
+        $cacheKey = 'static_num4_hz_counts_v1';
+        $counts = $cache->get($cacheKey);
+        if (is_array($counts)) {
+            return $counts;
+        }
+
+        $counts = array_fill(0, 37, 0);
+        $rows = Num4Type::find()
+            ->select(['codes_hz', 'nums' => 'COUNT(id)'])
+            ->where(['code_type' => 4])
+            ->groupBy(['codes_hz'])
+            ->asArray()
+            ->all();
+        foreach ($rows as $row) {
+            $counts[(int)$row['codes_hz']] = (int)$row['nums'];
+        }
+        $cache->set($cacheKey, $counts, 86400);
+
+        return $counts;
+    }
+
+    private static function sumHzCounts(array $counts, array $hzValues): int
+    {
+        $sum = 0;
+        foreach ($hzValues as $hz) {
+            $sum += (int)($counts[$hz] ?? 0);
+        }
+
+        return $sum;
     }
 
     /**

@@ -16,6 +16,9 @@ use yii\helpers\Html;
 <div class="btn-group">
     <?= Html::a('三重', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>4, 'SscStaticYl[type]'=>3, 'SscStaticYl[type_3]'=>1], ['class' => 'btn btn-sm '.($code_type == 4 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
 </div>
+<div class="btn-group">
+    <?= Html::a('三字复式', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>11, 'SscStaticYl[type]'=>6], ['class' => 'btn btn-sm '.($code_type == 11 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+</div>
 ||
 <div class="btn-group">
     <?= Html::a('四现带双三字', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>502, 'SscStaticYl[type]'=>5, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[is_hots]'=>1], ['class' => 'btn btn-sm '.($code_type == 502 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
