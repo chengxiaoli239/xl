@@ -4,6 +4,7 @@ namespace backend\modules\forum\controllers;
 
 use backend\service\StaticService;
 use backend\service\UserSysPlansService;
+use backend\service\statics\yl\ThreeComboYlService;
 use common\service\CommonService;
 use Yii;
 use backend\models\SscStaticYl;
@@ -11,6 +12,7 @@ use backend\models\searchs\SscStaticYl as SscStaticYlSearch;
 use backend\controllers\BaseController;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\data\ArrayDataProvider;
 
 /**
  * SscStaticYlController implements the CRUD actions for SscStaticYl model.
@@ -57,6 +59,29 @@ class SscStaticYlController extends BaseController
         }
         */
         $queryParams['SscStaticYl']['lottery_type'] = $lottery_type;
+
+        if ((int)$type === ThreeComboYlService::TYPE) {
+            $periods = ThreeComboYlService::normalizePeriods(Yii::$app->request->get('periods', ThreeComboYlService::DEFAULT_PERIODS));
+            $codeFilter = trim((string)Yii::$app->request->get('code', ''));
+            $result = ThreeComboYlService::getStatistics($lottery_type, $periods, $codeFilter);
+            $dataProvider = new ArrayDataProvider([
+                'allModels' => $result['statistics'],
+                'pagination' => false,
+                'sort' => [
+                    'attributes' => ['code', 'current_miss', 'last_time_miss', 'max_miss', 'hit_count'],
+                    'defaultOrder' => ['current_miss' => SORT_DESC],
+                ],
+            ]);
+
+            return $this->render('three_combo', [
+                'lottery_types' => $lottery_types,
+                'lottery_type' => $lottery_type,
+                'code_type' => 11,
+                'periods' => $result['periods'],
+                'codeFilter' => $codeFilter,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
 
         $dataProvider = $searchModel->search($queryParams);
 

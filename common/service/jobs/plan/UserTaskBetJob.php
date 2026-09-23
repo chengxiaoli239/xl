@@ -7,6 +7,13 @@ use yii\helpers\Json;
 
 class UserTaskBetJob extends CommonJob {
 
+    public $retryCount = 1;
+
+    public function getTtr(): int
+    {
+        return 120;
+    }
+
     public static function getName($params) {
         self::$name = '30-执行下注';
         return self::$name;
@@ -23,7 +30,16 @@ class UserTaskBetJob extends CommonJob {
         }
         $qihao = $params['qihao'];
 
-        $result = BetService::betUserOneTask($taskId, $qihao);
+        $lockKey = 'user-task-bet-job:'.$taskId;
+        if (!\Yii::$app->cache->add($lockKey, 1, 180)) {
+            return '下注任务正在执行，本次跳过:'.$taskId;
+        }
+
+        try {
+            $result = BetService::betUserOneTask($taskId, $qihao);
+        } finally {
+            \Yii::$app->cache->delete($lockKey);
+        }
 
         return is_json($result)?Json::decode($result):$result;
     }

@@ -39,6 +39,8 @@ use Yii;
  * @property int $type_4s 是否四双
  * @property int $type_log 是否对数
  * @property int $type_4ds 是否四单四双
+ * @property string|null $codes 统计号码集合
+ * @property int $stat_last_index_id 统计到的开奖顺序ID
  */
 class SscStaticYl extends \common\models\base\BaseModel
 {
@@ -56,8 +58,8 @@ class SscStaticYl extends \common\models\base\BaseModel
     public function rules()
     {
         return [
-            [['codes_hz', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'ytd_nums', 'lottery_type', 'type', 'status', 'created_at', 'updated_at', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4d', 'type_4s', 'type_log', 'type_4ds'], 'integer'],
-            [['yl_records'], 'string'],
+            [['codes_hz', 'current_miss', 'last_time_miss', 'max_miss', 'history_max_miss', 'count', 'static_nums', 'today_nums', 'ytd_nums', 'lottery_type', 'type', 'status', 'created_at', 'updated_at', 'type_2', 'type_22', 'type_3', 'type_4', 'type_2b', 'type_3b', 'type_4b', 'type_4d', 'type_4s', 'type_log', 'type_4ds', 'stat_last_index_id'], 'integer'],
+            [['yl_records', 'codes'], 'string'],
             [['update_time'], 'safe'],
             [['val', 'last_time_miss_range', 'max_range'], 'string', 'max' => 64],
             [['theory_nums_perdate'], 'string', 'max' => 8],
@@ -102,6 +104,8 @@ class SscStaticYl extends \common\models\base\BaseModel
             'type_4s' => '是否四双',
             'type_log' => '是否对数',
             'type_4ds' => '是否四单四双',
+            'codes' => '统计号码集合',
+            'stat_last_index_id' => '统计到的开奖顺序ID',
         ];
     }
 
