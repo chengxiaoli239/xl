@@ -31,6 +31,7 @@ $hasOpenQiShu = \backend\models\SscKjData::find()->where(['lottery_type'=>$lotte
                 </div-->
 
                 <?php include(dirname(__FILE__).'/code_type_tab.php'); ?>
+                <?php include(dirname(__FILE__).'/_miss_history_assets.php'); ?>
 
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -64,7 +65,7 @@ $hasOpenQiShu = \backend\models\SscKjData::find()->where(['lottery_type'=>$lotte
                         ['attribute' => 'yl_records','label'=>'遗漏记录', # 'headerOptions'=>['width'=>'5%'],
                             'format'=>'raw',
                             'value' => function($model) {
-                                return $model->current_miss.'-'.$model->yl_records;
+                                return \backend\helpers\MissHistoryFormatter::render($model->current_miss, $model->yl_records);
                             }
                         ],
                         'history_max_miss',
@@ -122,7 +123,7 @@ $hasOpenQiShu = \backend\models\SscKjData::find()->where(['lottery_type'=>$lotte
             val = $(this).data('val');
             lottery_type = $(this).data('lottery_type');
             $.post('/forum/ssc-static-yl/get-code-type-static', {val:val,lottery_type:lottery_type}, function(rst) {
-                $('#tip_msg_rst').html('<strong>号码：</strong>'+rst.val_desc + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str)
+                $('#tip_msg_rst').html('<strong>号码：</strong>'+rst.val_desc + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录（最新 → 更早）：</strong>" + renderMissHistory(rst.current_times, rst.yl_str))
                 $('#rstTipModal').modal('show');
             });
         });

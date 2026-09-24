@@ -27,6 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div-->
 
                 <?php include(dirname(__FILE__).'/code_type_tab.php'); ?>
+                <?php include(dirname(__FILE__).'/_miss_history_assets.php'); ?>
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -73,8 +74,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'max_range',
                         //'yl_records:ntext',
                         ['attribute' => 'yl_records','label'=>'遗漏','headerOptions'=>['width'=>'30%'],
+                            'format'=>'raw',
                             'value' => function($model) {
-                                return $model->current_miss.'-'.$model->yl_records;
+                                return \backend\helpers\MissHistoryFormatter::render($model->current_miss, $model->yl_records);
                             }
                         ],
                         //'history_max_miss',
@@ -196,7 +198,7 @@ $(function () {
         lottery_type = $(this).data('lottery_type');
         console.log(val, type, lottery_type);
         $.post('/forum/ssc-static-yl/get-val-static', {val:val,type:type,lottery_type:lottery_type}, function(rst) {
-            $('#tip_msg_rst').html('<strong>号码：</strong>'+val + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录：</strong>" +rst.current_times + '-' +rst.yl_str)
+            $('#tip_msg_rst').html('<strong>号码：</strong>'+val + "<br>" +'<strong>当前：</strong>'+ rst.current_times + "<br>" + '<strong>历史最大：</strong>'+ rst.max_miss + "<br>" + "<strong>遗漏记录（最新 → 更早）：</strong>" + renderMissHistory(rst.current_times, rst.yl_str))
             $('#rstTipModal').modal('show');
         });
     });

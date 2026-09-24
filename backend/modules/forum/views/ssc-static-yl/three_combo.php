@@ -14,6 +14,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </header>
         <div class="panel-body">
             <?php include __DIR__.'/code_type_tab.php'; ?>
+            <?php include __DIR__.'/_miss_history_assets.php'; ?>
 
             <?= Html::beginForm(['index'], 'get', ['class' => 'form-inline', 'style' => 'margin-bottom:15px;']) ?>
             <?= Html::hiddenInput('SscStaticYl[lottery_type]', $lottery_type) ?>
@@ -58,7 +59,15 @@ $this->params['breadcrumbs'][] = $this->title;
                         ['attribute' => 'last_time_miss', 'label' => '上次遗漏'],
                         ['attribute' => 'max_miss', 'label' => '区间最大遗漏'],
                         ['attribute' => 'hit_count', 'label' => '命中次数'],
-                        ['attribute' => 'yl_records', 'label' => '遗漏记录'],
+                        [
+                            'attribute' => 'yl_records',
+                            'label' => '遗漏记录',
+                            'format' => 'raw',
+                            'value' => static function ($row) use ($periods) {
+                                $display = !empty($row['is_window_limit']) ? '≥'.$periods : (string)$row['current_miss'];
+                                return \backend\helpers\MissHistoryFormatter::render($row['current_miss'], $row['yl_records'], $display);
+                            },
+                        ],
                     ],
                 ]) ?>
             </div>
