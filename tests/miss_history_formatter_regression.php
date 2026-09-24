@@ -8,13 +8,13 @@ use backend\helpers\MissHistoryFormatter;
 
 $html = MissHistoryFormatter::render(123, '-43-83-43');
 
-if (strpos($html, '最新') === false || strpos($html, '>123<') === false) {
+if (strpos($html, 'miss-history__latest') === false || strpos($html, '>123<') === false) {
     throw new RuntimeException('最新遗漏未突出显示');
 }
-if (strpos($html, '>123<') > strpos($html, '>43<')) {
+if (strpos($html, '123</strong>') > strpos($html, '43')) {
     throw new RuntimeException('最新遗漏没有排在历史遗漏之前');
 }
-if (substr_count($html, 'class="miss-history__item') !== 4) {
+if (strpos($html, '123</strong>-43-83-43</span>') === false) {
     throw new RuntimeException('遗漏记录数量不正确');
 }
 

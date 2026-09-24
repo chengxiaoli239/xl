@@ -28,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </div>
                 </div-->
                 <?php include(dirname(__FILE__).'/index_tab.php'); ?>
+                <?php include(dirname(__FILE__).'/../ssc-static-yl/_miss_history_assets.php'); ?>
 
     <?php Pjax::begin(); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -74,7 +75,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model->current_miss;
                             }
                         ],
-                        'yl_records',
+                        ['attribute'=>'yl_records','format'=>'raw',
+                            'value'=>function($model){
+                                return \backend\helpers\MissHistoryFormatter::render($model->current_miss, $model->yl_records, '', true);
+                            }
+                        ],
                         //'last_time_miss',
                         ['attribute'=>'last_time_miss','label'=>'上次','headerOptions'=>['width'=>'3%'],
                             'value'=>function($model){

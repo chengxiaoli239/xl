@@ -14,25 +14,16 @@ class MissHistoryFormatter
             array_shift($history);
         }
 
-        $items = [
-            Html::tag('span',
-                Html::tag('small', '最新', ['class' => 'miss-history__latest-label'])
-                .Html::tag('strong', Html::encode($currentDisplay), ['class' => 'miss-history__value']),
-                [
-                    'class' => 'miss-history__item miss-history__item--latest',
-                    'title' => '最新遗漏：'.$currentDisplay,
-                ]
-            ),
-        ];
+        $items = [Html::tag('strong', Html::encode($currentDisplay), [
+            'class' => 'miss-history__latest',
+            'title' => '最新遗漏',
+        ])];
 
         foreach ($history as $value) {
-            $items[] = Html::tag('span', Html::encode($value), [
-                'class' => 'miss-history__item',
-                'title' => '历史遗漏：'.$value,
-            ]);
+            $items[] = '-'.Html::encode($value);
         }
 
-        return Html::tag('div', implode('', $items), [
+        return Html::tag('span', implode('', $items), [
             'class' => 'miss-history',
             'aria-label' => '遗漏记录，从左到右为最新到更早',
         ]);

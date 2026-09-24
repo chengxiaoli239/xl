@@ -28,6 +28,7 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                 <?php
                 include(dirname(__FILE__).'/index_tab.php');
                 ?>
+                <?php include(dirname(__FILE__).'/../ssc-static-yl/_miss_history_assets.php'); ?>
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -58,7 +59,11 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                         ],
                         //'last_time_miss_range',
                         //'max_range',
-                        'yl_records:ntext',
+                        ['attribute'=>'yl_records','format'=>'raw',
+                            'value'=>function($model){
+                                return \backend\helpers\MissHistoryFormatter::render($model->current_miss, $model->yl_records, '', true);
+                            }
+                        ],
                         //'max_miss',
                         ['attribute'=>'max_miss','label'=>'最大','headerOptions'=>['width'=>'5%'],
                             'value'=>function($model){
