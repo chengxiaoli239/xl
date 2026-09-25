@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'tableOptions' => ['class' => 'table table-striped table-bordered'],
                     'columns' => [
                         ['class' => 'yii\grid\SerialColumn'],
-                        ['attribute' => 'code', 'label' => '三字复式号码'],
+                        ['attribute' => 'code', 'label' => '号码'],
                         [
                             'attribute' => 'current_miss',
                             'label' => '当前遗漏',

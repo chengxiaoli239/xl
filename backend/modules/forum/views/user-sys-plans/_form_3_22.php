@@ -21,6 +21,7 @@ use yii\widgets\ActiveForm;
             </header>
             <div class="panel-body">
                 <?php $form = ActiveForm::begin(); ?>
+                <?php include __DIR__.'/real_bet_window.php'; ?>
                     <!--?= $form->field($model, 'uid')->textInput(['maxlength' => true]) ?-->
 
                     <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->

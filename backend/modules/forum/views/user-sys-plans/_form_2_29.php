@@ -23,6 +23,7 @@ use yii\widgets\ActiveForm;
                 <?php $form = ActiveForm::begin([
                     //'fieldConfig'=>[ 'template'=> "{label}\n<div class=\"col-sm-8\">{input}</div>\n{error}", ]
                 ]); ?>
+                <?php include __DIR__.'/real_bet_window.php'; ?>
                     <!--?= $form->field($model, 'uid')->textInput(['maxlength' => true]) ?-->
 
                 <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->

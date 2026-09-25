@@ -16,6 +16,7 @@ use yii\widgets\ActiveForm;
             </header>
             <div class="panel-body">
                 <?php $form = ActiveForm::begin(); ?>
+                <?php include __DIR__.'/real_bet_window.php'; ?>
                 <div class="row">
                     <div class="col-lg-3 col-xs-4">
                         <?= $form->field($model, 'playway')->radioList([

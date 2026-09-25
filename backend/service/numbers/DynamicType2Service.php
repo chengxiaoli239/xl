@@ -6,6 +6,7 @@ use backend\models\SscKjData;
 use backend\service\BaseService;
 use backend\service\NumService;
 use backend\service\numbers\NumCodeService;
+use backend\service\statics\yl\ThreeComboYlService;
 use common\helpers\Code;
 use common\helpers\LotteryType;
 use common\service\ssc\QihaoService;
@@ -16,6 +17,44 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
 class DynamicType2Service extends BaseService {
+
+    /** Keep four-digit codes covered by the most-missed three-digit sets. */
+    public static function filter46(object $plan, $dynamic = [], $filterDesc = []): array
+    {
+        $x = max(1, min(120, (int)($dynamic['params']['x'] ?? 0)));
+        $statistics = ThreeComboYlService::getStatistics((int)$plan->lottery_type, ThreeComboYlService::DEFAULT_PERIODS)['statistics'];
+        usort($statistics, static function (array $left, array $right): int {
+            return ((int)$right['current_miss'] <=> (int)$left['current_miss'])
+                ?: strcmp((string)$left['code'], (string)$right['code']);
+        });
+        $allowedSets = array_map(static function (array $row): array {
+            return array_fill_keys(str_split((string)$row['code']), true);
+        }, array_slice($statistics, 0, $x));
+
+        $allCodes = Num4Type::find()->select(['code'])->where(['code_type' => 4])->asArray()->all();
+        $codes = [];
+        foreach ($allCodes as $row) {
+            $digits = str_split((string)$row['code']);
+            foreach ($allowedSets as $allowed) {
+                if (count($digits) === 4 && !array_diff($digits, array_keys($allowed))) {
+                    $codes[] = $row['code'];
+                    break;
+                }
+            }
+        }
+
+        [, $nextQiHao] = QihaoService::getKjQiHao($plan->lottery_type);
+        $betDesc = '三字复式动态遗漏最大前'.$x.'个';
+        NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+        Tool_Common::log('/data/'.__FUNCTION__, 'INFO', $betDesc, [
+            'plan_id' => $plan->id,
+            'lottery_type' => $plan->lottery_type,
+            'selected_count' => count($allowedSets),
+            'code_count' => count($codes),
+        ]);
+
+        return $codes;
+    }
 
     # 两合上1
     public static function filter1(object $plan, $dynamic=[]): array

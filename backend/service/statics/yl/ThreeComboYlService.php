@@ -57,6 +57,7 @@ class ThreeComboYlService
 
     public static function isHit(string $combination, array $drawCodes): bool
     {
+        // 复式号码表示允许出现的数字集合，不要求三个数字在本期都至少出现一次。
         if (count($drawCodes) < 4) {
             return false;
         }

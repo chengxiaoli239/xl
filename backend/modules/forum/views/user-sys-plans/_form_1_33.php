@@ -16,6 +16,7 @@ use yii\widgets\ActiveForm;
             </header>
             <div class="panel-body">
                 <?php $form = ActiveForm::begin(); ?>
+                <?php include __DIR__.'/real_bet_window.php'; ?>
                 <input type="hidden" value="<?=$tz_type?>" name="UserSysPlans[tz_type]">
                 <input type="hidden" value="<?=$model->status_val?>" name="UserSysPlans[status_val]">
                 <div class="row">

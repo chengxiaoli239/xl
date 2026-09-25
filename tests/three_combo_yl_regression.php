@@ -32,4 +32,19 @@ assertSameValue(1, $stats[0]['current_miss'], '当前遗漏错误');
 assertSameValue(0, $stats[0]['last_time_miss'], '上次遗漏错误');
 assertSameValue(2, $stats[0]['hit_count'], '命中次数错误');
 
+assertSameValue(true, ThreeComboYlService::isHit('238', [3, 3, 8, 8]), '3388应命中238');
+assertSameValue(true, ThreeComboYlService::isHit('368', [3, 3, 8, 8]), '3388应命中368');
+assertSameValue(true, ThreeComboYlService::isHit('378', [3, 3, 8, 8]), '3388应命中378');
+assertSameValue(true, ThreeComboYlService::isHit('389', [3, 3, 8, 8]), '3388应命中389');
+
+$sharedMissDraws = [];
+for ($position = 0; $position < 46; $position++) {
+    $sharedMissDraws[] = ['qihao' => (string)(100 - $position), 'code1' => 0, 'code2' => 0, 'code3' => 0, 'code4' => 0];
+}
+$sharedMissDraws[] = ['qihao' => '054', 'code1' => 3, 'code2' => 3, 'code3' => 8, 'code4' => 8];
+$sharedMissStats = ThreeComboYlService::calculate($sharedMissDraws, ['238', '368', '378', '389']);
+foreach ($sharedMissStats as $row) {
+    assertSameValue(46, $row['current_miss'], $row['code'].'应可与其他复式号码同时遗漏46期');
+}
+
 echo "three_combo_yl_regression: OK\n";

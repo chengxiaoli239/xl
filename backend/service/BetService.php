@@ -45,6 +45,7 @@ use backend\models\TzSystems;
 use backend\models\TzSystemsUsers;
 use backend\models\TzTypes;
 use backend\models\UserSysPlans;
+use backend\service\plans\PlanBetWindowService;
 use common\service\CommonService;
 use common\tools\Tool_Common;
 use common\tools\KjDataGet;
@@ -2351,8 +2352,18 @@ abstract class BetService extends BaseBetService {
             $is_test = $plan->is_test;
             list($sn, $snid) = BetService::getBetSnId($plan, $plan->plan_type, $is_test, $isAuto);
 
-            if($is_test == 1 OR $plan->uid == 1){ # 模拟下注
-                $testInsertRst = self::_logRecordsByPlandId($plan, $qiHao, $codes, $plan->lottery_type, $is_test, $sn, $snid, $plan->hz_Arr, $r=3); # 直接记录表
+            $withinRealBetWindow = PlanBetWindowService::isWithin($plan->real_bet_start_time, $plan->real_bet_end_time);
+            if($is_test == 1 OR $plan->uid == 1 OR !$withinRealBetWindow){ # 模拟下注（计划时间窗外也只记录模拟）
+                if(!$withinRealBetWindow && $is_test == 0 && $plan->uid != 1){
+                    Tool_Common::log('/bet/'.__FUNCTION__, 'INFO', '计划不在真实投注时间窗，写入模拟记录', [
+                        'plan_id' => $plan->id,
+                        'qihao' => $qiHao,
+                        'start' => $plan->real_bet_start_time,
+                        'end' => $plan->real_bet_end_time,
+                    ]);
+                }
+                $recordIsTest = ($is_test == 1 || $plan->uid == 1) ? $is_test : 1;
+                $testInsertRst = self::_logRecordsByPlandId($plan, $qiHao, $codes, $plan->lottery_type, $recordIsTest, $sn, $snid, $plan->hz_Arr, $r=3); # 直接记录表
                 if($testInsertRst['status'] == 200){
                     commonRedis()->setex($insert_mkey, 300, 1);
                 }

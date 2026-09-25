@@ -59,6 +59,7 @@ class DynamicFilterService extends BaseService {
         ['type'=>43, 'label'=>'取x位最近n个号码复式', 'params'=>['x'=>'', 'n'=>''], 'desc'=>"与「排除x位最近n个码的复试」相反，只保留落在该复式内的号码（逻辑对应类型27未填k时的复式池）：<br>1、x:1，n:6，则千位取最近6个开奖数字组成复式池，只保留四位数字均在该池内的号码<br>2、x:12，n:6，则保留「满足千位池复式」或「满足百位池复式」的号码（并集）", 'playway'=>[3]],
         ['type'=>44, 'label'=>'取x位各取最近y个号码复式', 'params'=>['x'=>'', 'y'=>''], 'desc'=>"每个位置独立取最近y个码后保留复式组合，与类型43不同(43是同一池过滤四位)，此类型每位用自己的码池：<br>1、x:1234，y:9 → 千位取最近9码、百位取最近9码、十位取最近9码、个位取最近9码，各自独立取码，最终结果约为9×9×9×9=6561组<br>2、二定可用：定X位置勾选后，X位自动跳过，实际投注位取对应位置最近y个热码<br>3、x、y都是灵活配置，不固定写死9个码", 'playway'=>[1, 3]],
         ['type'=>45, 'label'=>'上期x位定位合分排除', 'params'=>['x'=>''], 'desc'=>"自动过滤上期指定位置的定位合分，比如x:14，上期开2347，则第1位+第4位合分为9，下期过滤14位定位合分9，最终14位定位合分保留012345678", 'playway'=>[1, 2, 3]],
+        ['type'=>46, 'label'=>'取当前遗漏最大前x个三字复式', 'params'=>['x'=>''], 'desc'=>'按最近500期的当前遗漏从大到小取前x个三字复式，仅保留四个位置都落在其中一组三字复式内的四定位号码；x最大120。', 'playway'=>[3]],
     ];
     public static int $filterType = 0;
 
@@ -197,6 +198,9 @@ class DynamicFilterService extends BaseService {
                     break;
                 case 45: # 上期x位定位合分排除
                     $codes = DynamicType2Service::filter45($plan, $dynamic, $filterDesc);
+                    break;
+                case 46: # 当前遗漏最大前x个三字复式
+                    $codes = DynamicType2Service::filter46($plan, $dynamic, $filterDesc);
                     break;
             }
             if(empty($codes)){

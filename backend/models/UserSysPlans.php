@@ -41,6 +41,8 @@ use Yii;
  * @property string $base_codes 基础号码
  * @property string $desc 描述
  * @property string $remark 备注
+ * @property string $real_bet_start_time 真实投注开始时间(HH:MM)
+ * @property string $real_bet_end_time 真实投注结束时间(HH:MM)
  * @property int $plan_type 计划类型:0正常1止盈止损计划
  * @property int $change_per 号码轮换
  * @property int $tz_sort 投注排序:从小到大
@@ -275,6 +277,20 @@ class UserSysPlans extends \common\models\base\BaseModel
             [['uid', 'account', 'single', 'created_at', 'updated_at'], 'required'],
             [['single', 'take_profits', 'stop_loss', 'current_profits'], 'number'],
             [['update_time'], 'safe'],
+            [['real_bet_start_time', 'real_bet_end_time'], 'match',
+                'pattern' => '/^(?:[01]\d|2[0-3]):[0-5]\d$/',
+                'skipOnEmpty' => true,
+                'message' => '时间格式应为HH:MM'],
+            [['real_bet_start_time'], 'required',
+                'when' => static function ($model) {
+                    return !empty($model->real_bet_end_time);
+                },
+                'message' => '设置真实投注时间段时必须填写开始时间'],
+            [['real_bet_end_time'], 'required',
+                'when' => static function ($model) {
+                    return !empty($model->real_bet_start_time);
+                },
+                'message' => '设置真实投注时间段时必须填写结束时间'],
             [['children_plan_id'], 'string', 'max' => 255],
             [['singles', 'ids', 'base_codes', 'hz_Arr', 'desc', 'remark'], 'string'],
             [['account', 'tz_sites'], 'string', 'max' => 24],
@@ -321,6 +337,8 @@ class UserSysPlans extends \common\models\base\BaseModel
             'created_at' => '创建时间',
             'updated_at' => '更新时间',
             'update_time' => '更新时间',
+            'real_bet_start_time' => '真实投注开始时间',
+            'real_bet_end_time' => '真实投注结束时间',
         ];
     }
 

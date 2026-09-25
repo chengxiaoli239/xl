@@ -26,6 +26,7 @@ $this->title = '新过滤快打';
                         //'inputOptions'=>['class'=>'p-1'],
                     ],
                 ]); ?>
+                <?php include __DIR__.'/real_bet_window.php'; ?>
                 <!--?= $form->field($model, 'uid')->textInput(['maxlength' => true]) ?-->
 
                 <!--?= $form->field($model, 'account')->textInput(['maxlength' => true]) ?-->
