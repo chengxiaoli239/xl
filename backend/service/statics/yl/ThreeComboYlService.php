@@ -171,6 +171,17 @@ class ThreeComboYlService
         $isNew = $row->isNewRecord;
 
         $row->val = self::ROW_VAL;
+        // The legacy table keeps several non-null scalar columns alongside the JSON summary.
+        $row->codes_hz = 0;
+        $row->current_miss = 0;
+        $row->last_time_miss = 0;
+        $row->last_time_miss_range = '';
+        $row->max_miss = 0;
+        $row->max_range = '';
+        $row->history_max_miss = 0;
+        $row->today_nums = 0;
+        $row->ytd_nums = 0;
+        $row->theory_nums_perdate = '0';
         $row->codes = implode(',', self::getCombinations());
         $row->yl_records = Json::encode($statistics);
         $row->stat_last_index_id = $lastIndexId;
