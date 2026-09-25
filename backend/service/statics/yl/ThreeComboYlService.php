@@ -10,7 +10,7 @@ class ThreeComboYlService
 {
     public const TYPE = 6;
     public const ROW_VAL = 'three_combo_fs';
-    public const DEFAULT_PERIODS = 500;
+    public const DEFAULT_PERIODS = 2000;
     public const MAX_PERIODS = 10000;
 
     public static function normalizePeriods($periods): int
