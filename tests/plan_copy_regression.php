@@ -52,7 +52,7 @@ assertSameValue('1,2,4', $copy['singles'], '倍投梯度应保留');
 assertSameValue(0, $copy['current_profits'], '复制计划不能继承当前盈利');
 assertSameValue(1700000000, $copy['created_at'], '复制计划应使用新的创建时间');
 assertSameValue(1700000000, $copy['updated_at'], '复制计划应使用新的更新时间');
-assertSameValue('2023-11-14 22:13:20', $copy['update_time'], '更新时间应与时间戳一致');
+assertSameValue(date('Y-m-d H:i:s', 1700000000), $copy['update_time'], '更新时间应与时间戳一致');
 
 $hz = json_decode($copy['hz_Arr'], true);
 assertSameValue('123', $hz['codes'], '计划配置应保留');
