@@ -13,12 +13,14 @@ use backend\service\BetService;
 use backend\service\HN0898Service;
 use backend\service\numbers\DynamicFilterService;
 use backend\service\NumService;
+use backend\service\PlanCopyService;
 use backend\service\StaticService;
 use backend\service\TzService;
 use backend\service\UserService;
 use backend\service\UserSysPlansService;
 use backend\service\PlanProfitStatGroupService;
 use common\service\CommonService;
+use common\models\AdminModel;
 use common\service\jobs\plan\UserPlanBetJob;
 use common\service\jobs\user\UserExpireTimeOperateJob;
 use common\service\ssc\filterCode\FenLiShu;
@@ -40,6 +42,15 @@ use yii\data\ActiveDataProvider;
  */
 class UserSysPlansController extends BaseController
 {
+    public function beforeAction($action)
+    {
+        if ($action->id === 'copy-plan') {
+            Yii::$app->request->enableCsrfValidation = true;
+        }
+
+        return parent::beforeAction($action);
+    }
+
     /**
      * @inheritdoc
      */
@@ -54,6 +65,7 @@ class UserSysPlansController extends BaseController
                     'delete-profit-stat-group' => ['POST'],
                     'assign-profit-stat-group' => ['POST'],
                     'remove-plan-profit-stat-group' => ['POST'],
+                    'copy-plan' => ['POST'],
                 ],
             ],
         ];
@@ -166,6 +178,21 @@ class UserSysPlansController extends BaseController
             $statIndexBase['UserSysPlans[account]'] = $searchModel->account;
         }
 
+        $copyTargetAccounts = [];
+        if ((int)$this->_user_id === 1) {
+            $copyTargetAccounts = ArrayHelper::map(
+                AdminModel::find()
+                    ->select(['id', 'username'])
+                    ->where(['status' => AdminModel::STATUS_ACTIVE])
+                    ->andWhere(['<>', 'id', 1])
+                    ->orderBy(['username' => SORT_ASC])
+                    ->asArray()
+                    ->all(),
+                'id',
+                'username'
+            );
+        }
+
         $data = [
             'lottery_types' => $lottery_types,
             'lottery_type' => $lottery_type,
@@ -181,9 +208,42 @@ class UserSysPlansController extends BaseController
             'statIndexBase' => $statIndexBase,
             'planGroupUiByPlanId' => $planGroupUiByPlanId,
             'currentIdsNorm' => $currentIdsNorm,
+            'copyTargetAccounts' => $copyTargetAccounts,
         ];
 
         return $this->render('index', $data);
+    }
+
+    public function actionCopyPlan()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        if ((int)$this->_user_id !== 1) {
+            Yii::$app->response->statusCode = 403;
+            return ['status' => 403, 'message' => '仅超级管理员可以复制计划'];
+        }
+
+        try {
+            $sourcePlanId = (int)Yii::$app->request->post('source_plan_id');
+            $targetUid = (int)Yii::$app->request->post('target_uid');
+            $copy = PlanCopyService::copyPlan($sourcePlanId, $targetUid);
+
+            return [
+                'status' => 200,
+                'message' => '计划复制成功，新计划默认关闭',
+                'data' => [
+                    'plan_id' => (int)$copy->id,
+                    'account' => (string)$copy->account,
+                    'status' => (int)$copy->status,
+                ],
+            ];
+        } catch (\Throwable $e) {
+            Yii::warning([
+                'message' => $e->getMessage(),
+                'source_plan_id' => (int)Yii::$app->request->post('source_plan_id'),
+                'target_uid' => (int)Yii::$app->request->post('target_uid'),
+            ], __METHOD__);
+            return ['status' => 400, 'message' => $e->getMessage()];
+        }
     }
 
     /**

@@ -301,7 +301,7 @@ $columns = array_merge(
         ['attribute' => 'tz_type','label'=>'操作', 'headerOptions'=>['width'=>'18%'],
             'contentOptions' => ['class'=>'plan-operation-cell'],
             'format'=>'raw',
-            'value' => function($model) {
+            'value' => function($model) use ($isSuperAdmin) {
                 $url = "/forum/user-sys-plans/tz-now?id=".$model->id; # 立即下注
                 $links = [Html::a('立即下注', $url, ['title' => '立即下注'.$model->id,'alt'=>$model->id])];
                 if(in_array($model->plan_type,[1, 3]) OR ($model->take_profits>0 OR $model->stop_loss)){
@@ -309,6 +309,14 @@ $columns = array_merge(
                     $links[] = Html::a('重算盈利', $url1, ['title' => '重算盈利'.$model->id,'alt'=>$model->id]);
                 }
                 $links[] = Html::a('每期盈利', ['period-profits', 'id' => $model->id], ['title' => '查看计划每期盈利记录', 'target' => '_blank']);
+                if ($isSuperAdmin) {
+                    $links[] = Html::a('复制计划', 'javascript:;', [
+                        'class' => 'plan-copy-open',
+                        'data-plan-id' => (int)$model->id,
+                        'data-account' => (string)$model->account,
+                        'title' => '复制到其他账号，新计划默认关闭',
+                    ]);
+                }
                 return Html::tag('div', implode('<br>', $links), ['class' => 'plan-operation-links']);
             }
         ],
@@ -472,7 +480,7 @@ CSS
                     <div class="btn-group">
                         <?= Html::a($typeData['type_name'], ['create', 'tz_type'=>$typeData['tz_type'], 'lottery_type'=>$typeData['lottery_type']], ['class' => 'btn btn-success btn-sm', 'style' => 'margin-bottom:15px;']) ?>
                     </div>
-                    <?endforeach;?>
+                    <?php endforeach; ?>
                 </div>
 
                 <?php echo $this->render('_search', ['model' => $searchModel, 'ids' => $ids, 'lottery_type' => $lottery_type]); ?>
@@ -729,10 +737,89 @@ CSS
         </div>
     </div>
 </div>
+<?php if ($isSuperAdmin): ?>
+<div class="modal fade" id="planCopyModal" tabindex="-1" role="dialog" aria-labelledby="planCopyModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                <h4 class="modal-title" id="planCopyModalLabel">复制计划</h4>
+            </div>
+            <div class="modal-body">
+                <?= Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->getCsrfToken(), ['id' => 'planCopyCsrf']) ?>
+                <div class="form-group">
+                    <label>源计划</label>
+                    <p class="form-control-static" id="planCopySource"></p>
+                </div>
+                <div class="form-group">
+                    <label for="planCopyTargetUid">目标账号</label>
+                    <?= Html::dropDownList('plan_copy_target_uid', null, $copyTargetAccounts, [
+                        'id' => 'planCopyTargetUid',
+                        'class' => 'form-control',
+                        'prompt' => '请选择目标账号',
+                    ]) ?>
+                </div>
+                <div class="alert alert-info" style="margin-bottom:0;">
+                    只复制计划配置和导入号码。新计划默认关闭，不复制历史投注、盈利、运行状态或利润统计分组。
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" id="confirmPlanCopy">确认复制</button>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 <!--提示框-end-->
 <script src="/statics/js/jquery-2.0.3.js"></script>
 <script>
     $(document).ready(function() {
+        var copySourcePlanId = 0;
+
+        $(document).on('click', '.plan-copy-open', function () {
+            copySourcePlanId = parseInt($(this).data('plan-id'), 10) || 0;
+            $('#planCopySource').text('计划 ' + copySourcePlanId + '（' + $(this).data('account') + '）');
+            $('#planCopyTargetUid').val('');
+            $('#planCopyModal').modal('show');
+        });
+
+        $('#confirmPlanCopy').on('click', function () {
+            var targetUid = $('#planCopyTargetUid').val();
+            if (!copySourcePlanId || !targetUid) {
+                layer.alert('请选择目标账号');
+                return;
+            }
+
+            var button = $(this);
+            button.prop('disabled', true);
+            var requestData = {
+                source_plan_id: copySourcePlanId,
+                target_uid: targetUid
+            };
+            var csrf = $('#planCopyCsrf');
+            requestData[csrf.attr('name')] = csrf.val();
+            $.post('/forum/user-sys-plans/copy-plan', requestData, function (response) {
+                if (response.status === 200) {
+                    $('#planCopyModal').modal('hide');
+                    layer.alert(
+                        response.message + '；新计划ID：' + response.data.plan_id + '，目标账号：' + response.data.account,
+                        function (index) {
+                            layer.close(index);
+                            location.reload();
+                        }
+                    );
+                } else {
+                    layer.alert(response.message || '复制失败');
+                }
+            }, 'json').fail(function (xhr) {
+                var response = xhr.responseJSON || {};
+                layer.alert(response.message || '复制请求失败');
+            }).always(function () {
+                button.prop('disabled', false);
+            });
+        });
+
         // 多选框变单选效果
         $('.checkbox-item').click(function() {
             const name = $(this).attr('name');
