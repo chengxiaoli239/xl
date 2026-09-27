@@ -74,8 +74,9 @@ For an S3 release, set `AWS_S3_CLIENT_BUCKET` and optionally
 .\client\publish-windows-client.ps1
 ```
 
-If Windows builds the EXE remotely and the artifact is retrieved on macOS,
-publish and verify it from the Mac instead:
+If Windows builds the EXE remotely, retrieve both `Lucky5.exe` and
+`Lucky5-build.json` into the same directory on macOS, then publish and verify
+them from the Mac:
 
 ```bash
 AWS_S3_CLIENT_BUCKET=msll-app-releases-289069331089 \

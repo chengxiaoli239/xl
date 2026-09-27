@@ -1,5 +1,7 @@
 import argparse
 import datetime
+import hashlib
+import json
 import os
 import shutil
 import subprocess
@@ -75,7 +77,34 @@ def main():
     ]
     subprocess.run(command, cwd=repo_dir, check=True)
 
-    print("Built:", dist_dir / (output_name + ".exe"))
+    executable = dist_dir / (output_name + ".exe")
+    digest = hashlib.sha256()
+    with executable.open("rb") as built_file:
+        if built_file.read(2) != b"MZ":
+            raise RuntimeError("The build output is not a Windows PE executable")
+        built_file.seek(0)
+        for chunk in iter(lambda: built_file.read(1024 * 1024), b""):
+            digest.update(chunk)
+    checksum = digest.hexdigest()
+
+    commit = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], cwd=repo_dir, text=True
+    ).strip()
+    dirty_client = subprocess.check_output(
+        ["git", "status", "--porcelain", "--", "client"], cwd=repo_dir, text=True
+    ).strip()
+    if dirty_client:
+        raise RuntimeError("Client source has uncommitted changes; cannot label build with a source commit")
+
+    manifest = dist_dir / (output_name + "-build.json")
+    manifest.write_text(json.dumps({
+        "product": "Lucky5",
+        "source_commit": commit,
+        "size": executable.stat().st_size,
+        "sha256": checksum,
+    }, indent=2) + "\n", encoding="utf-8")
+    print("Built:", executable)
+    print("Manifest:", manifest)
 
 
 if __name__ == "__main__":

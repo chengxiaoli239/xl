@@ -8,11 +8,13 @@ fi
 
 command -v aws >/dev/null || { printf 'AWS CLI is required.\n' >&2; exit 1; }
 command -v curl >/dev/null || { printf 'curl is required.\n' >&2; exit 1; }
+command -v jq >/dev/null || { printf 'jq is required.\n' >&2; exit 1; }
 
 repo_root="$(cd "$(dirname "$0")/.." && pwd)"
 source_commit="$(git -C "$repo_root" rev-parse HEAD)"
 source_short="${source_commit:0:12}"
 source_exe="$1"
+manifest="${source_exe%.exe}-build.json"
 bucket="${AWS_S3_CLIENT_BUCKET:-}"
 region="${AWS_S3_CLIENT_REGION:-ap-east-1}"
 prefix="${AWS_S3_CLIENT_PREFIX:-lottery_xl/windows}"
@@ -28,6 +30,11 @@ if [[ ! "$source_commit" =~ ^[0-9a-f]{40}$ || ! "$bucket" =~ ^[A-Za-z0-9.-]+$ ||
   exit 2
 fi
 
+if [[ ! -f "$manifest" ]]; then
+  printf 'Windows build manifest is missing: %s\n' "$manifest" >&2
+  exit 1
+fi
+
 if [[ "$(od -An -tx1 -N2 "$source_exe" | tr -d ' \n')" != '4d5a' ]]; then
   printf 'The input is not a Windows PE executable (missing MZ header).\n' >&2
   exit 1
@@ -35,6 +42,11 @@ fi
 
 checksum="$(shasum -a 256 "$source_exe" | awk '{print $1}')"
 size="$(wc -c < "$source_exe" | tr -d ' ')"
+read -r built_commit built_size built_sha < <(jq -r '[.source_commit, (.size | tostring), .sha256] | @tsv' "$manifest")
+if [[ "$built_commit" != "$source_commit" || "$built_size" != "$size" || "$built_sha" != "$checksum" ]]; then
+  printf 'Windows build manifest does not match the EXE or current source commit.\n' >&2
+  exit 1
+fi
 version="$(date -u '+%Y%m%d-%H%M%S')-${source_short}"
 release_key="${prefix}/releases/Lucky5-${version}.exe"
 latest_key="${prefix}/Lucky5-latest.exe"
