@@ -18,7 +18,7 @@ $buildScript = Join-Path $clientDir 'xy_client\build.py'
 
 $bucket = $env:AWS_S3_CLIENT_BUCKET
 $region = if ($env:AWS_S3_CLIENT_REGION) { $env:AWS_S3_CLIENT_REGION } else { 'ap-east-1' }
-$prefix = if ($env:AWS_S3_CLIENT_PREFIX) { $env:AWS_S3_CLIENT_PREFIX.Trim('/') } else { 'windows' }
+$prefix = if ($env:AWS_S3_CLIENT_PREFIX) { $env:AWS_S3_CLIENT_PREFIX.Trim('/') } else { 'lottery_xl/windows' }
 $baseUrl = if ($env:AWS_S3_CLIENT_BASE_URL) { $env:AWS_S3_CLIENT_BASE_URL.TrimEnd('/') } else { '' }
 
 if ([string]::IsNullOrWhiteSpace($bucket)) {
