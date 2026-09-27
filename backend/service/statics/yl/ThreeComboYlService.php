@@ -10,6 +10,7 @@ class ThreeComboYlService
 {
     public const TYPE = 6;
     public const ROW_VAL = 'three_combo_fs';
+    public const COMBINATION_LENGTH = 3;
     public const DEFAULT_PERIODS = 2000;
     public const MAX_PERIODS = 10000;
 
@@ -17,37 +18,42 @@ class ThreeComboYlService
     {
         $periods = (int)$periods;
         if ($periods <= 0) {
-            return self::DEFAULT_PERIODS;
+            return static::DEFAULT_PERIODS;
         }
 
-        return min($periods, self::MAX_PERIODS);
+        return min($periods, static::MAX_PERIODS);
     }
 
     public static function getCombinations(): array
     {
         $codes = [];
-        for ($first = 0; $first <= 7; $first++) {
-            for ($second = $first + 1; $second <= 8; $second++) {
-                for ($third = $second + 1; $third <= 9; $third++) {
-                    $codes[] = (string)$first.$second.$third;
-                }
-            }
+        self::appendCombinations($codes, '', 0, static::COMBINATION_LENGTH);
+        return $codes;
+    }
+
+    private static function appendCombinations(array &$codes, string $prefix, int $nextDigit, int $remaining): void
+    {
+        if ($remaining === 0) {
+            $codes[] = $prefix;
+            return;
         }
 
-        return $codes;
+        for ($digit = $nextDigit; $digit <= 10 - $remaining; $digit++) {
+            self::appendCombinations($codes, $prefix.$digit, $digit + 1, $remaining - 1);
+        }
     }
 
     public static function normalizeCodeFilter(string $value): array
     {
         $codes = [];
         foreach (preg_split('/[\s,，]+/', trim($value), -1, PREG_SPLIT_NO_EMPTY) as $code) {
-            if (!preg_match('/^\d{3}$/', $code)) {
+            if (!preg_match('/^\d{'.static::COMBINATION_LENGTH.'}$/', $code)) {
                 continue;
             }
             $digits = str_split($code);
             $digits = array_values(array_unique($digits));
             sort($digits, SORT_NUMERIC);
-            if (count($digits) === 3) {
+            if (count($digits) === static::COMBINATION_LENGTH) {
                 $codes[] = implode('', $digits);
             }
         }
@@ -57,7 +63,7 @@ class ThreeComboYlService
 
     public static function isHit(string $combination, array $drawCodes): bool
     {
-        // 复式号码表示允许出现的数字集合，不要求三个数字在本期都至少出现一次。
+        // 复式号码表示允许出现的数字集合，不要求集合中的每个数字都在本期出现。
         if (count($drawCodes) < 4) {
             return false;
         }
@@ -74,14 +80,14 @@ class ThreeComboYlService
 
     public static function calculate(array $draws, ?array $onlyCodes = null): array
     {
-        $combinations = $onlyCodes ?: self::getCombinations();
+        $combinations = $onlyCodes ?: static::getCombinations();
         $hits = array_fill_keys($combinations, []);
         $scanned = 0;
 
         foreach ($draws as $position => $draw) {
             $drawCodes = [$draw['code1'], $draw['code2'], $draw['code3'], $draw['code4']];
             foreach ($combinations as $combination) {
-                if (self::isHit($combination, $drawCodes)) {
+                if (static::isHit($combination, $drawCodes)) {
                     $hits[$combination][] = [
                         'position' => (int)$position,
                         'qihao' => (string)$draw['qihao'],
@@ -134,14 +140,14 @@ class ThreeComboYlService
 
     public static function getStatistics(int $lotteryType, $periods, string $codeFilter = ''): array
     {
-        $periods = self::normalizePeriods($periods);
-        $onlyCodes = self::normalizeCodeFilter($codeFilter);
+        $periods = static::normalizePeriods($periods);
+        $onlyCodes = static::normalizeCodeFilter($codeFilter);
         $lastIndexId = (int)SscKjData::find()
             ->where(['lottery_type' => $lotteryType])
             ->max('index_id');
 
-        if ($periods === self::DEFAULT_PERIODS && empty($onlyCodes)) {
-            $row = self::findSummaryRow($lotteryType);
+        if ($periods === static::DEFAULT_PERIODS && empty($onlyCodes)) {
+            $row = static::findSummaryRow($lotteryType);
             if ($row && (int)$row->stat_last_index_id === $lastIndexId) {
                 $statistics = Json::decode($row->yl_records ?: '[]');
                 if (is_array($statistics)) {
@@ -150,27 +156,27 @@ class ThreeComboYlService
             }
         }
 
-        $cacheKey = 'three_combo_yl_'.$lotteryType.'_'.$lastIndexId.'_'.$periods.'_'.md5(implode(',', $onlyCodes));
+        $cacheKey = static::ROW_VAL.'_yl_'.$lotteryType.'_'.$lastIndexId.'_'.$periods.'_'.md5(implode(',', $onlyCodes));
         $cache = \Yii::$app->cache;
         $statistics = $cache->get($cacheKey);
         if (!is_array($statistics)) {
-            $statistics = self::calculate(self::fetchDraws($lotteryType, $periods), $onlyCodes ?: null);
+            $statistics = static::calculate(static::fetchDraws($lotteryType, $periods), $onlyCodes ?: null);
             $cache->set($cacheKey, $statistics, 300);
         }
 
         return self::buildResult($statistics, $periods, $lastIndexId, true);
     }
 
-    public static function refreshSummary(int $lotteryType, int $periods = self::DEFAULT_PERIODS): array
+    public static function refreshSummary(int $lotteryType, int $periods = 2000): array
     {
-        $periods = self::normalizePeriods($periods);
-        $draws = self::fetchDraws($lotteryType, $periods);
-        $statistics = self::calculate($draws);
+        $periods = static::normalizePeriods($periods);
+        $draws = static::fetchDraws($lotteryType, $periods);
+        $statistics = static::calculate($draws);
         $lastIndexId = empty($draws) ? 0 : (int)$draws[0]['index_id'];
-        $row = self::findSummaryRow($lotteryType) ?: new SscStaticYl();
+        $row = static::findSummaryRow($lotteryType) ?: new SscStaticYl();
         $isNew = $row->isNewRecord;
 
-        $row->val = self::ROW_VAL;
+        $row->val = static::ROW_VAL;
         // The legacy table keeps several non-null scalar columns alongside the JSON summary.
         $row->codes_hz = 0;
         $row->current_miss = 0;
@@ -182,13 +188,13 @@ class ThreeComboYlService
         $row->today_nums = 0;
         $row->ytd_nums = 0;
         $row->theory_nums_perdate = '0';
-        $row->codes = implode(',', self::getCombinations());
+        $row->codes = implode(',', static::getCombinations());
         $row->yl_records = Json::encode($statistics);
         $row->stat_last_index_id = $lastIndexId;
         $row->static_nums = $periods;
         $row->count = count($statistics);
         $row->lottery_type = $lotteryType;
-        $row->type = self::TYPE;
+        $row->type = static::TYPE;
         $row->status = 1;
         $row->update_time = date('Y-m-d H:i:s');
         $row->updated_at = time();
@@ -217,8 +223,8 @@ class ThreeComboYlService
     {
         return SscStaticYl::findOne([
             'lottery_type' => $lotteryType,
-            'type' => self::TYPE,
-            'val' => self::ROW_VAL,
+            'type' => static::TYPE,
+            'val' => static::ROW_VAL,
         ]);
     }
 

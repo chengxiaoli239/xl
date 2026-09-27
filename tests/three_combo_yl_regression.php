@@ -1,8 +1,10 @@
 <?php
 
 require dirname(__DIR__).'/backend/service/statics/yl/ThreeComboYlService.php';
+require dirname(__DIR__).'/backend/service/statics/yl/FiveComboYlService.php';
 
 use backend\service\statics\yl\ThreeComboYlService;
+use backend\service\statics\yl\FiveComboYlService;
 
 function assertSameValue($expected, $actual, string $message): void
 {
@@ -46,5 +48,13 @@ $sharedMissStats = ThreeComboYlService::calculate($sharedMissDraws, ['238', '368
 foreach ($sharedMissStats as $row) {
     assertSameValue(46, $row['current_miss'], $row['code'].'应可与其他复式号码同时遗漏46期');
 }
+
+$fiveCodes = FiveComboYlService::getCombinations();
+assertSameValue(252, count($fiveCodes), '五字复式组合总数错误');
+assertSameValue('01234', $fiveCodes[0], '五字复式首个组合错误');
+assertSameValue('56789', $fiveCodes[251], '五字复式最后组合错误');
+assertSameValue(true, FiveComboYlService::isHit('01234', [0, 0, 1, 2]), '0012应命中01234');
+assertSameValue(false, FiveComboYlService::isHit('01234', [0, 1, 2, 5]), '出现5不应命中01234');
+assertSameValue(['01234', '56789'], FiveComboYlService::normalizeCodeFilter('43210, 98765'), '五字复式号码标准化错误');
 
 echo "three_combo_yl_regression: OK\n";

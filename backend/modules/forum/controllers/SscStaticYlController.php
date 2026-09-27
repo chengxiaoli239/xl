@@ -5,6 +5,7 @@ namespace backend\modules\forum\controllers;
 use backend\service\StaticService;
 use backend\service\UserSysPlansService;
 use backend\service\statics\yl\ThreeComboYlService;
+use backend\service\statics\yl\FiveComboYlService;
 use common\service\CommonService;
 use Yii;
 use backend\models\SscStaticYl;
@@ -60,10 +61,11 @@ class SscStaticYlController extends BaseController
         */
         $queryParams['SscStaticYl']['lottery_type'] = $lottery_type;
 
-        if ((int)$type === ThreeComboYlService::TYPE) {
-            $periods = ThreeComboYlService::normalizePeriods(Yii::$app->request->get('periods', ThreeComboYlService::DEFAULT_PERIODS));
+        if (in_array((int)$type, [ThreeComboYlService::TYPE, FiveComboYlService::TYPE], true)) {
+            $comboService = (int)$type === FiveComboYlService::TYPE ? FiveComboYlService::class : ThreeComboYlService::class;
+            $periods = $comboService::normalizePeriods(Yii::$app->request->get('periods', $comboService::DEFAULT_PERIODS));
             $codeFilter = trim((string)Yii::$app->request->get('code', ''));
-            $result = ThreeComboYlService::getStatistics($lottery_type, $periods, $codeFilter);
+            $result = $comboService::getStatistics($lottery_type, $periods, $codeFilter);
             $dataProvider = new ArrayDataProvider([
                 'allModels' => $result['statistics'],
                 'pagination' => false,
@@ -76,7 +78,8 @@ class SscStaticYlController extends BaseController
             return $this->render('three_combo', [
                 'lottery_types' => $lottery_types,
                 'lottery_type' => $lottery_type,
-                'code_type' => 11,
+                'code_type' => (int)$type === FiveComboYlService::TYPE ? 12 : 11,
+                'combo_type' => (int)$type,
                 'periods' => $result['periods'],
                 'codeFilter' => $codeFilter,
                 'dataProvider' => $dataProvider,
