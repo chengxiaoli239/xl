@@ -23,7 +23,6 @@ use backend\models\User;
 use backend\models\searchs\Admin as UserSearch;
 use backend\controllers\BaseController;
 use yii\helpers\Json;
-use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use backend\service\HN0898Service;
@@ -220,9 +219,8 @@ class UserController extends BaseController
      */
     public function actionDownloadClient()
     {
-        $identity = Yii::$app->user->identity;
-        if (Yii::$app->user->isGuest || (!$identity || ((int)$identity->id !== 1 && !UserService::is3dAdmin($identity)))) {
-            throw new ForbiddenHttpException('仅管理员可下载 Lucky5 客户端');
+        if (Yii::$app->user->isGuest) {
+            throw new \yii\web\ForbiddenHttpException('请先登录');
         }
 
         $remoteUrl = trim((string)getenv('LUCKY5_CLIENT_DOWNLOAD_URL'));

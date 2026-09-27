@@ -161,17 +161,12 @@ class ChromePathDetector:
     
     def get_best_chrome_path(self) -> Optional[str]:
         """获取最佳的Chrome路径"""
-        # A long-running client can outlive a browser update or uninstall.
-        # Never reuse a stale cached path; re-scan when it disappeared.
-        if not self.detected_paths or not any(
-            self._is_valid_chrome_path(path) for path in self.detected_paths
-        ):
-            self.detect_chrome_paths()
-        
-        if not self.detected_paths:
-            return None
-        
-        return self.detected_paths[0]
+        # A browser update can invalidate a cached path during a long session.
+        for path in self.detected_paths:
+            if self._is_valid_chrome_path(path):
+                return path
+        paths = self.detect_chrome_paths()
+        return paths[0] if paths else None
     
     def test_chrome_path(self, chrome_path: str) -> bool:
         """测试Chrome路径是否可用"""

@@ -51,7 +51,10 @@ class Configs:
     def get_config(self, key="lottery_type", section="system_configs", fallback=""):
         env_key = "LUCKY5_" + key.upper()
         if os.environ.get(env_key):
-            return os.environ[env_key]
+            value = os.environ[env_key]
+            if key in ("binary_location", "binary_location_mac"):
+                return resolve_chrome_path(value) or ""
+            return value
 
         value = self.conf.get(section, key, fallback=fallback)
         if key in ("binary_location", "binary_location_mac"):

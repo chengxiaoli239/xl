@@ -16,6 +16,12 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
 ?>
 <section class="user-view wrapper site-min-height">
     <?= Alert::widget() ?>
+    <div class="text-right" style="margin-bottom: 12px">
+        <?= Html::a('下载 Lucky5 客户端', ['/forum/user/download-client'], [
+            'class' => 'btn btn-primary',
+            'title' => '下载 Windows 客户端',
+        ]) ?>
+    </div>
     <div class="row">
         <div class="col-lg-12">
             <?php foreach ($models as $model){?>

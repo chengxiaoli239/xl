@@ -4,6 +4,7 @@ from unittest.mock import patch
 
 from xy_client.services.tools.BrowserDetector import BrowserDetector
 from xy_client.services.tools.ChromePathDetector import ChromePathDetector, resolve_chrome_path
+from xy_client.services.tools.Configs import Configs
 
 
 class ChromePathDetectorTest(unittest.TestCase):
@@ -64,6 +65,24 @@ class ChromePathDetectorTest(unittest.TestCase):
                 detector._detect_chrome_windows(),
                 (True, r"C:\Chrome\chrome.exe"),
             )
+
+    def test_cached_path_falls_back_when_browser_is_removed(self):
+        detector = ChromePathDetector()
+        old_path = r"C:\Old\chrome.exe"
+        new_path = r"D:\Chrome\chrome.exe"
+        detector.detected_paths = [old_path]
+        with patch.object(detector, "_is_valid_chrome_path", side_effect=lambda path: path == new_path), patch.object(
+            detector, "detect_chrome_paths", return_value=[new_path]
+        ):
+            self.assertEqual(detector.get_best_chrome_path(), new_path)
+
+    def test_environment_auto_path_is_resolved(self):
+        config = Configs()
+        with patch.dict(os.environ, {"LUCKY5_BINARY_LOCATION": "auto"}), patch(
+            "xy_client.services.tools.Configs.resolve_chrome_path",
+            return_value=r"D:\Chrome\chrome.exe",
+        ):
+            self.assertEqual(config.get_config("binary_location"), r"D:\Chrome\chrome.exe")
 
 
 if __name__ == "__main__":

@@ -74,6 +74,18 @@ For an S3 release, set `AWS_S3_CLIENT_BUCKET` and optionally
 .\client\publish-windows-client.ps1
 ```
 
+If Windows builds the EXE remotely and the artifact is retrieved on macOS,
+publish and verify it from the Mac instead:
+
+```bash
+AWS_S3_CLIENT_BUCKET=msll-app-releases-289069331089 \
+AWS_S3_CLIENT_BASE_URL=https://d2syxruhedjsow.cloudfront.net \
+bash ./client/publish-built-client.sh /path/to/Lucky5.exe
+```
+
+The default S3 prefix for the macOS publisher is `lottery_xl/windows`. The
+CloudFront origin must be allowed to read that prefix before publishing.
+
 The script checks the PE header, records the source commit, size, and SHA-256,
 uploads both a versioned object and `Lucky5-latest.exe`, and verifies both S3
 objects with `head-object`. AWS credentials must come from the local short-lived
@@ -81,7 +93,7 @@ AWS CLI session or an approved instance role; no credentials belong in the
 repository.
 
 When `LUCKY5_CLIENT_DOWNLOAD_URL` is set on the backend to the verified HTTPS
-latest URL, the administrator personal information page downloads from S3 or
+latest URL, the personal information page downloads from S3 or
 CloudFront. Without that setting, the endpoint falls back to
 `backend/web/downloads/Lucky5.exe`.
 
