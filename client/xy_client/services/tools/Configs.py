@@ -3,7 +3,7 @@ import os
 import sys
 from pathlib import Path
 
-from xy_client.services.tools.ChromePathDetector import auto_detect_chrome_path
+from xy_client.services.tools.ChromePathDetector import resolve_chrome_path
 
 
 DEFAULT_CONFIG = {
@@ -54,8 +54,8 @@ class Configs:
             return os.environ[env_key]
 
         value = self.conf.get(section, key, fallback=fallback)
-        if key in ("binary_location", "binary_location_mac") and value == "auto":
-            return auto_detect_chrome_path() or ""
+        if key in ("binary_location", "binary_location_mac"):
+            return resolve_chrome_path(value) or ""
         return value
 
     def set_config(self, key, value, section="system_configs"):

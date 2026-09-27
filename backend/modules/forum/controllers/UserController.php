@@ -23,6 +23,7 @@ use backend\models\User;
 use backend\models\searchs\Admin as UserSearch;
 use backend\controllers\BaseController;
 use yii\helpers\Json;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use backend\service\HN0898Service;
@@ -217,6 +218,32 @@ class UserController extends BaseController
      * @param $status
      * @return \yii\web\Response
      */
+    public function actionDownloadClient()
+    {
+        $identity = Yii::$app->user->identity;
+        if (Yii::$app->user->isGuest || (!$identity || ((int)$identity->id !== 1 && !UserService::is3dAdmin($identity)))) {
+            throw new ForbiddenHttpException('仅管理员可下载 Lucky5 客户端');
+        }
+
+        $remoteUrl = trim((string)getenv('LUCKY5_CLIENT_DOWNLOAD_URL'));
+        if ($remoteUrl !== '') {
+            if (!preg_match('#^https://[^\s]+$#i', $remoteUrl)) {
+                throw new \RuntimeException('Lucky5 client download URL must use HTTPS');
+            }
+            return Yii::$app->response->redirect($remoteUrl);
+        }
+
+        $file = Yii::getAlias('@webroot/downloads/Lucky5.exe');
+        if (!is_file($file) || !is_readable($file)) {
+            throw new NotFoundHttpException('Lucky5 client is not published');
+        }
+
+        return Yii::$app->response->sendFile($file, 'Lucky5.exe', [
+            'mimeType' => 'application/vnd.microsoft.portable-executable',
+            'inline' => false,
+        ]);
+    }
+
     public function actionSwitchAutoBetStatus($id, $status) {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $uid = \Yii::$app->user->id;

@@ -8,6 +8,7 @@ Chrome路径自动检测模块
 import os
 import sys
 import platform
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Optional, List
@@ -43,24 +44,31 @@ class ChromePathDetector:
     def _detect_windows_chrome(self) -> List[str]:
         """检测Windows系统Chrome路径"""
         paths = []
-        
-        # 常见安装路径
-        username = os.getenv('USERNAME') or os.getenv('USER') or ''
-        common_paths = [
-            r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-            r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
-            r"C:\Users\{}\AppData\Local\Google\Chrome\Application\chrome.exe".format(username),
-            r"C:\Program Files\Google\Chrome Beta\Application\chrome.exe",
-            r"C:\Program Files (x86)\Google\Chrome Beta\Application\chrome.exe",
-        ]
-        
-        # 替换用户名占位符
-        for path in common_paths:
-            if '{' in path and username:
-                path = path.format(username)
-            paths.append(path)
-        
-        # 从PATH环境变量查找
+
+        # Chrome may be installed per-user, for all users, or on a non-C: drive.
+        program_dirs = []
+        for key in ('ProgramW6432', 'PROGRAMFILES', 'PROGRAMFILES(X86)'):
+            value = os.environ.get(key)
+            if value and value not in program_dirs:
+                program_dirs.append(value)
+
+        local_app_data = os.environ.get('LOCALAPPDATA')
+        if local_app_data:
+            program_dirs.append(local_app_data)
+
+        product_dirs = (
+            'Google\\Chrome',
+            'Google\\Chrome Beta',
+            'Google\\Chrome Dev',
+            'Google\\Chrome SxS',
+            'Chromium',
+        )
+        for base_dir in program_dirs:
+            for product_dir in product_dirs:
+                paths.append(os.path.join(base_dir, product_dir, 'Application', 'chrome.exe'))
+
+        paths.extend(self._detect_windows_registry_chrome())
+
         try:
             paths.extend(self._find_chrome_in_path())
         except Exception:
@@ -106,36 +114,58 @@ class ChromePathDetector:
     def _find_chrome_in_path(self) -> List[str]:
         """从PATH环境变量查找Chrome"""
         paths = []
-        path_dirs = os.environ.get('PATH', '').split(os.pathsep)
-        
-        for directory in path_dirs:
-            if directory:
-                chrome_exe = os.path.join(directory, "chrome.exe")
-                if os.path.exists(chrome_exe):
-                    paths.append(chrome_exe)
-        
+        for executable in ('chrome.exe', 'chrome', 'chromium.exe', 'chromium'):
+            resolved = shutil.which(executable)
+            if resolved:
+                paths.append(resolved)
+        return paths
+
+    def _detect_windows_registry_chrome(self) -> List[str]:
+        """Read Chrome's installer registration without requiring pywin32."""
+        if self.system != "Windows":
+            return []
+
+        try:
+            import winreg
+        except ImportError:
+            return []
+
+        paths = []
+        registry_locations = (
+            (winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe'),
+            (winreg.HKEY_LOCAL_MACHINE, r'Software\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe'),
+            (winreg.HKEY_LOCAL_MACHINE, r'Software\WOW6432Node\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe'),
+        )
+        for root, subkey in registry_locations:
+            try:
+                with winreg.OpenKey(root, subkey) as key:
+                    value, _ = winreg.QueryValueEx(key, None)
+                    if value:
+                        paths.append(str(value).strip('"'))
+            except (FileNotFoundError, OSError):
+                continue
         return paths
     
     def _is_valid_chrome_path(self, path: str) -> bool:
         """验证Chrome路径是否有效"""
         try:
-            if not path or not os.path.exists(path):
+            if not path or not os.path.isfile(path):
                 return False
-            
-            # 检查文件大小
-            if os.path.isfile(path):
-                size = os.path.getsize(path)
-                if size < 1024 * 1024:  # 小于1MB
-                    return False
-            
-            return True
+
+            # Portable Chromium wrappers can be small; existence and the
+            # Windows executable extension are enough for launch validation.
+            return os.access(path, os.X_OK) or self.system == 'Windows'
             
         except Exception:
             return False
     
     def get_best_chrome_path(self) -> Optional[str]:
         """获取最佳的Chrome路径"""
-        if not self.detected_paths:
+        # A long-running client can outlive a browser update or uninstall.
+        # Never reuse a stale cached path; re-scan when it disappeared.
+        if not self.detected_paths or not any(
+            self._is_valid_chrome_path(path) for path in self.detected_paths
+        ):
             self.detect_chrome_paths()
         
         if not self.detected_paths:
@@ -171,6 +201,15 @@ def get_chrome_detector() -> ChromePathDetector:
 def auto_detect_chrome_path() -> Optional[str]:
     """自动检测Chrome路径"""
     detector = get_chrome_detector()
+    return detector.get_best_chrome_path()
+
+
+def resolve_chrome_path(configured_path: Optional[str] = None) -> Optional[str]:
+    """Resolve a configured path, falling back to automatic detection."""
+    configured = str(configured_path or '').strip()
+    detector = get_chrome_detector()
+    if configured and configured.lower() != 'auto' and detector._is_valid_chrome_path(configured):
+        return configured
     return detector.get_best_chrome_path()
 
 def test_chrome_path(chrome_path: str) -> bool:

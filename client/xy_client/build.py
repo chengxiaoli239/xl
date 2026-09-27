@@ -7,7 +7,26 @@ import sys
 from pathlib import Path
 
 
+def ensure_windows_build_environment():
+    """Fail early instead of producing a non-Windows binary named .exe."""
+    if sys.platform != "win32":
+        raise SystemExit(
+            "Lucky5 Windows build must run on Windows. "
+            "PyInstaller does not cross-compile a Windows EXE from "
+            f"{sys.platform}; run this script on a Windows build host."
+        )
+
+    try:
+        import PyInstaller  # noqa: F401
+    except ImportError as exc:
+        raise SystemExit(
+            "PyInstaller is not installed. Run: "
+            "python -m pip install -r client\\requirements.txt"
+        ) from exc
+
+
 def main():
+    ensure_windows_build_environment()
     parser = argparse.ArgumentParser(description="Build the Lucky5 Windows client")
     parser.add_argument("--name", default=None, help="Executable name without .exe")
     parser.add_argument("--clean", action="store_true", help="Remove previous build output")

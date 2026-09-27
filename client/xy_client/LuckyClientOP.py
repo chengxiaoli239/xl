@@ -16,6 +16,7 @@ from xy_client.services.tools.account_runtime import (
     browser_profile_dir,
     chrome_launch_arguments,
 )
+from xy_client.services.tools.ChromePathDetector import resolve_chrome_path
 
 # 第三方库导入
 import requests
@@ -2966,9 +2967,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             print(f"🔧 [start_browser_process] 开始启动浏览器进程，类型: {browser_type}, 端口: {self.port}")
             if browser_type == "chrome":
                 # 获取Chrome路径
-                chrome_path = config.get_config('binary_location')
+                configured_path = config.get_config('binary_location')
+                chrome_path = resolve_chrome_path(configured_path)
                 if not chrome_path:
-                    print("❌ 未找到Chrome路径配置")
+                    print("Chrome browser was not found; install Google Chrome or set binary_location in systemConfigs.conf")
                     return False
                 print(f"✅ 找到Chrome路径: {chrome_path}")
                 

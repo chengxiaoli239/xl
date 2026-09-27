@@ -19,6 +19,7 @@ from xy_client.services.tools.account_runtime import (
     chrome_launch_arguments,
     debug_port_for_account,
 )
+from xy_client.services.tools.ChromePathDetector import resolve_chrome_path
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
@@ -191,21 +192,7 @@ class SafeBrowserProcessManager:
     def _start_chrome_process(self) -> bool:
         """启动Chrome进程"""
         try:
-            # 获取Chrome路径
-            chrome_paths = [
-                r"C:\Program Files\Google\Chrome\Application\chrome.exe",
-                r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
-                r"C:\Users\{}\AppData\Local\Google\Chrome\Application\chrome.exe".format(os.getenv('USERNAME')),
-                "/usr/bin/google-chrome",
-                "/usr/bin/chromium-browser",
-                "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-            ]
-            
-            chrome_path = None
-            for path in chrome_paths:
-                if os.path.exists(path):
-                    chrome_path = path
-                    break
+            chrome_path = resolve_chrome_path()
             
             if not chrome_path:
                 print("❌ 未找到Chrome浏览器路径")

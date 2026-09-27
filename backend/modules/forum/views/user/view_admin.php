@@ -35,6 +35,12 @@ $summary = static function (array $rows) {
     <section class="panel">
         <header class="panel-heading">
             <?= Html::encode($this->title) ?>
+            <span class="pull-right">
+                <?= Html::a('下载 Lucky5 客户端', ['/forum/user/download-client'], [
+                    'class' => 'btn btn-primary btn-xs',
+                    'title' => '下载 Windows 客户端',
+                ]) ?>
+            </span>
         </header>
         <div class="panel-body">
             <div class="adv-table editable-table ">
