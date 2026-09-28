@@ -36,6 +36,7 @@ use common\service\jobs\kj_data\Update1NumYlJob;
 use common\service\jobs\kj_data\UpdateCodeTypeYlJob;
 use common\service\jobs\kj_data\UpdateThreeComboYlJob;
 use common\service\jobs\kj_data\UpdateFiveComboYlJob;
+use common\service\jobs\kj_data\UpdateFiveAllReverseYlJob;
 use common\service\lottery\LotteryTypeService;
 use common\service\open\telegram\AoZhouKjService;
 use common\service\ssc\QihaoService;
@@ -479,6 +480,7 @@ class KjDataGet
                 push_queue(UpdateCodeTypeYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao]);
                 push_queue(UpdateThreeComboYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao]);
                 push_queue(UpdateFiveComboYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao]);
+                push_queue(UpdateFiveAllReverseYlJob::class, ['qihao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'business_id'=>$qihao]);
                 break;
         }
         Tool_Common::log('/datas/'.__FUNCTION__, 'INFO', '统计数据入列', ['qiHao'=>$qihao, 'lottery_type'=>$lottery_type, 'title'=>$lottery_name, 'msg'=>'数据入列成功']);

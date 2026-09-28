@@ -85,14 +85,12 @@ class ThreeComboYlService
         $scanned = 0;
 
         foreach ($draws as $position => $draw) {
-            $drawCodes = [$draw['code1'], $draw['code2'], $draw['code3'], $draw['code4']];
-            foreach ($combinations as $combination) {
-                if (static::isHit($combination, $drawCodes)) {
-                    $hits[$combination][] = [
-                        'position' => (int)$position,
-                        'qihao' => (string)$draw['qihao'],
-                    ];
-                }
+            $drawCodes = static::getDrawCodes($draw);
+            foreach (static::matchingCombinations($drawCodes, $hits) as $combination) {
+                $hits[$combination][] = [
+                    'position' => (int)$position,
+                    'qihao' => (string)$draw['qihao'],
+                ];
             }
             $scanned++;
         }
@@ -136,6 +134,22 @@ class ThreeComboYlService
         }
 
         return array_values($statistics);
+    }
+
+    protected static function getDrawCodes(array $draw): array
+    {
+        return [$draw['code1'], $draw['code2'], $draw['code3'], $draw['code4']];
+    }
+
+    protected static function matchingCombinations(array $drawCodes, array $hits): array
+    {
+        $matches = [];
+        foreach ($hits as $combination => $positions) {
+            if (static::isHit($combination, $drawCodes)) {
+                $matches[] = $combination;
+            }
+        }
+        return $matches;
     }
 
     public static function getStatistics(int $lotteryType, $periods, string $codeFilter = ''): array
