@@ -6,6 +6,7 @@ use backend\models\PlanStaticProfits;
 use backend\models\UserSysPlans;
 use backend\service\BaseService;
 use backend\service\HN0898Service;
+use backend\service\plans\PlanSinglesService;
 use backend\service\PlanType13Service;
 use backend\service\SscDataService;
 use common\service\lottery\LotteryTypeService;
@@ -41,7 +42,7 @@ class OperatePlanService extends BaseService
                     $beforeSingleKey = $codes_hz['singles_key'];
                     $beforeCurrentMiss = $codes_hz['current_miss'];
 
-                    $singles = explode('-', trim($UserSysPlan->singles));
+                    $singles = explode('-', PlanSinglesService::normalize((string)$UserSysPlan->singles));
                     if (empty($singles)) $singles = [$UserSysPlan->single];
                     $codes_hz['current_miss'] = 0;
                     $codes_hz['singles_key'] = 0;
@@ -1042,7 +1043,7 @@ class OperatePlanService extends BaseService
         $m = \Yii::$app->cache;
         $UserSysPlans = UserSysPlans::findOne($plan_id);
         $singles = $UserSysPlans->singles;
-        $singlesArr = explode(',', str_replace('-', ',', $singles));
+        $singlesArr = explode(',', str_replace('-', ',', PlanSinglesService::normalize((string)$singles)));
         if($BettingRecords = BettingRecords::find()->select(['id', 'qihao','status'])->where(['plan_id'=>$plan_id, 'status'=>1])->orderBy(['id'=>SORT_DESC])->limit(1)->one()){
             $mkey = 'getPlanNextSingle_1_'.$plan_id.'_'.$BettingRecords->qihao;
             if(!$next_single_key = $m->get($mkey)){

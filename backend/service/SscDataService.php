@@ -35,6 +35,7 @@ use backend\models\ThreeNum;
 use backend\models\TzSystemsUsers;
 use backend\models\UserSysPlans;
 use backend\service\numbers\NumCodeService;
+use backend\service\plans\PlanSinglesService;
 use backend\service\statics\plan\OperatePlanService;
 use backend\service\statics\statics_base\BaseDataService;
 use backend\service\statics\statics_base\DealDataService;
@@ -2365,7 +2366,7 @@ class SscDataService extends BaseService {
                     //$logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
 
                     # 倍数处理，中的计划回第一个倍数
-                    $singles = explode('-', trim($UserSysPlan->singles));
+                    $singles = explode('-', PlanSinglesService::normalize((string)$UserSysPlan->singles));
                     if(empty($singles)) $singles = [$UserSysPlan->single];
                     $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['singles'] = $singles; # 翻倍数据
                     $singles_count = count($singles); # 倍数个数
@@ -3164,7 +3165,7 @@ class SscDataService extends BaseService {
             //$logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['lossQs'] = $lossQs; # 遗漏期数
 
             # 倍数处理，中的计划回第一个倍数
-            $singles = explode('-', trim($UserSysPlan->singles));
+            $singles = explode('-', PlanSinglesService::normalize((string)$UserSysPlan->singles));
             if(empty($singles)) $singles = [$UserSysPlan->single];
             $logArr['plan_'.implode('_', $fb_plan_types)][$UserSysPlan->id]['singles'] = $singles; # 翻倍数据
 

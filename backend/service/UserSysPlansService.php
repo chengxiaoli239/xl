@@ -23,6 +23,7 @@ use backend\models\TzSystemsUsers;
 use backend\models\TzTypes;
 use backend\models\UserCustomPlans;
 use backend\models\UserSysPlans;
+use backend\service\plans\PlanSinglesService;
 use common\models\AdminModel;
 use common\models\base\BaseModel;
 use common\service\cache\CacheKeyService;
@@ -132,7 +133,7 @@ class UserSysPlansService extends BaseService {
         }
         //p(['tz_type'=>$tz_type, 'playway'=>$playway,'post'=>$post, 'user_id'=>$user_id]);
 
-        $post['UserSysPlans']['singles'] = preg_replace( '#\s+#', '', trim($post['UserSysPlans']['singles']));
+        $post['UserSysPlans']['singles'] = PlanSinglesService::normalize((string)$post['UserSysPlans']['singles']);
         $post['UserSysPlans']['start_qihao'] = str_replace(' ', '', $post['UserSysPlans']['start_qihao']);
 
         $User = AdminModel::findOne($user_id);
