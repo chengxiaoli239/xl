@@ -163,7 +163,7 @@ class ThreeComboYlService
         if ($periods === static::DEFAULT_PERIODS && empty($onlyCodes)) {
             $row = static::findSummaryRow($lotteryType);
             if ($row && (int)$row->stat_last_index_id === $lastIndexId) {
-                $statistics = Json::decode($row->yl_records ?: '[]');
+                $statistics = static::decodeSummary($row->yl_records ?: '[]');
                 if (is_array($statistics)) {
                     return self::buildResult($statistics, $periods, $lastIndexId, false);
                 }
@@ -203,7 +203,7 @@ class ThreeComboYlService
         $row->ytd_nums = 0;
         $row->theory_nums_perdate = '0';
         $row->codes = implode(',', static::getCombinations());
-        $row->yl_records = Json::encode($statistics);
+        $row->yl_records = static::encodeSummary($statistics);
         $row->stat_last_index_id = $lastIndexId;
         $row->static_nums = $periods;
         $row->count = count($statistics);
@@ -220,6 +220,32 @@ class ThreeComboYlService
         }
 
         return self::buildResult($statistics, $periods, $lastIndexId, false);
+    }
+
+    public static function encodeSummary(array $statistics): string
+    {
+        $json = Json::encode($statistics);
+        if (strlen($json) <= 60000) {
+            return $json;
+        }
+
+        $encoded = 'gz:'.base64_encode(gzdeflate($json, 6));
+        if (strlen($encoded) > 65535) {
+            throw new \RuntimeException('Omission summary exceeds yl_records TEXT capacity');
+        }
+        return $encoded;
+    }
+
+    public static function decodeSummary(string $stored): array
+    {
+        if (strncmp($stored, 'gz:', 3) === 0) {
+            $compressed = base64_decode(substr($stored, 3), true);
+            $stored = $compressed === false ? false : gzinflate($compressed, 1048576);
+            if ($stored === false) {
+                throw new \RuntimeException('Invalid compressed omission summary');
+            }
+        }
+        return Json::decode($stored);
     }
 
     private static function fetchDraws(int $lotteryType, int $periods): array
