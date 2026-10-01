@@ -5,8 +5,9 @@ use yii\helpers\Html;
 
 $isFiveAllReverse = (int)$combo_type === \backend\service\statics\yl\FiveAllReverseYlService::TYPE;
 $isFiveCombo = (int)$combo_type === \backend\service\statics\yl\FiveComboYlService::TYPE;
+$isThreeDistinct = (int)$combo_type === \backend\service\statics\yl\ThreeDistinctYlService::TYPE;
 $comboLength = $isFiveCombo || $isFiveAllReverse ? 5 : 3;
-$comboName = $isFiveAllReverse ? '五字全倒' : ($isFiveCombo ? '五字复式' : '三字复式');
+$comboName = $isFiveAllReverse ? '五字全倒' : ($isFiveCombo ? '五字复式' : ($isThreeDistinct ? '三字不重复' : '三字复式'));
 $this->title = $comboName.'遗漏';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -43,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]) ?>
             </div>
             <?= Html::submitButton('查询', ['class' => 'btn btn-primary']) ?>
-            <span class="help-block" style="display:inline-block;margin:0 0 0 10px;"><?= $isFiveAllReverse ? '前四位为所选五个数字中的四个不同数字，顺序不限；' : '前四位都属于所选'.$comboLength.'个数字即命中；' ?>统计期数最大10000。</span>
+            <span class="help-block" style="display:inline-block;margin:0 0 0 10px;"><?= $isFiveAllReverse ? '前四位为所选五个数字中的四个不同数字，顺序不限；' : ($isThreeDistinct ? '前四位包含所选三个不同数字即命中，顺序不限；' : '前四位都属于所选'.$comboLength.'个数字即命中；') ?>统计期数最大10000。</span>
             <?= Html::endForm() ?>
 
             <div class="table-responsive">

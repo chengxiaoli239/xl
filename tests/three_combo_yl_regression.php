@@ -2,9 +2,11 @@
 
 require dirname(__DIR__).'/backend/service/statics/yl/ThreeComboYlService.php';
 require dirname(__DIR__).'/backend/service/statics/yl/FiveComboYlService.php';
+require dirname(__DIR__).'/backend/service/statics/yl/ThreeDistinctYlService.php';
 
 use backend\service\statics\yl\ThreeComboYlService;
 use backend\service\statics\yl\FiveComboYlService;
+use backend\service\statics\yl\ThreeDistinctYlService;
 
 function assertSameValue($expected, $actual, string $message): void
 {
@@ -56,5 +58,20 @@ assertSameValue('56789', $fiveCodes[251], '五字复式最后组合错误');
 assertSameValue(true, FiveComboYlService::isHit('01234', [0, 0, 1, 2]), '0012应命中01234');
 assertSameValue(false, FiveComboYlService::isHit('01234', [0, 1, 2, 5]), '出现5不应命中01234');
 assertSameValue(['01234', '56789'], FiveComboYlService::normalizeCodeFilter('43210, 98765'), '五字复式号码标准化错误');
+
+$distinctCodes = ThreeDistinctYlService::getCombinations();
+assertSameValue(120, count($distinctCodes), '三字不重复组合总数错误');
+assertSameValue('012', $distinctCodes[0], '三字不重复首个组合错误');
+assertSameValue('789', $distinctCodes[119], '三字不重复最后组合错误');
+assertSameValue(true, ThreeDistinctYlService::isHit('012', [0, 0, 1, 2]), '0012应命中不重复012');
+assertSameValue(true, ThreeDistinctYlService::isHit('012', [0, 1, 2, 3]), '0123应命中不重复012');
+assertSameValue(false, ThreeDistinctYlService::isHit('012', [0, 0, 1, 1]), '0011不应命中不重复012');
+$distinctStats = ThreeDistinctYlService::calculate([
+    ['qihao' => '003', 'code1' => 0, 'code2' => 0, 'code3' => 1, 'code4' => 2],
+    ['qihao' => '002', 'code1' => 0, 'code2' => 1, 'code3' => 2, 'code4' => 3],
+], ['012', '013', '123']);
+assertSameValue(0, $distinctStats[0]['current_miss'], '不重复012当前遗漏错误');
+assertSameValue(1, $distinctStats[1]['current_miss'], '不重复013当前遗漏错误');
+assertSameValue(1, $distinctStats[2]['current_miss'], '不重复123当前遗漏错误');
 
 echo "three_combo_yl_regression: OK\n";

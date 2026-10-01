@@ -25,6 +25,9 @@ use yii\helpers\Html;
 <div class="btn-group">
     <?= Html::a('五字全倒', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>13, 'SscStaticYl[type]'=>8], ['class' => 'btn btn-sm '.($code_type == 13 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
 </div>
+<div class="btn-group">
+    <?= Html::a('三字不重复', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>14, 'SscStaticYl[type]'=>9], ['class' => 'btn btn-sm '.($code_type == 14 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+</div>
 ||
 <div class="btn-group">
     <?= Html::a('四现带双三字', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>502, 'SscStaticYl[type]'=>5, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[is_hots]'=>1], ['class' => 'btn btn-sm '.($code_type == 502 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>

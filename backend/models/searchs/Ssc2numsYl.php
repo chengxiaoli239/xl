@@ -47,6 +47,9 @@ class Ssc2numsYl extends Ssc2numsYlModel
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'defaultOrder' => ['val' => SORT_ASC],
+            ],
         ]);
 
         $this->load($params);
