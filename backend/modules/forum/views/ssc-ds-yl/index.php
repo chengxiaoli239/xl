@@ -33,20 +33,22 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php Pjax::begin(); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
+                <div class="table-responsive">
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
+                    'tableOptions' => ['class' => 'table table-striped table-bordered'],
                     'columns' => [
-                        ['class' => 'yii\grid\SerialColumn'],
+                        ['class' => 'yii\grid\SerialColumn','headerOptions'=>['width'=>'3%']],
 
                         //'id',
-                        ['attribute'=>'positions','label'=>'位置','headerOptions'=>['width'=>'5%'],
+                        ['attribute'=>'positions','label'=>'位置','headerOptions'=>['width'=>'6%'],
                             'value'=>function($model){
                                 return $model->positions;
                             }
                         ],
                         //'zhi',
-                        ['attribute'=>'positions','label'=>'值','headerOptions'=>['width'=>'5%'],
+                        ['attribute'=>'positions','label'=>'值','headerOptions'=>['width'=>'12%'],
                             'value'=>function($model){
                                 if(strlen($model->zhi)>4 OR in_array($model->zhi,[1111,2222])){
                                     $typeArr = [
@@ -70,70 +72,42 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         //'current_miss',
-                        ['attribute'=>'current_miss','label'=>'本期','headerOptions'=>['width'=>'3%'],
+                        ['attribute'=>'current_miss','label'=>'当前遗漏','headerOptions'=>['width'=>'8%'],
                             'value'=>function($model){
                                 return $model->current_miss;
                             }
                         ],
-                        ['attribute'=>'yl_records','format'=>'raw',
+                        // 上次/最大/历史都是短数字，合并成一列，把宽度让给遗漏记录
+                        [
+                            'label'=>'上次/最大/历史',
+                            'headerOptions'=>['width'=>'10%','title'=>'依次为：上次遗漏 / 区间最大遗漏 / 历史最大遗漏'],
                             'value'=>function($model){
-                                return \backend\helpers\MissHistoryFormatter::render($model->current_miss, $model->yl_records, '', true);
+                                return $model->last_time_miss.' / '.$model->max_miss.' / '.$model->history_max_miss;
                             }
                         ],
                         //'last_time_miss',
-                        ['attribute'=>'last_time_miss','label'=>'上次','headerOptions'=>['width'=>'3%'],
-                            'value'=>function($model){
-                                return $model->last_time_miss;
-                            }
-                        ],
                         //'last_time_miss_range',
-                        /*
-                        ['attribute'=>'last_time_miss_range','label'=>'上次遗漏范围',//'headerOptions'=>['width'=>'5%'],
-                            'value'=>function($model){
-                                return $model->last_time_miss_range;
-                            }
-                        ],
-                        */
                         //'max_miss',
-                        ['attribute'=>'max_miss','label'=>'最大','headerOptions'=>['width'=>'3%'],
-                            'value'=>function($model){
-                                return $model->max_miss;
-                            }
-                        ],
                         //'max_range',
-                        /*
-                        ['attribute'=>'max_range','label'=>'最大遗漏范围',//'headerOptions'=>['width'=>'5%'],
-                            'value'=>function($model){
-                                return $model->max_range;
-                            }
-                        ],
-                        */
                         //'history_max_miss',
-                        ['attribute'=>'history_max_miss','label'=>'历史','headerOptions'=>['width'=>'3%'],
-                            'value'=>function($model){
-                                return $model->history_max_miss;
-                            }
-                        ],
-                        /*
-                        ['attribute' => 'lottery_type','label'=>'彩票类型',#'headerOptions'=>['width'=>'5%'],
-                            'value' => function($model) {
-                                $txt = \common\service\CommonService::getLotteryName($model->lottery_type);
-
-                                return $txt;
-                            }
-                        ],
-                        */
+                        //'lottery_type',
                         //'updated_at',
                         //'update_time',
-                        ['attribute'=>'update_time','label'=>'时间','headerOptions'=>['width'=>'5%'],
+                        ['attribute'=>'update_time','label'=>'更新时间','headerOptions'=>['width'=>'8%'],
                             'value'=>function($model){
                                 return substr($model->update_time, 11);
+                            }
+                        ],
+                        ['attribute'=>'yl_records','label'=>'遗漏记录','format'=>'raw',
+                            'value'=>function($model){
+                                return \backend\helpers\MissHistoryFormatter::renderListCell($model->current_miss, $model->yl_records);
                             }
                         ],
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
+                </div>
     <?php Pjax::end(); ?>
             </div>
         </div>

@@ -6,6 +6,21 @@ use yii\helpers\Html;
 
 class MissHistoryFormatter
 {
+    /**
+     * 列表页单元格：只展示最新若干条，完整记录放进 title，避免超长单元格把表格撑坏。
+     */
+    public static function renderListCell($currentMiss, $records, bool $recordsIncludeCurrent = true, int $limit = 30): string
+    {
+        $values = self::splitRecords($records);
+        $shown = array_slice($values, 0, max($limit, 0));
+        $cell = self::render($currentMiss, $shown, '', $recordsIncludeCurrent);
+        if (count($values) <= count($shown)) {
+            return $cell;
+        }
+
+        return Html::tag('span', $cell, ['title' => '完整遗漏记录：'.implode('-', $values)]);
+    }
+
     public static function render($currentMiss, $records = '', string $currentDisplay = '', bool $recordsIncludeCurrent = false): string
     {
         $currentDisplay = $currentDisplay !== '' ? $currentDisplay : (string)$currentMiss;
@@ -29,7 +44,11 @@ class MissHistoryFormatter
         ]);
     }
 
-    private static function splitRecords($records): array
+    /**
+     * 把 `-` 分隔的遗漏记录拆成明细数组；已拆好的数组原样返回。
+     * 列表页可按需截取最新若干条，避免单个单元格过长。
+     */
+    public static function splitRecords($records): array
     {
         if (is_array($records)) {
             $values = $records;

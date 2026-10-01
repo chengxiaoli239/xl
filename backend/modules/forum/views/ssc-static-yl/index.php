@@ -36,15 +36,17 @@ $hasOpenQiShu = \backend\models\SscKjData::find()->where(['lottery_type'=>$lotte
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
+                <div class="table-responsive">
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     //'filterModel' => $searchModel,
+                    'tableOptions' => ['class' => 'table table-striped table-bordered'],
                     'columns' => [
-                        ['class' => 'yii\grid\SerialColumn'],
+                        ['class' => 'yii\grid\SerialColumn','headerOptions'=>['width'=>'3%']],
 
                         //'id',
                         //'val',
-                        ['attribute' => 'val','headerOptions'=>['width'=>'5%'],'label'=>'号码',
+                        ['attribute' => 'val','headerOptions'=>['width'=>'6%'],'label'=>'号码',
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = \backend\service\SscDataService::getStaticNameByType($model->val);
@@ -56,38 +58,66 @@ $hasOpenQiShu = \backend\models\SscKjData::find()->where(['lottery_type'=>$lotte
                                 return Html::a($txt, 'javascript:;', $options);
                             }
                         ],
-                        'current_miss',
-                        'last_time_miss',
-                        //'last_time_miss_range',
-                        'max_miss',
-                        //'max_range',
-                        //'yl_records:ntext',
-                        ['attribute' => 'yl_records','label'=>'遗漏记录', # 'headerOptions'=>['width'=>'5%'],
-                            'format'=>'raw',
+                        ['attribute' => 'current_miss','headerOptions'=>['width'=>'6%'],'label'=>'当前遗漏',
                             'value' => function($model) {
-                                return \backend\helpers\MissHistoryFormatter::render($model->current_miss, $model->yl_records);
+                                return $model->current_miss;
                             }
                         ],
-                        'history_max_miss',
-                        'count',
+                        // 上次/最大/历史都是短数字，合并成一列，把宽度让给遗漏记录
+                        [
+                            'label'=>'上次/最大/历史',
+                            'headerOptions'=>['width'=>'10%','title'=>'依次为：上次遗漏 / 区间最大遗漏 / 历史最大遗漏'],
+                            'value'=>function($model){
+                                return $model->last_time_miss.' / '.$model->max_miss.' / '.$model->history_max_miss;
+                            }
+                        ],
+                        //'last_time_miss',
+                        //'last_time_miss_range',
+                        //'max_miss',
+                        //'max_range',
+                        //'history_max_miss',
+                        ['attribute' => 'count','headerOptions'=>['width'=>'5%'],'label'=>'组数',
+                            'value' => function($model) {
+                                return $model->count;
+                            }
+                        ],
                         //'static_nums',
-                        'theory_nums_perdate',
-                        'today_nums',
-                        'ytd_nums',
+                        ['attribute' => 'theory_nums_perdate','headerOptions'=>['width'=>'7%'],'label'=>'理论次/天',
+                            'value' => function($model) {
+                                return $model->theory_nums_perdate;
+                            }
+                        ],
+                        ['attribute' => 'today_nums','headerOptions'=>['width'=>'5%'],'label'=>'今出(次)',
+                            'value' => function($model) {
+                                return $model->today_nums;
+                            }
+                        ],
+                        ['attribute' => 'ytd_nums','headerOptions'=>['width'=>'5%'],'label'=>'昨出(次)',
+                            'value' => function($model) {
+                                return $model->ytd_nums;
+                            }
+                        ],
                         //'lottery_type',
                         //'status',
                         //'created_at',
                         //'updated_at',
-                        ['attribute' => 'update_time','label'=>'时间', # 'headerOptions'=>['width'=>'5%'],
+                        ['attribute' => 'update_time','headerOptions'=>['width'=>'7%'],'label'=>'更新时间',
                             'format'=>'raw',
                             'value' => function($model) {
                                 return substr($model->update_time, 10, 9);
+                            }
+                        ],
+                        ['attribute'=>'yl_records','label'=>'遗漏记录','format'=>'raw',# 'yl_records:ntext',
+                            'value'=>function($model){
+                                // 本页各号码类型的 yl_records 不一定含当前遗漏，保持原样不去重
+                                return \backend\helpers\MissHistoryFormatter::renderListCell($model->current_miss, $model->yl_records, false);
                             }
                         ],
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
+                </div>
             </div>
         </div>
     </section>

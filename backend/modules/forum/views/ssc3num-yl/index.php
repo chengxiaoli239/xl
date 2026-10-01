@@ -25,19 +25,22 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                     </div>
                 </div-->
                 <?php include(dirname(__FILE__).'/index_tab.php'); ?>
+                <?php include(dirname(__FILE__).'/../ssc-static-yl/_miss_history_assets.php'); ?>
 
     <?php //Pjax::begin(); ?>
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
+                <div class="table-responsive">
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
+                    'tableOptions' => ['class' => 'table table-striped table-bordered'],
                     'columns' => [
-                        ['class' => 'yii\grid\SerialColumn'],
+                        ['class' => 'yii\grid\SerialColumn','headerOptions'=>['width'=>'3%']],
 
                         //'id',
                         //'zhi',
-                        ['attribute' => 'zhi','headerOptions'=>['width'=>'5%'],'label'=>'号码',
+                        ['attribute' => 'zhi','headerOptions'=>['width'=>'6%'],'label'=>'号码',
                             'format'=>'raw',
                             'value' => function($model) {
                                 $txt = $model->zhi;
@@ -50,43 +53,41 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
                             }
                         ],
                         //'current_miss',
-                        ['attribute'=>'current_miss','label'=>'本期','headerOptions'=>['width'=>'5%'],
+                        ['attribute'=>'current_miss','label'=>'当前遗漏','headerOptions'=>['width'=>'8%'],
                             'value'=>function($model){
                                 return $model->current_miss;
                             }
                         ],
-                        'yl_records:ntext',
-                        //'last_time_miss',
-                        ['attribute'=>'last_time_miss','label'=>'上次','headerOptions'=>['width'=>'5%'],
+                        // 上次/最大/历史都是短数字，合并成一列，把宽度让给遗漏记录
+                        [
+                            'label'=>'上次/最大/历史',
+                            'headerOptions'=>['width'=>'10%','title'=>'依次为：上次遗漏 / 区间最大遗漏 / 历史最大遗漏'],
                             'value'=>function($model){
-                                return $model->last_time_miss;
+                                return $model->last_time_miss.' / '.$model->max_miss.' / '.$model->history_max_miss;
                             }
                         ],
+                        //'last_time_miss',
                         //'last_time_miss_range',
                         //'max_miss',
-                        ['attribute'=>'max_miss','label'=>'最大','headerOptions'=>['width'=>'5%'],
-                            'value'=>function($model){
-                                return $model->last_time_miss;
-                            }
-                        ],
                         //'max_range',
                         //'history_max_miss',
-                        ['attribute'=>'history_max_miss','label'=>'历史','headerOptions'=>['width'=>'5%'],
-                            'value'=>function($model){
-                                return $model->history_max_miss;
-                            }
-                        ],
                         //'updated_at',
                         //'created_at',
                         //'update_time',
-                        ['attribute'=>'update_time','label'=>'时间','headerOptions'=>['width'=>'8%'],
+                        ['attribute'=>'update_time','label'=>'更新时间','headerOptions'=>['width'=>'10%'],
                             'value'=>function($model){
                                 return substr($model->update_time, 5,11);
+                            }
+                        ],
+                        ['attribute'=>'yl_records','label'=>'遗漏记录','format'=>'raw',# 'yl_records:ntext',
+                            'value'=>function($model){
+                                return \backend\helpers\MissHistoryFormatter::renderListCell($model->current_miss, $model->yl_records);
                             }
                         ],
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
+                </div>
     <?php //Pjax::end(); ?>
             </div>
         </div>

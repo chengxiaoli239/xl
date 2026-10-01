@@ -1,5 +1,6 @@
 <?php
 
+use backend\helpers\MissHistoryFormatter;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -10,6 +11,10 @@ use yii\grid\GridView;
 $this->title = Yii::t('app', 'Ssc2nums Yls');
 $this->params['breadcrumbs'][] = $this->title;
 $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type);
+
+// 表头字段与「号码类型遗漏 - 三字复式/五字全倒」保持一致；遗漏记录只展示最新若干条，
+// 完整记录放在 title 里，避免超长单元格把表格撑坏。
+$missRecordDisplayLimit = 30;
 ?>
 <section class="ssc2nums-yl-index wrapper site-min-height">
     <!-- page start-->
@@ -32,62 +37,55 @@ $lottery_type_name = \common\service\CommonService::getLotteryName($lottery_type
 
                 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
+                <div class="table-responsive">
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
+                    'tableOptions' => ['class' => 'table table-striped table-bordered'],
                     'columns' => [
-                        ['class' => 'yii\grid\SerialColumn'],
+                        ['class' => 'yii\grid\SerialColumn','headerOptions'=>['width'=>'3%']],
 
                         //'id',
                         //'val',
-                        ['attribute' => 'val','headerOptions'=>['width'=>'5%'],'label'=>'号码',
+                        ['attribute' => 'val','label'=>'号码','headerOptions'=>['width'=>'6%'],
                             'value' => function($model) {
                                 return $model->val;
                             }
                         ],
                         //'current_miss',
-                        ['attribute' => 'current_miss','headerOptions'=>['width'=>'5%'],'label'=>'当前',
+                        ['attribute' => 'current_miss','label'=>'当前遗漏','headerOptions'=>['width'=>'8%'],
                             'value' => function($model) {
                                 return $model->current_miss;
                             }
                         ],
-                        //'last_time_miss',
-                        ['attribute' => 'last_time_miss','headerOptions'=>['width'=>'5%'],'label'=>'上次',
-                            'value' => function($model) {
-                                return $model->last_time_miss;
+                        // 上次/区间最大/历史最大都是短数字，合并成一列，把宽度让给遗漏记录
+                        [
+                            'label'=>'上次/最大/历史',
+                            'headerOptions'=>['width'=>'10%','title'=>'依次为：上次遗漏 / 区间最大遗漏 / 历史最大遗漏'],
+                            'value'=>function($model){
+                                return $model->last_time_miss.' / '.$model->max_miss.' / '.$model->history_max_miss;
                             }
                         ],
                         //'last_time_miss_range',
                         //'max_range',
-                        ['attribute'=>'yl_records','format'=>'raw',
-                            'value'=>function($model){
-                                return \backend\helpers\MissHistoryFormatter::render($model->current_miss, $model->yl_records, '', true);
-                            }
-                        ],
-                        //'max_miss',
-                        ['attribute'=>'max_miss','label'=>'最大','headerOptions'=>['width'=>'5%'],
-                            'value'=>function($model){
-                                return $model->last_time_miss;
-                            }
-                        ],
                         //'history_max_miss',
-                        ['attribute'=>'history_max_miss','label'=>'历史','headerOptions'=>['width'=>'5%'],
-                            'value'=>function($model){
-                                return $model->history_max_miss;
-                            }
-                        ],
                         //'created_at',
                         //'updated_at',
-                        //'update_time',
-                        ['attribute' => 'update_time','headerOptions'=>['width'=>'8%'],'label'=>'时间',
+                        ['attribute' => 'update_time','label'=>'更新时间','headerOptions'=>['width'=>'10%'],
                             'value' => function($model) {
                                 return substr($model->update_time, 5,11);
+                            }
+                        ],
+                        ['attribute'=>'yl_records','label'=>'遗漏记录','format'=>'raw',
+                            'value'=>function($model) use ($missRecordDisplayLimit){
+                                return MissHistoryFormatter::renderListCell($model->current_miss, $model->yl_records, true, $missRecordDisplayLimit);
                             }
                         ],
 
                         //['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
+                </div>
             </div>
         </div>
     </section>
