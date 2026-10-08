@@ -3,10 +3,12 @@
 require dirname(__DIR__).'/backend/service/statics/yl/ThreeComboYlService.php';
 require dirname(__DIR__).'/backend/service/statics/yl/FiveComboYlService.php';
 require dirname(__DIR__).'/backend/service/statics/yl/ThreeDistinctYlService.php';
+require dirname(__DIR__).'/backend/service/statics/yl/ThreeBrothersYlService.php';
 
 use backend\service\statics\yl\ThreeComboYlService;
 use backend\service\statics\yl\FiveComboYlService;
 use backend\service\statics\yl\ThreeDistinctYlService;
+use backend\service\statics\yl\ThreeBrothersYlService;
 
 function assertSameValue($expected, $actual, string $message): void
 {
@@ -73,5 +75,22 @@ $distinctStats = ThreeDistinctYlService::calculate([
 assertSameValue(0, $distinctStats[0]['current_miss'], '不重复012当前遗漏错误');
 assertSameValue(1, $distinctStats[1]['current_miss'], '不重复013当前遗漏错误');
 assertSameValue(1, $distinctStats[2]['current_miss'], '不重复123当前遗漏错误');
+
+$brotherCodes = ThreeBrothersYlService::getCombinations();
+assertSameValue(10, count($brotherCodes), '三兄弟组合数量错误');
+assertSameValue(['012', '123', '234', '345', '456', '567', '678', '789', '019', '089'], $brotherCodes, '三兄弟组合内容错误');
+assertSameValue(true, ThreeBrothersYlService::isHit('012', [0, 1, 2, 9]), '012三兄弟命中错误');
+assertSameValue(true, ThreeBrothersYlService::isHit('019', [0, 1, 9, 9]), '019首尾三兄弟命中错误');
+assertSameValue(false, ThreeBrothersYlService::isHit('012', [0, 1, 3, 9]), '012三兄弟误命中');
+assertSameValue(['019', '012'], ThreeBrothersYlService::normalizeCodeFilter('910, 210, 013'), '只能筛选三兄弟号码');
+$brotherStats = ThreeBrothersYlService::calculate([
+    ['qihao' => '003', 'code1' => 0, 'code2' => 1, 'code3' => 2, 'code4' => 9],
+    ['qihao' => '002', 'code1' => 0, 'code2' => 8, 'code3' => 9, 'code4' => 9],
+    ['qihao' => '001', 'code1' => 1, 'code2' => 1, 'code3' => 1, 'code4' => 1],
+]);
+assertSameValue(10, count($brotherStats), '三兄弟应只统计十组');
+assertSameValue(0, $brotherStats[0]['current_miss'], '012当前遗漏错误');
+assertSameValue(0, $brotherStats[8]['current_miss'], '019当前遗漏错误');
+assertSameValue(1, $brotherStats[9]['current_miss'], '089当前遗漏错误');
 
 echo "three_combo_yl_regression: OK\n";

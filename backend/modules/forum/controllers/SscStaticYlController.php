@@ -8,6 +8,7 @@ use backend\service\statics\yl\ThreeComboYlService;
 use backend\service\statics\yl\FiveComboYlService;
 use backend\service\statics\yl\FiveAllReverseYlService;
 use backend\service\statics\yl\ThreeDistinctYlService;
+use backend\service\statics\yl\ThreeBrothersYlService;
 use common\service\CommonService;
 use Yii;
 use backend\models\SscStaticYl;
@@ -68,6 +69,7 @@ class SscStaticYlController extends BaseController
             FiveComboYlService::TYPE => FiveComboYlService::class,
             FiveAllReverseYlService::TYPE => FiveAllReverseYlService::class,
             ThreeDistinctYlService::TYPE => ThreeDistinctYlService::class,
+            ThreeBrothersYlService::TYPE => ThreeBrothersYlService::class,
         ];
         if (isset($comboServices[(int)$type])) {
             $comboService = $comboServices[(int)$type];
@@ -86,7 +88,7 @@ class SscStaticYlController extends BaseController
             return $this->render('three_combo', [
                 'lottery_types' => $lottery_types,
                 'lottery_type' => $lottery_type,
-                'code_type' => (int)$type === ThreeDistinctYlService::TYPE ? 14 : ((int)$type === FiveAllReverseYlService::TYPE ? 13 : ((int)$type === FiveComboYlService::TYPE ? 12 : 11)),
+                'code_type' => (int)$type === ThreeBrothersYlService::TYPE ? 15 : ((int)$type === ThreeDistinctYlService::TYPE ? 14 : ((int)$type === FiveAllReverseYlService::TYPE ? 13 : ((int)$type === FiveComboYlService::TYPE ? 12 : 11))),
                 'combo_type' => (int)$type,
                 'periods' => $result['periods'],
                 'codeFilter' => $codeFilter,
