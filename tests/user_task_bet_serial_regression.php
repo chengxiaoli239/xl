@@ -20,8 +20,6 @@ $sameAccount = [
     'tz_system_id' => 6,
     'account' => 'AA03',
 ];
-$sameAccountDifferentCase = $sameAccount;
-$sameAccountDifferentCase['account'] = ' aa03 ';
 $differentAccount = $sameAccount;
 $differentAccount['account'] = 'aa04';
 $differentSite = $sameAccount;
@@ -29,12 +27,9 @@ $differentSite['tz_system_id'] = 7;
 
 assertSameValue(
     UserTaskBetJob::buildSerialLockKey($sameAccount),
-    UserTaskBetJob::buildSerialLockKey($sameAccountDifferentCase),
-    '同一盘口账号的大小写和空格不应产生不同锁'
+    UserTaskBetJob::buildSerialLockKey($differentAccount),
+    '同一用户同一盘口系统不应因账号字段不同而绕过串行锁'
 );
-if (UserTaskBetJob::buildSerialLockKey($sameAccount) === UserTaskBetJob::buildSerialLockKey($differentAccount)) {
-    throw new RuntimeException('不同盘口账号不应共用串行锁');
-}
 if (UserTaskBetJob::buildSerialLockKey($sameAccount) === UserTaskBetJob::buildSerialLockKey($differentSite)) {
     throw new RuntimeException('不同盘口系统不应共用串行锁');
 }

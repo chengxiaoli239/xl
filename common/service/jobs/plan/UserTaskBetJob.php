@@ -70,15 +70,14 @@ class UserTaskBetJob extends CommonJob {
 
     /**
      * Build the lock scope used by service-side betting requests.
-     * Plans sharing a user and盘口 account are serialized; unrelated accounts remain concurrent.
+     * Plans sharing a user and盘口 system are serialized; unrelated users/sites remain concurrent.
      */
     public static function buildSerialLockKey(array $task): string
     {
         $uid = (int)($task['uid'] ?? 0);
         $tzSystemId = (int)($task['tz_system_id'] ?? 0);
-        $account = strtolower(trim((string)($task['account'] ?? '')));
 
-        return 'user-task-bet-serial:'.$uid.':'.$tzSystemId.':'.md5($account);
+        return 'user-task-bet-serial:'.$uid.':'.$tzSystemId;
     }
 
     private static function buildLockOwner($taskId, $queueId): string
