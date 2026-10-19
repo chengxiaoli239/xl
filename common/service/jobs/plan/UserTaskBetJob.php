@@ -12,7 +12,7 @@ class UserTaskBetJob extends CommonJob {
 
     private const TASK_LOCK_TTL = 180;
     private const USER_SERIAL_LOCK_TTL = 180;
-    private const USER_SERIAL_LOCK_WAIT = 90;
+    private const USER_SERIAL_LOCK_WAIT = 5;
     private const USER_SERIAL_RETRY_DELAY = 3;
 
     public function getTtr(): int
@@ -113,7 +113,10 @@ class UserTaskBetJob extends CommonJob {
         $params['business_id'] = $params['business_id'] ?? (int)$taskId;
         $params['queue_delay_time'] = self::USER_SERIAL_RETRY_DELAY;
         $params['serial_retry'] = (int)($params['serial_retry'] ?? 0) + 1;
-        push_queue_fast(self::class, $params);
+        $params['queue_fast'] = true;
+        if (!push_queue(self::class, $params)) {
+            throw new \RuntimeException('同一用户盘口下注延后入列失败:'.$taskId);
+        }
     }
 
 }
