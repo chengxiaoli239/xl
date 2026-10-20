@@ -22,6 +22,10 @@ class UpdateThreeBrothersYlJob extends CommonJob
 
     public function exec($params)
     {
-        return ThreeBrothersYlService::refreshSummary((int)$params['lottery_type']);
+        $result = ThreeBrothersYlService::refreshSummary((int)$params['lottery_type']);
+        // 沿用每期开奖已有的统计入口，兼容尚未重启的开奖采集进程。
+        push_queue(UpdateFourSameYlJob::class, $params);
+        push_queue(UpdateTwoComboYlJob::class, $params);
+        return $result;
     }
 }

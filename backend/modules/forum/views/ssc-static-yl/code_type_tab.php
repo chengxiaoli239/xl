@@ -6,6 +6,12 @@ use yii\helpers\Html;
 <div class="btn-group">
     <?= Html::a('号码类型', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>1, 'SscStaticYl[type]'=>2], ['class' => 'btn btn-sm '.($code_type == 1 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
 </div>
+<div class="btn-group">
+    <?= Html::a('四重', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>16, 'SscStaticYl[type]'=>11], ['class' => 'btn btn-sm '.($code_type == 16 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+</div>
+<div class="btn-group">
+    <?= Html::a('二字复式', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>17, 'SscStaticYl[type]'=>12], ['class' => 'btn btn-sm '.($code_type == 17 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
+</div>
 ||
 <div class="btn-group">
     <?= Html::a('三现带双', ['index', 'SscStaticYl[lottery_type]'=>$lottery_type, 'SscStaticYl[code_type]'=>2, 'SscStaticYl[type]'=>3, 'SscStaticYl[type_2]'=>1, 'SscStaticYl[type_3]'=>0], ['class' => 'btn btn-sm '.($code_type == 2 ? 'btn-success' : 'btn-default'), 'style' => 'margin-bottom:15px;']) ?>
