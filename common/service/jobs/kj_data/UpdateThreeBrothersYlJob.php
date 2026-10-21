@@ -27,6 +27,7 @@ class UpdateThreeBrothersYlJob extends CommonJob
         push_queue(UpdateFourSameYlJob::class, $params);
         push_queue(UpdateTwoComboYlJob::class, $params);
         push_queue(UpdateThreeSameYlJob::class, $params);
+        push_queue(UpdateDoublePairYlJob::class, $params);
         return $result;
     }
 }

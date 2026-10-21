@@ -18,6 +18,11 @@ if ((int)$combo_type === \backend\service\statics\yl\ThreeSameYlService::TYPE) {
     $codeExample = '000';
     $hitDescription = '前四位中所选数字至少出现3次即命中，包含四重，顺序不限；';
 }
+if ((int)$combo_type === \backend\service\statics\yl\DoublePairYlService::TYPE) {
+    $comboName = '双双重';
+    $codeExample = '0011';
+    $hitDescription = '前四位为所选两个不同数字各出现2次即命中，顺序不限，不含三重、四重；';
+}
 $this->title = $comboName.'遗漏';
 $this->params['breadcrumbs'][] = $this->title;
 ?>

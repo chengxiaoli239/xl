@@ -5,6 +5,7 @@ namespace backend\modules\forum\controllers;
 use backend\service\StaticService;
 use backend\service\UserSysPlansService;
 use backend\service\statics\yl\ThreeComboYlService;
+use backend\service\statics\yl\DoublePairYlService;
 use backend\service\statics\yl\ThreeSameYlService;
 use backend\service\statics\yl\FiveComboYlService;
 use backend\service\statics\yl\FiveAllReverseYlService;
@@ -68,6 +69,7 @@ class SscStaticYlController extends BaseController
         $queryParams['SscStaticYl']['lottery_type'] = $lottery_type;
 
         $comboServices = [
+            DoublePairYlService::TYPE => DoublePairYlService::class,
             ThreeSameYlService::TYPE => ThreeSameYlService::class,
             ThreeComboYlService::TYPE => ThreeComboYlService::class,
             FiveComboYlService::TYPE => FiveComboYlService::class,
@@ -77,7 +79,7 @@ class SscStaticYlController extends BaseController
             FourSameYlService::TYPE => FourSameYlService::class,
             TwoComboYlService::TYPE => TwoComboYlService::class,
         ];
-        $comboCodeTypes = [6 => 11, 7 => 12, 8 => 13, 9 => 14, 10 => 15, 11 => 16, 12 => 17, 13 => 18];
+        $comboCodeTypes = [6 => 11, 7 => 12, 8 => 13, 9 => 14, 10 => 15, 11 => 16, 12 => 17, 13 => 18, 14 => 19];
         if (isset($comboServices[(int)$type])) {
             $comboService = $comboServices[(int)$type];
             $periods = $comboService::normalizePeriods(Yii::$app->request->get('periods', $comboService::DEFAULT_PERIODS));

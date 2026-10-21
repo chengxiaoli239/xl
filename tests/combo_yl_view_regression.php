@@ -38,6 +38,7 @@ $cases = [
     [backend\service\statics\yl\FourSameYlService::class, 16, '四重', 10],
     [backend\service\statics\yl\TwoComboYlService::class, 17, '二字复式', 45],
     [backend\service\statics\yl\ThreeSameYlService::class, 18, '三重', 10],
+    [backend\service\statics\yl\DoublePairYlService::class, 19, '双双重', 45],
 ];
 foreach ($cases as [$service, $codeType, $label, $count]) {
     $html = $controller->view->renderFile(dirname(__DIR__).'/backend/modules/forum/views/ssc-static-yl/three_combo.php', [
@@ -60,8 +61,9 @@ foreach ($cases as [$service, $codeType, $label, $count]) {
         || strpos($html, '>四重</a>') === false
         || strpos($html, '>二字复式</a>') === false
         || strpos($html, 'SscStaticYl%5Btype%5D=13') === false
+        || strpos($html, 'SscStaticYl%5Btype%5D=14') === false
         || strpos($html, '≥2000') === false) {
         throw new RuntimeException($label.' view render failed');
     }
 }
-echo "combo_yl_view_regression: OK (8 tabs)\n";
+echo "combo_yl_view_regression: OK (9 tabs)\n";
