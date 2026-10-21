@@ -26,6 +26,7 @@ class UpdateThreeBrothersYlJob extends CommonJob
         // 沿用每期开奖已有的统计入口，兼容尚未重启的开奖采集进程。
         push_queue(UpdateFourSameYlJob::class, $params);
         push_queue(UpdateTwoComboYlJob::class, $params);
+        push_queue(UpdateThreeSameYlJob::class, $params);
         return $result;
     }
 }

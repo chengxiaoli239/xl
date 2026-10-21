@@ -13,6 +13,11 @@ $comboLength = $isTwoCombo ? 2 : ($isFiveCombo || $isFiveAllReverse ? 5 : 3);
 $comboName = $isFourSame ? '四重' : ($isTwoCombo ? '二字复式' : ($isFiveAllReverse ? '五字全倒' : ($isFiveCombo ? '五字复式' : ($isThreeBrothers ? '三兄弟' : ($isThreeDistinct ? '三字不重复' : '三字复式')))));
 $codeExample = $isFourSame ? '0000' : ($isTwoCombo ? '01' : ($comboLength === 5 ? '01234' : '012'));
 $hitDescription = $isFourSame ? '前四位与所选四重号码完全相同即命中；' : ($isFiveAllReverse ? '前四位为所选五个数字中的四个不同数字，顺序不限；' : ($isThreeBrothers ? '前四位去重后包含所选三个相邻数字即命中，0和9首尾相邻；' : ($isThreeDistinct ? '前四位包含所选三个不同数字即命中，顺序不限；' : '前四位都属于所选'.$comboLength.'个数字即命中；')));
+if ((int)$combo_type === \backend\service\statics\yl\ThreeSameYlService::TYPE) {
+    $comboName = '三重';
+    $codeExample = '000';
+    $hitDescription = '前四位中所选数字至少出现3次即命中，包含四重，顺序不限；';
+}
 $this->title = $comboName.'遗漏';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
