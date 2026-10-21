@@ -6,6 +6,7 @@ namespace backend\service\statics\yl;
 class ThreeSameYlService extends ThreeComboYlService
 {
     public const TYPE = 13;
+    public const DEFAULT_PERIODS = 10000;
     public const ROW_VAL = 'three_same';
     public const COMBINATION_LENGTH = 3;
 

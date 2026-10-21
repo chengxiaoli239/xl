@@ -46,7 +46,7 @@ foreach ($cases as [$service, $codeType, $label, $count]) {
         'lottery_type' => 8,
         'code_type' => $codeType,
         'combo_type' => $service::TYPE,
-        'periods' => 2000,
+        'periods' => $service::DEFAULT_PERIODS,
         'codeFilter' => '',
         'dataProvider' => new yii\data\ArrayDataProvider([
             'allModels' => $service::calculate([
@@ -62,7 +62,7 @@ foreach ($cases as [$service, $codeType, $label, $count]) {
         || strpos($html, '>二字复式</a>') === false
         || strpos($html, 'SscStaticYl%5Btype%5D=13') === false
         || strpos($html, 'SscStaticYl%5Btype%5D=14') === false
-        || strpos($html, '≥2000') === false) {
+        || strpos($html, '≥'.$service::DEFAULT_PERIODS) === false) {
         throw new RuntimeException($label.' view render failed');
     }
 }

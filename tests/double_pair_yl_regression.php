@@ -13,6 +13,9 @@ function checkEqual($expected, $actual, string $message): void
 }
 
 $codes = DoublePairYlService::getCombinations();
+checkEqual(10000, DoublePairYlService::normalizePeriods(0), 'default periods');
+checkEqual(10000, DoublePairYlService::normalizePeriods(20000), 'max periods');
+checkEqual(2000, DoublePairYlService::normalizePeriods(2000), 'custom periods');
 checkEqual(45, count($codes), '45 pairs');
 checkEqual('0011', $codes[0], 'leading zeros');
 checkEqual('8899', $codes[44], 'last pair');

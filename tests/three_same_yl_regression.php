@@ -13,6 +13,10 @@ function assertEqual($expected, $actual, string $message): void
 }
 
 assertEqual(['000', '111', '222', '333', '444', '555', '666', '777', '888', '999'], ThreeSameYlService::getCombinations(), '10 groups');
+assertEqual(10000, ThreeSameYlService::normalizePeriods(0), 'default periods');
+assertEqual(10000, ThreeSameYlService::normalizePeriods(20000), 'max periods');
+assertEqual(2000, ThreeSameYlService::normalizePeriods(2000), 'custom periods');
+assertEqual(2000, \backend\service\statics\yl\ThreeComboYlService::normalizePeriods(0), 'other statistics default');
 assertEqual(['000', '999'], ThreeSameYlService::normalizeCodeFilter('000，999,012,0000,000'), 'filter');
 assertEqual(false, ThreeSameYlService::isHit('000', [0, 0, 0]), 'require four positions');
 assertEqual(false, ThreeSameYlService::isHit('012', [0, 0, 0, 1]), 'reject non-triple code');

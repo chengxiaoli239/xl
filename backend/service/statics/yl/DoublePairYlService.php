@@ -6,6 +6,7 @@ namespace backend\service\statics\yl;
 class DoublePairYlService extends ThreeComboYlService
 {
     public const TYPE = 14;
+    public const DEFAULT_PERIODS = 10000;
     public const ROW_VAL = 'double_pair';
     public const COMBINATION_LENGTH = 4;
 

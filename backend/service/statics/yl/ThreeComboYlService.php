@@ -162,7 +162,7 @@ class ThreeComboYlService
 
         if ($periods === static::DEFAULT_PERIODS && empty($onlyCodes)) {
             $row = static::findSummaryRow($lotteryType);
-            if ($row && (int)$row->stat_last_index_id === $lastIndexId) {
+            if ($row && (int)$row->stat_last_index_id === $lastIndexId && (int)$row->static_nums === $periods) {
                 $statistics = static::decodeSummary($row->yl_records ?: '[]');
                 if (is_array($statistics)) {
                     return self::buildResult($statistics, $periods, $lastIndexId, false);
@@ -181,7 +181,7 @@ class ThreeComboYlService
         return self::buildResult($statistics, $periods, $lastIndexId, true);
     }
 
-    public static function refreshSummary(int $lotteryType, int $periods = 2000): array
+    public static function refreshSummary(int $lotteryType, int $periods = 0): array
     {
         $periods = static::normalizePeriods($periods);
         $draws = static::fetchDraws($lotteryType, $periods);
