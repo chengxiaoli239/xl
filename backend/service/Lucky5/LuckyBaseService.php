@@ -2074,6 +2074,8 @@ class LuckyBaseService extends BaseTZService { # 重庆7时彩登陆体系
      * @return array|mixed
      */
     public static function getNumType($tz_type, $playway='', $tmpcodesArr=[]){
+        // 二定快选发送的是四位中含两个X的号码，必须使用二定位类别。
+        if ((int)$tz_type === 30 && (int)$playway === 1) return 20;
         if($playway==2) return 30;
         if($tz_type == 27 && !empty($tmpcodesArr[0]) && strlen($tmpcodesArr[0])==5){
             $num_type = 30;
