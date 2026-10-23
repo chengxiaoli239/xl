@@ -1171,8 +1171,9 @@ class DynamicType2Service extends BaseService {
     }
 
     /**
-     * 过滤类型号码 - 取x位各取最近y个号码复式（每位独立取码）
-     * 与类型43不同：类型43是同一位置码池过滤全部四位，此类型是每个位置用自己的码池
+     * 过滤类型号码 - 取x位各取最近y个号码复式。
+     * 四定的每个位置独立取码；二定明确选中两个X位且x为单个来源位时，
+     * 两个投注位共用来源位号码池。
      * 相当于类型35（排除）的反选保留版本，但参数简化为 x:位置、y:统一码数
      * @param object $plan
      * @param array $dynamic
@@ -1207,6 +1208,39 @@ class DynamicType2Service extends BaseService {
             throw_info('取x位各取最近y个号码复式：参数x只能包含1、2、3、4');
         }
         $posNameMap = ['1'=>'千', '2'=>'百', '3'=>'十', '4'=>'个'];
+
+        // 二定快选：单个x是号码来源位，不是唯一受限制的投注位。
+        // 两个非X位共用这个号码池；没有明确选中两个X位时保留原有过滤规则。
+        if ((int)$playway === 1 && count($positions) === 1) {
+            $planFilters = Json::decode($plan->hz_Arr, true);
+            $fixedPositions = array_values(array_unique(array_filter(
+                array_map('trim', explode(',', (string)($planFilters['fixed_sel_pos'] ?? ''))),
+                static function ($pos): bool { return in_array($pos, ['1', '2', '3', '4'], true); }
+            )));
+        }
+        if (isset($fixedPositions) && count($fixedPositions) === 2) {
+            $pool = NumService::getPosLatelyCode((int)$positions[0], $y, $lottery_type, $currentKjQiHao);
+            $where = self::filter44TwoFixedWhere($fixedPositions, $pool);
+            $query = (new \yii\db\Query())->select(['code'])->from('lt_num4_type')
+                ->where(['code_type' => $playway + 1]);
+            foreach ($where as $condition) {
+                $query->andWhere($condition);
+            }
+            $codes = ArrayHelper::getColumn($query->all(), 'code');
+            if (!$codes) {
+                throw new \RuntimeException('二定复式没有匹配号码，已停止本次过滤以避免回退为全部号码');
+            }
+            $betDesc = ($filterDesc['label'] ?? '取x位各取最近y个号码复式')
+                .'：取'.$posNameMap[$positions[0]].'位近'.$y.'个码:' . implode('', $pool)
+                .'，应用于两个非X位，最终组数：'.count($codes);
+            NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
+            Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '二定共用来源位号码池', [
+                'plan_id' => $plan->id, 'lottery_type' => $lottery_type,
+                'source_position' => $positions[0], 'fixed_positions' => $fixedPositions,
+                'pool_count' => count($pool), 'count' => count($codes),
+            ]);
+            return $codes;
+        }
 
         // 构建查询：每个指定位置用自己的独立码池过滤
         $query = (new \yii\db\Query())
@@ -1254,6 +1288,27 @@ class DynamicType2Service extends BaseService {
         ]);
 
         return $codes;
+    }
+
+    /** @return array<int, array<int, mixed>> */
+    public static function filter44TwoFixedWhere(array $fixedPositions, array $pool): array
+    {
+        $fixedPositions = array_map('strval', $fixedPositions);
+        if (count($fixedPositions) !== 2 || count(array_unique($fixedPositions)) !== 2
+            || array_diff($fixedPositions, ['1', '2', '3', '4'])) {
+            throw new \InvalidArgumentException('二定复式必须指定两个不同的X位置');
+        }
+        if (!$pool) {
+            throw new \RuntimeException('二定复式来源位没有可用的近期号码');
+        }
+
+        $where = [];
+        for ($position = 1; $position <= 4; $position++) {
+            $where[] = in_array((string)$position, $fixedPositions, true)
+                ? ['=', 'code_'.$position, 'X']
+                : ['IN', 'code_'.$position, $pool];
+        }
+        return $where;
     }
 
     /**
