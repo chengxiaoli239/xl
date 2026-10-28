@@ -11,7 +11,7 @@ class UserTaskBetJob extends CommonJob {
     public $retryCount = 1;
 
     private const TASK_LOCK_TTL = 180;
-    private const USER_SERIAL_LOCK_TTL = 180;
+    private const USER_SERIAL_LOCK_TTL = 600;
     private const USER_SERIAL_RETRY_DELAY = 3;
 
     public function getTtr(): int
@@ -86,15 +86,23 @@ class UserTaskBetJob extends CommonJob {
     private static function acquireSerialLock(string $key, string $owner): bool
     {
         // 用户已有计划下注时立即让出共享消费者，不在此等待锁。
-        return \Yii::$app->cache->add($key, $owner, self::USER_SERIAL_LOCK_TTL);
+        $cache = \Yii::$app->cache;
+        return (bool)$cache->redis->executeCommand('SET', [
+            $cache->buildKey($key), $owner, 'NX', 'EX', self::USER_SERIAL_LOCK_TTL,
+        ]);
     }
 
     private static function releaseSerialLock(string $key, string $owner): void
     {
-        // Do not delete a lock that was acquired by a later task after our lease expired.
-        if (\Yii::$app->cache->get($key) === $owner) {
-            \Yii::$app->cache->delete($key);
-        }
+        static $releaseScript = <<<'LUA'
+if redis.call("GET", KEYS[1]) == ARGV[1] then
+    return redis.call("DEL", KEYS[1])
+end
+return 0
+LUA;
+
+        $cache = \Yii::$app->cache;
+        $cache->redis->executeCommand('EVAL', [$releaseScript, 1, $cache->buildKey($key), $owner]);
     }
 
     private static function requeueAfterSerialWait(array $params, $taskId): void
