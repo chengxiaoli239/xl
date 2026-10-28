@@ -12,7 +12,6 @@ class UserTaskBetJob extends CommonJob {
 
     private const TASK_LOCK_TTL = 180;
     private const USER_SERIAL_LOCK_TTL = 180;
-    private const USER_SERIAL_LOCK_WAIT = 5;
     private const USER_SERIAL_RETRY_DELAY = 3;
 
     public function getTtr(): int
@@ -70,14 +69,13 @@ class UserTaskBetJob extends CommonJob {
 
     /**
      * Build the lock scope used by service-side betting requests.
-     * Plans sharing a user and盘口 system are serialized; unrelated users/sites remain concurrent.
+     * All service-side real bets for one user are serialized; different users remain concurrent.
      */
     public static function buildSerialLockKey(array $task): string
     {
         $uid = (int)($task['uid'] ?? 0);
-        $tzSystemId = (int)($task['tz_system_id'] ?? 0);
 
-        return 'user-task-bet-serial:'.$uid.':'.$tzSystemId;
+        return 'user-task-bet-serial:'.$uid;
     }
 
     private static function buildLockOwner($taskId, $queueId): string
@@ -87,15 +85,8 @@ class UserTaskBetJob extends CommonJob {
 
     private static function acquireSerialLock(string $key, string $owner): bool
     {
-        $deadline = microtime(true) + self::USER_SERIAL_LOCK_WAIT;
-        do {
-            if (\Yii::$app->cache->add($key, $owner, self::USER_SERIAL_LOCK_TTL)) {
-                return true;
-            }
-            usleep(250000);
-        } while (microtime(true) < $deadline);
-
-        return false;
+        // 用户已有计划下注时立即让出共享消费者，不在此等待锁。
+        return \Yii::$app->cache->add($key, $owner, self::USER_SERIAL_LOCK_TTL);
     }
 
     private static function releaseSerialLock(string $key, string $owner): void
