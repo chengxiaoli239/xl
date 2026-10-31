@@ -1397,6 +1397,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
             }elseif(!empty($matches[1])){
                 $roboot_id = trim($matches[1]);
             }
+            if(strpos($roboot_id, '=') !== false){
+                $roboot_id = trim(explode(';', $roboot_id, 2)[0]);
+            }
             if(strpos($roboot_id, '您当前使用的浏览器不支持') !== false){
                 $tmp_roboot_id = explode('\';', $roboot_id);
                 if($tmp_roboot_id[0]) $roboot_id = $tmp_roboot_id[0];
@@ -1414,6 +1417,19 @@ class Lucky5Service { # 重庆7时彩登陆体系
     /**
      *curl get请求
      */
+    public static function extractRequestCookies($response){
+        preg_match_all('/^Set-Cookie:\s*([^\r\n]*)/im', (string)$response, $matches);
+        $pairs = [];
+        foreach ($matches[1] as $header){
+            $pair = trim(explode(';', $header, 2)[0]);
+            if(strpos($pair, '=') !== false){
+                $pairs[] = $pair;
+            }
+        }
+
+        return implode(';', $pairs);
+    }
+
     public static function curlGetSevenCookie($url,$header = [], $uid = 0){
         $tzSystemId = self::$tz_system_id;
         $proxyRequired = self::isProxyRequiredForScene($uid, $tzSystemId, BaseService::PROXY_SCENE_LOGIN);
@@ -1463,17 +1479,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
             }
             curl_close($curl);
 
-            preg_match_all("/Set-Cookie: (.*)/i", (string)$content, $matches);
-            //p($matches,0);
-            $cookies = $matches[1] ?? [];
-            $logArr = ['cookies'=>$cookies, 'matches'=>$matches, 'content'=>$content, 'proxy_ip'=>$proxyAddr, 'attempt'=>$attempt];
+            $data = self::extractRequestCookies($content);
+            $logArr = ['content'=>$content, 'proxy_ip'=>$proxyAddr, 'attempt'=>$attempt];
             Tool_Common::log('curl_get_cookie', 'INFO', '获取cookie', $logArr);
-            $data = '';
-            foreach ($cookies as $cookie){
-                $data .= str_replace('; path=/; HttpOnly','',trim($cookie)).';';
-            }
-
-            $data = str_replace("; path=/; Httponly;",'',$data);
             return $data;
         }
 
