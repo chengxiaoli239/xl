@@ -233,6 +233,15 @@ class Lucky5Service { # 重庆7时彩登陆体系
         return 108;
     }
 
+    public static function getWayForPlan($tz_type, $playway){
+        return ((int)$tz_type === 19 && (int)$playway === 2) ? 102 : self::getWay($tz_type);
+    }
+
+    public static function getBetLogForPlan($tz_type, $playway, $plan_id=0){
+        return ((int)$tz_type === 19 && (int)$playway === 2)
+            ? '[三定位]' : self::getBetLog($tz_type, $plan_id);
+    }
+
     /**
      * @desc 根据playway、tz_type 获取投注方式
      * @param int $tz_type
@@ -462,7 +471,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
      * @desc 返回和值投注
      * @return string
      */
-    public static function getOperationCondition($tz_type = 20){
+    public static function getOperationCondition($tz_type = 20, $playway = 3){
         if($tz_type == 27) {
             $json = '{"symbol":"X","isXian":0,"firstNumber":"1","secondNumber":"34","thirdNumber":"","fourthNumber":"","fifthNumber":"","numberType":20,"positionType":0,"positionFilter":0,"remainFixedFilter":0,"remainFixedNumbers":[],"remainMatchFilter":0,"remainMatchNumbers":[],"remainValueRanges":[],"transformNumbers":[],"upperNumbers":[],"exceptNumbers":[],"fixedPositions":[],"symbolPositions":[0,0,0,0],"containFilter":0,"containNumbers":[],"multipleFilter":0,"multipleNumbers":[],"repeatTwoWordsFilter":-1,"repeatThreeWordsFilter":-1,"repeatFourWordsFilter":-1,"repeatDoubleWordsFilter":-1,"twoBrotherFilter":-1,"threeBrotherFilter":-1,"fourBrotherFilter":-1,"logarithmNumberFilter":-1,"logarithmNumbers":[],"oddNumberFilter":-1,"oddNumberPositions":[0,0,0,0],"evenNumberFilter":-1,"evenNumberPositions":[0,0,0,0]}';
         }elseif ($tz_type == 29){
@@ -528,6 +537,17 @@ class Lucky5Service { # 重庆7时彩登陆体系
             ];
         }
 
+        // 仅导入三定使用盘口手工三定的操作条件，避免影响其它玩法。
+        if ((int)$tz_type === 19 && (int)$playway === 2) {
+            $condition = json_decode($json, true);
+            $condition['numberType'] = 30;
+            $condition['remainValueRanges'] = [];
+            $condition['fixedPositions'] = [];
+            $condition['symbolPositions'] = [0, 0, 0, 0];
+            $condition['remainMatchFilterThree'] = 0;
+            $condition['remainMatchNumbersThree'] = [];
+            return json_encode($condition, JSON_UNESCAPED_UNICODE);
+        }
         return $json;
     }
 
@@ -2683,7 +2703,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if(empty($url) || is_array($url)){
             return ['status'=>300, 'msg'=>'下注URL无效:uid='.$plan->uid.',tz_system_id='.self::$tz_system_id];
         }
-        $way = self::getWay($tz_type);
+        $way = self::getWayForPlan($tz_type, $playway);
         $snInfo_sn = '';
         $snInfo_snid = '';
         $rst = [];
@@ -2691,7 +2711,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             BetService::markRepeatSubmitSplitGroup($plan->uid, $lottery_type, $qihao, $plan_id, count($codesArrs));
         }
         foreach ($codesArrs as $key=>$tmpcodesArr){
-            $bet_log = self::getBetLog($tz_type, $plan_id);
+            $bet_log = self::getBetLogForPlan($tz_type, $playway, $plan_id);
             if($playway == 4){ # 一字定
                 $url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ');//.'?'.http_build_query($post_data);
                 $post_data = [
@@ -2731,7 +2751,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                         'bet_log'=>$bet_log,
                         'is_package' => 0,
                         'period_no'=>$qihao,
-                        'operation_condition' => self::getOperationCondition(),
+                        'operation_condition' => self::getOperationCondition($tz_type, $playway),
                     ];
                 }
             }
@@ -2880,12 +2900,12 @@ class Lucky5Service { # 重庆7时彩登陆体系
         if(empty($url) || is_array($url)){
             return ['status'=>300, 'msg'=>'下注URL无效:uid='.$uid.',tz_system_id='.self::$tz_system_id];
         }
-        $way = self::getWay($tz_type);
+        $way = self::getWayForPlan($tz_type, $playway);
         $snInfo_sn = '';
         $snInfo_snid = '';
         $rst = [];
         foreach ($codesArrs as $key=>$tmpcodesArr){
-            $bet_log = self::getBetLog($tz_type, $plan_id);
+            $bet_log = self::getBetLogForPlan($tz_type, $playway, $plan_id);
             if($playway == 4){ # 一字定
                 $url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ');//.'?'.http_build_query($post_data);
                 $post_data = [
@@ -2908,7 +2928,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
                     'bet_log'=>$bet_log,
                     'is_package' => 0,
                     'period_no'=>$qihao,
-                    'operation_condition' => self::getOperationCondition(),
+                    'operation_condition' => self::getOperationCondition($tz_type, $playway),
                 ];
             }
 
