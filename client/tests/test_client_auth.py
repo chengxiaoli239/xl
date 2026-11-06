@@ -21,6 +21,29 @@ from xy_client.services.tools.ClientFriendlyAccountManager import ClientFriendly
 from xy_client.launcher import configure_account_environment, configure_standard_streams
 
 
+class MemoryKeyring:
+    class errors:
+        class PasswordDeleteError(Exception):
+            pass
+
+    def __init__(self):
+        self.values = {}
+
+    def get_password(self, service, account):
+        return self.values.get((service, account))
+
+    def set_password(self, service, account, value):
+        self.values[(service, account)] = value
+
+    def delete_password(self, service, account):
+        if self.values.pop((service, account), None) is None:
+            raise self.errors.PasswordDeleteError()
+
+
+def test_cache(path):
+    return CredentialCache(path, keyring_backend=MemoryKeyring())
+
+
 class ReconfigurableStream:
     def __init__(self):
         self.options = None
@@ -44,7 +67,7 @@ class ConsoleEncodingTest(unittest.TestCase):
 class CredentialCacheTest(unittest.TestCase):
     def test_round_trip_and_clear(self):
         with tempfile.TemporaryDirectory() as directory:
-            cache = CredentialCache(Path(directory) / "credentials.dat")
+            cache = test_cache(Path(directory) / "credentials.dat")
             cache.save("https://backend.example.com/", "demo", "token-value")
 
             loaded = cache.load()
@@ -52,13 +75,16 @@ class CredentialCacheTest(unittest.TestCase):
             self.assertEqual(loaded["username"], "demo")
             self.assertEqual(loaded["access_token"], "token-value")
             self.assertTrue(loaded["account_key"])
+            if sys.platform == "darwin":
+                self.assertFalse(cache.path.exists())
+                self.assertNotIn("token-value", str(cache._keyring().values.keys()))
 
             cache.clear()
             self.assertEqual(cache.load(), {})
 
     def test_legacy_single_account_cache_is_migrated(self):
         with tempfile.TemporaryDirectory() as directory:
-            cache = CredentialCache(Path(directory) / "credentials.dat")
+            cache = test_cache(Path(directory) / "credentials.dat")
             legacy = json.dumps({
                 "robot_domain": "https://backend.example.com",
                 "username": "legacy-user",
@@ -71,13 +97,19 @@ class CredentialCacheTest(unittest.TestCase):
             self.assertEqual(len(cache.list_accounts()), 1)
 
             cache.set_active(loaded["account_key"])
-            encrypted = base64.b64decode(cache.path.read_bytes())
-            migrated = json.loads(cache._unprotect(encrypted).decode("utf-8"))
+            if sys.platform == "darwin":
+                self.assertFalse(cache.path.exists())
+                migrated = json.loads(cache._keyring().get_password(
+                    "Lucky5 credentials", cache._keyring_account()
+                ))
+            else:
+                encrypted = base64.b64decode(cache.path.read_bytes())
+                migrated = json.loads(cache._unprotect(encrypted).decode("utf-8"))
             self.assertEqual(migrated["version"], 2)
 
     def test_login_result_saves_and_removes_multiple_accounts(self):
         with tempfile.TemporaryDirectory() as directory:
-            cache = CredentialCache(Path(directory) / "credentials.dat")
+            cache = test_cache(Path(directory) / "credentials.dat")
             profiles = cache.save_login_result(
                 "https://backend.example.com/",
                 "admin",
@@ -92,7 +124,10 @@ class CredentialCacheTest(unittest.TestCase):
 
             self.assertEqual(len(cache.list_accounts()), 2)
             self.assertNotEqual(profiles[0]["account_key"], profiles[1]["account_key"])
-            self.assertNotIn("password", cache.path.read_text(encoding="ascii"))
+            if sys.platform == "darwin":
+                self.assertFalse(cache.path.exists())
+            else:
+                self.assertNotIn("password", cache.path.read_text(encoding="ascii"))
 
             cache.remove(profiles[0]["account_key"])
             remaining = cache.list_accounts()
@@ -107,7 +142,7 @@ class AccountSelectionDialogTest(unittest.TestCase):
 
     def test_saved_accounts_are_available_for_selection(self):
         with tempfile.TemporaryDirectory() as directory:
-            cache = CredentialCache(Path(directory) / "credentials.dat")
+            cache = test_cache(Path(directory) / "credentials.dat")
             cache.save_login_result(
                 "https://backend.example.com",
                 "admin",
@@ -130,7 +165,7 @@ class AccountSelectionDialogTest(unittest.TestCase):
     @patch("xy_client.services.auth.login_dialog.ClientAuth")
     def test_selected_account_uses_configured_server(self, auth_class):
         with tempfile.TemporaryDirectory() as directory:
-            cache = CredentialCache(Path(directory) / "credentials.dat")
+            cache = test_cache(Path(directory) / "credentials.dat")
             profile = cache.save(
                 "http://old.example.com",
                 "admin",

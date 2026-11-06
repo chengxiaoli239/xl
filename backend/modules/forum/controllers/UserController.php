@@ -217,13 +217,25 @@ class UserController extends BaseController
      * @param $status
      * @return \yii\web\Response
      */
-    public function actionDownloadClient()
+    public function actionDownloadClient($platform = 'windows')
     {
         if (Yii::$app->user->isGuest) {
             throw new \yii\web\ForbiddenHttpException('请先登录');
         }
 
-        $remoteUrl = trim((string)getenv('LUCKY5_CLIENT_DOWNLOAD_URL'));
+        if ($platform === 'macos') {
+            $remoteUrl = trim((string)getenv('LUCKY5_CLIENT_MAC_ZIP_URL'));
+            if ($remoteUrl === '') {
+                throw new NotFoundHttpException('Lucky5 macOS client is not published');
+            }
+        } elseif ($platform === 'windows') {
+            $remoteUrl = trim((string)getenv('LUCKY5_CLIENT_WINDOWS_ZIP_URL'));
+            if ($remoteUrl === '') {
+                $remoteUrl = trim((string)getenv('LUCKY5_CLIENT_DOWNLOAD_URL'));
+            }
+        } else {
+            throw new NotFoundHttpException('Unsupported client platform');
+        }
         if ($remoteUrl !== '') {
             if (!preg_match('#^https://[^\s]+$#i', $remoteUrl)) {
                 throw new \RuntimeException('Lucky5 client download URL must use HTTPS');

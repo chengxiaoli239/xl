@@ -1,8 +1,10 @@
-# Lucky5 Windows client
+# Lucky5 desktop client
 
 The client authenticates with the same username and password as the backend. The
 password is never written to disk. After a successful login, the selected local
-betting account token is cached with Windows DPAPI under `%LOCALAPPDATA%\Lucky5`.
+betting account token is cached with Windows DPAPI under `%LOCALAPPDATA%\Lucky5`
+or in the macOS Keychain. macOS migrates an older local cache into Keychain on
+first use and removes the old cache file after a successful migration.
 
 ## Runtime modes
 
@@ -52,8 +54,18 @@ executable:
 python .\client\xy_client\build.py --name Lucky5_Debug --console
 ```
 
-Distribute `client/dist/Lucky5.exe`. The customer starts it directly; neither
-Python nor a configuration file is required.
+Distribute `client/dist/Lucky5-Windows.zip`. It contains one `Lucky5/` folder
+with `Lucky5.exe` and its build manifest. The customer extracts the folder and
+starts the EXE; neither Python nor a separate configuration file is required.
+The uncompressed EXE remains available for existing deployments.
+
+On macOS, run the same build command with Python 3.11 on the Mac. It produces
+`client/dist/Lucky5-macOS.zip`, containing `Lucky5/Lucky5.app`. This build is
+for the Mac's architecture; an Apple Silicon build does not run on Intel Macs.
+The app can run locally after extraction. Distribution to other Macs requires
+Apple Developer ID signing and notarization to avoid Gatekeeper blocking the
+downloaded app; a local build without these credentials is not a public Mac
+release.
 
 ## Windows release and S3 publication
 
@@ -86,6 +98,22 @@ bash ./client/publish-built-client.sh /path/to/Lucky5.exe
 
 The default S3 prefix for the macOS publisher is `lottery_xl/windows`. The
 CloudFront origin must be allowed to read that prefix before publishing.
+
+For a verified folder ZIP, publish from the matching source commit:
+
+```bash
+AWS_S3_CLIENT_BUCKET=msll-app-releases-289069331089 \
+AWS_S3_CLIENT_BASE_URL=https://d2syxruhedjsow.cloudfront.net \
+bash ./client/publish-package.sh client/dist/Lucky5-macOS.zip
+```
+
+The package publisher verifies the ZIP's source manifest, S3 metadata and
+CloudFront download bytes. It writes the Mac package under `lottery_xl/macos/`
+and the Windows package under `lottery_xl/windows/`; CloudFront must have read
+permission for the chosen prefix. The backend reads
+`LUCKY5_CLIENT_MAC_ZIP_URL` and `LUCKY5_CLIENT_WINDOWS_ZIP_URL` for platform
+downloads. Until a new package URL is configured, the Windows download uses
+the existing `LUCKY5_CLIENT_DOWNLOAD_URL` EXE and the Mac link stays hidden.
 
 The script checks the PE header, records the source commit, size, and SHA-256,
 uploads both a versioned object and `Lucky5-latest.exe`, and verifies both S3

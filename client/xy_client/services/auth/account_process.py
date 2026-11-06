@@ -3,6 +3,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from xy_client.services.tools.Configs import application_dir
+
 
 ACCOUNT_ENV_KEYS = (
     "LUCKY5_ROBOT_DOMAIN",
@@ -29,7 +31,7 @@ def launch_client_process(account_key=""):
 
     if getattr(sys, "frozen", False):
         command = [sys.executable]
-        working_dir = str(Path(sys.executable).resolve().parent)
+        working_dir = str(application_dir())
     else:
         command = [sys.executable, "-m", "xy_client.launcher"]
         working_dir = str(Path(__file__).resolve().parents[3])

@@ -3,6 +3,7 @@ import ctypes
 import hashlib
 import json
 import os
+import sys
 import threading
 import time
 from ctypes import wintypes
@@ -16,10 +17,20 @@ class _DataBlob(ctypes.Structure):
 class CredentialCache:
     STORE_VERSION = 2
 
-    def __init__(self, path=None):
+    def __init__(self, path=None, keyring_backend=None):
         base_dir = Path(os.environ.get("LOCALAPPDATA", Path.home())) / "Lucky5"
         self.path = Path(path) if path else base_dir / "credentials.dat"
         self._lock = threading.RLock()
+        self._keyring_backend = keyring_backend
+
+    def _keyring(self):
+        if self._keyring_backend is not None:
+            return self._keyring_backend
+        import keyring
+        return keyring
+
+    def _keyring_account(self):
+        return hashlib.sha256(str(self.path.resolve()).encode("utf-8")).hexdigest()
 
     def load(self):
         """Return the active account for compatibility with the old cache API."""
@@ -131,6 +142,11 @@ class CredentialCache:
 
     def clear(self):
         with self._lock:
+            if sys.platform == "darwin":
+                try:
+                    self._keyring().delete_password("Lucky5 credentials", self._keyring_account())
+                except self._keyring().errors.PasswordDeleteError:
+                    pass
             try:
                 self.path.unlink()
             except FileNotFoundError:
@@ -152,13 +168,29 @@ class CredentialCache:
             "active_account": "",
             "accounts": {},
         }
-        if not self.path.exists():
-            return empty
-        try:
-            encrypted = base64.b64decode(self.path.read_bytes())
-            payload = json.loads(self._unprotect(encrypted).decode("utf-8"))
-        except (OSError, ValueError, json.JSONDecodeError):
-            return empty
+        if sys.platform == "darwin":
+            secured = self._keyring().get_password("Lucky5 credentials", self._keyring_account())
+            if secured:
+                try:
+                    payload = json.loads(secured)
+                except (TypeError, ValueError):
+                    return empty
+            elif self.path.exists():
+                try:
+                    payload = json.loads(base64.b64decode(self.path.read_bytes()).decode("utf-8"))
+                except (OSError, ValueError):
+                    return empty
+                self._write_store(payload)
+            else:
+                return empty
+        else:
+            if not self.path.exists():
+                return empty
+            try:
+                encrypted = base64.b64decode(self.path.read_bytes())
+                payload = json.loads(self._unprotect(encrypted).decode("utf-8"))
+            except (OSError, ValueError, json.JSONDecodeError):
+                return empty
 
         if payload.get("version") == self.STORE_VERSION and isinstance(
             payload.get("accounts"), dict
@@ -181,6 +213,10 @@ class CredentialCache:
 
     def _write_store(self, store):
         data = json.dumps(store, ensure_ascii=True).encode("utf-8")
+        if sys.platform == "darwin":
+            self._keyring().set_password("Lucky5 credentials", self._keyring_account(), data.decode("utf-8"))
+            self.path.unlink(missing_ok=True)
+            return
         self.path.parent.mkdir(parents=True, exist_ok=True)
         temporary = self.path.with_name(
             f"{self.path.name}.{os.getpid()}.{threading.get_ident()}.tmp"

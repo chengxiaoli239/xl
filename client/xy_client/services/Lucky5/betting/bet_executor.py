@@ -7,12 +7,14 @@ import time
 import threading
 from typing import Dict, Any, Optional, List
 from urllib import parse
+import requests
 
 from xy_client.services.Lucky5.core import StateManager, BrowserManager, ErrorHandler
 from xy_client.services.Lucky5.Lucky import localBet, getPostRstByRstText
 from xy_client.services.systems_users.SystemsUsers import pushTasksBetRst, pushErrorLog
 from xy_client.services.tools import tools
 from xy_client.services.tools.GlobalSession import GlobalSession
+from xy_client.services.tools.Configs import Configs
 from xy_client.services.Lucky5.utils.log_optimizer import optimized_print
 
 globalSession = GlobalSession().get_session()
@@ -36,6 +38,54 @@ class BetExecutor:
         self.state_manager = state_manager
         self.browser_manager = browser_manager
         self.error_handler = error_handler
+        self._bet_config = Configs()
+
+    def _bet_retry_settings(self):
+        """Read bounded per-client betting retry settings.
+
+        Attempts means total POST requests, not retries after the first POST.
+        """
+        config = getattr(self, '_bet_config', None)
+        try:
+            attempts = int(config.get_config('bet_max_attempts', fallback='2')) if config else 2
+        except (TypeError, ValueError):
+            attempts = 2
+        try:
+            delay = float(config.get_config('bet_retry_delay', fallback='7')) if config else 7.0
+        except (TypeError, ValueError):
+            delay = 7.0
+        return max(1, min(attempts, 5)), max(6.0, min(delay, 8.0))
+
+    @staticmethod
+    def _is_safe_bet_retry_error(error: Exception) -> bool:
+        """Only retry when the connection never reached the betting server."""
+        return isinstance(error, requests.exceptions.ConnectTimeout)
+
+    def _post_bet_with_retry(self, session, url: str, encoded_data: str,
+                             headers: Dict[str, Any]) -> requests.Response:
+        """Retry only connection-establishment timeouts within the configured cap."""
+        max_attempts, retry_delay = self._bet_retry_settings()
+        for attempt in range(max_attempts):
+            try:
+                if hasattr(self.main_window, '_bet_last_heartbeat'):
+                    self.main_window._bet_last_heartbeat = time.time()
+                return session.post(
+                    url,
+                    data=encoded_data,
+                    headers=headers,
+                    verify=False,
+                    timeout=(1, 12),
+                    allow_redirects=False,
+                )
+            except Exception as error:
+                if not self._is_safe_bet_retry_error(error) or attempt >= max_attempts - 1:
+                    raise
+                optimized_print(
+                    f"⚠️ [BetExecutor] 连接建立超时，确认请求未送达；等待{retry_delay:g}秒后再请求 ({attempt + 1}/{max_attempts})",
+                    category='bet_executor', level='WARNING', force=True
+                )
+                time.sleep(retry_delay)
+
     
     def execute_bets(self, plan_data: Dict[str, Any], direct: int = 1, 
                     session=None) -> bool:
@@ -55,7 +105,9 @@ class BetExecutor:
         success_count = 0
         error_count = 0
         
-        current_session = session if session else globalSession
+        # The shared session has urllib3 retries for ordinary APIs. Never use
+        # it for betting POSTs because those retries can duplicate a bet.
+        current_session = GlobalSession.get_bet_session(session or globalSession)
         
         # 关键优化：连接预热机制优化
         # 即使是单个任务，也需要轻量级预热，避免第一次请求慢（建立连接耗时）
@@ -238,122 +290,55 @@ class BetExecutor:
                 optimized_print(f"开始执行第{index+1}个下注任务 [direct={direct}]",
                                category='bet_executor', level='INFO')
             
-            # 自动重试机制：超时后立即重试一次，避免等待定时器重启
-            max_retries = 2  # 最多重试2次（首次+1次重试）
-            last_exception = None
-            
-            for retry_count in range(max_retries):
-                try:
-                    # 在执行网络请求前更新心跳
-                    if hasattr(self.main_window, '_bet_last_heartbeat'):
-                        import time as _time
-                        self.main_window._bet_last_heartbeat = _time.time()
-                    
-                    # 记录请求开始时间
-                    request_start = time.time()
-                    # 优化：平衡速度和稳定性，连接超时1.5秒，读取超时12秒
-                    # 如果盘口卡顿超过12秒，可能是真的卡住，需要重试或跳过
-                    response = session.post(
-                        data['bet_url'],
-                        data=parse.urlencode(data['post_data']),
-                        headers=headers_dict,
-                        verify=False,
-                        timeout=(1, 12)  # 优化：连接超时1.5秒，读取超时12秒（从2秒/15秒缩短，提高速度）
+            try:
+                request_start = time.time()
+                response = self._post_bet_with_retry(
+                    session,
+                    data['bet_url'],
+                    parse.urlencode(data['post_data']),
+                    headers_dict,
+                )
+                request_time = time.time() - request_start
+
+                # 检查HTTP状态码：401/403 通常表示未登录
+                if response.status_code in [401, 403]:
+                    optimized_print(f"⚠️ [BetExecutor] 检测到HTTP登录错误（状态码={response.status_code}），立即停止下注并触发登录",
+                                   category='bet_executor', level='WARNING', force=True)
+                    error_postRst = {
+                        'Status': 0,
+                        'code': 310,
+                        'msg': f'HTTP {response.status_code}: 未登录或登录已过期'
+                    }
+                    self._handle_cookie_invalid(data, error_postRst, start_time, bet_started_at)
+                    return {'success': False, 'cookie_invalid': True}
+
+                if hasattr(self.main_window, '_bet_last_heartbeat'):
+                    self.main_window._bet_last_heartbeat = time.time()
+
+                process_start = time.time()
+                response.encoding = response.apparent_encoding
+                postRst = getPostRstByRstText(response.text)
+                process_time = time.time() - process_start
+
+                total_elapsed = time.time() - start_time
+                if total_elapsed > 5 or index == 0:
+                    optimized_print(f"⏱️ [BetExecutor] 下注任务时间统计: 准备{prepare_time:.2f}s, 请求{request_time:.2f}s, 处理{process_time:.2f}s, 总计{total_elapsed:.2f}s",
+                                   category='bet_executor', level='INFO', force=True)
+            except Exception as error:
+                error_str = str(error).lower()
+                is_ambiguous = (
+                    isinstance(error, requests.exceptions.Timeout)
+                    or 'connection aborted' in error_str
+                    or 'connectionreseterror' in error_str
+                    or '10054' in error_str
+                )
+                if is_ambiguous:
+                    optimized_print(
+                        f"⚠️ [BetExecutor] 第{index+1}个下注请求结果不明，盘口可能已受理；停止重发以避免重复下注",
+                        category='bet_executor', level='WARNING', force=True
                     )
-                    request_time = time.time() - request_start
-                    
-                    # 检查HTTP状态码：401/403 通常表示未登录
-                    if response.status_code in [401, 403]:
-                        optimized_print(f"⚠️ [BetExecutor] 检测到HTTP登录错误（状态码={response.status_code}），立即停止下注并触发登录",
-                                       category='bet_executor', level='WARNING', force=True)
-                        # 构造一个错误响应对象
-                        error_postRst = {
-                            'Status': 0,
-                            'code': 310,
-                            'msg': f'HTTP {response.status_code}: 未登录或登录已过期'
-                        }
-                        self._handle_cookie_invalid(data, error_postRst, start_time, bet_started_at)
-                        return {'success': False, 'cookie_invalid': True}
-                    
-                    # 网络请求完成后立即更新心跳
-                    if hasattr(self.main_window, '_bet_last_heartbeat'):
-                        import time as _time
-                        self.main_window._bet_last_heartbeat = _time.time()
-                    
-                    # 记录处理响应时间
-                    process_start = time.time()
-                    response.encoding = response.apparent_encoding
-                    postRst = getPostRstByRstText(response.text)
-                    process_time = time.time() - process_start
-                    
-                    # 输出详细时间统计（只在首次或总时间超过5秒时输出）
-                    total_elapsed = time.time() - start_time
-                    if total_elapsed > 5 or index == 0:
-                        optimized_print(f"⏱️ [BetExecutor] 下注任务时间统计: 准备{prepare_time:.2f}s, 请求{request_time:.2f}s, 处理{process_time:.2f}s, 总计{total_elapsed:.2f}s",
-                                       category='bet_executor', level='INFO', force=True)
-                    
-                    # 成功则跳出重试循环
-                    break
-                except Exception as e:
-                    last_exception = e
-                    # 检查是否是连接重置错误（ConnectionResetError 10054）
-                    error_str = str(e).lower()
-                    is_connection_reset = (
-                        'connection aborted' in error_str or 
-                        'connectionreseterror' in error_str or 
-                        '10054' in error_str or
-                        '远程主机强迫关闭' in error_str
-                    )
-                    is_timeout = 'timeout' in error_str or 'timed out' in error_str
-                    
-                    # 关键修复：连接重置错误需要快速恢复浏览器连接
-                    if is_connection_reset:
-                        optimized_print(f"⚠️ [BetExecutor] 第{index+1}个下注任务连接重置错误，尝试恢复浏览器连接...",
-                                       category='bet_executor', level='WARNING', force=True)
-                        # 尝试恢复浏览器连接
-                        try:
-                            if hasattr(self.main_window, 'browser_manager'):
-                                self.main_window.browser_manager.check_and_recover_browser_connection(silent=False)
-                        except Exception as recover_error:
-                            optimized_print(f"⚠️ [BetExecutor] 恢复浏览器连接失败: {recover_error}",
-                                           category='bet_executor', level='WARNING', force=True)
-                        
-                        # 连接重置错误可以重试（如果还有重试次数）
-                        if retry_count < max_retries - 1:
-                            optimized_print(f"⚠️ [BetExecutor] 第{index+1}个下注任务连接重置，立即重试 ({retry_count + 1}/{max_retries})",
-                                           category='bet_executor', level='WARNING', force=True)
-                            time.sleep(0.2)  # 等待0.2秒，让连接恢复（优化：从0.5秒缩短到0.2秒）
-                            continue
-                        else:
-                            # 已用完重试次数，抛出异常
-                            self._push_bet_exception_result(data, last_exception, start_time, bet_started_at)
-                            raise
-                    
-                    # 优化：超时处理策略
-                    # 1. 如果超时时间较短（<12秒），可能是网络问题，可以重试
-                    # 2. 如果超时时间较长（>=12秒），可能是盘口卡顿，需要谨慎处理，避免重复下注
-                    elapsed = time.time() - request_start if 'request_start' in locals() else 0
-                    
-                    if retry_count < max_retries - 1 and is_timeout:
-                        # 超时时间较长（>=12秒），可能是盘口卡顿，请求可能已经成功
-                        # 这种情况下不重试，避免重复下注，直接抛出异常让上层处理
-                        if elapsed >= 12:
-                            optimized_print(f"⚠️ [BetExecutor] 第{index+1}个下注任务长时间超时（耗时{elapsed:.2f}s），可能是盘口卡顿，不重试避免重复下注",
-                                           category='bet_executor', level='WARNING', force=True)
-                            # 不重试，直接抛出异常，让上层判断是否已经下注成功
-                            self._push_bet_exception_result(data, last_exception, start_time, bet_started_at)
-                            raise
-                        else:
-                            # 超时时间较短（<12秒），可能是网络问题，可以重试
-                            optimized_print(f"⚠️ [BetExecutor] 第{index+1}个下注任务超时（耗时{elapsed:.2f}s），立即重试 ({retry_count + 1}/{max_retries})",
-                                           category='bet_executor', level='WARNING', force=True)
-                            # 优化：延迟0.2秒，给网络恢复时间（从0.5秒缩短到0.2秒，提高响应速度）
-                            time.sleep(0.2)
-                            continue
-                    else:
-                        # 非超时错误或已用完重试次数，抛出异常
-                        self._push_bet_exception_result(data, last_exception, start_time, bet_started_at)
-                        raise
+                self._push_bet_exception_result(data, error, start_time, bet_started_at)
+                raise
         
         # 处理结果
         result = self._process_bet_result(postRst, data, start_time, direct, bet_started_at)

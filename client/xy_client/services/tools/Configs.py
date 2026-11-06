@@ -22,13 +22,22 @@ DEFAULT_CONFIG = {
         "preferred_browser": "chrome",
         "daily_restart_hour": "7",
         "daily_restart_minute": "45",
+        # 每个盘口下注任务的总请求次数（包含首次请求），避免盘口卡顿时重复下注。
+        "bet_max_attempts": "2",
+        # 确认请求未送达后再次请求前等待秒数。
+        "bet_retry_delay": "7",
     }
 }
 
 
 def application_dir():
     if getattr(sys, "frozen", False):
-        return Path(sys.executable).resolve().parent
+        executable = Path(sys.executable)
+        if sys.platform == "darwin":
+            bundle = next((parent for parent in executable.parents if parent.suffix == ".app"), None)
+            if bundle is not None:
+                return bundle.parent
+        return executable.resolve().parent
     return Path(__file__).resolve().parents[2]
 
 

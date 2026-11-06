@@ -1,4 +1,5 @@
 import requests
+import copy
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 import time
@@ -8,6 +9,7 @@ import threading
 
 class GlobalSession:
     _session = None
+    _bet_session = None
     _last_reset_time = 0
     _consecutive_errors = 0
     _lock = threading.Lock()
@@ -66,6 +68,60 @@ class GlobalSession:
         return cls._session
 
     @classmethod
+    def get_bet_session(cls, base_session=None):
+        """Return a session whose adapters never retry POST requests implicitly.
+
+        Betting retries are controlled by BetExecutor so the configured total
+        request limit remains true even when a platform connection stalls. An
+        explicitly supplied session is cloned so account-specific proxies and
+        cookies remain available without mutating the shared API session.
+        """
+        if base_session is not None:
+            session = requests.Session()
+            session.headers.update(getattr(base_session, 'headers', {}))
+            session.cookies = copy.copy(getattr(base_session, 'cookies', session.cookies))
+            session.proxies.update(getattr(base_session, 'proxies', {}))
+            session.auth = getattr(base_session, 'auth', None)
+            session.verify = getattr(base_session, 'verify', False)
+            session.cert = getattr(base_session, 'cert', None)
+            session.trust_env = getattr(base_session, 'trust_env', True)
+            cls._configure_bet_session(session)
+            return session
+
+        if cls._bet_session is None:
+            with cls._lock:
+                if cls._bet_session is None:
+                    session = requests.Session()
+                    cls._configure_bet_session(session)
+                    cls._bet_session = session
+        return cls._bet_session
+
+    @staticmethod
+    def _configure_bet_session(session):
+        no_retry = Retry(
+            total=0,
+            connect=0,
+            read=0,
+            redirect=0,
+            status=0,
+            other=0,
+            raise_on_status=False,
+        )
+        adapter = HTTPAdapter(
+            pool_connections=20,
+            pool_maxsize=50,
+            max_retries=no_retry,
+            pool_block=False,
+        )
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
+        session.verify = False
+        session.headers.setdefault(
+            'User-Agent',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        )
+
+    @classmethod
     def set_default_timeout(cls, connect_timeout=5, read_timeout=30):
         """设置默认超时时间"""
         session = cls.get_session()
@@ -77,6 +133,7 @@ class GlobalSession:
         """重置session，用于网络问题后的恢复"""
         with cls._lock:
             cls._session = None
+            cls._bet_session = None
             cls._consecutive_errors = 0
             cls._last_reset_time = time.time()
             print("🔄 GlobalSession已重置")

@@ -27,7 +27,7 @@ jobs:
       - name: Test Chrome detection
         env:
           PYTHONPATH: client
-        run: python -m unittest client.tests.test_chrome_path_detector
+        run: python -m unittest client.tests.test_chrome_path_detector client.tests.test_client_auth client.tests.test_bet_execution_timing
       - name: Build Windows executable
         run: python client/xy_client/build.py --clean --name Lucky5
       - name: Verify Windows executable
@@ -46,11 +46,30 @@ jobs:
           }
           Write-Host "Size: $($bytes.Length) bytes"
           Write-Host "SHA-256: $hash"
+      - name: Verify folder package
+        shell: pwsh
+        run: |
+          $manifest = Get-Content 'client/dist/Lucky5-package.json' | ConvertFrom-Json
+          $zip = 'client/dist/Lucky5-Windows.zip'
+          if ($manifest.platform -ne 'windows' -or $manifest.source_commit -ne $env:GITHUB_SHA -or
+              $manifest.size -ne (Get-Item $zip).Length -or
+              $manifest.sha256 -ne (Get-FileHash $zip -Algorithm SHA256).Hash.ToLowerInvariant()) {
+            throw 'Windows ZIP does not match its manifest.'
+          }
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $entries = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path $zip))
+          try {
+            if (-not ($entries.Entries.FullName -contains 'Lucky5/Lucky5.exe')) {
+              throw 'The ZIP must contain Lucky5/Lucky5.exe.'
+            }
+          } finally { $entries.Dispose() }
       - uses: actions/upload-artifact@v4
         with:
           name: Lucky5-Windows-${{ github.sha }}
           path: |
             client/dist/Lucky5.exe
             client/dist/Lucky5-build.json
+            client/dist/Lucky5-Windows.zip
+            client/dist/Lucky5-package.json
           if-no-files-found: error
           retention-days: 7

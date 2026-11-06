@@ -5,3 +5,5 @@ psutil>=5.9,<8
 urllib3>=2.2,<3
 websocket-client>=1.8,<2
 PyInstaller>=6.10,<7
+keyring>=25,<26
+brotli>=1.1,<2

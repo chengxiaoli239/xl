@@ -3,6 +3,7 @@ import os
 from PyQt5 import QtCore, QtWidgets
 
 from xy_client.services.auth import ClientAuth, ClientAuthError, CredentialCache
+from xy_client.services.ui.client_theme import apply_dialog_theme
 
 
 def _auth_data(profile, from_cache=True):
@@ -26,6 +27,7 @@ class LoginDialog(QtWidgets.QDialog):
         self.setWindowTitle("添加 Lucky5 账号")
         self.setMinimumWidth(410)
         self.setWindowFlag(QtCore.Qt.WindowContextHelpButtonHint, False)
+        apply_dialog_theme(self)
 
         layout = QtWidgets.QFormLayout(self)
         layout.setContentsMargins(24, 22, 24, 22)
@@ -128,6 +130,7 @@ class AccountSelectionDialog(QtWidgets.QDialog):
         self.setWindowTitle("选择 Lucky5 账号")
         self.setMinimumSize(560, 340)
         self.setWindowFlag(QtCore.Qt.WindowContextHelpButtonHint, False)
+        apply_dialog_theme(self)
 
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(20, 18, 20, 18)

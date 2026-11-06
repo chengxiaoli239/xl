@@ -17,6 +17,7 @@ from xy_client.services.tools.account_runtime import (
     chrome_launch_arguments,
 )
 from xy_client.services.tools.ChromePathDetector import resolve_chrome_path
+from xy_client.services.ui.client_theme import apply_main_window_theme
 
 # 第三方库导入
 import requests
@@ -497,6 +498,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             
             print("🔄 初始化UI界面...")
             self.setupUi(self)
+            apply_main_window_theme(self)
             print("✅ UI界面初始化完成")
 
             self.is_running = is_running
@@ -3750,9 +3752,58 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         exit_action.triggered.connect(self.close)
         account_menu.addAction(exit_action)
 
+        settings_menu = self.menubar.addMenu('下注设置')
+        retry_settings_action = QtWidgets.QAction('请求次数与等待时间', self)
+        retry_settings_action.triggered.connect(self.editBetRetrySettings)
+        settings_menu.addAction(retry_settings_action)
+
         self.setWindowTitle(f"Lucky5 - {self.account_display_name}")
         self._showAccountStatus()
         return True
+
+    def editBetRetrySettings(self):
+        settings = config
+        if settings is None:
+            try:
+                settings = Configs()
+            except Exception as error:
+                self.statusbar.showMessage(f'下注设置不可用：{error}', 5000)
+                return
+
+        dialog = QtWidgets.QDialog(self)
+        dialog.setWindowTitle('下注请求设置')
+        form = QtWidgets.QFormLayout(dialog)
+
+        attempts = QtWidgets.QSpinBox(dialog)
+        attempts.setRange(1, 5)
+        attempts.setToolTip('总请求数包含第一次请求；单次计划最多5次。')
+        attempts.setValue(int(settings.get_config('bet_max_attempts', fallback='2') or 2))
+
+        delay = QtWidgets.QSpinBox(dialog)
+        delay.setRange(6, 8)
+        delay.setSuffix(' 秒')
+        delay.setToolTip('只在确认请求未送达时等待后再次请求。')
+        delay.setValue(int(float(settings.get_config('bet_retry_delay', fallback='7') or 7)))
+
+        form.addRow('单个计划最多请求', attempts)
+        form.addRow('安全重试前等待', delay)
+        buttons = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Save | QtWidgets.QDialogButtonBox.Cancel,
+            parent=dialog,
+        )
+        buttons.accepted.connect(dialog.accept)
+        buttons.rejected.connect(dialog.reject)
+        form.addRow(buttons)
+
+        if dialog.exec_() != QtWidgets.QDialog.Accepted:
+            return
+
+        settings.set_config('bet_max_attempts', attempts.value())
+        settings.set_config('bet_retry_delay', delay.value())
+        manager = getattr(self, '_bet_manager', None)
+        if manager and hasattr(manager, 'executor'):
+            manager.executor._bet_config = settings
+        self.statusbar.showMessage('下注请求设置已保存', 5000)
 
     def _refreshLocalBettingAction(self):
         if not hasattr(self, 'local_betting_action'):
