@@ -27,7 +27,7 @@ jobs:
       - name: Test Chrome detection
         env:
           PYTHONPATH: client
-        run: python -m unittest client.tests.test_chrome_path_detector client.tests.test_client_auth client.tests.test_bet_execution_timing
+        run: python -m unittest client.tests.test_chrome_path_detector client.tests.test_client_auth client.tests.test_bet_execution_timing client.tests.test_client_theme
       - name: Build Windows executable
         run: python client/xy_client/build.py --clean --name Lucky5
       - name: Verify Windows executable

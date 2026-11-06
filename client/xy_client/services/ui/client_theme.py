@@ -88,6 +88,11 @@ QLabel#workbenchBrand { color: #ffffff; background: #294a79; border-radius: 6px;
 QLabel#workbenchTitle { color: #182433; font-size: 18px; font-weight: 700; }
 QLabel#workbenchSubtitle { color: #6c7c89; font-size: 11px; }
 QLabel#workbenchStatus { color: #147664; background: #e5f3ef; border-radius: 4px; padding: 6px 10px; font-weight: 600; }
+QTabWidget#accountTabs::pane { background: #ffffff; border: 1px solid #d7e0e8; border-radius: 6px; }
+QTabWidget#accountTabs QGroupBox { background: #ffffff; border: 0; margin-top: 0; padding: 6px; }
+QTabBar::tab { background: #e8edf2; color: #56697b; border: 1px solid #d7e0e8; border-bottom: 0; padding: 9px 19px; }
+QTabBar::tab:selected { background: #ffffff; color: #294a79; font-weight: 700; }
+QTabBar::tab:hover { color: #294a79; }
 """
 
 
@@ -142,24 +147,27 @@ def apply_main_window_theme(window):
     window.horizontalLayout_browser.removeWidget(window.open_browser_checkbox)
     browser_row = window.verticalLayout.indexOf(window.horizontalLayout_browser)
     window.verticalLayout.insertWidget(browser_row + 1, window.open_browser_checkbox)
+    window.verticalLayout.addStretch(1)
+    window.verticalLayout_2.addStretch(1)
+    window.category_combo.setMaximumWidth(92)
+    window.queryHLayout.setSpacing(4)
     for group in (window.UserInfo, window.ProxyInfo, window.QueryGroup):
         group.setMinimumWidth(320)
         group.setMaximumWidth(360)
         group.setMinimumHeight(max(group.minimumHeight(), group.sizeHint().height()))
-    left_layout = window.verticalLayout_5
-    window.horizontalLayout_12.removeItem(left_layout)
-    left_content = QtWidgets.QWidget(window.centralwidget)
-    left_content.setLayout(left_layout)
-    left_content.setMinimumHeight(left_content.sizeHint().height())
-    left_scroll = QtWidgets.QScrollArea(window.centralwidget)
-    left_scroll.setObjectName("accountScroll")
-    left_scroll.setWidgetResizable(True)
-    left_scroll.setFrameShape(QtWidgets.QFrame.NoFrame)
-    left_scroll.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-    left_scroll.setMinimumWidth(340)
-    left_scroll.setMaximumWidth(380)
-    left_scroll.setWidget(left_content)
-    window.horizontalLayout_12.insertWidget(0, left_scroll)
+    tabs = QtWidgets.QTabWidget(window.centralwidget)
+    tabs.setObjectName("accountTabs")
+    tabs.setMinimumWidth(350)
+    tabs.setMaximumWidth(380)
+    for label, group in (("用户", window.UserInfo), ("代理", window.ProxyInfo),
+                         ("查询", window.QueryGroup)):
+        window.verticalLayout_5.removeWidget(group)
+        group.setTitle("")
+        group.setStyleSheet("QGroupBox { background: transparent; border: 0; margin: 0; padding: 0; }")
+        tabs.addTab(group, label)
+    window.verticalLayout_5.addWidget(tabs)
+    window.period_val.setMinimumWidth(0)
+    window.period_val.setMaximumWidth(70)
     for field in (window.username_val, window.pwd_val, window.balance,
                   window.token_val, window.expire_val,
                   window.agent_username_val, window.agent_password_val):
