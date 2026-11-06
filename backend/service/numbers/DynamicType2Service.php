@@ -1188,7 +1188,8 @@ class DynamicType2Service extends BaseService {
 
         $params = $dynamic['params'] ?? [];
         $x = preg_replace('/\s+/', '', (string)($params['x'] ?? ''));
-        $y = (int)($params['y'] ?? 0);
+        // 0-9只有十个不同数字，避免误填超大y导致扫描整张开奖表。
+        $y = min(10, (int)($params['y'] ?? 0));
 
         if ($x === '' || $y < 1) {
             Tool_Common::log('/data/'.__FUNCTION__, 'WARNING', '取x位各取最近y个号码复式参数无效', ['plan_id'=>$plan->id, 'params'=>$params]);
@@ -1209,16 +1210,19 @@ class DynamicType2Service extends BaseService {
         }
         $posNameMap = ['1'=>'千', '2'=>'百', '3'=>'十', '4'=>'个'];
 
-        // 二定快选：单个x是号码来源位，不是唯一受限制的投注位。
-        // 两个非X位共用这个号码池；没有明确选中两个X位时保留原有过滤规则。
-        if ((int)$playway === 1 && count($positions) === 1) {
+        // 二、三定有明确的定X位置时，过滤结果也限定在这些位置。
+        if (in_array((int)$playway, [1, 2], true)) {
             $planFilters = Json::decode($plan->hz_Arr, true);
             $fixedPositions = array_values(array_unique(array_filter(
                 array_map('trim', explode(',', (string)($planFilters['fixed_sel_pos'] ?? ''))),
                 static function ($pos): bool { return in_array($pos, ['1', '2', '3', '4'], true); }
             )));
+            if (count($fixedPositions) !== 3 - (int)$playway) {
+                $fixedPositions = [];
+            }
         }
-        if (isset($fixedPositions) && count($fixedPositions) === 2) {
+        // 二定旧配置：单个x作为两个非X投注位共用的号码来源。
+        if ((int)$playway === 1 && count($positions) === 1 && count($fixedPositions) === 2) {
             $pool = NumService::getPosLatelyCode((int)$positions[0], $y, $lottery_type, $currentKjQiHao);
             $where = self::filter44TwoFixedWhere($fixedPositions, $pool);
             $query = (new \yii\db\Query())->select(['code'])->from('lt_num4_type')
@@ -1249,32 +1253,31 @@ class DynamicType2Service extends BaseService {
             ->where(['code_type' => $playway + 1]);
 
         $descParts = [];
+        $positionPools = [];
         foreach ($positions as $pos) {
-            if (!in_array($pos, ['1', '2', '3', '4'])) {
+            if (!empty($fixedPositions) && in_array($pos, $fixedPositions, true)) {
+                $descParts[] = $posNameMap[$pos] . '为定X位';
                 continue;
             }
             $posInt = (int)$pos;
             $posCodes = NumService::getPosLatelyCode($posInt, $y, $lottery_type, $currentKjQiHao);
-            if (!empty($posCodes)) {
-                if ($playway == 3) {
-                    $query->andWhere(['IN', 'code_' . $posInt, $posCodes]);
-                } else {
-                    $query->andWhere([
-                        'OR',
-                        ['=', 'code_' . $posInt, 'X'],
-                        ['IN', 'code_' . $posInt, $posCodes],
-                    ]);
-                }
-            }
+            $positionPools[$pos] = $posCodes;
             $posName = $posNameMap[$pos] ?? $pos . '位';
             $descParts[] = $posName . '近' . $y . '个码:' . implode('', $posCodes);
+        }
+        foreach (self::filter44PositionWhere((int)$playway, $positionPools, $fixedPositions ?? []) as $condition) {
+            $query->andWhere($condition);
         }
 
         $sql = $query->createCommand()->getRawSql();
         $results = $query->all();
         $codes = ArrayHelper::getColumn($results, 'code');
+        if (!$codes) {
+            throw new \RuntimeException('取x位各取最近y个号码复式没有匹配号码，已停止本次过滤');
+        }
 
-        $betDesc = $filterDesc['desc'] . '：保留' . implode('、', $descParts) . '，最终组数：' . count($codes);
+        $betDesc = ($filterDesc['label'] ?? '取x位各取最近y个号码复式')
+            . '：保留' . implode('、', $descParts) . '，最终组数：' . count($codes);
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
 
         Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '取x位各取最近y个号码复式', [
@@ -1288,6 +1291,25 @@ class DynamicType2Service extends BaseService {
         ]);
 
         return $codes;
+    }
+
+    /** 每个指定的投注位使用该位自己的近期号码池；已定X位置不参与投注。 */
+    public static function filter44PositionWhere(int $playway, array $positionPools, array $fixedPositions = []): array
+    {
+        $where = [];
+        foreach ($fixedPositions as $position) {
+            $where[] = ['=', 'code_'.$position, 'X'];
+        }
+        foreach ($positionPools as $position => $pool) {
+            if (!in_array((string)$position, ['1', '2', '3', '4'], true) || !$pool) {
+                throw new \InvalidArgumentException('指定位置没有可用的近期号码');
+            }
+            $condition = ['IN', 'code_'.$position, $pool];
+            $where[] = $playway === 3 || $fixedPositions
+                ? $condition
+                : ['OR', ['=', 'code_'.$position, 'X'], $condition];
+        }
+        return $where;
     }
 
     /** @return array<int, array<int, mixed>> */
