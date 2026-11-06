@@ -63,6 +63,29 @@ jobs:
               throw 'The ZIP must contain Lucky5/Lucky5.exe.'
             }
           } finally { $entries.Dispose() }
+      - name: Smoke test extracted client
+        shell: pwsh
+        run: |
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $folder = Join-Path $env:RUNNER_TEMP 'lucky5-package-smoke'
+          [System.IO.Compression.ZipFile]::ExtractToDirectory(
+            (Resolve-Path 'client/dist/Lucky5-Windows.zip'), $folder)
+          $exe = Join-Path $folder 'Lucky5/Lucky5.exe'
+          $startInfo = [System.Diagnostics.ProcessStartInfo]::new($exe)
+          $startInfo.UseShellExecute = $false
+          $startInfo.Environment['QT_QPA_PLATFORM'] = 'offscreen'
+          $startInfo.Environment['LOCALAPPDATA'] = Join-Path $env:RUNNER_TEMP 'lucky5-empty-profile'
+          $process = [System.Diagnostics.Process]::Start($startInfo)
+          try {
+            Start-Sleep -Seconds 15
+            $process.Refresh()
+            if ($process.HasExited) {
+              throw "Lucky5 exited during startup with code $($process.ExitCode)."
+            }
+          } finally {
+            if (-not $process.HasExited) { $process.Kill($true) }
+            $process.Dispose()
+          }
       - uses: actions/upload-artifact@v4
         with:
           name: Lucky5-Windows-${{ github.sha }}
