@@ -2595,6 +2595,24 @@ class Lucky5Service { # 重庆7时彩登陆体系
         return $codesArr;
     }
 
+    /** Normalize stored four-digit import codes for the platform TXT protocol. */
+    public static function normalizePlatformTxtCodes(array $codes): array
+    {
+        $normalized = [];
+        foreach($codes as $code){
+            $code = (string)$code;
+            if(preg_match('/^[0-9](?:,[0-9]){3}$/D', $code)){
+                $code = str_replace(',', '', $code);
+            }
+            if(!preg_match('/^[0-9]{4}$/D', $code)){
+                return [];
+            }
+            $normalized[] = $code;
+        }
+
+        return $normalized;
+    }
+
     /**
      * @desc 获取每次下注号码量
      * @return int|string
@@ -2726,15 +2744,16 @@ class Lucky5Service { # 重庆7时彩登陆体系
         foreach ($codesArrs as $key=>$tmpcodesArr){
             $bet_log = self::getBetLogForPlan($tz_type, $playway, $plan_id);
             if($usePlatformTxt){
-                foreach($tmpcodesArr as $txtCode){
-                    if(!preg_match('/^[0-9]{4}$/D', (string)$txtCode)){
-                        return ['status'=>300, 'msg'=>'盘口 TXT 导入号码必须是四位数字'];
-                    }
+                // ImportPlanCodes stores each digit comma-separated (for example 1,2,3,4).
+                // The platform TXT upload expects one four-digit token per bet.
+                $txtCodes = self::normalizePlatformTxtCodes($tmpcodesArr);
+                if(count($txtCodes) !== count($tmpcodesArr)){
+                    return ['status'=>300, 'msg'=>'盘口 TXT 导入号码必须是四位数字'];
                 }
                 $url = self::PLATFORM_TXT_IMPORT_URL;
                 $post_data = [
                     'txt_import_v1'=>1,
-                    'txt_codes'=>implode(',', $tmpcodesArr),
+                    'txt_codes'=>implode(',', $txtCodes),
                     'txt_money'=>$single,
                     'period_no'=>$qihao,
                 ];
