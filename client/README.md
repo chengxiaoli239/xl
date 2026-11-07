@@ -72,7 +72,8 @@ python client/xy_client/build.py --clean --name Lucky5 --architecture x86_64
 
 `--architecture auto` (the default) uses the current Python/runner
 architecture. The script rejects a mismatched request, so an Intel package must
-be built on an Intel macOS runner (or an Intel Python under Rosetta). Each ZIP
+be built on an Intel macOS runner (or an Intel Python under Rosetta). CI uses
+the `macos-15-intel` runner for that package. Each ZIP
 contains `Lucky5/Lucky5.app`; choose the Apple Silicon package for M-series Macs
 and the Intel package for Intel Macs. Distribution to other Macs requires Apple
 Developer ID signing and notarization to avoid Gatekeeper blocking the downloaded

@@ -28,7 +28,7 @@ if [[ ! "$bucket" =~ ^[A-Za-z0-9.-]+$ || ! "$region" =~ ^[a-z0-9-]+$ ||
 fi
 
 read -r platform architecture built_commit built_file built_size built_sha < <(
-  jq -r '[.platform, (.architecture // ""), .source_commit, .file, (.size | tostring), .sha256] | @tsv' "$manifest"
+  jq -r '[.platform, (.architecture // "none"), .source_commit, .file, (.size | tostring), .sha256] | @tsv' "$manifest"
 )
 size="$(wc -c < "$package" | tr -d ' ')"
 checksum="$(shasum -a 256 "$package" | awk '{print $1}')"
@@ -40,6 +40,10 @@ fi
 
 case "$platform" in
   windows)
+    if [[ "$architecture" != 'none' ]]; then
+      printf 'Windows package must not declare a macOS architecture.\n' >&2
+      exit 1
+    fi
     payload='Lucky5/Lucky5.exe'
     prefix='lottery_xl/windows'
     release_suffix=''
@@ -49,7 +53,7 @@ case "$platform" in
     prefix='lottery_xl/macos'
     case "$architecture" in
       arm64|x86_64) release_suffix="-${architecture}" ;;
-      '') release_suffix='' ;;
+      none) release_suffix='' ;;
       *) printf 'Unsupported macOS architecture.\n' >&2; exit 1 ;;
     esac
     ;;
