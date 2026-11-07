@@ -17,16 +17,7 @@ $balance = \backend\models\TzSystemsUsers::findOne(['uid'=>1, 'tz_system_id'=>2]
 <section class="user-view wrapper site-min-height">
     <?= Alert::widget() ?>
     <div class="text-right" style="margin-bottom: 12px">
-        <?= Html::a(getenv('LUCKY5_CLIENT_WINDOWS_ZIP_URL') ? '下载 Windows 客户端 (ZIP)' : '下载 Windows 客户端 (EXE)', ['/forum/user/download-client', 'platform' => 'windows'], [
-            'class' => 'btn btn-primary',
-            'title' => '下载 Windows 客户端',
-        ]) ?>
-        <?php if (getenv('LUCKY5_CLIENT_MAC_ZIP_URL')): ?>
-            <?= Html::a('下载 Mac 客户端 (ZIP)', ['/forum/user/download-client', 'platform' => 'macos'], [
-                'class' => 'btn btn-default',
-                'title' => '下载 macOS 客户端',
-            ]) ?>
-        <?php endif; ?>
+        <?php $clientDownloadCompact = false; include dirname(__FILE__) . '/_client_download_links.php'; ?>
     </div>
     <div class="row">
         <div class="col-lg-12">

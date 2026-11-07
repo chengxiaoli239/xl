@@ -36,16 +36,7 @@ $summary = static function (array $rows) {
         <header class="panel-heading">
             <?= Html::encode($this->title) ?>
             <span class="pull-right">
-                <?= Html::a(getenv('LUCKY5_CLIENT_WINDOWS_ZIP_URL') ? '下载 Windows 客户端 (ZIP)' : '下载 Windows 客户端 (EXE)', ['/forum/user/download-client', 'platform' => 'windows'], [
-                    'class' => 'btn btn-primary btn-xs',
-                    'title' => '下载 Windows 客户端',
-                ]) ?>
-                <?php if (getenv('LUCKY5_CLIENT_MAC_ZIP_URL')): ?>
-                    <?= Html::a('下载 Mac 客户端 (ZIP)', ['/forum/user/download-client', 'platform' => 'macos'], [
-                        'class' => 'btn btn-default btn-xs',
-                        'title' => '下载 macOS 客户端',
-                    ]) ?>
-                <?php endif; ?>
+                <?php $clientDownloadCompact = true; include dirname(__FILE__) . '/_client_download_links.php'; ?>
             </span>
         </header>
         <div class="panel-body">
