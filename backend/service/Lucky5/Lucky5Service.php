@@ -36,6 +36,7 @@ use  yii;
 use yii\helpers\Json;
 
 class Lucky5Service { # 重庆7时彩登陆体系
+    const PLATFORM_TXT_IMPORT_URL = 'lucky5-txt-import://v1';
     public static $baseUrl =  '';
     public static $domain =  '';
     public static $cookie = '';
@@ -2639,6 +2640,10 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $count = count($codesArr);
         //p(['codesArr'=>$codesArr,'count'=>$count, 'codeHz'=>Json::decode($plan->hz_Arr)], 0);
         $hzArr = Json::decode($plan->hz_Arr);
+        $usePlatformTxt = (int)$plan->tz_type === 34 && !empty($hzArr['use_platform_txt_import']);
+        if($usePlatformTxt && !$is_task){
+            return ['status'=>300, 'msg'=>'盘口 TXT 导入仅支持本地客户端下注'];
+        }
 
         # 获取倍数倍数（bet_op_to_wp_singles）
         $opWpSingles = isset($hzArr['bet_op_to_wp_singles']) ? explode('-', $hzArr['bet_op_to_wp_singles']) : [];
@@ -2697,7 +2702,7 @@ class Lucky5Service { # 重庆7时彩登陆体系
             return is_scalar($code) ? (string)$code : json_encode($code, 320);
         }, $codesArr);
         $hasRepeatCodes = count($codeSignatures) > count(array_unique($codeSignatures));
-        $codesArrs = self::splitCodes($codesArr,  $betNums); # 2500一次
+        $codesArrs = self::splitCodes($codesArr, $usePlatformTxt ? min((int)$betNums, 500) : $betNums); # TXT 预览按较小批次校验
 
         $single = floatval($single);
         $tz_type = $plan->tz_type ? $plan->tz_type : 0;
@@ -2720,7 +2725,20 @@ class Lucky5Service { # 重庆7时彩登陆体系
         }
         foreach ($codesArrs as $key=>$tmpcodesArr){
             $bet_log = self::getBetLogForPlan($tz_type, $playway, $plan_id);
-            if($playway == 4){ # 一字定
+            if($usePlatformTxt){
+                foreach($tmpcodesArr as $txtCode){
+                    if(!preg_match('/^[0-9]{4}$/D', (string)$txtCode)){
+                        return ['status'=>300, 'msg'=>'盘口 TXT 导入号码必须是四位数字'];
+                    }
+                }
+                $url = self::PLATFORM_TXT_IMPORT_URL;
+                $post_data = [
+                    'txt_import_v1'=>1,
+                    'txt_codes'=>implode(',', $tmpcodesArr),
+                    'txt_money'=>$single,
+                    'period_no'=>$qihao,
+                ];
+            }elseif($playway == 4){ # 一字定
                 $url = self::getTzSiteInfo(self::$tz_system_id, 'ORDER_TZ');//.'?'.http_build_query($post_data);
                 $post_data = [
                     'bets' => json_encode($tmpcodesArr),
@@ -2768,6 +2786,9 @@ class Lucky5Service { # 重庆7时彩登陆体系
             $TzSystemsUsers = TzSystemsUsers::findOne(['uid'=>$plan->uid, 'tz_system_id'=>self::$tz_system_id]);
             if(!$TzSystemsUsers){
                 return ['status'=>300, 'msg'=>'找不到盘口账号配置:uid='.$plan->uid.',tz_system_id='.self::$tz_system_id];
+            }
+            if($usePlatformTxt && (int)$TzSystemsUsers->is_local_bet !== TzSystemsUsers::BET_TYPE_LOCAL_API){
+                return ['status'=>300, 'msg'=>'盘口 TXT 导入仅支持本地客户端下注'];
             }
             $need_money = count($tmpcodesArr) * $single;
             $left_money = $TzSystemsUsers->balance;

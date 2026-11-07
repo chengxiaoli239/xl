@@ -83,6 +83,7 @@ class UserSysPlans extends \common\models\base\BaseModel
     public $type_2log; # 双对数
     public $turn_key; # 轮换号码组的key
     public $import_codes_txts; # 导入号码
+    public $use_platform_txt_import; # 四定导入时使用盘口 TXT 接口
     public $type_4ds; # 号码类型、四定单双:0保留1四单2四双3两单两双4一单三双5一双三单
     public $get_types; #  取类型
     public $remove_types; #  排除类型

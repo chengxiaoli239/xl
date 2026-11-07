@@ -11,6 +11,7 @@ import requests
 
 from xy_client.services.Lucky5.core import StateManager, BrowserManager, ErrorHandler
 from xy_client.services.Lucky5.Lucky import localBet, getPostRstByRstText
+from xy_client.services.Lucky5.betting.txt_import import TASK_URL, execute_txt_import
 from xy_client.services.systems_users.SystemsUsers import pushTasksBetRst, pushErrorLog
 from xy_client.services.tools import tools
 from xy_client.services.tools.GlobalSession import GlobalSession
@@ -115,7 +116,7 @@ class BetExecutor:
         total_count = len(sorted_data)
         if sorted_data and len(sorted_data) > 0:
             first_bet = sorted_data[0]
-            if first_bet.get('plan_type') != 'local' and first_bet.get('bet_url'):
+            if first_bet.get('plan_type') != 'local' and first_bet.get('bet_url') and first_bet.get('bet_url') != TASK_URL:
                 try:
                     from urllib.parse import urlparse
                     bet_url = first_bet['bet_url']
@@ -292,6 +293,11 @@ class BetExecutor:
             
             try:
                 request_start = time.time()
+                if data['bet_url'] == TASK_URL:
+                    postRst = execute_txt_import(session, data, headers_dict)
+                    result = self._process_bet_result(postRst, data, start_time, direct, bet_started_at)
+                    self._wait_bet_interval(data)
+                    return result
                 response = self._post_bet_with_retry(
                     session,
                     data['bet_url'],

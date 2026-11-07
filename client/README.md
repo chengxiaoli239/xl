@@ -21,6 +21,14 @@ If the background session expires, select `打开浏览器登录` in the client 
 the member login button. A successful browser login uploads the refreshed cookie,
 after which the client can return to background mode.
 
+For a four-fixed import plan, the backend can explicitly select `盘口 TXT 导入`.
+The plan's TXT file is read in the browser and its four-digit numbers are saved
+with the plan; the plan's single-bet amount applies to every number. Only local
+client accounts can enable this mode. The client uploads a generated TXT to the
+platform for preview, checks every number and amount, then submits one
+`BatchBet` request. An unknown confirmation result is never retried automatically.
+Existing import plans keep their original request path.
+
 ## Configuration
 
 The executable includes the current backend address and defaults to background

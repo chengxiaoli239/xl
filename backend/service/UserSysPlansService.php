@@ -57,6 +57,16 @@ class UserSysPlansService extends BaseService {
         $configuredSiteIds = array_map('intval', $configuredSiteIds);
         $missingSiteIds = array_values(array_diff($siteIds, $configuredSiteIds));
         if(empty($missingSiteIds)){
+            $planSettings = json_decode((string)$plan->hz_Arr, true);
+            if((int)$plan->tz_type === 34 && !empty($planSettings['use_platform_txt_import'])){
+                $cloudAccounts = TzSystemsUsers::find()
+                    ->where(['uid'=>(int)$plan->uid, 'status'=>1, 'tz_system_id'=>$siteIds])
+                    ->andWhere(['<>', 'is_local_bet', TzSystemsUsers::BET_TYPE_LOCAL_API])
+                    ->exists();
+                if($cloudAccounts){
+                    return ['status'=>300, 'msg'=>'盘口 TXT 导入仅支持本地客户端下注，请先将所选盘口账号切换为本地下注'];
+                }
+            }
             return ['status'=>200, 'msg'=>'校验通过'];
         }
 
@@ -169,6 +179,23 @@ class UserSysPlansService extends BaseService {
         # 一、位置
         # 10、第1位
         $UserSysPlans = $post['UserSysPlans'];
+        if((int)$tz_type === 34){
+            $usePlatformTxt = (int)($UserSysPlans['use_platform_txt_import'] ?? 0) === 1;
+            $tmpFilter['use_platform_txt_import'] = $usePlatformTxt ? 1 : 0;
+            if($usePlatformTxt){
+                $rawCodes = trim((string)($UserSysPlans['import_codes_txts'][0] ?? ''));
+                $codes = preg_split('/[\s,\x{FF0C}]+/u', $rawCodes, -1, PREG_SPLIT_NO_EMPTY);
+                if(!$codes || count($codes) > 2500){
+                    throw_info('盘口 TXT 导入须填写 1 至 2500 个四位号码');
+                }
+                foreach($codes as $code){
+                    if(!preg_match('/^[0-9]{4}$/D', $code)){
+                        throw_info('盘口 TXT 导入仅支持四位数字，金额统一使用计划的单注金额');
+                    }
+                }
+            }
+        }
+        unset($post['UserSysPlans']['use_platform_txt_import']);
         if((int)$plan_type === 13){
             $importCodes = $UserSysPlans['import_codes_txts'] ?? [];
             if(trim((string)($importCodes['arise_A_codes'] ?? '')) === ''){
