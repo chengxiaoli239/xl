@@ -59,13 +59,24 @@ with `Lucky5.exe` and its build manifest. The customer extracts the folder and
 starts the EXE; neither Python nor a separate configuration file is required.
 The uncompressed EXE remains available for existing deployments.
 
-On macOS, run the same build command with Python 3.11 on the Mac. It produces
-`client/dist/Lucky5-macOS.zip`, containing `Lucky5/Lucky5.app`. This build is
-for the Mac's architecture; an Apple Silicon build does not run on Intel Macs.
-The app can run locally after extraction. Distribution to other Macs requires
-Apple Developer ID signing and notarization to avoid Gatekeeper blocking the
-downloaded app; a local build without these credentials is not a public Mac
-release.
+On macOS, run the build with Python 3.11 on a Mac matching the target CPU. The
+script records the architecture and produces one of these packages:
+
+```bash
+python client/xy_client/build.py --clean --name Lucky5 --architecture arm64
+# client/dist/Lucky5-arm64-macOS.zip
+
+python client/xy_client/build.py --clean --name Lucky5 --architecture x86_64
+# client/dist/Lucky5-x86_64-macOS.zip
+```
+
+`--architecture auto` (the default) uses the current Python/runner
+architecture. The script rejects a mismatched request, so an Intel package must
+be built on an Intel macOS runner (or an Intel Python under Rosetta). Each ZIP
+contains `Lucky5/Lucky5.app`; choose the Apple Silicon package for M-series Macs
+and the Intel package for Intel Macs. Distribution to other Macs requires Apple
+Developer ID signing and notarization to avoid Gatekeeper blocking the downloaded
+app; a local ad-hoc build is for testing only.
 
 ## Windows release and S3 publication
 
@@ -96,24 +107,30 @@ AWS_S3_CLIENT_BASE_URL=https://d2syxruhedjsow.cloudfront.net \
 bash ./client/publish-built-client.sh /path/to/Lucky5.exe
 ```
 
-The default S3 prefix for the macOS publisher is `lottery_xl/windows`. The
-CloudFront origin must be allowed to read that prefix before publishing.
+The Windows publisher uses `lottery_xl/windows`; the package publisher uses
+`lottery_xl/macos` for macOS and `lottery_xl/windows` for Windows. The
+CloudFront origin must be allowed to read the chosen prefix before publishing.
 
-For a verified folder ZIP, publish from the matching source commit:
+For a verified folder ZIP, publish from the matching source commit. Run the
+command once for each architecture:
 
 ```bash
 AWS_S3_CLIENT_BUCKET=msll-app-releases-289069331089 \
 AWS_S3_CLIENT_BASE_URL=https://d2syxruhedjsow.cloudfront.net \
-bash ./client/publish-package.sh client/dist/Lucky5-macOS.zip
+bash ./client/publish-package.sh client/dist/Lucky5-arm64-macOS.zip
+# or: bash ./client/publish-package.sh client/dist/Lucky5-x86_64-macOS.zip
 ```
 
 The package publisher verifies the ZIP's source manifest, S3 metadata and
 CloudFront download bytes. It writes the Mac package under `lottery_xl/macos/`
 and the Windows package under `lottery_xl/windows/`; CloudFront must have read
 permission for the chosen prefix. The backend reads
-`LUCKY5_CLIENT_MAC_ZIP_URL` and `LUCKY5_CLIENT_WINDOWS_ZIP_URL` for platform
-downloads. Until a new package URL is configured, the Windows download uses
-the existing `LUCKY5_CLIENT_DOWNLOAD_URL` EXE and the Mac link stays hidden.
+`LUCKY5_CLIENT_MAC_ARM64_ZIP_URL`, `LUCKY5_CLIENT_MAC_X86_64_ZIP_URL`, and
+`LUCKY5_CLIENT_WINDOWS_ZIP_URL` for platform downloads. The personal
+information page shows separate Apple Silicon and Intel links when those URLs
+are configured. The legacy `LUCKY5_CLIENT_MAC_ZIP_URL` remains supported for a
+single existing Mac package. Until a Mac URL is configured, the Mac links stay
+hidden.
 
 The script checks the PE header, records the source commit, size, and SHA-256,
 uploads both a versioned object and `Lucky5-latest.exe`, and verifies both S3

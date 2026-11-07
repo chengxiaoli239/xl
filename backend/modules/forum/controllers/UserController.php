@@ -223,8 +223,12 @@ class UserController extends BaseController
             throw new \yii\web\ForbiddenHttpException('请先登录');
         }
 
-        if ($platform === 'macos') {
-            $remoteUrl = trim((string)getenv('LUCKY5_CLIENT_MAC_ZIP_URL'));
+        if ($platform === 'macos' || $platform === 'macos-arm64' || $platform === 'macos-x86_64') {
+            $macEnvironmentKey = [
+                'macos-arm64' => 'LUCKY5_CLIENT_MAC_ARM64_ZIP_URL',
+                'macos-x86_64' => 'LUCKY5_CLIENT_MAC_X86_64_ZIP_URL',
+            ][$platform] ?? 'LUCKY5_CLIENT_MAC_ZIP_URL';
+            $remoteUrl = trim((string)getenv($macEnvironmentKey));
             if ($remoteUrl === '') {
                 throw new NotFoundHttpException('Lucky5 macOS client is not published');
             }

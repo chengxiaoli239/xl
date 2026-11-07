@@ -1,0 +1,84 @@
+name: Build Lucky5 for macOS
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/lucky5-macos.yml'
+      - 'client/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - architecture: arm64
+            runner: macos-14
+          - architecture: x86_64
+            runner: macos-13
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: client/requirements.txt
+      - name: Install dependencies
+        run: python -m pip install -r client/requirements.txt
+      - name: Test client
+        env:
+          PYTHONPATH: client
+        run: python -m unittest discover -s client/tests -p 'test_*.py'
+      - name: Build macOS package
+        run: python client/xy_client/build.py --clean --name Lucky5 --architecture ${{ matrix.architecture }}
+      - name: Verify architecture and package
+        env:
+          EXPECTED_ARCH: ${{ matrix.architecture }}
+        run: |
+          set -euo pipefail
+          file client/dist/Lucky5.app/Contents/MacOS/Lucky5
+          lipo -info client/dist/Lucky5.app/Contents/MacOS/Lucky5 | grep -E "${EXPECTED_ARCH}"
+          package="client/dist/Lucky5-${EXPECTED_ARCH}-macOS.zip"
+          manifest="client/dist/Lucky5-${EXPECTED_ARCH}-macOS-package.json"
+          test -f "$package"
+          test -f "$manifest"
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          package = Path("client/dist/Lucky5-{}-macOS.zip".format(os.environ["EXPECTED_ARCH"]))
+          manifest = json.loads(Path("client/dist/Lucky5-{}-macOS-package.json".format(os.environ["EXPECTED_ARCH"])).read_text())
+          assert manifest["source_commit"] == os.environ["GITHUB_SHA"]
+          assert manifest["architecture"] == os.environ["EXPECTED_ARCH"]
+          assert manifest["file"] == package.name
+          assert manifest["size"] == package.stat().st_size
+          assert manifest["sha256"] == hashlib.sha256(package.read_bytes()).hexdigest()
+          PY
+          unzip -Z1 "$package" | grep -Fx 'Lucky5/Lucky5.app/Contents/Info.plist'
+      - name: Smoke test app
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          set -euo pipefail
+          client/dist/Lucky5.app/Contents/MacOS/Lucky5 >/tmp/lucky5-smoke.log 2>&1 &
+          pid=$!
+          trap 'kill "$pid" 2>/dev/null || true' EXIT
+          sleep 15
+          kill -0 "$pid"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Lucky5-macOS-${{ matrix.architecture }}-${{ github.sha }}
+          path: |
+            client/dist/Lucky5-${{ matrix.architecture }}-macOS.zip
+            client/dist/Lucky5-${{ matrix.architecture }}-macOS-package.json
+          if-no-files-found: error
+          retention-days: 7

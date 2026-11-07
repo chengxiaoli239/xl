@@ -12,7 +12,10 @@ done
 
 repo_root="$(cd "$(dirname "$0")/.." && pwd)"
 package="$1"
-manifest="$(dirname "$package")/Lucky5-package.json"
+manifest="${package%.zip}-package.json"
+if [[ ! -f "$manifest" ]]; then
+  manifest="$(dirname "$package")/Lucky5-package.json"
+fi
 bucket="${AWS_S3_CLIENT_BUCKET:-}"
 region="${AWS_S3_CLIENT_REGION:-ap-east-1}"
 base_url="${AWS_S3_CLIENT_BASE_URL:-}"
@@ -24,8 +27,8 @@ if [[ ! "$bucket" =~ ^[A-Za-z0-9.-]+$ || ! "$region" =~ ^[a-z0-9-]+$ ||
   exit 2
 fi
 
-read -r platform built_commit built_file built_size built_sha < <(
-  jq -r '[.platform, .source_commit, .file, (.size | tostring), .sha256] | @tsv' "$manifest"
+read -r platform architecture built_commit built_file built_size built_sha < <(
+  jq -r '[.platform, (.architecture // ""), .source_commit, .file, (.size | tostring), .sha256] | @tsv' "$manifest"
 )
 size="$(wc -c < "$package" | tr -d ' ')"
 checksum="$(shasum -a 256 "$package" | awk '{print $1}')"
@@ -36,8 +39,20 @@ if [[ "$built_commit" != "$source_commit" || "$built_file" != "$(basename "$pack
 fi
 
 case "$platform" in
-  windows) payload='Lucky5/Lucky5.exe'; prefix='lottery_xl/windows' ;;
-  macos) payload='Lucky5/Lucky5.app/Contents/Info.plist'; prefix='lottery_xl/macos' ;;
+  windows)
+    payload='Lucky5/Lucky5.exe'
+    prefix='lottery_xl/windows'
+    release_suffix=''
+    ;;
+  macos)
+    payload='Lucky5/Lucky5.app/Contents/Info.plist'
+    prefix='lottery_xl/macos'
+    case "$architecture" in
+      arm64|x86_64) release_suffix="-${architecture}" ;;
+      '') release_suffix='' ;;
+      *) printf 'Unsupported macOS architecture.\n' >&2; exit 1 ;;
+    esac
+    ;;
   *) printf 'Unsupported package platform.\n' >&2; exit 1 ;;
 esac
 if ! unzip -Z1 "$package" | grep -Fx "$payload" >/dev/null; then
@@ -46,8 +61,8 @@ if ! unzip -Z1 "$package" | grep -Fx "$payload" >/dev/null; then
 fi
 
 version="$(date -u '+%Y%m%d-%H%M%S')-${source_commit:0:12}"
-release_key="${prefix}/releases/Lucky5-${version}.zip"
-latest_key="${prefix}/Lucky5-latest.zip"
+release_key="${prefix}/releases/Lucky5${release_suffix}-${version}.zip"
+latest_key="${prefix}/Lucky5${release_suffix}-latest.zip"
 metadata="sha256=${checksum},source-commit=${source_commit},version=${version}"
 aws sts get-caller-identity --region "$region" --query Account --output text
 

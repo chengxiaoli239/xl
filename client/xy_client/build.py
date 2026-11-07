@@ -3,6 +3,7 @@ import datetime
 import hashlib
 import json
 import os
+import platform as platform_module
 import shutil
 import subprocess
 import sys
@@ -26,15 +27,48 @@ def ensure_build_environment():
         ) from exc
 
 
+def normalize_macos_architecture(value):
+    aliases = {
+        "arm64": "arm64",
+        "aarch64": "arm64",
+        "x86_64": "x86_64",
+        "amd64": "x86_64",
+    }
+    try:
+        return aliases[value.lower()]
+    except (AttributeError, KeyError) as exc:
+        raise SystemExit(f"Unsupported macOS architecture: {value}") from exc
+
+
 def main():
     ensure_build_environment()
     parser = argparse.ArgumentParser(description="Build Lucky5 for the current platform")
     parser.add_argument("--name", default=None, help="Application name")
     parser.add_argument("--clean", action="store_true", help="Remove previous build output")
     parser.add_argument("--console", action="store_true", help="Show a console for startup diagnostics")
+    parser.add_argument(
+        "--architecture",
+        choices=("auto", "arm64", "x86_64"),
+        default="auto",
+        help="macOS architecture; must match the Python/runner architecture",
+    )
     args = parser.parse_args()
     if args.console and sys.platform == "darwin":
         parser.error("--console is only supported for Windows builds")
+    if sys.platform != "darwin" and args.architecture != "auto":
+        parser.error("--architecture is only supported for macOS builds")
+
+    architecture = None
+    if sys.platform == "darwin":
+        actual_architecture = normalize_macos_architecture(platform_module.machine())
+        architecture = (
+            actual_architecture if args.architecture == "auto" else args.architecture
+        )
+        if architecture != actual_architecture:
+            raise SystemExit(
+                f"Requested macOS architecture {architecture}, but this build host is {actual_architecture}. "
+                "Build each architecture on a matching macOS runner."
+            )
 
     client_dir = Path(__file__).resolve().parent
     project_dir = client_dir.parent
@@ -113,7 +147,12 @@ def main():
             "sha256": digest.hexdigest(),
         }, indent=2) + "\n", encoding="utf-8")
 
-    package_name = output_name + ("-Windows.zip" if sys.platform == "win32" else "-macOS.zip")
+    if sys.platform == "win32":
+        package_name = output_name + "-Windows.zip"
+        package_manifest = dist_dir / (output_name + "-package.json")
+    else:
+        package_name = f"{output_name}-{architecture}-macOS.zip"
+        package_manifest = dist_dir / f"{output_name}-{architecture}-macOS-package.json"
     package = dist_dir / package_name
     with tempfile.TemporaryDirectory(prefix="lucky5-package-") as staging:
         folder = Path(staging) / output_name
@@ -129,15 +168,17 @@ def main():
 
     with package.open("rb") as built_package:
         package_digest = hashlib.file_digest(built_package, "sha256").hexdigest()
-    package_manifest = dist_dir / (output_name + "-package.json")
-    package_manifest.write_text(json.dumps({
+    package_metadata = {
         "product": "Lucky5",
         "platform": "windows" if sys.platform == "win32" else "macos",
         "source_commit": commit,
         "file": package.name,
         "size": package.stat().st_size,
         "sha256": package_digest,
-    }, indent=2) + "\n", encoding="utf-8")
+    }
+    if architecture is not None:
+        package_metadata["architecture"] = architecture
+    package_manifest.write_text(json.dumps(package_metadata, indent=2) + "\n", encoding="utf-8")
     print("Built:", payload)
     print("Package:", package)
     print("Package manifest:", package_manifest)
