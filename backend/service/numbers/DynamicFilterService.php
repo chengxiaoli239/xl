@@ -60,6 +60,7 @@ class DynamicFilterService extends BaseService {
         ['type'=>44, 'label'=>'取x位各取最近y个号码复式', 'params'=>['x'=>'', 'y'=>''], 'desc'=>"二、三、四定：x填实际投注位置，可填1、24、1234等；每位独立取该位最近y个不同数字，只保留对应位置在各自号码池中的组合。例：x:24、y:9，百位和个位各取最近9个码；若要各取8个，填y:8。<br>二、三定请先勾选上方定X位置；填在定X位置的x不参与过滤。<br>二定旧配置若x仅填一个位置且明确勾选两个定X位置，仍沿用该位号码池同时用于两个非X投注位，例如x:1、y:8得64组。", 'playway'=>[1, 2, 3]],
         ['type'=>45, 'label'=>'上期x位定位合分排除', 'params'=>['x'=>''], 'desc'=>"自动过滤上期指定位置的定位合分，比如x:14，上期开2347，则第1位+第4位合分为9，下期过滤14位定位合分9，最终14位定位合分保留012345678", 'playway'=>[1, 2, 3]],
         ['type'=>46, 'label'=>'取当前遗漏最大前x个三字复式', 'params'=>['x'=>''], 'desc'=>'按最近500期的当前遗漏从大到小取前x个三字复式，仅保留四个位置都落在其中一组三字复式内的四定位号码；x最大120。', 'playway'=>[3]],
+        ['type'=>47, 'label'=>'x位各取或排除最近y个号码', 'params'=>['x'=>'', 'y'=>'', 'z'=>'1'], 'desc'=>'x填千百十个位的任意组合（1-4），y填1-9个最近出现的不同数字；z=1只取这些数字，z=2排除这些数字，省略z默认取。每个非X投注位独立计算，例如x:1234、y:3、z:2，四定保留7×7×7×7组；三定保留7×7×7组。二/三定请先勾选定X位置。', 'playway'=>[1, 2, 3]],
     ];
     public static int $filterType = 0;
 
@@ -201,6 +202,9 @@ class DynamicFilterService extends BaseService {
                     break;
                 case 46: # 当前遗漏最大前x个三字复式
                     $codes = DynamicType2Service::filter46($plan, $dynamic, $filterDesc);
+                    break;
+                case 47: # 各位置最近y个数字，可取或排除
+                    $codes = DynamicType2Service::filter47($plan, $dynamic, $filterDesc);
                     break;
             }
             if(empty($codes)){

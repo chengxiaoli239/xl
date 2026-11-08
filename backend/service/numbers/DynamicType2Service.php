@@ -1180,7 +1180,7 @@ class DynamicType2Service extends BaseService {
      * @param array $filterDesc
      * @return array
      */
-    public static function filter44(object $plan, $dynamic=[], $filterDesc = []): array
+    public static function filter44(object $plan, $dynamic=[], $filterDesc = [], int $mode = 1): array
     {
         $playway = $plan->playway;
         $lottery_type = $plan->lottery_type;
@@ -1192,6 +1192,9 @@ class DynamicType2Service extends BaseService {
         $y = min(10, (int)($params['y'] ?? 0));
 
         if ($x === '' || $y < 1) {
+            if ($mode !== 1 || (int)($dynamic['type'] ?? 44) === 47) {
+                throw new \InvalidArgumentException('取或排除近期号码：x和y不能为空');
+            }
             Tool_Common::log('/data/'.__FUNCTION__, 'WARNING', '取x位各取最近y个号码复式参数无效', ['plan_id'=>$plan->id, 'params'=>$params]);
             $NumTypes = Num4Type::find()->select(['code'])
                 ->where(['=', 'code_type', $playway + 1])
@@ -1220,11 +1223,15 @@ class DynamicType2Service extends BaseService {
             if (count($fixedPositions) !== 3 - (int)$playway) {
                 $fixedPositions = [];
             }
+            if ((int)($dynamic['type'] ?? 44) === 47 && !$fixedPositions) {
+                throw new \InvalidArgumentException('取或排除近期号码：二、三定须先指定定X位置');
+            }
         }
         // 二定旧配置：单个x作为两个非X投注位共用的号码来源。
-        if ((int)$playway === 1 && count($positions) === 1 && count($fixedPositions) === 2) {
+        if ((int)($dynamic['type'] ?? 44) !== 47
+            && (int)$playway === 1 && count($positions) === 1 && count($fixedPositions) === 2) {
             $pool = NumService::getPosLatelyCode((int)$positions[0], $y, $lottery_type, $currentKjQiHao);
-            $where = self::filter44TwoFixedWhere($fixedPositions, $pool);
+            $where = self::filter44TwoFixedWhere($fixedPositions, $pool, $mode);
             $query = (new \yii\db\Query())->select(['code'])->from('lt_num4_type')
                 ->where(['code_type' => $playway + 1]);
             foreach ($where as $condition) {
@@ -1235,7 +1242,7 @@ class DynamicType2Service extends BaseService {
                 throw new \RuntimeException('二定复式没有匹配号码，已停止本次过滤以避免回退为全部号码');
             }
             $betDesc = ($filterDesc['label'] ?? '取x位各取最近y个号码复式')
-                .'：取'.$posNameMap[$positions[0]].'位近'.$y.'个码:' . implode('', $pool)
+                .'：'.($mode === 2 ? '排除' : '取').$posNameMap[$positions[0]].'位近'.$y.'个码:' . implode('', $pool)
                 .'，应用于两个非X位，最终组数：'.count($codes);
             NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
             Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '二定共用来源位号码池', [
@@ -1265,7 +1272,10 @@ class DynamicType2Service extends BaseService {
             $posName = $posNameMap[$pos] ?? $pos . '位';
             $descParts[] = $posName . '近' . $y . '个码:' . implode('', $posCodes);
         }
-        foreach (self::filter44PositionWhere((int)$playway, $positionPools, $fixedPositions ?? []) as $condition) {
+        if ((int)($dynamic['type'] ?? 44) === 47 && !$positionPools) {
+            throw new \InvalidArgumentException('取或排除近期号码：x至少要包含一个投注位置');
+        }
+        foreach (self::filter44PositionWhere((int)$playway, $positionPools, $fixedPositions ?? [], $mode) as $condition) {
             $query->andWhere($condition);
         }
 
@@ -1277,7 +1287,7 @@ class DynamicType2Service extends BaseService {
         }
 
         $betDesc = ($filterDesc['label'] ?? '取x位各取最近y个号码复式')
-            . '：保留' . implode('、', $descParts) . '，最终组数：' . count($codes);
+            . '：'.($mode === 2 ? '排除' : '保留') . implode('、', $descParts) . '，最终组数：' . count($codes);
         NumCodeService::addBetDescRand($plan->id, $nextQiHao, $betDesc);
 
         Tool_Common::log('/data/'.__FUNCTION__, 'INFO', '取x位各取最近y个号码复式', [
@@ -1286,6 +1296,7 @@ class DynamicType2Service extends BaseService {
             'current_kj_qihao' => $currentKjQiHao,
             'x' => $x,
             'y' => $y,
+            'mode' => $mode,
             'count' => count($codes),
             'sql' => $sql,
         ]);
@@ -1293,8 +1304,24 @@ class DynamicType2Service extends BaseService {
         return $codes;
     }
 
+    public static function filter47(object $plan, $dynamic = [], $filterDesc = []): array
+    {
+        $params = $dynamic['params'] ?? [];
+        $x = preg_replace('/\s+/', '', (string)($params['x'] ?? ''));
+        $y = (string)($params['y'] ?? '');
+        $mode = (string)($params['z'] ?? '1');
+        if (!preg_match('/^[1-4]{1,4}$/', $x) || count(array_unique(str_split($x))) !== strlen($x)
+            || !preg_match('/^[1-9]$/', $y) || !in_array($mode, ['1', '2'], true)) {
+            throw new \InvalidArgumentException('取或排除近期号码：x只能填不重复的1-4位置，y为1-9，z为1或2');
+        }
+        if (!in_array((int)$plan->playway, [1, 2, 3], true)) {
+            throw new \InvalidArgumentException('取或排除近期号码仅支持二、三、四定');
+        }
+        return self::filter44($plan, $dynamic, $filterDesc, (int)$mode);
+    }
+
     /** 每个指定的投注位使用该位自己的近期号码池；已定X位置不参与投注。 */
-    public static function filter44PositionWhere(int $playway, array $positionPools, array $fixedPositions = []): array
+    public static function filter44PositionWhere(int $playway, array $positionPools, array $fixedPositions = [], int $mode = 1): array
     {
         $where = [];
         foreach ($fixedPositions as $position) {
@@ -1304,7 +1331,7 @@ class DynamicType2Service extends BaseService {
             if (!in_array((string)$position, ['1', '2', '3', '4'], true) || !$pool) {
                 throw new \InvalidArgumentException('指定位置没有可用的近期号码');
             }
-            $condition = ['IN', 'code_'.$position, $pool];
+            $condition = [$mode === 2 ? 'NOT IN' : 'IN', 'code_'.$position, $pool];
             $where[] = $playway === 3 || $fixedPositions
                 ? $condition
                 : ['OR', ['=', 'code_'.$position, 'X'], $condition];
@@ -1313,7 +1340,7 @@ class DynamicType2Service extends BaseService {
     }
 
     /** @return array<int, array<int, mixed>> */
-    public static function filter44TwoFixedWhere(array $fixedPositions, array $pool): array
+    public static function filter44TwoFixedWhere(array $fixedPositions, array $pool, int $mode = 1): array
     {
         $fixedPositions = array_map('strval', $fixedPositions);
         if (count($fixedPositions) !== 2 || count(array_unique($fixedPositions)) !== 2
@@ -1328,7 +1355,7 @@ class DynamicType2Service extends BaseService {
         for ($position = 1; $position <= 4; $position++) {
             $where[] = in_array((string)$position, $fixedPositions, true)
                 ? ['=', 'code_'.$position, 'X']
-                : ['IN', 'code_'.$position, $pool];
+                : [$mode === 2 ? 'NOT IN' : 'IN', 'code_'.$position, $pool];
         }
         return $where;
     }
