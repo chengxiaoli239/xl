@@ -11,7 +11,7 @@ return [
     'basePath' => dirname(__DIR__),
     'vendorPath' => dirname(__DIR__).'/../vendor',
     'controllerNamespace' => 'backend\controllers',
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'browserAccessGuard'],
     'language' => 'zh-CN',
     'timeZone' => 'Asia/Shanghai',      // ����ʱ��
     'modules' => [
@@ -72,6 +72,9 @@ return [
         ],
     ],
     'components' => [
+        'browserAccessGuard' => [
+            'class' => 'backend\components\BrowserAccessGuard',
+        ],
         'request' => [
             'class' => 'common\web\Request',
             'enableCookieValidation' => true,
