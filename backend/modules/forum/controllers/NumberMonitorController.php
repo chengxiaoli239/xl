@@ -14,6 +14,11 @@ use yii\web\UploadedFile;
 
 class NumberMonitorController extends BaseController
 {
+    public function allowAction()
+    {
+        return ['index', 'data', 'preview', 'create', 'toggle', 'clear'];
+    }
+
     public function behaviors()
     {
         return [
