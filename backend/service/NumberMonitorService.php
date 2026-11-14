@@ -297,6 +297,23 @@ class NumberMonitorService
         }
     }
 
+    public static function hasActiveMonitoringFiles(int $lotteryType): bool
+    {
+        return self::supportedLotteryType($lotteryType) && self::hasActiveFile($lotteryType);
+    }
+
+    public static function latestDrawIdForLottery(int $lotteryType): int
+    {
+        return self::supportedLotteryType($lotteryType) ? self::latestDrawId($lotteryType) : 0;
+    }
+
+    public static function processedDrawIdForLottery(int $lotteryType): int
+    {
+        $cursor = NumberMonitorCursor::find()->select('last_draw_id')
+            ->where(['lottery_type' => $lotteryType])->scalar();
+        return $cursor === false ? 0 : (int)$cursor;
+    }
+
     public static function hasPendingDraws(int $lotteryType): bool
     {
         $cursor = NumberMonitorCursor::find()->where(['lottery_type' => $lotteryType])->one();
