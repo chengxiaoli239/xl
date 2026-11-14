@@ -2596,15 +2596,16 @@ class Lucky5Service { # 重庆7时彩登陆体系
     }
 
     /** Normalize stored four-digit import codes for the platform TXT protocol. */
-    public static function normalizePlatformTxtCodes(array $codes): array
+    public static function normalizePlatformTxtCodes(array $codes, int $playway=3): array
     {
+        if(!in_array($playway, [1, 2, 3], true)) return [];
         $normalized = [];
         foreach($codes as $code){
             $code = (string)$code;
-            if(preg_match('/^[0-9](?:,[0-9]){3}$/D', $code)){
+            if(preg_match('/^[0-9X](?:,[0-9X]){3}$/D', $code)){
                 $code = str_replace(',', '', $code);
             }
-            if(!preg_match('/^[0-9]{4}$/D', $code)){
+            if(!preg_match('/^[0-9X]{4}$/D', $code) || substr_count($code, 'X') !== 3 - $playway){
                 return [];
             }
             $normalized[] = $code;
@@ -2658,7 +2659,8 @@ class Lucky5Service { # 重庆7时彩登陆体系
         $count = count($codesArr);
         //p(['codesArr'=>$codesArr,'count'=>$count, 'codeHz'=>Json::decode($plan->hz_Arr)], 0);
         $hzArr = Json::decode($plan->hz_Arr);
-        $usePlatformTxt = (int)$plan->tz_type === 34 && !empty($hzArr['use_platform_txt_import']);
+        $usePlatformTxt = in_array((int)$plan->tz_type, [19, 27, 34], true)
+            && !empty($hzArr['use_platform_txt_import']);
         if($usePlatformTxt && !$is_task){
             return ['status'=>300, 'msg'=>'盘口 TXT 导入仅支持本地客户端下注'];
         }
@@ -2746,15 +2748,16 @@ class Lucky5Service { # 重庆7时彩登陆体系
             if($usePlatformTxt){
                 // ImportPlanCodes stores each digit comma-separated (for example 1,2,3,4).
                 // The platform TXT upload expects one four-digit token per bet.
-                $txtCodes = self::normalizePlatformTxtCodes($tmpcodesArr);
+                $txtCodes = self::normalizePlatformTxtCodes($tmpcodesArr, (int)$playway);
                 if(count($txtCodes) !== count($tmpcodesArr)){
-                    return ['status'=>300, 'msg'=>'盘口 TXT 导入号码必须是四位数字'];
+                    return ['status'=>300, 'msg'=>'盘口 TXT 导入号码与二/三/四定玩法不符'];
                 }
                 $url = self::PLATFORM_TXT_IMPORT_URL;
                 $post_data = [
                     'txt_import_v1'=>1,
                     'txt_codes'=>implode(',', $txtCodes),
                     'txt_money'=>$single,
+                    'txt_playway'=>(int)$playway,
                     'period_no'=>$qihao,
                 ];
             }elseif($playway == 4){ # 一字定

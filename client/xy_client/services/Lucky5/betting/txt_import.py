@@ -25,16 +25,39 @@ def _amount(value):
     return amount
 
 
+_TYPE_BY_POSITIONS = {
+    (0, 1): 1, (0, 2): 2, (0, 3): 3,
+    (1, 2): 4, (1, 3): 5, (2, 3): 6,
+    (0, 1, 2): 7, (0, 1, 3): 8,
+    (0, 2, 3): 9, (1, 2, 3): 10,
+    (0, 1, 2, 3): 11,
+}
+
+
+def _type_for_code(code, playway):
+    return _TYPE_BY_POSITIONS.get(tuple(index for index, value in enumerate(code) if value != 'X'))
+
+
 def _expect_task(task):
     post_data = task.get('post_data') or {}
     if task.get('bet_url') != TASK_URL or post_data.get('txt_import_v1') != 1:
         raise TxtImportError('TXT 任务格式无效')
     codes = str(post_data.get('txt_codes') or '').split(',')
-    if not 1 <= len(codes) <= 500 or any(not re.fullmatch(r'[0-9]{4}', code) for code in codes):
+    try:
+        playway = int(post_data.get('txt_playway', 3))
+    except (TypeError, ValueError):
+        raise TxtImportError('TXT 玩法无效')
+    if playway not in (1, 2, 3):
+        raise TxtImportError('TXT 玩法无效')
+    if not 1 <= len(codes) <= 500 or any(
+            not re.fullmatch(r'[0-9X]{4}', code) or code.count('X') != 3 - playway
+            for code in codes):
         raise TxtImportError('TXT 号码格式无效')
     if str(post_data.get('period_no')) != str(task.get('qihao')):
         raise TxtImportError('TXT 期号与任务不一致')
     money = _amount(post_data.get('txt_money'))
+    if playway == 1 and (money < Decimal('1') or money != money.to_integral_value()):
+        raise TxtImportError('二定 TXT 单注金额须为至少 1 元的整数')
     origin = (task.get('headers') or {}).get('Origin', '').rstrip('/')
     parsed = urlparse(origin)
     if (parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password
@@ -43,7 +66,7 @@ def _expect_task(task):
     return codes, money, origin
 
 
-def _check_preview(preview, codes, money):
+def _check_preview(preview, codes, money, playway):
     if not isinstance(preview, dict) or str(preview.get('Status')) != '1':
         raise TxtImportError('盘口 TXT 预览失败')
     data = preview.get('Data')
@@ -55,11 +78,13 @@ def _check_preview(preview, codes, money):
     expected = Counter(codes)
     bets = []
     for item in details:
-        if not isinstance(item, dict) or str(item.get('dict_no_type_id')) != '11':
+        if not isinstance(item, dict):
             raise TxtImportError('盘口 TXT 预览玩法不一致')
         code = str(item.get('bet_no') or '')
-        if not re.fullmatch(r'[0-9]{4}', code) or expected[code] <= 0:
+        if not re.fullmatch(r'[0-9X]{4}', code) or expected[code] <= 0:
             raise TxtImportError('盘口 TXT 预览号码不一致')
+        if str(item.get('dict_no_type_id')) != str(_type_for_code(code, playway)):
+            raise TxtImportError('盘口 TXT 预览玩法不一致')
         if _amount(item.get('bet_money')) != money:
             raise TxtImportError('盘口 TXT 预览金额不一致')
         expected[code] -= 1
@@ -98,7 +123,8 @@ def execute_txt_import(session, task, headers):
         preview = preview_response.json()
     except ValueError:
         raise TxtImportError('盘口 TXT 预览响应不是 JSON')
-    bets = _check_preview(preview, codes, money)
+    playway = int((task.get('post_data') or {}).get('txt_playway', 3))
+    bets = _check_preview(preview, codes, money, playway)
     confirm_response = session.post(
         origin + '/Member/BatchBet',
         data={

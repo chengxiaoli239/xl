@@ -73,6 +73,7 @@ use yii\widgets\ActiveForm;
                         <?= $form->field($model,"import_codes_txts[0]")->textarea([ 'autofocus' => false,'style'=>'height:100px' ])->label('多组英文逗号或空格隔开 23XX,34XX 或 23XX 34XX 或五位二定：XX3X4 XX3X3')?>
                     </div>
                 </div>
+                <?php $platformTxtPlayway = 1; include __DIR__.'/platform_txt_import.php'; ?>
 
                 <!--排除前xx期-->
                 <?php //include(dirname(__FILE__).'/filter_xs_before.php'); # 功能完好，不常用先注释 ?>

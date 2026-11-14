@@ -58,7 +58,7 @@ class UserSysPlansService extends BaseService {
         $missingSiteIds = array_values(array_diff($siteIds, $configuredSiteIds));
         if(empty($missingSiteIds)){
             $planSettings = json_decode((string)$plan->hz_Arr, true);
-            if((int)$plan->tz_type === 34 && !empty($planSettings['use_platform_txt_import'])){
+            if(in_array((int)$plan->tz_type, [19, 27, 34], true) && !empty($planSettings['use_platform_txt_import'])){
                 $cloudAccounts = TzSystemsUsers::find()
                     ->where(['uid'=>(int)$plan->uid, 'status'=>1, 'tz_system_id'=>$siteIds])
                     ->andWhere(['<>', 'is_local_bet', TzSystemsUsers::BET_TYPE_LOCAL_API])
@@ -179,18 +179,29 @@ class UserSysPlansService extends BaseService {
         # 一、位置
         # 10、第1位
         $UserSysPlans = $post['UserSysPlans'];
-        if((int)$tz_type === 34){
+        if(in_array((int)$tz_type, [19, 27, 34], true)){
             $usePlatformTxt = (int)($UserSysPlans['use_platform_txt_import'] ?? 0) === 1;
             $tmpFilter['use_platform_txt_import'] = $usePlatformTxt ? 1 : 0;
             if($usePlatformTxt){
+                $expectedPlayway = [27=>1, 19=>2, 34=>3][(int)$tz_type];
+                if((int)$playway !== $expectedPlayway){
+                    throw_info('盘口 TXT 导入玩法与计划类型不一致');
+                }
+                if($expectedPlayway === 1){
+                    $txtSingle = $UserSysPlans['single'] ?? null;
+                    if(!is_numeric($txtSingle) || (float)$txtSingle < 1 || floor((float)$txtSingle) != (float)$txtSingle){
+                        throw_info('二定 TXT 单注金额须为至少 1 元的整数');
+                    }
+                }
                 $rawCodes = trim((string)($UserSysPlans['import_codes_txts'][0] ?? ''));
                 $codes = preg_split('/[\s,\x{FF0C}]+/u', $rawCodes, -1, PREG_SPLIT_NO_EMPTY);
                 if(!$codes || count($codes) > 2500){
-                    throw_info('盘口 TXT 导入须填写 1 至 2500 个四位号码');
+                    throw_info('盘口 TXT 导入须填写 1 至 2500 个号码');
                 }
                 foreach($codes as $code){
-                    if(!preg_match('/^[0-9]{4}$/D', $code)){
-                        throw_info('盘口 TXT 导入仅支持四位数字，金额统一使用计划的单注金额');
+                    if(!preg_match('/^[0-9X]{4}$/D', $code)
+                        || substr_count($code, 'X') !== 3 - $expectedPlayway){
+                        throw_info('盘口 TXT 导入号码必须与二/三/四定玩法一致，金额统一使用计划的单注金额');
                     }
                 }
             }

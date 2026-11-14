@@ -1,5 +1,6 @@
 import json
 import unittest
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 import requests
@@ -56,7 +57,8 @@ class TxtImportTest(unittest.TestCase):
         self.assertEqual(session.post.call_count, 2)
         upload, confirm = session.post.call_args_list
         self.assertEqual(upload.args[0], 'https://example.invalid/Member/UpLoadBetNos')
-        self.assertEqual(upload.kwargs['files']['file'][1], b'1234=0.1 7493=0.1')
+        fixture = Path(__file__).parent / 'fixtures' / 'txt_import_preview.txt'
+        self.assertEqual(upload.kwargs['files']['file'][1], fixture.read_bytes().strip())
         self.assertNotIn('Content-Type', upload.kwargs['headers'])
         self.assertNotIn('Content-Length', upload.kwargs['headers'])
         self.assertEqual(confirm.args[0], 'https://example.invalid/Member/BatchBet')
@@ -83,6 +85,82 @@ class TxtImportTest(unittest.TestCase):
             execute_txt_import(session, self.task, self.headers)
 
         session.post.assert_called_once()
+
+    def test_two_and_three_fixed_positions_use_platform_preview_types(self):
+        cases = (
+            (1, '12XX', 1),
+            (1, '1X3X', 2),
+            (1, '1XX4', 3),
+            (1, 'X23X', 4),
+            (1, 'X2X4', 5),
+            (1, 'XX34', 6),
+            (2, '123X', 7),
+            (2, '12X4', 8),
+            (2, '1X34', 9),
+            (2, 'X234', 10),
+        )
+        for playway, code, type_id in cases:
+            with self.subTest(code=code):
+                amount = 1.0 if playway == 1 else 0.1
+                self.task['post_data'].update(txt_codes=code, txt_playway=playway, txt_money=amount)
+                preview = {
+                    'Status': 1,
+                    'Data': {
+                        'upload_type': 1,
+                        'TotalCount': 1,
+                        'TotalBetMoney': amount,
+                        'Details': [
+                            {'dict_no_type_id': type_id, 'bet_no': code, 'bet_money': amount},
+                        ],
+                    },
+                }
+                session = Mock()
+                session.post.side_effect = [
+                    self.response(preview),
+                    self.response({'Status': 1, 'Data': {'CompletedStatus': 1}}),
+                ]
+
+                execute_txt_import(session, self.task, self.headers)
+
+                self.assertEqual(session.post.call_count, 2)
+                self.assertEqual(session.post.call_args_list[0].kwargs['files']['file'][1],
+                                 (code + '=' + str(amount)).encode('ascii'))
+                bets = json.loads(session.post.call_args_list[1].kwargs['data']['bets'])
+                self.assertEqual(bets[0]['dict_no_type_id'], type_id)
+
+    def test_preview_position_type_mismatch_never_confirms(self):
+        self.task['post_data'].update(txt_codes='12XX', txt_playway=1)
+        self.task['post_data']['txt_money'] = 1.0
+        self.preview['Data']['TotalCount'] = 1
+        self.preview['Data']['TotalBetMoney'] = 1.0
+        self.preview['Data']['Details'] = [
+            {'dict_no_type_id': 2, 'bet_no': '12XX', 'bet_money': 1.0},
+        ]
+        session = Mock()
+        session.post.return_value = self.response(self.preview)
+
+        with self.assertRaisesRegex(TxtImportError, '玩法不一致'):
+            execute_txt_import(session, self.task, self.headers)
+
+        session.post.assert_called_once()
+
+    def test_two_fixed_amount_below_minimum_never_uploads(self):
+        self.task['post_data'].update(txt_codes='12XX', txt_playway=1)
+        session = Mock()
+
+        with self.assertRaisesRegex(TxtImportError, '至少 1 元'):
+            execute_txt_import(session, self.task, self.headers)
+
+        session.post.assert_not_called()
+
+    def test_two_fixed_fractional_amount_never_uploads(self):
+        self.task['post_data'].update(txt_codes='12XX', txt_playway=1, txt_money=1.1)
+        session = Mock()
+
+        with self.assertRaisesRegex(TxtImportError, '整数'):
+            execute_txt_import(session, self.task, self.headers)
+
+        session.post.assert_not_called()
 
     def test_confirmation_timeout_is_not_retried(self):
         session = Mock()
