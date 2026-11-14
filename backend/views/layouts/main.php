@@ -405,6 +405,12 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
                         <span><?=Yii::t('admin', 'dashboard')?></span>
                     </a>
                 </li>
+                <li>
+                    <a class="<?=($controllerName == 'forum/number-monitor' ? 'active' : '')?>" href="<?=Url::toRoute('/forum/number-monitor/index')?>">
+                        <i class="fa fa-crosshairs"></i>
+                        <span>号码监控</span>
+                    </a>
+                </li>
                 <?php
                     if(isset($menuRows)){
 

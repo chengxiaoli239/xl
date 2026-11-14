@@ -235,6 +235,9 @@ if (!function_exists('push_queue')) {
             } elseif (!empty($params['queue_open'])) {
                 $type = 'queue_open';
                 $queue = \Yii::$app->queue_open;
+            } elseif (!empty($params['queue_monitor'])) {
+                $type = 'queue_monitor';
+                $queue = \Yii::$app->queue_monitor;
             }
             \common\tools\Tool_Common::log('/queue/push-start', 'info', '入列开始1', ['params'=>$params, 'jobClass'=>$jobClass]);
             if (empty($jobClass)) {
@@ -320,6 +323,14 @@ if (!function_exists('push_queue_open')) {
     {
         $params['queue_open'] = true;
         push_queue($jobClass, $params, $isRepush);
+    }
+}
+
+if (!function_exists('push_queue_monitor')) {
+    function push_queue_monitor($jobClass, array $params, $isRepush = false)
+    {
+        $params['queue_monitor'] = true;
+        return push_queue($jobClass, $params, $isRepush);
     }
 }
 

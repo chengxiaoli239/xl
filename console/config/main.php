@@ -9,7 +9,7 @@ $params = array_merge(
 return [
     'id' => 'app-console',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log', 'queue'],
+    'bootstrap' => ['log', 'queue', 'queue_monitor'],
     'controllerNamespace' => 'console\controllers',
     'modules' => [
         'wechat' => [

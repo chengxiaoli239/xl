@@ -10,6 +10,7 @@ namespace common\tools;
 use backend\models\DataDealStatus;
 use backend\models\DataTime;
 use backend\models\KjConfig;
+use backend\models\NumberMonitorFile;
 use backend\models\Num4Type;
 use backend\models\SscKjData;
 use backend\models\StaticCodeTypeArisePerdate;
@@ -608,6 +609,26 @@ class KjDataGet
         # 开奖数据缓存
         $mKey = CacheKeyService::lotteryLastIndexKey($lottery_type);
         commonRedis()->setex($mKey, 30, $SscKjData->attributes);
+        try {
+            if (in_array((int)$lottery_type, [CommonBaseService::LOTTERY_TYPE_LUCKY5, CommonBaseService::LOTTERY_TYPE_AOZHOU5], true)
+                && NumberMonitorFile::find()->where(['lottery_type' => (int)$lottery_type, 'status' => 1])->exists()) {
+                $queued = push_queue_monitor(\common\service\jobs\number_monitor\ProcessNumberMonitorDrawJob::class, [
+                    'lotteryType' => (int)$lottery_type,
+                    'business_id' => 'draw-' . (int)$lottery_type . '-' . $qihao,
+                ]);
+                if (!$queued) {
+                    Tool_Common::log('/number-monitor/queue', 'WARNING', '独立号码监控任务入列失败', [
+                        'lottery_type' => (int)$lottery_type,
+                        'qihao' => (string)$qihao,
+                    ]);
+                }
+            }
+        } catch (\Throwable $queueException) {
+            Tool_Common::log('/number-monitor/queue', 'WARNING', '独立号码监控任务入列异常', [
+                'lottery_type' => (int)$lottery_type,
+                'message' => $queueException->getMessage(),
+            ]);
+        }
         return [
             'status'=>200,
             'msg'=>'开奖数据写入成功',

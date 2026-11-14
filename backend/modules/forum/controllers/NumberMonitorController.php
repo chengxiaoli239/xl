@@ -1,0 +1,156 @@
+<?php
+
+namespace backend\modules\forum\controllers;
+
+use backend\controllers\BaseController;
+use backend\service\NumberMonitorService;
+use common\service\lottery\CommonLotteryService;
+use common\service\numberMonitor\NumberSchemeParser;
+use Yii;
+use yii\filters\VerbFilter;
+use yii\web\ForbiddenHttpException;
+use yii\web\Response;
+use yii\web\UploadedFile;
+
+class NumberMonitorController extends BaseController
+{
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'data' => ['GET'],
+                    'preview' => ['POST'],
+                    'create' => ['POST'],
+                    'toggle' => ['POST'],
+                    'clear' => ['POST'],
+                ],
+            ],
+        ];
+    }
+
+    public function beforeAction($action)
+    {
+        if (Yii::$app->user->isGuest || !$this->_user_id) {
+            throw new ForbiddenHttpException('请先登录');
+        }
+        return parent::beforeAction($action);
+    }
+
+    public function actionIndex($lottery_type = CommonLotteryService::LOTTERY_TYPE_LUCKY5)
+    {
+        $lotteryType = (int)$lottery_type;
+        if (!NumberMonitorService::supportedLotteryType($lotteryType)) {
+            $lotteryType = CommonLotteryService::LOTTERY_TYPE_LUCKY5;
+        }
+        return $this->render('index', [
+            'lotteryType' => $lotteryType,
+            'lotteryTypes' => NumberMonitorService::lotteryTypeOptions(),
+            'dashboard' => NumberMonitorService::dashboardData((int)$this->_user_id, $lotteryType),
+            'csrfToken' => Yii::$app->request->csrfToken,
+        ]);
+    }
+
+    public function actionData($lottery_type = CommonLotteryService::LOTTERY_TYPE_LUCKY5)
+    {
+        $lotteryType = (int)$lottery_type;
+        if (!NumberMonitorService::supportedLotteryType($lotteryType)) {
+            return $this->jsonResponse(['success' => false, 'message' => '彩种参数无效'], 400);
+        }
+        return $this->jsonResponse([
+            'success' => true,
+            'dashboard' => NumberMonitorService::dashboardData((int)$this->_user_id, $lotteryType),
+        ]);
+    }
+
+    public function actionPreview()
+    {
+        try {
+            $content = $this->getUploadedContent();
+            $schemes = array_map(function ($scheme) {
+                return [
+                    'title' => $scheme['title'],
+                    'pattern_count' => $scheme['pattern_count'],
+                    'patterns' => array_slice($scheme['patterns'], 0, 8),
+                ];
+            }, NumberSchemeParser::parse($content));
+            return $this->jsonResponse(['success' => true, 'schemes' => $schemes]);
+        } catch (\Throwable $exception) {
+            return $this->errorResponse($exception);
+        }
+    }
+
+    public function actionCreate()
+    {
+        $lotteryType = (int)Yii::$app->request->post('lottery_type', 0);
+        try {
+            $content = $this->getUploadedContent();
+            $schemes = NumberSchemeParser::parse($content);
+            $file = UploadedFile::getInstanceByName('file');
+            $result = NumberMonitorService::createFile(
+                (int)$this->_user_id,
+                $lotteryType,
+                $file ? $file->name : '号码方案.txt',
+                $schemes
+            );
+            return $this->jsonResponse(['success' => true, 'file' => $result]);
+        } catch (\Throwable $exception) {
+            return $this->errorResponse($exception);
+        }
+    }
+
+    public function actionToggle()
+    {
+        try {
+            $fileId = (int)Yii::$app->request->post('id', 0);
+            $active = (string)Yii::$app->request->post('active', '') === '1';
+            NumberMonitorService::setFileStatus((int)$this->_user_id, $fileId, $active);
+            return $this->jsonResponse(['success' => true]);
+        } catch (\Throwable $exception) {
+            return $this->errorResponse($exception);
+        }
+    }
+
+    public function actionClear()
+    {
+        try {
+            NumberMonitorService::deleteFile((int)$this->_user_id, (int)Yii::$app->request->post('id', 0));
+            return $this->jsonResponse(['success' => true]);
+        } catch (\Throwable $exception) {
+            return $this->errorResponse($exception);
+        }
+    }
+
+    private function getUploadedContent(): string
+    {
+        $file = UploadedFile::getInstanceByName('file');
+        if (!$file || $file->error !== UPLOAD_ERR_OK || strtolower($file->extension) !== 'txt') {
+            throw new \InvalidArgumentException('请选择有效的 TXT 文件');
+        }
+        if ($file->size > NumberSchemeParser::MAX_FILE_BYTES) {
+            throw new \InvalidArgumentException('TXT 文件不能超过 256 KB');
+        }
+        $content = file_get_contents($file->tempName);
+        if (!is_string($content)) {
+            throw new \InvalidArgumentException('无法读取 TXT 文件');
+        }
+        return $content;
+    }
+
+    private function jsonResponse(array $data, int $status = 200): array
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        Yii::$app->response->statusCode = $status;
+        return $data;
+    }
+
+    private function errorResponse(\Throwable $exception): array
+    {
+        if ($exception instanceof \InvalidArgumentException) {
+            return $this->jsonResponse(['success' => false, 'message' => $exception->getMessage()], 422);
+        }
+        Yii::error($exception, 'number-monitor');
+        return $this->jsonResponse(['success' => false, 'message' => '操作失败，请稍后重试'], 500);
+    }
+}

@@ -72,5 +72,13 @@ return [
             //'as jobRetry' => 'yii\queue\RetryBehavior',
             'ttr' => 3600,
         ],
+        'queue_monitor' => [
+            'class' => \yii\queue\redis\Queue::class,
+            'redis' => 'redis',
+            'channel' => 'lottery:queue_monitor',
+            'as log' => \yii\queue\LogBehavior::class,
+            'ttr' => 90,
+            'attempts' => 3,
+        ],
     ]
 ];

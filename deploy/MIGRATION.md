@@ -15,7 +15,7 @@ server. Commands assume the app root is:
 - Redis: DB 0 for Yii cache/queues, DB 1 for common Redis cache.
 - Web root: `backend/web`.
 - Queue workers: `yii queue/listen`, `yii queue-fast/listen`,
-  `yii queue-open/listen`.
+  `yii queue-open/listen`, and the isolated `yii queue-monitor/listen`.
 
 ## Source Server
 
@@ -60,6 +60,7 @@ DB_PASS='replace-with-target-db-password' bash deploy/scripts/restore-target.sh 
 cp deploy/nginx/xl-backend.conf.example /www/server/panel/vhost/nginx/xl-backend.conf
 cp deploy/supervisor/supervisord.conf /www/server/supervisor/supervisord.conf
 cp deploy/supervisor/xl-lottery-queues.ini /www/server/supervisor/conf.d/xl-lottery-queues.ini
+cp deploy/supervisor/xl-lottery-monitor.ini /www/server/supervisor/conf.d/xl-lottery-monitor.ini
 cp deploy/systemd/xl-supervisord.service /etc/systemd/system/xl-supervisord.service
 ```
 
@@ -84,6 +85,7 @@ cd /www/wwwroot/lt/lottery_xl/xl
 /www/server/php/74/bin/php yii queue/info
 /www/server/php/74/bin/php yii queue-fast/info
 /www/server/php/74/bin/php yii queue-open/info
+/www/server/php/74/bin/php yii queue-monitor/info
 ```
 
 Then verify:
