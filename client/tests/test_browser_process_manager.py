@@ -10,7 +10,7 @@ from xy_client.launcher import configure_standard_streams
 
 configure_standard_streams()
 
-from xy_client.LuckyClientOP import MainWindow
+from xy_client.LuckyClientOP import MainWindow, show_main_window_before_network_sync
 from xy_client.services.tools import BrowserPortManager as browser_port_module
 from xy_client.services.tools import SafeBrowserProcessManager as safe_process_module
 from xy_client.services.tools import account_runtime
@@ -28,6 +28,20 @@ from xy_client.services.tools.account_runtime import (
 
 
 class BrowserProcessMonitorTest(unittest.TestCase):
+    def test_main_window_is_visible_before_startup_network_requests(self):
+        events = []
+        window = Mock()
+        app = Mock()
+        window.show.side_effect = lambda: events.append('show')
+        app.processEvents.side_effect = lambda: events.append('paint')
+        window.syncUserInfoOnStartup.side_effect = lambda: events.append('sync')
+        window.getRuntimeMode.return_value = 'background'
+        window.restore_background_session.side_effect = lambda **_: events.append('restore')
+
+        show_main_window_before_network_sync(window, app)
+
+        self.assertEqual(events, ['show', 'paint', 'sync', 'restore'])
+
     def test_launcher_forces_selenium_manager_offline(self):
         self.assertEqual(os.environ.get("SE_OFFLINE"), "true")
         self.assertEqual(os.environ.get("SE_AVOID_STATS"), "true")

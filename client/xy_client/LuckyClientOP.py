@@ -655,13 +655,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 print(f"❌ 初始化浏览器选择控件异常: {e}")
                 traceback.print_exc()
             
-            # 启动后立即同步用户信息 - 添加异常处理
-            try:
-                self.syncUserInfoOnStartup()
-            except Exception as e:
-                print(f"❌ 同步用户信息异常: {e}")
-                traceback.print_exc()
-            
             # 添加鼠标点击事件异常处理
             def mousePressEvent(event):
                 try:
@@ -5562,6 +5555,15 @@ def createConnectionMonitor(mainWindow, inc):
 
 
 # @pysnooper.snoop()
+def show_main_window_before_network_sync(main_window, app):
+    """Show the workbench before the first potentially slow backend request."""
+    main_window.show()
+    app.processEvents()
+    main_window.syncUserInfoOnStartup()
+    if main_window.getRuntimeMode() == 'background':
+        main_window.restore_background_session(show_message=False)
+
+
 def main(existing_app=None):
     try:
         # 立即激活输入阻塞预防，防止程序卡住等待输入
@@ -5616,9 +5618,7 @@ def main(existing_app=None):
         signal.signal(signal.SIGTERM, signal_handler)
         
         mainWindow = MainWindow()
-
-        if mainWindow.getRuntimeMode() == 'background':
-            mainWindow.restore_background_session(show_message=False)
+        show_main_window_before_network_sync(mainWindow, app)
         
         # 在设置 is_test 之前先打印值
         if ENABLE_DETAILED_LOGS:
@@ -5636,8 +5636,6 @@ def main(existing_app=None):
     - mainWindow.is_test: {mainWindow.is_test}
             """)
 
-        print("🔄 准备显示主窗口...")
-        mainWindow.show()
         print("✅ 主窗口已显示")
         mainWindow.is_test = is_test
         if ENABLE_DETAILED_LOGS:
