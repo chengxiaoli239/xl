@@ -37,21 +37,25 @@ var Script = function () {
             var wSize = $(window).width();
             if (wSize <= 768) {
                 $('#container').addClass('sidebar-close');
+                $('#container').removeClass('xl-mobile-menu-open');
                 $('#sidebar > ul').hide();
                 $('#sidebar').hide();
+                $('.xl-nav-toggle').attr({'aria-expanded': 'false', 'aria-label': '打开菜单'});
             }
 
             if (wSize > 768) {
                 $('#container').removeClass('sidebar-close');
                 $('#sidebar > ul').show();
                 $('#sidebar').show();
+                $('#container').removeClass('xl-mobile-menu-open');
+                $('.xl-nav-toggle').attr({'aria-expanded': 'true', 'aria-label': '关闭菜单'});
             }
         }
         $(window).on('load', responsiveView);
         $(window).on('resize', responsiveView);
     });
 
-    $('.fa-bars').click(function () {
+    $('.xl-nav-toggle').click(function () {
         var v = $('#sidebar > ul').is(':visible');
         if ( v === true) {
             $('#main-content').css({
@@ -64,6 +68,8 @@ var Script = function () {
             $('#sidebar').css('display','none');
             $('#nav-accordion').css('display','none');
             $('#container').addClass('sidebar-closed');
+            $('#container').removeClass('xl-mobile-menu-open');
+            $(this).attr({'aria-expanded': 'false', 'aria-label': '打开菜单'});
         } else {
             $('#main-content').css({
                 'margin-left': '210px'
@@ -75,6 +81,18 @@ var Script = function () {
                 'margin-left': '0'
             });
             $('#container').removeClass('sidebar-closed');
+            if ($(window).width() <= 768) {
+                $('#container').addClass('xl-mobile-menu-open');
+            }
+            $(this).attr({'aria-expanded': 'true', 'aria-label': '关闭菜单'});
+        }
+    });
+    $('.xl-nav-backdrop').on('click', function () {
+        $('.xl-nav-toggle').trigger('click');
+    });
+    $(document).on('keydown', function (event) {
+        if (event.key === 'Escape' && $('#container').hasClass('xl-mobile-menu-open')) {
+            $('.xl-nav-toggle').trigger('click');
         }
     });
 

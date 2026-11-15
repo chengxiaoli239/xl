@@ -160,10 +160,33 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
         $url = $url == '#' ? 'javascript:;' : Url::toRoute($url);
         $menuIcons = [
             '游戏记录' => 'fa-list-alt', '计划任务' => 'fa-tasks',
-            '个人信息' => 'fa-user-o', '异常监控' => 'fa-exclamation-circle',
+            '个人信息' => 'fa-user', '异常监控' => 'fa-exclamation-circle',
             '号码监控' => 'fa-eye', '开奖记录' => 'fa-calendar',
+            '记录' => 'fa-book', '会员管理' => 'fa-users',
+            '登陆信息' => 'fa-sign-in', '登录信息' => 'fa-sign-in',
+            '积分流水' => 'fa-exchange', '开奖信息' => 'fa-calendar',
+            '利润统计' => 'fa-line-chart', '数据统计' => 'fa-bar-chart',
+            '系统设置' => 'fa-cog', '功能开通' => 'fa-check-circle',
         ];
-        $icon = $menuIcons[$menuArray['label']] ?? 'fa-file-text-o';
+        $icon = $menuIcons[$menuArray['label']] ?? null;
+        if ($icon === null) {
+            $iconKeywords = [
+                '遗漏' => 'fa-line-chart', '利润' => 'fa-pie-chart',
+                '统计' => 'fa-bar-chart', '监控' => 'fa-eye',
+                '计划' => 'fa-tasks', '账号' => 'fa-user',
+                '会员' => 'fa-users', '流水' => 'fa-exchange',
+                '开奖' => 'fa-calendar', '日志' => 'fa-book',
+                '号码' => 'fa-list-ol', '数据' => 'fa-database',
+                '设置' => 'fa-cog', '配置' => 'fa-wrench',
+            ];
+            foreach ($iconKeywords as $keyword => $keywordIcon) {
+                if (strpos($menuArray['label'], $keyword) !== false) {
+                    $icon = $keywordIcon;
+                    break;
+                }
+            }
+            $icon = $icon ?? 'fa-file-text-o';
+        }
         echo '<a href="'.$url.'"  class="'.$class.'">'.($isShowIcon ? '<i class="fa '.$icon.'" aria-hidden="true"></i>' : '').'<span>'.$menuArray['label'].'</span></a>';
 
         if (isset($menuArray['items'])) {
@@ -204,7 +227,8 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
 <?php $this->beginBody() ?>
 
 <section id="container" >
-    <button type="button" class="fa fa-bars xl-nav-toggle" aria-label="切换菜单" aria-controls="nav-accordion"></button>
+    <button type="button" class="fa fa-bars xl-nav-toggle" aria-label="打开菜单" aria-controls="sidebar" aria-expanded="false"></button>
+    <div class="xl-nav-backdrop" aria-hidden="true"></div>
     <!--sidebar start-->
     <aside>
         <div id="sidebar" class="nav-collapse" style="width: 185px">
@@ -236,23 +260,23 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
                 ?>
 
             </ul>
-            <div class="xl-sidebar-tools">
-                <button type="button" id="xl-theme-toggle" class="xl-theme-toggle" aria-pressed="false" aria-label="切换到暗色主题" title="切换到暗色主题">
-                    <i class="fa fa-moon-o" aria-hidden="true"></i><span>暗色</span>
-                </button>
-                <details class="xl-account-menu">
-                    <summary><i class="fa fa-user-o" aria-hidden="true"></i><span><?= Html::encode($username) ?></span><i class="fa fa-angle-down" aria-hidden="true"></i></summary>
-                    <div class="xl-account-actions">
-                        <a href="<?= Url::toRoute('/forum/user/view') ?>">个人信息</a>
-                        <a href="javascript:;" id="updatePassword">修改密码</a>
-                        <a href="<?= Url::toRoute('/site/logout') ?>" data-method="post">退出登录</a>
-                    </div>
-                </details>
-            </div>
             <!-- sidebar menu end-->
         </div>
     </aside>
     <!--sidebar end-->
+    <div class="xl-shell-actions">
+        <button type="button" id="xl-theme-toggle" class="xl-theme-toggle" aria-pressed="false" aria-label="切换到暗色主题" title="切换到暗色主题">
+            <i class="fa fa-moon-o" aria-hidden="true"></i><span class="sr-only">暗色</span>
+        </button>
+        <details class="xl-account-menu">
+            <summary><i class="fa fa-user" aria-hidden="true"></i><span><?= Html::encode($username) ?></span><i class="fa fa-angle-down" aria-hidden="true"></i></summary>
+            <div class="xl-account-actions">
+                <a href="<?= Url::toRoute('/forum/user/view') ?>"><i class="fa fa-user" aria-hidden="true"></i>个人信息</a>
+                <a href="javascript:;" id="updatePassword"><i class="fa fa-lock" aria-hidden="true"></i>修改密码</a>
+                <a href="<?= Url::toRoute('/site/logout') ?>" data-method="post"><i class="fa fa-sign-out" aria-hidden="true"></i>退出登录</a>
+            </div>
+        </details>
+    </div>
     <!--main content start-->
     <section id="main-content">
         <script src="/statics/js/jquery-2.0.3.js"></script>
