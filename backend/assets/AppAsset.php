@@ -25,7 +25,7 @@ class AppAsset extends AssetBundle
         'statics/js/jquery.nicescroll.js',
         'statics/js/jquery.sparkline.js',
         'statics/js/slidebars.min.js',
-        'statics/js/common-scripts.js?v=10',
+        'statics/js/common-scripts.js?v=11',
         'statics/js/common.js?v=2',
     ];
     public $depends = [
