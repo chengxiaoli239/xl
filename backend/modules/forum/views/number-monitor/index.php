@@ -69,7 +69,14 @@ $stateJson = Json::htmlEncode($dashboard);
 
             <div class="nm-board-heading">
                 <div><h2>监控方案</h2><span id="nm-scheme-count" class="nm-count">0 套</span><span id="nm-monitor-period" class="nm-monitor-period">最新期号 --</span></div>
-                <span id="nm-sync-state" class="nm-sync-state">实时同步中</span>
+                <div class="nm-board-controls">
+                    <div class="nm-view-switch" role="group" aria-label="监控方案显示模式">
+                        <button type="button" id="nm-mode-compact" aria-pressed="true">紧凑</button>
+                        <button type="button" id="nm-mode-detail" aria-pressed="false">详细</button>
+                    </div>
+                    <button type="button" id="nm-fullscreen" class="nm-fullscreen-button" aria-label="全屏查看号码监控" title="全屏查看"><i class="fa fa-expand" aria-hidden="true"></i></button>
+                    <span id="nm-sync-state" class="nm-sync-state">实时同步中</span>
+                </div>
             </div>
             <div class="nm-board-viewport">
                 <div class="nm-board" id="nm-board" aria-live="polite"></div>
@@ -232,7 +239,7 @@ $stateJson = Json::htmlEncode($dashboard);
 .nm-file-action-label{display:none}
 .nm-file-paused{padding:3px 4px;font-size:10px}
 .nm-scheme-list{display:block;padding:2px 3px}
-.nm-scheme{display:flex;align-items:center;justify-content:space-between;gap:1px;min-width:0;min-height:28px;padding:3px 0;border:0;border-bottom:1px solid var(--nm-line);border-radius:0;box-shadow:none}
+.nm-scheme{display:flex;align-items:center;justify-content:space-between;gap:1px;min-width:0;min-height:clamp(30px,calc((100dvh - 330px)/15),46px);padding:3px 0;border:0;border-bottom:1px solid var(--nm-line);border-radius:0;box-shadow:none}
 .nm-scheme:last-child{border-bottom:0}
 .nm-scheme:hover{border-color:var(--nm-line);background:var(--nm-ground);box-shadow:none}
 .nm-scheme-view{flex:1;width:auto;min-width:0;overflow:hidden;margin:0;padding:2px 0;text-overflow:clip;white-space:nowrap;font-size:12px;font-weight:650;font-variant-numeric:tabular-nums;line-height:18px}
@@ -241,6 +248,33 @@ $stateJson = Json::htmlEncode($dashboard);
 .nm-streak .fa{font-size:10px}
 .nm-file-column.paused .nm-scheme{opacity:.72}
 .nm-monitor-period{color:var(--nm-muted);font-size:10px;white-space:nowrap}
+.nm-board-controls{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:6px;margin-left:auto}
+.nm-view-switch{display:inline-flex;overflow:hidden;border:1px solid var(--nm-line);border-radius:6px;background:var(--nm-paper)}
+.nm-view-switch button{height:28px;border:0;background:transparent;color:var(--nm-muted);padding:0 9px;font-size:11px;cursor:pointer}
+.nm-view-switch button[aria-pressed="true"]{background:#e8f0ff;color:#2455c9;font-weight:700}
+.nm-fullscreen-button{display:grid;width:29px;height:29px;place-items:center;border:1px solid var(--nm-line);border-radius:6px;background:var(--nm-paper);color:var(--nm-ink);cursor:pointer}
+.nm-file-top{grid-template-columns:minmax(0,1fr);grid-template-areas:"title" "meta" "actions";align-items:center;gap:2px}
+.nm-file-title{grid-area:title}
+.nm-file-meta{grid-area:meta;display:flex;align-items:center;justify-content:space-between;gap:2px;min-width:0}
+.nm-file-meta small{flex:none;color:var(--nm-muted);font-size:9px;white-space:nowrap}
+.nm-file-period{flex:none;color:var(--nm-muted);font:600 10px ui-monospace,SFMono-Regular,Menlo,monospace;white-space:nowrap}
+.nm-file-actions{grid-area:actions}
+.nm-scheme-detail,.nm-streak-text{display:none}
+.nm-mode-detail .nm-file-column{flex:0 0 240px;width:240px}
+.nm-mode-detail .nm-scheme-list{display:grid;gap:6px;padding:6px}
+.nm-mode-detail .nm-scheme{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:8px;min-height:78px;border:1px solid var(--nm-line);border-radius:6px;padding:7px 8px}
+.nm-mode-detail .nm-scheme-view{white-space:normal;overflow:visible;font-size:13px}
+.nm-mode-detail .nm-scheme-detail{display:grid;gap:2px;margin-top:4px;color:var(--nm-muted);font-size:11px;line-height:1.35}
+.nm-mode-detail .nm-scheme-detail strong{overflow:hidden;color:var(--nm-ink);font-size:11px;text-overflow:ellipsis;white-space:nowrap}
+.nm-mode-detail .nm-scheme-detail span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+.nm-mode-detail .nm-scheme-detail small{font-size:10px}
+.nm-mode-detail .nm-streak-button{padding-top:2px}
+.nm-mode-detail .nm-streak .fa{display:none}
+.nm-mode-detail .nm-streak-text{display:inline}
+.nm-mode-detail .nm-streak-button .nm-streak{gap:3px;min-width:48px;padding:5px 6px;font-size:11px}
+.number-monitor:fullscreen,.number-monitor.nm-focus-mode{position:fixed!important;inset:0!important;z-index:3000;width:100vw!important;height:100dvh!important;max-width:none!important;margin:0!important;overflow:auto!important;border-radius:0!important}
+body.nm-page-focus-open{overflow:hidden}
+@media(min-height:850px){.nm-scheme{min-height:clamp(30px,calc((100dvh - 300px)/15),46px)}}
 @media(max-width:1600px){
     .nm-workspace{display:block}
     .nm-import-head>.nm-mobile-draws-action{display:block;margin-left:auto}
@@ -270,12 +304,17 @@ $stateJson = Json::htmlEncode($dashboard);
     .nm-file-column{flex:0 0 106px;width:106px}
     .nm-file-title strong{font-size:11px}
     .nm-scheme-view{font-size:11px}
+    .nm-file-period{font-size:9px}
+    .nm-file-actions button{min-width:22px;width:22px}
+    .nm-scheme{min-height:30px}
+    .nm-mode-detail .nm-file-column{flex:0 0 min(240px,calc(100vw - 30px));width:min(240px,calc(100vw - 30px))}
 }
 @media(min-width:1800px){
     .nm-file-title strong,.nm-scheme-view{font-size:13px}
     .nm-streak-button .nm-streak{font-size:12px}
-    .nm-scheme{min-height:31px}
+    .nm-scheme{min-height:clamp(32px,calc((100dvh - 330px)/15),52px)}
 }
+@media(min-width:1800px) and (min-height:850px){.nm-scheme{min-height:clamp(32px,calc((100dvh - 300px)/15),52px)}}
 </style>
 
 <script>
@@ -318,6 +357,8 @@ $stateJson = Json::htmlEncode($dashboard);
     var drawsToggle = document.getElementById('nm-mobile-draws-toggle');
     var drawsBackdrop = document.getElementById('nm-draws-backdrop');
     var drawsPreviousFocus = null;
+    var displayMode = 'compact';
+    try { displayMode = localStorage.getItem('number-monitor-display-mode') === 'detail' ? 'detail' : 'compact'; } catch (error) {}
 
     function escapeHtml(value) {
         return String(value == null ? '' : value).replace(/[&<>"']/g, function (char) {
@@ -586,6 +627,73 @@ $stateJson = Json::htmlEncode($dashboard);
         updateFileLabel();
     }
 
+    function formatFileTime(timestamp) {
+        if (!Number(timestamp)) return '--:--';
+        var date = new Date(Number(timestamp) * 1000);
+        return String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0');
+    }
+
+    function filePeriod(schemes) {
+        var latest = null;
+        schemes.forEach(function (scheme) {
+            if (scheme.last_qihao && (!latest || Number(scheme.updated_at) > Number(latest.updated_at))) latest = scheme;
+        });
+        if (!latest) return {short:'--- --:--', full:'尚未处理开奖'};
+        var issue = String(latest.last_qihao);
+        var time = formatFileTime(latest.updated_at);
+        return {short:issue.slice(-3) + ' ' + time, full:'最近处理 ' + issue + ' ' + time};
+    }
+
+    function setDisplayMode(mode) {
+        displayMode = mode === 'detail' ? 'detail' : 'compact';
+        root.classList.toggle('nm-mode-detail', displayMode === 'detail');
+        document.getElementById('nm-mode-compact').setAttribute('aria-pressed', displayMode === 'compact' ? 'true' : 'false');
+        document.getElementById('nm-mode-detail').setAttribute('aria-pressed', displayMode === 'detail' ? 'true' : 'false');
+        try { localStorage.setItem('number-monitor-display-mode', displayMode); } catch (error) {}
+    }
+
+    function updateFullscreenButton() {
+        var active = document.fullscreenElement === root || root.classList.contains('nm-focus-mode');
+        var button = document.getElementById('nm-fullscreen');
+        button.setAttribute('aria-label', active ? '退出全屏' : '全屏查看号码监控');
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        button.title = active ? '退出全屏' : '全屏查看';
+        button.querySelector('i').className = 'fa ' + (active ? 'fa-compress' : 'fa-expand');
+    }
+
+    function exitFocusMode() {
+        if (document.fullscreenElement === root && document.exitFullscreen) {
+            var result = document.exitFullscreen();
+            if (result && result.catch) result.catch(updateFullscreenButton);
+            return;
+        }
+        root.classList.remove('nm-focus-mode');
+        document.body.classList.remove('nm-page-focus-open');
+        updateFullscreenButton();
+    }
+
+    function toggleFullscreen() {
+        if (document.fullscreenElement === root || root.classList.contains('nm-focus-mode')) {
+            exitFocusMode();
+            return;
+        }
+        function fallback() {
+            root.classList.add('nm-focus-mode');
+            document.body.classList.add('nm-page-focus-open');
+            updateFullscreenButton();
+        }
+        if (!root.requestFullscreen) {
+            fallback();
+            return;
+        }
+        try {
+            var result = root.requestFullscreen();
+            if (result && result.catch) result.catch(fallback);
+        } catch (error) {
+            fallback();
+        }
+    }
+
     function renderBoard() {
         var board = document.getElementById('nm-board');
         var scrollLeft = board.parentNode.scrollLeft;
@@ -610,6 +718,7 @@ $stateJson = Json::htmlEncode($dashboard);
         } else {
             board.innerHTML = files.map(function (file) {
                 var schemes = file.schemes || [];
+                var period = filePeriod(schemes);
                 var cards = schemes.map(function (scheme, schemeIndex) {
                     var paused = Number(file.status) !== 1;
                     var status = paused ? 'none' : Number(scheme.current_status) === 1 ? 'hit' : Number(scheme.current_status) === 2 ? 'miss' : 'none';
@@ -617,10 +726,12 @@ $stateJson = Json::htmlEncode($dashboard);
                     var label = paused ? '已暂停' : status === 'hit' ? '连中 ' + scheme.streak_count + ' 期' : status === 'miss' ? '连错 ' + scheme.streak_count + ' 期' : '等待本期开奖';
                     var streak = status === 'hit' || status === 'miss' ? '+' + Number(scheme.streak_count || 0) : '';
                     var number = Number(scheme.line_no || schemeIndex + 1);
-                    return '<div class="nm-scheme"><button type="button" class="nm-scheme-view" data-action="view" data-id="' + Number(scheme.id) + '" aria-label="查看第' + number + '套，' + escapeHtml(scheme.title) + '，' + Number(scheme.pattern_count || 0) + '组号码" title="' + escapeHtml(scheme.title) + ' · 查看号码">' + number + '.' + Number(scheme.pattern_count || 0) + '组</button><button type="button" class="nm-streak-button" data-action="history" data-id="' + Number(scheme.id) + '" aria-label="' + escapeHtml(label + '，查看逐期监控历史') + '" title="' + escapeHtml(label) + ' · 查看历史"><span class="nm-streak ' + status + '"><i class="fa ' + icon + '" aria-hidden="true"></i>' + streak + '</span></button></div>';
+                    var statusText = status === 'hit' ? '中' : status === 'miss' ? '错' : paused ? '暂停' : '待开';
+                    var sample = String(scheme.sample || '');
+                    return '<div class="nm-scheme"><button type="button" class="nm-scheme-view" data-action="view" data-id="' + Number(scheme.id) + '" aria-label="查看第' + number + '套，' + escapeHtml(scheme.title) + '，' + Number(scheme.pattern_count || 0) + '组号码" title="' + escapeHtml(scheme.title) + ' · 查看号码"><span class="nm-scheme-primary">' + number + '.' + Number(scheme.pattern_count || 0) + '组</span><span class="nm-scheme-detail"><strong>' + escapeHtml(scheme.title) + '</strong>' + (sample ? '<span>' + escapeHtml(sample) + '</span>' : '') + '<small>最近期号 ' + escapeHtml(scheme.last_qihao || '--') + '</small></span></button><button type="button" class="nm-streak-button" data-action="history" data-id="' + Number(scheme.id) + '" aria-label="' + escapeHtml(label + '，查看逐期监控历史') + '" title="' + escapeHtml(label) + ' · 查看历史"><span class="nm-streak ' + status + '"><i class="fa ' + icon + '" aria-hidden="true"></i><span class="nm-streak-text">' + statusText + '</span>' + streak + '</span></button></div>';
                 }).join('');
                 return '<section class="nm-file-column ' + (Number(file.status) === 1 ? '' : 'paused') + '" data-file-id="' + Number(file.id) + '">' +
-                    '<header class="nm-file-top"><div class="nm-file-title"><span class="nm-file-mark"><i class="fa fa-file-text-o" aria-hidden="true"></i></span><div><strong title="' + escapeHtml(file.name) + '">' + escapeHtml(file.name) + '</strong><small>' + schemes.length + ' 套方案</small></div></div>' +
+                    '<header class="nm-file-top"><div class="nm-file-title"><span class="nm-file-mark"><i class="fa fa-file-text-o" aria-hidden="true"></i></span><strong title="' + escapeHtml(file.name) + '">' + escapeHtml(file.name) + '</strong></div><div class="nm-file-meta"><small>' + schemes.length + '套</small><span class="nm-file-period" title="' + escapeHtml(period.full) + '">' + escapeHtml(period.short) + '</span></div>' +
                     '<div class="nm-file-actions"><button type="button" data-action="toggle" data-id="' + Number(file.id) + '" data-active="' + (Number(file.status) === 1 ? '0' : '1') + '" aria-label="' + (Number(file.status) === 1 ? '暂停' : '继续') + '监控文件 ' + escapeHtml(file.name) + '" title="' + (Number(file.status) === 1 ? '暂停' : '继续') + '"><i class="fa ' + (Number(file.status) === 1 ? 'fa-pause' : 'fa-play') + '" aria-hidden="true"></i><span class="nm-file-action-label">' + (Number(file.status) === 1 ? '暂停' : '继续') + '</span></button><button type="button" data-action="clear" data-id="' + Number(file.id) + '" aria-label="清除监控文件 ' + escapeHtml(file.name) + '" title="清除"><i class="fa fa-trash-o" aria-hidden="true"></i><span class="nm-file-action-label">清除</span></button></div></header>' +
                     (Number(file.status) === 1 ? '' : '<div class="nm-file-paused">已暂停监控</div>') +
                     '<div class="nm-scheme-list">' + cards + '</div></section>';
@@ -790,9 +901,15 @@ $stateJson = Json::htmlEncode($dashboard);
     drawsToggle.addEventListener('click', openDraws);
     document.getElementById('nm-mobile-draws-close').addEventListener('click', closeDraws);
     drawsBackdrop.addEventListener('click', closeDraws);
+    document.getElementById('nm-mode-compact').addEventListener('click', function () { setDisplayMode('compact'); });
+    document.getElementById('nm-mode-detail').addEventListener('click', function () { setDisplayMode('detail'); });
+    document.getElementById('nm-fullscreen').addEventListener('click', toggleFullscreen);
+    document.addEventListener('fullscreenchange', updateFullscreenButton);
     document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape' && !schemeDialog.hidden) closeScheme();
-        else if (event.key === 'Escape') closeDraws();
+        if (event.key !== 'Escape') return;
+        if (!schemeDialog.hidden) closeScheme();
+        else if (root.classList.contains('nm-mobile-draws-open')) closeDraws();
+        else if (root.classList.contains('nm-focus-mode')) exitFocusMode();
     });
     window.addEventListener('resize', function () {
         if (window.innerWidth > 1600) closeDraws();
@@ -803,6 +920,8 @@ $stateJson = Json::htmlEncode($dashboard);
     });
     document.addEventListener('visibilitychange', function () { scheduleNextPoll(true); });
 
+    setDisplayMode(displayMode);
+    updateFullscreenButton();
     renderBoard();
     scheduleNextPoll(true);
 })();

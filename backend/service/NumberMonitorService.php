@@ -259,8 +259,8 @@ class NumberMonitorService
             ->orderBy(['id' => SORT_ASC])->asArray()->all();
         $fileIds = array_column($files, 'id');
         $schemes = $fileIds ? NumberMonitorScheme::find()
-            ->select(['id', 'file_id', 'line_no', 'title', 'fixed_count', 'pattern_count',
-                'last_qihao', 'current_status', 'streak_count'])
+            ->select(['id', 'file_id', 'line_no', 'title', 'fixed_count', 'pattern_count', 'sample',
+                'last_qihao', 'current_status', 'streak_count', 'updated_at'])
             ->where(['file_id' => $fileIds])
             ->orderBy(['file_id' => SORT_ASC, 'line_no' => SORT_ASC])->asArray()->all() : [];
         $schemesByFile = [];
