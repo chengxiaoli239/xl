@@ -316,6 +316,79 @@ class NumberMonitorService
         ];
     }
 
+    public static function schemeHistory(int $uid, int $schemeId, int $beforeDrawId = 0): array
+    {
+        if ($uid <= 0 || $schemeId <= 0 || $beforeDrawId < 0) {
+            throw new \InvalidArgumentException('监控方案或历史游标无效');
+        }
+        $scheme = (new Query())->from(NumberMonitorScheme::tableName() . ' s')
+            ->innerJoin(NumberMonitorFile::tableName() . ' f', 'f.id = s.file_id')
+            ->select(['s.id', 's.title', 's.lottery_type', 's.started_draw_id', 's.last_draw_id'])
+            ->where(['s.id' => $schemeId, 'f.uid' => $uid])->one();
+        if (!$scheme) {
+            throw new \InvalidArgumentException('监控方案不存在');
+        }
+        if ((int)$scheme['last_draw_id'] <= (int)$scheme['started_draw_id']) {
+            return ['title' => (string)$scheme['title'], 'has_more' => false,
+                'next_before_id' => 0, 'records' => []];
+        }
+
+        $drawQuery = SscKjData::find()->select(['id', 'qihao', 'code_4n_str'])
+            ->where(['lottery_type' => (int)$scheme['lottery_type']])
+            ->andWhere(['>', 'id', (int)$scheme['started_draw_id']])
+            ->andWhere(['<=', 'id', (int)$scheme['last_draw_id']]);
+        if ($beforeDrawId > 0) {
+            $drawQuery->andWhere(['<', 'id', $beforeDrawId]);
+        }
+        $draws = $drawQuery->orderBy(['id' => SORT_DESC])->limit(51)->asArray()->all();
+        $hasMore = count($draws) > 50;
+        if ($hasMore) {
+            array_pop($draws);
+        }
+
+        $candidatePatterns = [];
+        foreach ($draws as $draw) {
+            $code = preg_replace('/\D/', '', (string)$draw['code_4n_str']);
+            if (preg_match('/^[0-9]{4}$/', $code)) {
+                foreach (self::candidatePatterns($code) as $pattern) {
+                    $candidatePatterns[$pattern] = true;
+                }
+            }
+        }
+        $matchedPatterns = $candidatePatterns ? NumberMonitorPattern::find()
+            ->select('pattern')
+            ->where(['scheme_id' => $schemeId, 'pattern' => array_keys($candidatePatterns)])
+            ->column() : [];
+        $matchedLookup = array_fill_keys($matchedPatterns, true);
+        $records = [];
+        foreach ($draws as $draw) {
+            $code = preg_replace('/\D/', '', (string)$draw['code_4n_str']);
+            $validCode = preg_match('/^[0-9]{4}$/', $code) === 1;
+            $hit = false;
+            if ($validCode) {
+                foreach (self::candidatePatterns($code) as $pattern) {
+                    if (isset($matchedLookup[$pattern])) {
+                        $hit = true;
+                        break;
+                    }
+                }
+            }
+            $records[] = [
+                'id' => (int)$draw['id'],
+                'qihao' => (string)$draw['qihao'],
+                'code' => $validCode ? $code : '',
+                'status' => $validCode ? ($hit ? NumberMonitorScheme::STATUS_HIT : NumberMonitorScheme::STATUS_MISS) : 0,
+            ];
+        }
+
+        return [
+            'title' => (string)$scheme['title'],
+            'has_more' => $hasMore,
+            'next_before_id' => $records ? (int)end($records)['id'] : 0,
+            'records' => $records,
+        ];
+    }
+
     public static function processPendingDraws(int $lotteryType): int
     {
         if (!self::supportedLotteryType($lotteryType)) {

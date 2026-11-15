@@ -16,7 +16,7 @@ class NumberMonitorController extends BaseController
 {
     public function allowAction()
     {
-        return ['index', 'data', 'scheme', 'preview', 'create', 'toggle', 'clear'];
+        return ['index', 'data', 'scheme', 'history', 'preview', 'create', 'toggle', 'clear'];
     }
 
     public function behaviors()
@@ -27,6 +27,7 @@ class NumberMonitorController extends BaseController
                 'actions' => [
                     'data' => ['GET'],
                     'scheme' => ['GET'],
+                    'history' => ['GET'],
                     'preview' => ['POST'],
                     'create' => ['POST'],
                     'toggle' => ['POST'],
@@ -82,6 +83,22 @@ class NumberMonitorController extends BaseController
             return $this->jsonResponse([
                 'success' => true,
                 'scheme' => NumberMonitorService::schemePatterns((int)$this->_user_id, (int)$id, (int)$page),
+            ]);
+        } catch (\Throwable $exception) {
+            return $this->errorResponse($exception);
+        }
+    }
+
+    public function actionHistory($id = 0, $before_id = 0)
+    {
+        try {
+            return $this->jsonResponse([
+                'success' => true,
+                'history' => NumberMonitorService::schemeHistory(
+                    (int)$this->_user_id,
+                    (int)$id,
+                    (int)$before_id
+                ),
             ]);
         } catch (\Throwable $exception) {
             return $this->errorResponse($exception);

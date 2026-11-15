@@ -255,6 +255,18 @@ html[data-xl-theme="dark"] body.xl-admin-shell .nm-draws-heading > i {
 html[data-xl-theme="dark"] body.xl-admin-shell .nm-streak.none {
     background: #344b5f; color: var(--nm-ink);
 }
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-mobile-draws-action button {
+    border-color: var(--nm-line); background: var(--nm-paper); color: var(--nm-teal);
+}
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-history-status.hit {
+    background: #1b4c41; color: #9aebc6;
+}
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-history-status.miss {
+    background: #57313c; color: #ffc2c6;
+}
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-history-status.none {
+    background: #344b5f; color: var(--nm-ink);
+}
 html[data-xl-theme="dark"] body.xl-admin-shell .nm-sync-state.error,
 html[data-xl-theme="dark"] body.xl-admin-shell .nm-feedback.error {
     color: #ff9d9d;

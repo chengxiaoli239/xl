@@ -175,9 +175,9 @@ $largeFile = NumberMonitorService::createFile(124, 8, 'large.txt', $largeFileSch
 $largeSchemeId = (int)NumberMonitorScheme::find()->select('id')
     ->where(['file_id' => $largeFile['id'], 'line_no' => 1])->scalar();
 $firstPage = NumberMonitorService::schemePatterns(124, $largeSchemeId, 1);
-$lastPage = NumberMonitorService::schemePatterns(124, $largeSchemeId, 50);
-checkMonitor(count($firstPage['patterns']) === 200 && $firstPage['has_more']
-    && count($lastPage['patterns']) === 200 && !$lastPage['has_more'],
+$lastPage = NumberMonitorService::schemePatterns(124, $largeSchemeId, 25);
+checkMonitor(count($firstPage['patterns']) === 400 && $firstPage['has_more']
+    && count($lastPage['patterns']) === 400 && !$lastPage['has_more'],
     'large scheme detail pagination is incorrect');
 $storedLargePatterns = (new Query())->from(NumberMonitorPattern::tableName() . ' p')
     ->innerJoin(NumberMonitorScheme::tableName() . ' s', 's.id = p.scheme_id')

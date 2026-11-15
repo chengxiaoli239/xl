@@ -18,6 +18,7 @@ $stateJson = Json::htmlEncode($dashboard);
          data-lottery-type="<?= (int)$lotteryType ?>"
          data-data-url="<?= Html::encode(Url::to(['/forum/number-monitor/data'])) ?>"
          data-scheme-url="<?= Html::encode(Url::to(['/forum/number-monitor/scheme'])) ?>"
+         data-history-url="<?= Html::encode(Url::to(['/forum/number-monitor/history'])) ?>"
          data-preview-url="<?= Html::encode(Url::to(['/forum/number-monitor/preview'])) ?>"
          data-create-url="<?= Html::encode(Url::to(['/forum/number-monitor/create'])) ?>"
          data-toggle-url="<?= Html::encode(Url::to(['/forum/number-monitor/toggle'])) ?>"
@@ -38,9 +39,8 @@ $stateJson = Json::htmlEncode($dashboard);
             </select>
         </label>
         <div class="nm-mobile-draws-action">
-            <span>最近开奖</span>
             <button type="button" id="nm-mobile-draws-toggle" aria-label="查看最近开奖号" aria-controls="nm-draws-panel" aria-expanded="false">
-                <i class="fa fa-history" aria-hidden="true"></i>
+                <strong id="nm-floating-draw-code">----</strong><small>开奖</small>
             </button>
         </div>
     </header>
@@ -143,11 +143,18 @@ $stateJson = Json::htmlEncode($dashboard);
 .nm-scheme-meta>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nm-heading>.nm-mobile-draws-action,#nm-mobile-draws-close{display:none}
 @media(max-width:760px){
-    .nm-heading{position:relative}
-    .nm-heading>div:first-child{padding-right:98px}
-    .nm-heading>.nm-mobile-draws-action{position:absolute;top:16px;right:16px;display:flex;align-items:center;gap:7px;color:var(--nm-muted);font-size:11px}
-    .nm-mobile-draws-action button,#nm-mobile-draws-close{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--nm-line);border-radius:50%;background:var(--nm-paper);color:var(--nm-teal);font-size:16px;cursor:pointer}
-    .nm-file-column{flex:0 0 min(320px,calc(100vw - 64px));width:min(320px,calc(100vw - 64px))}
+    .nm-heading>.nm-mobile-draws-action{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));z-index:1000;display:block}
+    .nm-mobile-draws-action button,#nm-mobile-draws-close{display:grid;place-content:center;gap:2px;width:62px;height:62px;border:1px solid #cbd9ef;border-radius:50%;background:#fff;color:#315efb;box-shadow:0 8px 24px rgba(32,61,105,.2);cursor:pointer}
+    .nm-mobile-draws-action button strong{font:700 14px ui-monospace,SFMono-Regular,Menlo,monospace;line-height:1}
+    .nm-mobile-draws-action button small{font-size:9px;line-height:1}
+    .nm-file-column{flex:0 0 min(300px,calc(100vw - 40px));width:min(300px,calc(100vw - 40px))}
+    .nm-scheme-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:7px}
+    .nm-scheme{min-width:0;padding:7px}
+    .nm-scheme-head{gap:4px;align-items:flex-start}
+    .nm-scheme-title{min-width:0;font-size:10px}
+    .nm-streak-button{min-width:0;padding:4px 5px;font-size:10px}
+    .nm-scheme-sample{font-size:9px}
+    .nm-scheme-meta{font-size:9px}
     .nm-scheme-patterns{grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:5px;padding:10px}
     .nm-scheme-patterns .nm-pattern{padding:6px;font-size:11px}
     .nm-draws{display:none}
@@ -157,6 +164,25 @@ $stateJson = Json::htmlEncode($dashboard);
     .nm-draw-list{display:block;max-height:70vh;max-height:70dvh;overflow-y:auto}
     .nm-draw-row{padding:10px 14px}
 }
+.nm-scheme-panel{display:grid;grid-template-rows:auto minmax(0,1fr) auto;height:min(84vh,800px);max-height:calc(100vh - 32px)}
+.nm-scheme-patterns{min-height:0}
+.nm-scheme-patterns.nm-history-list{display:block}
+.nm-history-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:12px;min-height:42px;border-bottom:1px solid var(--nm-line);padding:7px 4px}
+.nm-history-issue{overflow:hidden;color:var(--nm-ink);font-size:12px;text-overflow:ellipsis;white-space:nowrap}
+.nm-history-code{color:var(--nm-muted);font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em!important}
+.nm-history-status{min-width:48px;border-radius:5px;padding:4px 7px;text-align:center;font-size:11px;font-weight:700}
+.nm-history-status.hit{background:#e5f5ee;color:#15774e}
+.nm-history-status.miss{background:#fdecec;color:#ad3434}
+.nm-history-status.none{background:#eef1f4;color:#687581}
+.nm-scheme-panel .nm-scheme-dialog-foot{min-height:62px}
+.nm-scheme-title,.nm-scheme-view,.nm-streak-button{border:0;background:transparent;color:inherit;cursor:pointer;font:inherit}
+.nm-scheme-title{min-width:0;flex:1;padding:0;text-align:left;color:var(--nm-ink);font-size:11px;font-weight:650}
+.nm-streak-button{flex:none;padding:0}
+.nm-streak-button .nm-streak{display:block;min-width:62px}
+.nm-scheme-view{display:block;width:100%;min-width:0;padding:0;text-align:left}
+.nm-scheme-title:focus-visible,.nm-scheme-view:focus-visible,.nm-streak-button:focus-visible{outline:2px solid var(--nm-teal);outline-offset:2px}
+.nm-history-row:last-child{border-bottom:0}
+@media(max-width:760px){.nm-scheme-panel{height:min(84dvh,800px);max-height:calc(100dvh - 32px)}}
 </style>
 
 <script>
@@ -190,6 +216,10 @@ $stateJson = Json::htmlEncode($dashboard);
     var openedPreviewEntries = [];
     var openedSchemePage = 1;
     var schemeRequest = 0;
+    var dialogMode = 'patterns';
+    var schemeHasMore = false;
+    var historyCursors = [0];
+    var historyHasMore = false;
     var previousFocus = null;
     var previewPageSize = 400;
     var drawsToggle = document.getElementById('nm-mobile-draws-toggle');
@@ -215,13 +245,19 @@ $stateJson = Json::htmlEncode($dashboard);
     function closeScheme() {
         schemeRequest++;
         schemeDialog.hidden = true;
+        schemeDialog.querySelector('.nm-scheme-panel').classList.remove('loading');
         document.body.classList.remove('nm-dialog-open');
         if (previousFocus && document.contains(previousFocus)) previousFocus.focus();
     }
 
     function renderSchemePage(scheme) {
         var list = document.getElementById('nm-scheme-patterns');
+        dialogMode = 'patterns';
+        list.classList.remove('nm-history-list');
+        list.setAttribute('aria-busy', 'false');
+        schemeDialog.querySelector('.nm-scheme-panel').classList.remove('loading');
         openedSchemePage = Number(scheme.page);
+        schemeHasMore = Boolean(scheme.has_more);
         document.getElementById('nm-scheme-title').textContent = scheme.title;
         document.getElementById('nm-scheme-summary').textContent = scheme.pattern_count + ' 组号码 · 重复号码以 × 次数展示';
         document.getElementById('nm-scheme-page').textContent = '第 ' + openedSchemePage + ' 页';
@@ -231,7 +267,60 @@ $stateJson = Json::htmlEncode($dashboard);
         }).join('') || '<p class="nm-scheme-message">本页没有号码</p>';
         list.scrollTop = 0;
         document.getElementById('nm-scheme-prev').disabled = openedSchemePage <= 1;
-        document.getElementById('nm-scheme-next').disabled = !scheme.has_more;
+        document.getElementById('nm-scheme-next').disabled = !schemeHasMore;
+    }
+
+    function renderHistoryPage(history, page) {
+        var list = document.getElementById('nm-scheme-patterns');
+        dialogMode = 'history';
+        openedSchemePage = page;
+        historyHasMore = Boolean(history.has_more);
+        if (historyHasMore) historyCursors[page] = Number(history.next_before_id);
+        list.classList.add('nm-history-list');
+        list.setAttribute('aria-busy', 'false');
+        schemeDialog.querySelector('.nm-scheme-panel').classList.remove('loading');
+        document.getElementById('nm-scheme-title').textContent = history.title + ' · 监控历史';
+        document.getElementById('nm-scheme-summary').textContent = '本次开始监控后的记录，最新在前';
+        document.getElementById('nm-scheme-page').textContent = '第 ' + page + ' 页';
+        list.innerHTML = history.records.map(function (record) {
+            var status = Number(record.status) === 1 ? 'hit' : Number(record.status) === 2 ? 'miss' : 'none';
+            var label = status === 'hit' ? '中' : status === 'miss' ? '错' : '无结果';
+            return '<div class="nm-history-row"><span class="nm-history-issue">' + escapeHtml(record.qihao) + '</span>' +
+                '<strong class="nm-history-code">' + escapeHtml(record.code || '----') + '</strong>' +
+                '<span class="nm-history-status ' + status + '">' + label + '</span></div>';
+        }).join('') || '<p class="nm-scheme-message">方案开始监控后暂无开奖记录</p>';
+        list.scrollTop = 0;
+        document.getElementById('nm-scheme-prev').disabled = page <= 1;
+        document.getElementById('nm-scheme-next').disabled = !historyHasMore;
+    }
+
+    function loadHistoryPage(page) {
+        if (page < 1 || page > historyCursors.length || !openedSchemeId || typeof historyCursors[page - 1] === 'undefined') return;
+        var requestId = ++schemeRequest;
+        var panel = schemeDialog.querySelector('.nm-scheme-panel');
+        var list = document.getElementById('nm-scheme-patterns');
+        panel.classList.add('loading');
+        list.setAttribute('aria-busy', 'true');
+        document.getElementById('nm-scheme-summary').textContent = '正在读取第 ' + page + ' 页历史…';
+        document.getElementById('nm-scheme-prev').disabled = true;
+        document.getElementById('nm-scheme-next').disabled = true;
+        var url = root.dataset.historyUrl + '?id=' + openedSchemeId + '&before_id=' + historyCursors[page - 1];
+        fetch(url, {credentials:'same-origin', headers:{'Accept':'application/json'}}).then(function (response) {
+            return response.json().then(function (body) {
+                if (!response.ok || !body.success) throw new Error(body.message || '历史记录读取失败');
+                return body.history;
+            });
+        }).then(function (history) {
+            if (requestId !== schemeRequest || schemeDialog.hidden) return;
+            renderHistoryPage(history, page);
+        }).catch(function (error) {
+            if (requestId !== schemeRequest || schemeDialog.hidden) return;
+            document.getElementById('nm-scheme-summary').textContent = error.message;
+            list.setAttribute('aria-busy', 'false');
+            panel.classList.remove('loading');
+            document.getElementById('nm-scheme-prev').disabled = openedSchemePage <= 1;
+            document.getElementById('nm-scheme-next').disabled = !historyHasMore;
+        });
     }
 
     function loadSchemePage(page) {
@@ -251,7 +340,9 @@ $stateJson = Json::htmlEncode($dashboard);
         if (!openedSchemeId) return;
         var requestId = ++schemeRequest;
         var list = document.getElementById('nm-scheme-patterns');
-        list.innerHTML = '<p class="nm-scheme-message">正在读取号码…</p>';
+        schemeDialog.querySelector('.nm-scheme-panel').classList.add('loading');
+        list.setAttribute('aria-busy', 'true');
+        document.getElementById('nm-scheme-summary').textContent = '正在读取第 ' + page + ' 页号码…';
         document.getElementById('nm-scheme-prev').disabled = true;
         document.getElementById('nm-scheme-next').disabled = true;
         var url = root.dataset.schemeUrl + '?id=' + openedSchemeId + '&page=' + page;
@@ -265,7 +356,11 @@ $stateJson = Json::htmlEncode($dashboard);
             renderSchemePage(scheme);
         }).catch(function (error) {
             if (requestId !== schemeRequest || schemeDialog.hidden) return;
-            list.innerHTML = '<p class="nm-scheme-message">' + escapeHtml(error.message) + '</p>';
+            document.getElementById('nm-scheme-summary').textContent = error.message;
+            list.setAttribute('aria-busy', 'false');
+            schemeDialog.querySelector('.nm-scheme-panel').classList.remove('loading');
+            document.getElementById('nm-scheme-prev').disabled = openedSchemePage <= 1;
+            document.getElementById('nm-scheme-next').disabled = !schemeHasMore;
         });
     }
 
@@ -273,18 +368,44 @@ $stateJson = Json::htmlEncode($dashboard);
         openedPreviewScheme = null;
         openedPreviewEntries = [];
         openedSchemeId = Number(id);
+        dialogMode = 'patterns';
         openedSchemePage = 1;
+        schemeHasMore = false;
+        historyCursors = [0];
         previousFocus = trigger;
         schemeDialog.hidden = false;
         document.body.classList.add('nm-dialog-open');
+        document.getElementById('nm-scheme-title').textContent = '方案号码';
+        document.getElementById('nm-scheme-patterns').classList.remove('nm-history-list');
+        document.getElementById('nm-scheme-patterns').innerHTML = '';
         schemeDialog.querySelector('.nm-scheme-panel').focus();
         loadSchemePage(1);
+    }
+
+    function openHistory(id, trigger) {
+        openedPreviewScheme = null;
+        openedPreviewEntries = [];
+        openedSchemeId = Number(id);
+        dialogMode = 'history';
+        openedSchemePage = 1;
+        historyCursors = [0];
+        historyHasMore = false;
+        previousFocus = trigger;
+        schemeDialog.hidden = false;
+        document.body.classList.add('nm-dialog-open');
+        document.getElementById('nm-scheme-title').textContent = '监控历史';
+        document.getElementById('nm-scheme-summary').textContent = '正在读取历史记录…';
+        document.getElementById('nm-scheme-patterns').classList.add('nm-history-list');
+        document.getElementById('nm-scheme-patterns').innerHTML = '';
+        schemeDialog.querySelector('.nm-scheme-panel').focus();
+        loadHistoryPage(1);
     }
 
     function openPreviewScheme(index, trigger) {
         var scheme = previewSchemes[index];
         if (!scheme) return;
         openedSchemeId = 0;
+        dialogMode = 'patterns';
         openedPreviewScheme = scheme;
         openedPreviewEntries = [];
         var occurrences = Object.create(null);
@@ -399,7 +520,7 @@ $stateJson = Json::htmlEncode($dashboard);
                     var label = paused ? '已暂停' : status === 'hit' ? '中 +' + scheme.streak_count : status === 'miss' ? '错 +' + scheme.streak_count : '待开奖';
                     var meta = scheme.last_qihao ? '最近更新 ' + scheme.last_qihao : scheme.pattern_count + ' 组号码';
                     var sample = String(scheme.sample || '').replace(/ ?…$/, '');
-                    return '<button type="button" class="nm-scheme" data-action="view" data-id="' + Number(scheme.id) + '" aria-label="查看' + escapeHtml(scheme.title) + '号码"><div class="nm-scheme-head"><strong>' + escapeHtml(scheme.title) + '</strong><span class="nm-streak ' + status + '">' + escapeHtml(label) + '</span></div><div class="nm-scheme-sample">' + escapeHtml(sample) + '</div><div class="nm-scheme-meta"><span>' + escapeHtml(meta) + '</span><span class="nm-scheme-open-hint">查看 <i class="fa fa-angle-right" aria-hidden="true"></i></span></div></button>';
+                    return '<article class="nm-scheme"><div class="nm-scheme-head"><button type="button" class="nm-scheme-title" data-action="view" data-id="' + Number(scheme.id) + '" aria-label="查看' + escapeHtml(scheme.title) + '号码">' + escapeHtml(scheme.title) + '</button><button type="button" class="nm-streak-button" data-action="history" data-id="' + Number(scheme.id) + '" aria-label="查看' + escapeHtml(scheme.title) + '每期监控历史"><span class="nm-streak ' + status + '">' + escapeHtml(label) + '</span></button></div><button type="button" class="nm-scheme-view" data-action="view" data-id="' + Number(scheme.id) + '" aria-label="查看' + escapeHtml(scheme.title) + '号码"><div class="nm-scheme-sample">' + escapeHtml(sample) + '</div><div class="nm-scheme-meta"><span>' + escapeHtml(meta) + '</span><span class="nm-scheme-open-hint">号码 <i class="fa fa-angle-right" aria-hidden="true"></i></span></div></button></article>';
                 }).join('');
                 return '<section class="nm-file-column ' + (Number(file.status) === 1 ? '' : 'paused') + '" data-file-id="' + Number(file.id) + '">' +
                     '<header class="nm-file-top"><div class="nm-file-title"><span class="nm-file-mark"><i class="fa fa-file-text-o" aria-hidden="true"></i></span><div><strong title="' + escapeHtml(file.name) + '">' + escapeHtml(file.name) + '</strong><small>' + schemes.length + ' 套方案</small></div></div>' +
@@ -417,8 +538,12 @@ $stateJson = Json::htmlEncode($dashboard);
         var list = document.getElementById('nm-draw-list');
         if (!draws.length) {
             list.innerHTML = '<div class="nm-draw-empty">暂无开奖数据</div>';
+            document.getElementById('nm-floating-draw-code').textContent = '----';
             return;
         }
+        var latestCode = String(draws[0].kj_code || '').replace(/\D/g, '');
+        document.getElementById('nm-floating-draw-code').textContent = latestCode || '----';
+        drawsToggle.setAttribute('aria-label', '查看最近开奖号，最新期号 ' + String(draws[0].qihao || ''));
         list.innerHTML = draws.map(function (draw, index) {
             var code = String(draw.kj_code || '').replace(/\D/g, '');
             return '<div class="nm-draw-row ' + (index === 0 ? 'latest' : '') + '"><span class="nm-draw-issue">' + escapeHtml(draw.qihao) + '</span><strong class="nm-draw-code">' + escapeHtml(code || '----') + '</strong></div>';
@@ -541,6 +666,7 @@ $stateJson = Json::htmlEncode($dashboard);
         if (!button) return;
         var action = button.dataset.action;
         if (action === 'view') { openScheme(button.dataset.id, button); return; }
+        if (action === 'history') { openHistory(button.dataset.id, button); return; }
         var form = new FormData();
         form.append('id', button.dataset.id);
         if (action === 'toggle') {
@@ -556,8 +682,14 @@ $stateJson = Json::htmlEncode($dashboard);
     schemeDialog.addEventListener('click', function (event) {
         if (event.target.dataset.closeScheme) closeScheme();
     });
-    document.getElementById('nm-scheme-prev').addEventListener('click', function () { loadSchemePage(openedSchemePage - 1); });
-    document.getElementById('nm-scheme-next').addEventListener('click', function () { loadSchemePage(openedSchemePage + 1); });
+    document.getElementById('nm-scheme-prev').addEventListener('click', function () {
+        if (dialogMode === 'history') loadHistoryPage(openedSchemePage - 1);
+        else loadSchemePage(openedSchemePage - 1);
+    });
+    document.getElementById('nm-scheme-next').addEventListener('click', function () {
+        if (dialogMode === 'history') loadHistoryPage(openedSchemePage + 1);
+        else loadSchemePage(openedSchemePage + 1);
+    });
     drawsToggle.addEventListener('click', openDraws);
     document.getElementById('nm-mobile-draws-close').addEventListener('click', closeDraws);
     drawsBackdrop.addEventListener('click', closeDraws);
