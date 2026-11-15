@@ -12,6 +12,7 @@ use common\service\numberMonitor\NumberSchemeParser;
 use Yii;
 use yii\db\Expression;
 use yii\db\Query;
+use yii\helpers\StringHelper;
 
 class NumberMonitorService
 {
@@ -36,13 +37,16 @@ class NumberMonitorService
         return array_intersect_key(CommonLotteryService::LOTTERY_TYPE_OPTIONS, array_flip(self::SUPPORTED_LOTTERY_TYPES));
     }
 
-    public static function createFile(int $uid, int $lotteryType, string $name, array $schemes): array
+    public static function createFile(int $uid, int $lotteryType, string $name, array $schemes, bool $fillExisting = false): array
     {
         if ($uid <= 0 || !self::supportedLotteryType($lotteryType)) {
             throw new \InvalidArgumentException('彩种参数无效');
         }
         if (!$schemes || count($schemes) > NumberSchemeParser::MAX_SCHEMES_PER_FILE) {
             throw new \InvalidArgumentException('文件方案数量无效');
+        }
+        if ($fillExisting && count($schemes) !== 1) {
+            throw new \InvalidArgumentException('文件夹内每个 TXT 文件只能包含一套方案');
         }
         $name = trim(basename(str_replace('\\', '/', $name)));
         if ($name === '' || strlen($name) > 180) {
@@ -104,9 +108,6 @@ class NumberMonitorService
                 ->innerJoin(NumberMonitorFile::tableName() . ' f', 'f.id = s.file_id')
                 ->where(['f.uid' => $uid])->count();
             $patternCount = (int)NumberMonitorScheme::find()->where(['uid' => $uid])->sum('pattern_count');
-            if ($fileCount >= self::MAX_FILES_PER_USER) {
-                throw new \InvalidArgumentException('账号最多支持 100 个监控文件');
-            }
             if ($schemeCount + count($schemes) > self::MAX_SCHEMES_PER_USER) {
                 throw new \InvalidArgumentException('账号最多支持 2,000 套监控方案');
             }
@@ -116,23 +117,37 @@ class NumberMonitorService
             $activeSchemeCount = (int)(new Query())->from(NumberMonitorScheme::tableName() . ' s')
                 ->innerJoin(NumberMonitorFile::tableName() . ' f', 'f.id = s.file_id')
                 ->where(['f.lottery_type' => $lotteryType, 'f.status' => 1])->count();
-            if ($activeSchemeCount + count($schemes) > self::MAX_ACTIVE_SCHEMES_PER_LOTTERY) {
+            $now = time();
+            $file = $fillExisting ? NumberMonitorFile::find()
+                ->where(['uid' => $uid, 'lottery_type' => $lotteryType])
+                ->andWhere(['<', 'scheme_count', NumberSchemeParser::MAX_SCHEMES_PER_FILE])
+                ->orderBy(['id' => SORT_ASC])->one() : null;
+            if ($activeSchemeCount + (($file && !(int)$file->status) ? 0 : count($schemes))
+                > self::MAX_ACTIVE_SCHEMES_PER_LOTTERY) {
                 throw new \InvalidArgumentException('该彩种的监控方案数量已达上限');
             }
-
-            $now = time();
-            $file = new NumberMonitorFile();
-            $file->setAttributes([
-                'uid' => $uid,
-                'lottery_type' => $lotteryType,
-                'name' => $name,
-                'status' => 1,
-                'scheme_count' => count($schemes),
-                'created_at' => $now,
-                'updated_at' => $now,
-            ], false);
+            if ($file) {
+                $firstLine = (int)$file->scheme_count;
+                $file->scheme_count += count($schemes);
+                $file->updated_at = $now;
+            } else {
+                if ($fileCount >= self::MAX_FILES_PER_USER) {
+                    throw new \InvalidArgumentException('账号最多支持 100 个监控文件');
+                }
+                $firstLine = 0;
+                $file = new NumberMonitorFile();
+                $file->setAttributes([
+                    'uid' => $uid,
+                    'lottery_type' => $lotteryType,
+                    'name' => $name,
+                    'status' => 1,
+                    'scheme_count' => count($schemes),
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ], false);
+            }
             if (!$file->save(false)) {
-                throw new \RuntimeException('无法保存监控文件');
+                throw new \RuntimeException('无法保存监控列');
             }
 
             $patternRows = [];
@@ -151,13 +166,18 @@ class NumberMonitorService
             foreach ($schemes as $index => $scheme) {
                 $firstPattern = reset($scheme['patterns']);
                 $fixedCount = strlen(str_replace('X', '', $firstPattern));
+                $lineNo = $firstLine + $index + 1;
+                $title = $fillExisting ? trim((string)($scheme['title'] ?? '')) : '';
+                if ($title === '') {
+                    $title = '方案 ' . $lineNo . ' · ' . $fixedCount . ' 定';
+                }
                 $model = new NumberMonitorScheme();
                 $model->setAttributes([
                     'file_id' => $file->id,
                     'uid' => $uid,
                     'lottery_type' => $lotteryType,
-                    'line_no' => $index + 1,
-                    'title' => '方案 ' . ($index + 1) . ' · ' . $fixedCount . ' 定',
+                    'line_no' => $lineNo,
+                    'title' => StringHelper::truncate($title, 70),
                     'sample' => implode(' ', $scheme['sample_patterns']) . ($scheme['pattern_count'] > 8 ? ' …' : ''),
                     'fixed_count' => $fixedCount,
                     'pattern_count' => $scheme['pattern_count'],

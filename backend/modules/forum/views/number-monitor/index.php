@@ -21,6 +21,7 @@ $stateJson = Json::htmlEncode($dashboard);
          data-history-url="<?= Html::encode(Url::to(['/forum/number-monitor/history'])) ?>"
          data-preview-url="<?= Html::encode(Url::to(['/forum/number-monitor/preview'])) ?>"
          data-create-url="<?= Html::encode(Url::to(['/forum/number-monitor/create'])) ?>"
+         data-create-folder-url="<?= Html::encode(Url::to(['/forum/number-monitor/create-folder-scheme'])) ?>"
          data-toggle-url="<?= Html::encode(Url::to(['/forum/number-monitor/toggle'])) ?>"
          data-clear-url="<?= Html::encode(Url::to(['/forum/number-monitor/clear'])) ?>"
          data-csrf="<?= Html::encode($csrfToken) ?>">
@@ -45,7 +46,7 @@ $stateJson = Json::htmlEncode($dashboard);
                 <div class="nm-import-head">
                     <div>
                         <h2>添加号码文件</h2>
-                        <span class="nm-muted">TXT · 空行分隔 · 最多 15 套，每套 10,000 组（保留重复号码）</span>
+                        <span class="nm-muted">单文件空行分套，最多 15 套；文件夹中每个 TXT 为一套，每套最多 10,000 组（保留重复号码）</span>
                     </div>
                     <div class="nm-mobile-draws-action">
                         <button type="button" id="nm-mobile-draws-toggle" aria-label="查看最近开奖号" aria-controls="nm-draws-panel" aria-expanded="false">
@@ -53,16 +54,18 @@ $stateJson = Json::htmlEncode($dashboard);
                         </button>
                     </div>
                     <div class="nm-import-actions">
+                        <button type="button" id="nm-pick-folder" class="nm-button nm-button-secondary"><i class="fa fa-folder-open-o" aria-hidden="true"></i> 添加文件夹</button>
                         <button type="button" id="nm-preview" class="nm-button nm-button-secondary" disabled>预览号码</button>
                         <button type="button" id="nm-create" class="nm-button nm-button-primary" disabled>开始监控</button>
                     </div>
                 </div>
                 <button type="button" class="nm-dropzone" id="nm-dropzone" aria-label="选择或拖入 TXT 文件">
                     <span class="nm-drop-icon"><i class="fa fa-file-text-o" aria-hidden="true"></i></span>
-                    <span class="nm-drop-copy"><strong id="nm-file-name">拖入 TXT 文件</strong><small id="nm-file-meta">单文件最多 2 MB</small></span>
+                    <span class="nm-drop-copy"><strong id="nm-file-name">拖入 TXT 文件或文件夹</strong><small id="nm-file-meta">单个 TXT 最多 2 MB</small></span>
                     <span class="nm-drop-browse">选择文件</span>
                 </button>
                 <input id="nm-file-input" type="file" accept=".txt,text/plain" hidden>
+                <input id="nm-folder-input" type="file" webkitdirectory directory multiple hidden>
                 <div class="nm-preview" id="nm-preview-list" hidden></div>
                 <div id="nm-feedback" class="nm-feedback" role="status" aria-live="polite"></div>
             </section>
@@ -126,7 +129,7 @@ $stateJson = Json::htmlEncode($dashboard);
 .number-monitor button:focus-visible,.number-monitor select:focus-visible{outline:2px solid var(--nm-teal);outline-offset:2px}
 @media(max-width:760px){.number-monitor{border-radius:0}.nm-heading{padding:16px}.nm-file-title strong{max-width:170px}}
 @media(prefers-reduced-motion:reduce){.nm-button{transition:none}}
-#nm-file-input{display:none!important}
+#nm-file-input,#nm-folder-input{display:none!important}
 .nm-draw-row{gap:6px;padding:9px 12px}
 .nm-draw-issue{overflow:hidden;font-size:13px;text-overflow:ellipsis;white-space:nowrap}
 .nm-draw-code{font-size:17px;letter-spacing:.14em!important;padding-left:.14em}
@@ -217,6 +220,7 @@ $stateJson = Json::htmlEncode($dashboard);
 .nm-import-head{gap:8px;margin-bottom:5px}
 .nm-import-head .nm-muted{margin-top:2px;font-size:10px}
 .nm-import-actions{gap:6px}
+.nm-import-actions .fa{margin-right:4px}
 .nm-button{height:30px;padding:0 9px}
 .nm-dropzone{min-height:38px;gap:8px;padding:4px 8px}
 .nm-drop-icon{flex-basis:25px;width:25px;height:25px;font-size:12px}
@@ -324,6 +328,8 @@ body.nm-page-focus-open{overflow:hidden}
     var csrf = root.dataset.csrf;
     var state = <?= $stateJson ?>;
     var selectedFile = null;
+    var selectedFolderFiles = [];
+    var selectedFolderName = '';
     var previewed = false;
     var previewSchemes = [];
     var busy = false;
@@ -338,9 +344,11 @@ body.nm-page-focus-open{overflow:hidden}
     var cycleStartDrawId = Number(state.latest_draw_id || 0);
     var settledCycle = -1;
     var input = document.getElementById('nm-file-input');
+    var folderInput = document.getElementById('nm-folder-input');
     var dropzone = document.getElementById('nm-dropzone');
     var previewButton = document.getElementById('nm-preview');
     var createButton = document.getElementById('nm-create');
+    var folderButton = document.getElementById('nm-pick-folder');
     var feedback = document.getElementById('nm-feedback');
     var schemeDialog = document.getElementById('nm-scheme-dialog');
     var openedSchemeId = 0;
@@ -591,29 +599,94 @@ body.nm-page-focus-open{overflow:hidden}
         feedback.className = 'nm-feedback' + (kind ? ' ' + kind : '');
     }
 
-    function formForFile() {
+    function formForFile(file) {
         var form = new FormData();
-        form.append('file', selectedFile);
+        form.append('file', file || selectedFile);
         form.append('lottery_type', String(lotteryType));
         return form;
     }
 
     function updateFileLabel() {
-        document.getElementById('nm-file-name').textContent = selectedFile ? selectedFile.name : '拖入 TXT 文件';
-        document.getElementById('nm-file-meta').textContent = selectedFile ? Math.ceil(selectedFile.size / 1024) + ' KB' : '单文件最多 2 MB';
+        var folderMode = selectedFolderFiles.length > 0;
+        document.getElementById('nm-file-name').textContent = folderMode ? selectedFolderName :
+            (selectedFile ? selectedFile.name : '拖入 TXT 文件或文件夹');
+        document.getElementById('nm-file-meta').textContent = folderMode ? selectedFolderFiles.length + ' 个 TXT 文件，按顺序填满监控列' :
+            (selectedFile ? Math.ceil(selectedFile.size / 1024) + ' KB' : '单个 TXT 最多 2 MB');
         previewButton.disabled = !selectedFile || busy;
-        createButton.disabled = !selectedFile || !previewed || busy;
+        createButton.disabled = busy || (!folderMode && (!selectedFile || !previewed));
+        folderButton.disabled = busy;
     }
 
     function chooseFile(file) {
         if (!file || busy) return;
         selectedFile = file;
+        selectedFolderFiles = [];
+        selectedFolderName = '';
+        folderInput.value = '';
         previewed = false;
         previewSchemes = [];
         document.getElementById('nm-preview-list').hidden = true;
         document.getElementById('nm-preview-list').innerHTML = '';
         setFeedback('', '');
         updateFileLabel();
+    }
+
+    function chooseFolder(files, name) {
+        if (busy) return;
+        var txtFiles = files.filter(function (file) { return /\.txt$/i.test(file.name) && !file.name.startsWith('.'); });
+        if (!txtFiles.length) { rejectFolder('文件夹中没有 TXT 文件'); return; }
+        if (txtFiles.length > 1500) { rejectFolder('单次最多选择 1,500 个 TXT 文件'); return; }
+        var invalid = txtFiles.find(function (file) { return file.size > 2097152; });
+        if (invalid) { rejectFolder('TXT 文件「' + invalid.name + '」超过 2 MB'); return; }
+        selectedFolderFiles = txtFiles.sort(function (a, b) {
+            return a.name.localeCompare(b.name, undefined, {numeric:true});
+        });
+        selectedFolderName = name || '文件夹导入';
+        selectedFile = null;
+        input.value = '';
+        previewed = false;
+        previewSchemes = [];
+        var preview = document.getElementById('nm-preview-list');
+        preview.innerHTML = folderPreviewHtml(selectedFolderFiles);
+        preview.hidden = false;
+        setFeedback('已选择 ' + selectedFolderFiles.length + ' 个 TXT 文件', 'success');
+        updateFileLabel();
+    }
+
+    function rejectFolder(message) {
+        selectedFile = null;
+        selectedFolderFiles = [];
+        selectedFolderName = '';
+        previewed = false;
+        previewSchemes = [];
+        document.getElementById('nm-preview-list').hidden = true;
+        document.getElementById('nm-preview-list').innerHTML = '';
+        updateFileLabel();
+        setFeedback(message, 'error');
+    }
+
+    function folderPreviewHtml(files) {
+        return files.map(function (file, index) {
+            return '<button type="button" class="nm-preview-row" data-folder-preview-index="' + index + '" aria-label="查看' + escapeHtml(file.name) + '的号码"><span>' + (index + 1) + '. ' + escapeHtml(file.name) + '</span><em>' + Math.ceil(file.size / 1024) + ' KB · 查看</em></button>';
+        }).join('');
+    }
+
+    function readDirectory(entry) {
+        if (entry.isFile) return new Promise(function (resolve, reject) {
+            entry.file(function (file) { resolve([file]); }, reject);
+        });
+        var reader = entry.createReader();
+        var entries = [];
+        function nextBatch() {
+            return new Promise(function (resolve, reject) { reader.readEntries(resolve, reject); }).then(function (batch) {
+                if (!batch.length) return entries;
+                entries.push.apply(entries, batch);
+                return nextBatch();
+            });
+        }
+        return nextBatch().then(function (children) {
+            return Promise.all(children.map(readDirectory));
+        }).then(function (groups) { return [].concat.apply([], groups); });
     }
 
     function renderPreview(schemes) {
@@ -829,15 +902,37 @@ body.nm-page-focus-open{overflow:hidden}
 
     dropzone.addEventListener('click', function () { if (!busy) input.click(); });
     input.addEventListener('change', function () { chooseFile(input.files && input.files[0]); });
+    folderButton.addEventListener('click', function () { if (!busy) { folderInput.value = ''; folderInput.click(); } });
+    folderInput.addEventListener('change', function () {
+        var files = Array.prototype.slice.call(folderInput.files || []);
+        var path = files[0] && files[0].webkitRelativePath || '';
+        chooseFolder(files, path.split('/')[0]);
+    });
     ['dragenter', 'dragover'].forEach(function (eventName) {
         dropzone.addEventListener(eventName, function (event) { event.preventDefault(); dropzone.classList.add('dragging'); });
     });
-    ['dragleave', 'drop'].forEach(function (eventName) {
-        dropzone.addEventListener(eventName, function (event) {
-            event.preventDefault();
-            dropzone.classList.remove('dragging');
-            if (eventName === 'drop' && event.dataTransfer.files.length) chooseFile(event.dataTransfer.files[0]);
-        });
+    dropzone.addEventListener('dragleave', function (event) {
+        event.preventDefault();
+        dropzone.classList.remove('dragging');
+    });
+    dropzone.addEventListener('drop', function (event) {
+        event.preventDefault();
+        dropzone.classList.remove('dragging');
+        if (busy) return;
+        var items = Array.prototype.slice.call(event.dataTransfer.items || []);
+        var entries = items.map(function (item) { return item.webkitGetAsEntry ? item.webkitGetAsEntry() : null; }).filter(Boolean);
+        var directories = entries.filter(function (entry) { return entry.isDirectory; });
+        if (directories.length) {
+            if (entries.length !== 1) { rejectFolder('一次请拖入一个文件夹'); return; }
+            readDirectory(directories[0]).then(function (files) { chooseFolder(files, directories[0].name); })
+                .catch(function () { rejectFolder('无法读取文件夹，请使用“添加文件夹”选择'); });
+            return;
+        }
+        if (event.dataTransfer.files.length > 1) {
+            chooseFolder(Array.prototype.slice.call(event.dataTransfer.files), '拖入的文件');
+        } else if (event.dataTransfer.files.length) {
+            chooseFile(event.dataTransfer.files[0]);
+        }
     });
 
     previewButton.addEventListener('click', function () {
@@ -853,10 +948,55 @@ body.nm-page-focus-open{overflow:hidden}
     });
     document.getElementById('nm-preview-list').addEventListener('click', function (event) {
         var button = event.target.closest('button[data-preview-index]');
-        if (button) openPreviewScheme(Number(button.dataset.previewIndex), button);
+        if (button) { openPreviewScheme(Number(button.dataset.previewIndex), button); return; }
+        var folderPreview = event.target.closest('button[data-folder-preview-index]');
+        if (!folderPreview || busy) return;
+        var file = selectedFolderFiles[Number(folderPreview.dataset.folderPreviewIndex)];
+        if (!file) return;
+        busy = true; updateFileLabel();
+        request(root.dataset.previewUrl, formForFile(file)).then(function (body) {
+            if (body.schemes.length !== 1) throw new Error('文件夹内每个 TXT 文件只能包含一套方案');
+            previewSchemes = body.schemes;
+            setFeedback('', '');
+            openPreviewScheme(0, folderPreview);
+        }).catch(function (error) { setFeedback('「' + file.name + '」预览失败：' + error.message, 'error'); })
+            .finally(function () { busy = false; updateFileLabel(); });
     });
 
     createButton.addEventListener('click', function () {
+        if (selectedFolderFiles.length) {
+            if (busy) return;
+            busy = true; updateFileLabel();
+            var files = selectedFolderFiles.slice();
+            var imported = 0;
+            function nextFile() {
+                if (imported >= files.length) return Promise.resolve();
+                var file = files[imported];
+                setFeedback('正在导入 ' + (imported + 1) + '/' + files.length + '：' + file.name, '');
+                var form = new FormData();
+                form.append('file', file);
+                form.append('folder_name', selectedFolderName);
+                form.append('lottery_type', String(lotteryType));
+                return request(root.dataset.createFolderUrl, form).then(function () {
+                    imported++;
+                    return nextFile();
+                });
+            }
+            nextFile().then(function () {
+                selectedFolderFiles = [];
+                selectedFolderName = '';
+                folderInput.value = '';
+                document.getElementById('nm-preview-list').hidden = true;
+                document.getElementById('nm-preview-list').innerHTML = '';
+                setFeedback('已导入 ' + imported + ' 套方案', 'success');
+            }).catch(function (error) {
+                selectedFolderFiles = files.slice(imported);
+                setFeedback('已导入 ' + imported + ' 套；「' + files[imported].name + '」失败：' + error.message, 'error');
+                var preview = document.getElementById('nm-preview-list');
+                preview.innerHTML = folderPreviewHtml(selectedFolderFiles);
+            }).then(loadData).finally(function () { busy = false; updateFileLabel(); });
+            return;
+        }
         if (!selectedFile || !previewed || busy) return;
         busy = true; updateFileLabel(); setFeedback('', '');
         request(root.dataset.createUrl, formForFile()).then(function () {

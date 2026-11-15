@@ -146,6 +146,44 @@ checkMonitor((int)NumberMonitorFile::find()->count() === 0
     && (int)NumberMonitorPattern::find()->count() === 0, 'clear left monitor rows behind');
 addMonitorDraw($db, '1007', '99999');
 
+$folderScheme = ['title' => 'folder-01', 'patterns' => ['1234', '1234']];
+$leftColumn = NumberMonitorService::createFile(125, 8, 'existing-left.txt', array_fill(0, 14, $folderScheme));
+$rightColumn = NumberMonitorService::createFile(125, 8, 'existing-right.txt', array_fill(0, 13, $folderScheme));
+NumberMonitorService::setFileStatus(125, $leftColumn['id'], false);
+$folderTargets = [];
+for ($number = 1; $number <= 4; $number++) {
+    $folderScheme['title'] = 'file-' . $number;
+    $folderTargets[] = NumberMonitorService::createFile(125, 8, 'folder-name', [$folderScheme], true)['id'];
+}
+checkMonitor($folderTargets[0] === $leftColumn['id']
+    && $folderTargets[1] === $rightColumn['id']
+    && $folderTargets[2] === $rightColumn['id']
+    && $folderTargets[3] !== $rightColumn['id'], 'folder import did not fill partial columns left to right');
+$folderFiles = NumberMonitorFile::find()->where(['uid' => 125])->orderBy(['id' => SORT_ASC])->all();
+checkMonitor(array_map(function ($file) { return (int)$file->scheme_count; }, $folderFiles) === [15, 15, 1]
+    && (int)$folderFiles[0]->status === 0 && $folderFiles[2]->name === 'folder-name',
+    'folder column counts or paused status changed');
+checkMonitor((string)NumberMonitorScheme::find()->select('title')
+    ->where(['file_id' => $folderTargets[3]])->scalar() === 'file-4', 'folder file title was not retained');
+try {
+    NumberMonitorService::createFile(125, 8, 'folder-name', [$folderScheme, $folderScheme], true);
+    throw new RuntimeException('folder accepted multiple schemes from one file');
+} catch (InvalidArgumentException $expected) {
+}
+foreach ($folderFiles as $file) {
+    NumberMonitorService::deleteFile(125, (int)$file->id);
+}
+$folderIds = [];
+for ($number = 1; $number <= 16; $number++) {
+    $folderIds[] = NumberMonitorService::createFile(126, 8, 'sixteen-files', [$folderScheme], true)['id'];
+}
+checkMonitor(count(array_unique($folderIds)) === 2
+    && count(array_unique(array_slice($folderIds, 0, 15))) === 1
+    && $folderIds[15] !== $folderIds[14], 'folder with more than 15 files did not start a second column');
+foreach (NumberMonitorFile::find()->where(['uid' => 126])->all() as $file) {
+    NumberMonitorService::deleteFile(126, (int)$file->id);
+}
+
 $bulkSchemes = [];
 for ($i = 0; $i < 10; $i++) {
     $patterns = [];

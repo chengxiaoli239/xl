@@ -7,6 +7,7 @@ use backend\service\NumberMonitorService;
 use common\service\lottery\CommonLotteryService;
 use common\service\numberMonitor\NumberSchemeParser;
 use Yii;
+use yii\helpers\StringHelper;
 use yii\filters\VerbFilter;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
@@ -16,7 +17,7 @@ class NumberMonitorController extends BaseController
 {
     public function allowAction()
     {
-        return ['index', 'data', 'scheme', 'history', 'preview', 'create', 'toggle', 'clear'];
+        return ['index', 'data', 'scheme', 'history', 'preview', 'create', 'create-folder-scheme', 'toggle', 'clear'];
     }
 
     public function behaviors()
@@ -30,6 +31,7 @@ class NumberMonitorController extends BaseController
                     'history' => ['GET'],
                     'preview' => ['POST'],
                     'create' => ['POST'],
+                    'create-folder-scheme' => ['POST'],
                     'toggle' => ['POST'],
                     'clear' => ['POST'],
                 ],
@@ -134,6 +136,30 @@ class NumberMonitorController extends BaseController
                 $lotteryType,
                 $file ? $file->name : '号码方案.txt',
                 $schemes
+            );
+            return $this->jsonResponse(['success' => true, 'file' => $result]);
+        } catch (\Throwable $exception) {
+            return $this->errorResponse($exception);
+        }
+    }
+
+    public function actionCreateFolderScheme()
+    {
+        try {
+            $content = $this->getUploadedContent();
+            $schemes = NumberSchemeParser::parse($content);
+            if (count($schemes) !== 1) {
+                throw new \InvalidArgumentException('文件夹内每个 TXT 文件只能包含一套方案');
+            }
+            $file = UploadedFile::getInstanceByName('file');
+            $title = trim(pathinfo($file->name, PATHINFO_FILENAME));
+            $schemes[0]['title'] = StringHelper::truncate($title ?: '号码方案', 70);
+            $result = NumberMonitorService::createFile(
+                (int)$this->_user_id,
+                (int)Yii::$app->request->post('lottery_type', 0),
+                (string)Yii::$app->request->post('folder_name', '文件夹导入'),
+                $schemes,
+                true
             );
             return $this->jsonResponse(['success' => true, 'file' => $result]);
         } catch (\Throwable $exception) {
