@@ -16,7 +16,7 @@ class NumberMonitorController extends BaseController
 {
     public function allowAction()
     {
-        return ['index', 'data', 'preview', 'create', 'toggle', 'clear'];
+        return ['index', 'data', 'scheme', 'preview', 'create', 'toggle', 'clear'];
     }
 
     public function behaviors()
@@ -26,6 +26,7 @@ class NumberMonitorController extends BaseController
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'data' => ['GET'],
+                    'scheme' => ['GET'],
                     'preview' => ['POST'],
                     'create' => ['POST'],
                     'toggle' => ['POST'],
@@ -73,6 +74,18 @@ class NumberMonitorController extends BaseController
             'success' => true,
             'dashboard' => NumberMonitorService::dashboardData((int)$this->_user_id, $lotteryType),
         ]);
+    }
+
+    public function actionScheme($id = 0, $page = 1)
+    {
+        try {
+            return $this->jsonResponse([
+                'success' => true,
+                'scheme' => NumberMonitorService::schemePatterns((int)$this->_user_id, (int)$id, (int)$page),
+            ]);
+        } catch (\Throwable $exception) {
+            return $this->errorResponse($exception);
+        }
     }
 
     public function actionPreview()

@@ -87,6 +87,17 @@ checkMonitor($created['scheme_count'] === 4 && $created['pattern_count'] === 14,
 checkMonitor((int)NumberMonitorPattern::find()->count() === 13, 'patterns were duplicated during import');
 checkMonitor((int)NumberMonitorPattern::find()->where(['pattern' => '234X'])->sum('occurrence_count') === 2,
     'duplicate pattern occurrence was not preserved');
+$schemeId = (int)NumberMonitorScheme::find()->select('id')->where(['file_id' => $fileId, 'line_no' => 4])->scalar();
+$schemePage = NumberMonitorService::schemePatterns(123, $schemeId, 1);
+checkMonitor($schemePage['pattern_count'] === 5 && count($schemePage['patterns']) === 4
+    && $schemePage['patterns'][0]['pattern'] === '234X'
+    && (int)$schemePage['patterns'][0]['occurrence_count'] === 2
+    && $schemePage['has_more'] === false, 'scheme detail lost order or duplicate counts');
+try {
+    NumberMonitorService::schemePatterns(456, $schemeId, 1);
+    throw new RuntimeException('another account was able to read scheme patterns');
+} catch (InvalidArgumentException $expected) {
+}
 checkMonitor(NumberMonitorService::dashboardData(456, 8)['files'] === [], 'files leaked across accounts');
 try {
     NumberMonitorService::setFileStatus(456, $fileId, false);
@@ -161,6 +172,13 @@ for ($number = 0; $number < 10000; $number++) {
 }
 $largeFileSchemes = array_fill(0, 3, ['patterns' => $allFourDigitPatterns]);
 $largeFile = NumberMonitorService::createFile(124, 8, 'large.txt', $largeFileSchemes);
+$largeSchemeId = (int)NumberMonitorScheme::find()->select('id')
+    ->where(['file_id' => $largeFile['id'], 'line_no' => 1])->scalar();
+$firstPage = NumberMonitorService::schemePatterns(124, $largeSchemeId, 1);
+$lastPage = NumberMonitorService::schemePatterns(124, $largeSchemeId, 50);
+checkMonitor(count($firstPage['patterns']) === 200 && $firstPage['has_more']
+    && count($lastPage['patterns']) === 200 && !$lastPage['has_more'],
+    'large scheme detail pagination is incorrect');
 $storedLargePatterns = (new Query())->from(NumberMonitorPattern::tableName() . ' p')
     ->innerJoin(NumberMonitorScheme::tableName() . ' s', 's.id = p.scheme_id')
     ->where(['s.file_id' => $largeFile['id']])->count();

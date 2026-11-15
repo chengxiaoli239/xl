@@ -6,6 +6,7 @@ body.xl-admin-shell {
     --xl-section: #cfdeeb; --xl-section-hover: #c1d5e7;
     --xl-item: #e2edf6; --xl-item-hover: #d2e5f3; --xl-item-active: #bbdaef;
     --xl-text: #1a304a; --xl-muted: #546b82; --xl-accent: #225f9a;
+    --xl-heading: #415e7a;
     --xl-border: #bbccdb; --xl-item-border: #ccdeea;
     --xl-shadow: rgba(27, 62, 93, .09);
     background: var(--xl-page); color: var(--xl-text);
@@ -17,32 +18,46 @@ html[data-xl-theme="dark"] body.xl-admin-shell {
     --xl-section: #2a435c; --xl-section-hover: #355470;
     --xl-item: #20364b; --xl-item-hover: #2b4c68; --xl-item-active: #315c7e;
     --xl-text: #e3edf6; --xl-muted: #b7c9da; --xl-accent: #92caff;
+    --xl-heading: #b5c9dd;
     --xl-border: #40566b; --xl-item-border: #2c455c;
     --xl-shadow: rgba(0, 0, 0, .2);
     color-scheme: dark;
 }
 .xl-admin-shell #sidebar {
-    top: 60px; left: 8px; bottom: 12px;
-    width: 198px !important; height: auto; overflow-x: hidden;
+    top: 8px; left: 8px; bottom: 8px;
+    width: 198px !important; height: auto; overflow-x: hidden; overflow-y: auto;
     border: 1px solid var(--xl-border); border-radius: 18px;
     background: linear-gradient(160deg, var(--xl-sidebar-top), var(--xl-sidebar-bottom));
     box-shadow: 4px 8px 24px var(--xl-shadow);
 }
-.xl-admin-shell .header.white-bg {
-    border-bottom: 1px solid var(--xl-border);
-    background: var(--xl-header); box-shadow: 0 2px 12px var(--xl-shadow);
+.xl-admin-shell .xl-nav-toggle {
+    position: fixed; top: 24px; left: 20px; z-index: 1100;
+    width: 30px; height: 30px; border: 0; border-radius: 8px;
+    background: var(--xl-item); color: var(--xl-accent); font-size: 16px;
+    cursor: pointer;
 }
-.xl-admin-shell a.logo, .xl-admin-shell .top-nav .username { color: var(--xl-text); }
-.xl-admin-shell a.logo { font-weight: 750; }
-.xl-admin-shell a.logo span, .xl-admin-shell .sidebar-toggle-box .fa-bars { color: var(--xl-accent); }
-.xl-admin-shell ul.sidebar-menu { margin: 14px 0 0; padding: 0 10px 20px; }
+.xl-admin-shell .xl-nav-toggle:hover { background: var(--xl-item-hover); }
+.xl-admin-shell .xl-nav-toggle:focus-visible { outline: 2px solid var(--xl-accent); outline-offset: 2px; }
+.xl-admin-shell .xl-sidebar-brand {
+    min-height: 76px; padding: 18px 14px 14px 50px;
+    border-bottom: 1px solid var(--xl-border);
+}
+.xl-admin-shell .xl-sidebar-brand a {
+    display: block; color: var(--xl-text); font-size: 17px; font-weight: 750; white-space: nowrap;
+}
+.xl-admin-shell .xl-sidebar-brand span { display: block; margin-top: 3px; color: var(--xl-muted); font-size: 10px; }
+.xl-admin-shell #main-content > .wrapper { margin-top: 0; }
+.xl-admin-shell ul.sidebar-menu { margin: 10px 0 0; padding: 0 10px 16px; }
 .xl-admin-shell ul.sidebar-menu > li { margin: 0 0 17px; padding: 0; }
 .xl-admin-shell ul.sidebar-menu > li > a {
     display: flex; min-height: 30px; align-items: center; gap: 7px;
     border: 1px solid transparent; border-radius: 8px;
-    padding: 5px 29px 5px 12px; color: var(--xl-muted);
+    padding: 5px 29px 5px 12px; color: var(--xl-heading);
     font-size: 11px; font-weight: 600; line-height: 1.45; letter-spacing: .06em;
     white-space: normal; overflow-wrap: anywhere;
+}
+.xl-admin-shell #sidebar > ul.sidebar-menu > li > a {
+    height: auto; line-height: 1.45;
 }
 .xl-admin-shell ul.sidebar-menu > li > a > i {
     width: 14px; flex: 0 0 14px; padding: 0;
@@ -80,6 +95,10 @@ html[data-xl-theme="dark"] body.xl-admin-shell {
     white-space: normal; overflow-wrap: anywhere;
     transition: background .15s ease, border-color .15s ease;
 }
+.xl-admin-shell ul.sidebar-menu li ul.sub li a > i {
+    width: 18px; flex: 0 0 18px; padding: 0;
+    color: var(--xl-accent); font-size: 16px; text-align: center;
+}
 .xl-admin-shell ul.sidebar-menu li ul.sub li a:hover,
 .xl-admin-shell ul.sidebar-menu li ul.sub li a:focus {
     background: var(--xl-item-hover); border-color: var(--xl-border); color: var(--xl-text);
@@ -109,6 +128,26 @@ html[data-xl-theme="dark"] body.xl-admin-shell {
     font-size: 13px; font-weight: 600; cursor: pointer;
 }
 .xl-admin-shell .xl-theme-toggle:hover { background: var(--xl-item-hover); }
+.xl-admin-shell .xl-sidebar-tools {
+    margin: 4px 10px 12px; padding-top: 12px; border-top: 1px solid var(--xl-border);
+}
+.xl-admin-shell .xl-sidebar-tools .xl-theme-toggle {
+    width: 100%; min-height: 40px; justify-content: flex-start; margin: 0; padding: 8px 10px;
+}
+.xl-admin-shell .xl-account-menu { margin-top: 8px; color: var(--xl-text); }
+.xl-admin-shell .xl-account-menu summary {
+    display: flex; min-height: 40px; align-items: center; gap: 8px;
+    padding: 8px 10px; border: 1px solid var(--xl-border); border-radius: 9px;
+    background: var(--xl-item); font-size: 13px; cursor: pointer; list-style: none;
+}
+.xl-admin-shell .xl-account-menu summary::-webkit-details-marker { display: none; }
+.xl-admin-shell .xl-account-menu summary span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.xl-admin-shell .xl-account-menu summary > i:first-child { color: var(--xl-accent); }
+.xl-admin-shell .xl-account-actions { padding: 7px 4px 0; }
+.xl-admin-shell .xl-account-actions a {
+    display: block; min-height: 38px; padding: 9px 10px; border-radius: 7px; color: var(--xl-text);
+}
+.xl-admin-shell .xl-account-actions a:hover { background: var(--xl-item-hover); }
 html[data-xl-theme="dark"] .xl-admin-shell #main-content,
 html[data-xl-theme="dark"] .xl-admin-shell .wrapper { color: var(--xl-text); }
 html[data-xl-theme="dark"] .xl-admin-shell .panel,
@@ -212,14 +251,14 @@ html[data-xl-theme="dark"] body.xl-admin-shell .nm-feedback.error {
 }
 @media (max-width: 768px) {
     .xl-admin-shell #sidebar, .xl-admin-shell #container.sidebar-close #sidebar {
-        top: 60px; bottom: auto; left: 0; height: auto;
+        top: 0; bottom: auto; left: 0; height: auto;
         width: min(290px, calc(100vw - 24px)) !important;
-        max-width: calc(100vw - 24px); max-height: calc(100vh - 60px);
+        max-width: calc(100vw - 24px); max-height: 100vh;
         overflow-y: auto; border-radius: 0 16px 16px 0;
         background: linear-gradient(160deg, var(--xl-sidebar-top), var(--xl-sidebar-bottom));
         box-shadow: 8px 0 28px var(--xl-shadow);
     }
-    .xl-admin-shell ul.sidebar-menu { margin-top: 12px; padding: 0 12px 18px; }
+    .xl-admin-shell ul.sidebar-menu { margin-top: 8px; padding: 0 12px 18px; }
     .xl-admin-shell ul.sidebar-menu > li.sub-menu > a { min-height: 40px; }
     .xl-admin-shell #sidebar > ul > li > ul.sub > li > a {
         min-height: 48px; background: transparent !important;
@@ -228,11 +267,7 @@ html[data-xl-theme="dark"] body.xl-admin-shell .nm-feedback.error {
     .xl-admin-shell #sidebar > ul > li > ul.sub > li.active > a {
         background: var(--xl-item-active) !important;
     }
-    .xl-admin-shell .xl-theme-control { margin-right: 0; }
-    .xl-admin-shell .xl-theme-toggle { width: 36px; justify-content: center; padding: 5px; }
-    .xl-admin-shell .xl-theme-toggle span,
-    .xl-admin-shell .top-nav .username,
-    .xl-admin-shell .top-nav .sb-toggle-right { display: none; }
+    .xl-admin-shell #main-content > .wrapper { padding-top: 64px; }
     .xl-admin-shell #main-content { margin: 0 !important; }
 }
 @media (prefers-reduced-motion: reduce) {

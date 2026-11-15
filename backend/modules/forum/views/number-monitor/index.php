@@ -17,6 +17,7 @@ $stateJson = Json::htmlEncode($dashboard);
          id="number-monitor"
          data-lottery-type="<?= (int)$lotteryType ?>"
          data-data-url="<?= Html::encode(Url::to(['/forum/number-monitor/data'])) ?>"
+         data-scheme-url="<?= Html::encode(Url::to(['/forum/number-monitor/scheme'])) ?>"
          data-preview-url="<?= Html::encode(Url::to(['/forum/number-monitor/preview'])) ?>"
          data-create-url="<?= Html::encode(Url::to(['/forum/number-monitor/create'])) ?>"
          data-toggle-url="<?= Html::encode(Url::to(['/forum/number-monitor/toggle'])) ?>"
@@ -75,6 +76,21 @@ $stateJson = Json::htmlEncode($dashboard);
             <div id="nm-draw-list" class="nm-draw-list"></div>
         </aside>
     </div>
+    <div class="nm-scheme-dialog" id="nm-scheme-dialog" hidden>
+        <div class="nm-scheme-backdrop" data-close-scheme="1"></div>
+        <section class="nm-scheme-panel" role="dialog" aria-modal="true" aria-labelledby="nm-scheme-title" tabindex="-1">
+            <header class="nm-scheme-dialog-head">
+                <div><h2 id="nm-scheme-title">方案号码</h2><p id="nm-scheme-summary"></p></div>
+                <button type="button" id="nm-scheme-close" aria-label="关闭号码列表"><i class="fa fa-times" aria-hidden="true"></i></button>
+            </header>
+            <div class="nm-scheme-patterns" id="nm-scheme-patterns" aria-live="polite"></div>
+            <footer class="nm-scheme-dialog-foot">
+                <button type="button" id="nm-scheme-prev">上一页</button>
+                <span id="nm-scheme-page"></span>
+                <button type="button" id="nm-scheme-next">下一页</button>
+            </footer>
+        </section>
+    </div>
 </section>
 
 <style>
@@ -103,6 +119,12 @@ $stateJson = Json::htmlEncode($dashboard);
 .nm-draw-code{font-size:17px;letter-spacing:.14em!important;padding-left:.14em}
 @media(max-width:760px){.nm-draw-row{gap:5px;padding:8px}.nm-draw-issue{font-size:12px}.nm-draw-code{font-size:16px;letter-spacing:.1em!important;padding-left:.1em}}
 @media(max-width:760px){.nm-live-line{flex-wrap:wrap;gap:4px 6px}.nm-live-line>span{flex:0 0 auto;white-space:nowrap}}
+.nm-scheme{display:block;width:100%;text-align:left;font:inherit;cursor:pointer}.nm-scheme:hover{border-color:var(--nm-teal);box-shadow:0 4px 12px rgba(54,91,128,.1)}.nm-scheme:focus-visible{outline:2px solid var(--nm-teal);outline-offset:2px}.nm-scheme-meta{display:flex;justify-content:space-between;gap:6px}.nm-scheme-open-hint{flex:none;color:var(--nm-teal)}
+.nm-scheme-dialog{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;padding:16px}.nm-scheme-dialog[hidden]{display:none}.nm-scheme-backdrop{position:absolute;inset:0;background:rgba(12,28,45,.62)}.nm-scheme-panel{position:relative;display:flex;flex-direction:column;width:min(680px,100%);max-height:min(80vh,760px);overflow:hidden;border:1px solid var(--nm-line);border-radius:16px;background:var(--nm-paper);color:var(--nm-ink);box-shadow:0 22px 64px rgba(12,28,45,.2)}.nm-scheme-dialog-head,.nm-scheme-dialog-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px}.nm-scheme-dialog-head{border-bottom:1px solid var(--nm-line)}.nm-scheme-dialog-head h2{margin:0;font-size:18px;color:var(--nm-ink)}.nm-scheme-dialog-head p{margin:5px 0 0;color:var(--nm-muted);font-size:12px}.nm-scheme-dialog-head button,.nm-scheme-dialog-foot button{border:1px solid var(--nm-line);border-radius:8px;background:var(--nm-paper);color:var(--nm-ink);cursor:pointer}.nm-scheme-dialog-head button{width:34px;height:34px}.nm-scheme-dialog-foot{border-top:1px solid var(--nm-line);font-size:12px;color:var(--nm-muted)}.nm-scheme-dialog-foot button{min-height:36px;padding:0 12px}.nm-scheme-dialog-foot button:disabled{opacity:.45;cursor:not-allowed}.nm-scheme-patterns{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));align-content:start;gap:8px;min-height:120px;overflow-y:auto;padding:16px 18px}.nm-scheme-patterns .nm-pattern{display:flex;justify-content:space-between;gap:5px;border:1px solid var(--nm-line);border-radius:7px;background:var(--nm-ground);padding:7px 9px;font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace}.nm-pattern-count{color:var(--nm-muted);font-size:11px}.nm-scheme-patterns .nm-scheme-message{grid-column:1/-1;color:var(--nm-muted);font-size:13px}
+@media(max-width:760px){.nm-scheme-panel{max-height:85vh}.nm-scheme-patterns{grid-template-columns:repeat(auto-fill,minmax(86px,1fr));padding:12px}.nm-scheme-dialog-head,.nm-scheme-dialog-foot{padding:12px}}
+.nm-dialog-open{overflow:hidden}
+.number-monitor{box-sizing:border-box}
+@media(max-width:760px){.nm-heading{flex-direction:column;align-items:stretch}.nm-lottery-select{flex-direction:row;align-items:center}.nm-import-head{align-items:stretch}}
 </style>
 
 <script>
@@ -116,11 +138,24 @@ $stateJson = Json::htmlEncode($dashboard);
     var busy = false;
     var loadingData = false;
     var pollTimer = null;
+    var pollDenied = false;
+    var pollCycleMs = 5 * 60 * 1000;
+    var pollStartMs = 20 * 1000;
+    var pollEndMs = 90 * 1000;
+    var clockOffsetMs = Number(state.server_now) ? Number(state.server_now) * 1000 - Date.now() : 0;
+    var activeCycle = Math.floor((Date.now() + clockOffsetMs) / pollCycleMs);
+    var cycleStartDrawId = Number(state.latest_draw_id || 0);
+    var settledCycle = -1;
     var input = document.getElementById('nm-file-input');
     var dropzone = document.getElementById('nm-dropzone');
     var previewButton = document.getElementById('nm-preview');
     var createButton = document.getElementById('nm-create');
     var feedback = document.getElementById('nm-feedback');
+    var schemeDialog = document.getElementById('nm-scheme-dialog');
+    var openedSchemeId = 0;
+    var openedSchemePage = 1;
+    var schemeRequest = 0;
+    var previousFocus = null;
 
     function escapeHtml(value) {
         return String(value == null ? '' : value).replace(/[&<>"']/g, function (char) {
@@ -136,6 +171,54 @@ $stateJson = Json::htmlEncode($dashboard);
                     return body;
                 });
             });
+    }
+
+    function closeScheme() {
+        schemeRequest++;
+        schemeDialog.hidden = true;
+        document.body.classList.remove('nm-dialog-open');
+        if (previousFocus && document.contains(previousFocus)) previousFocus.focus();
+    }
+
+    function loadSchemePage(page) {
+        if (!openedSchemeId || page < 1 || page > 50) return;
+        var requestId = ++schemeRequest;
+        var list = document.getElementById('nm-scheme-patterns');
+        list.innerHTML = '<p class="nm-scheme-message">正在读取号码…</p>';
+        document.getElementById('nm-scheme-prev').disabled = true;
+        document.getElementById('nm-scheme-next').disabled = true;
+        var url = root.dataset.schemeUrl + '?id=' + openedSchemeId + '&page=' + page;
+        fetch(url, {credentials:'same-origin', headers:{'Accept':'application/json'}}).then(function (response) {
+            return response.json().then(function (body) {
+                if (!response.ok || !body.success) throw new Error(body.message || '号码读取失败');
+                return body.scheme;
+            });
+        }).then(function (scheme) {
+            if (requestId !== schemeRequest || schemeDialog.hidden) return;
+            openedSchemePage = Number(scheme.page);
+            document.getElementById('nm-scheme-title').textContent = scheme.title;
+            document.getElementById('nm-scheme-summary').textContent = scheme.pattern_count + ' 组号码 · 重复号码以 × 次数展示';
+            document.getElementById('nm-scheme-page').textContent = '第 ' + openedSchemePage + ' 页';
+            list.innerHTML = scheme.patterns.map(function (entry) {
+                return '<span class="nm-pattern"><span>' + escapeHtml(entry.pattern) + '</span>' +
+                    (Number(entry.occurrence_count) > 1 ? '<span class="nm-pattern-count">×' + Number(entry.occurrence_count) + '</span>' : '') + '</span>';
+            }).join('') || '<p class="nm-scheme-message">本页没有号码</p>';
+            document.getElementById('nm-scheme-prev').disabled = openedSchemePage <= 1;
+            document.getElementById('nm-scheme-next').disabled = !scheme.has_more;
+        }).catch(function (error) {
+            if (requestId !== schemeRequest || schemeDialog.hidden) return;
+            list.innerHTML = '<p class="nm-scheme-message">' + escapeHtml(error.message) + '</p>';
+        });
+    }
+
+    function openScheme(id, trigger) {
+        openedSchemeId = Number(id);
+        openedSchemePage = 1;
+        previousFocus = trigger;
+        schemeDialog.hidden = false;
+        document.body.classList.add('nm-dialog-open');
+        schemeDialog.querySelector('.nm-scheme-panel').focus();
+        loadSchemePage(1);
     }
 
     function setFeedback(message, kind) {
@@ -206,7 +289,7 @@ $stateJson = Json::htmlEncode($dashboard);
                     var status = paused ? 'none' : Number(scheme.current_status) === 1 ? 'hit' : Number(scheme.current_status) === 2 ? 'miss' : 'none';
                     var label = paused ? '已暂停' : status === 'hit' ? '中 +' + scheme.streak_count : status === 'miss' ? '错 +' + scheme.streak_count : '待开奖';
                     var meta = scheme.last_qihao ? '最近更新 ' + scheme.last_qihao : scheme.pattern_count + ' 组号码';
-                    return '<article class="nm-scheme"><div class="nm-scheme-head"><strong>' + escapeHtml(scheme.title) + '</strong><span class="nm-streak ' + status + '">' + escapeHtml(label) + '</span></div><div class="nm-scheme-sample">' + escapeHtml(scheme.sample || '') + '</div><div class="nm-scheme-meta">' + escapeHtml(meta) + '</div></article>';
+                    return '<button type="button" class="nm-scheme" data-action="view" data-id="' + Number(scheme.id) + '" aria-label="查看' + escapeHtml(scheme.title) + '号码"><div class="nm-scheme-head"><strong>' + escapeHtml(scheme.title) + '</strong><span class="nm-streak ' + status + '">' + escapeHtml(label) + '</span></div><div class="nm-scheme-sample">' + escapeHtml(scheme.sample || '') + '</div><div class="nm-scheme-meta"><span>' + escapeHtml(meta) + '</span><span class="nm-scheme-open-hint">查看 <i class="fa fa-angle-right" aria-hidden="true"></i></span></div></button>';
                 }).join('');
                 return '<section class="nm-file-column ' + (Number(file.status) === 1 ? '' : 'paused') + '" data-file-id="' + Number(file.id) + '">' +
                     '<header class="nm-file-top"><div class="nm-file-title"><span class="nm-file-mark"><i class="fa fa-file-text-o" aria-hidden="true"></i></span><div><strong title="' + escapeHtml(file.name) + '">' + escapeHtml(file.name) + '</strong><small>' + schemes.length + ' 套方案</small></div></div>' +
@@ -232,11 +315,23 @@ $stateJson = Json::htmlEncode($dashboard);
         }).join('');
     }
 
+    function serverNowMs() { return Date.now() + clockOffsetMs; }
+
+    function syncPollCycle() {
+        var cycle = Math.floor(serverNowMs() / pollCycleMs);
+        if (cycle !== activeCycle) {
+            activeCycle = cycle;
+            cycleStartDrawId = Number(state.latest_draw_id || 0);
+            settledCycle = -1;
+        }
+    }
+
     function loadData() {
         if (loadingData) return Promise.resolve();
         window.clearTimeout(pollTimer);
         pollTimer = null;
         loadingData = true;
+        syncPollCycle();
         var url = root.dataset.dataUrl + '?lottery_type=' + lotteryType;
         return fetch(url, {credentials:'same-origin', headers:{'Accept':'application/json'}}).then(function (response) {
             if (response.status === 401 || response.status === 403) {
@@ -251,24 +346,42 @@ $stateJson = Json::htmlEncode($dashboard);
                     throw error;
                 }
                 state = body.dashboard;
+                if (Number(state.server_now)) clockOffsetMs = Number(state.server_now) * 1000 - Date.now();
                 renderBoard();
-                return 5000;
+                var files = state.files || [];
+                var hasActiveFile = files.some(function (file) { return Number(file.status) === 1; });
+                if (Number(state.latest_draw_id || 0) > cycleStartDrawId &&
+                    (!hasActiveFile || Number(state.processed_draw_id || 0) >= Number(state.latest_draw_id || 0))) {
+                    settledCycle = activeCycle;
+                }
             });
         }).catch(function (error) {
             var message = error.status === 401 ? '登录状态已失效，请重新登录' :
                 (error.status === 403 ? '当前账号没有号码监控数据权限' : '同步暂不可用');
             document.getElementById('nm-sync-state').textContent = message;
             document.getElementById('nm-sync-state').classList.add('error');
-            return error.status === 401 || error.status === 403 ? 30000 : 5000;
-        }).then(function (delay) {
+            if (error.status === 401 || error.status === 403) pollDenied = true;
+        }).then(function () {
             loadingData = false;
-            scheduleNextPoll(delay);
+            scheduleNextPoll(false);
         });
     }
 
-    function scheduleNextPoll(delay) {
+    function scheduleNextPoll(immediate) {
         window.clearTimeout(pollTimer);
-        pollTimer = window.setTimeout(loadData, delay || 5000);
+        pollTimer = null;
+        if (document.hidden || pollDenied) return;
+        syncPollCycle();
+        var phase = serverNowMs() % pollCycleMs;
+        var delay;
+        if (phase < pollStartMs) {
+            delay = pollStartMs - phase;
+        } else if (phase < pollEndMs - 1000 && settledCycle !== activeCycle) {
+            delay = immediate ? 0 : Math.min(5000, pollEndMs - phase - 1000);
+        } else {
+            delay = pollCycleMs - phase + pollStartMs;
+        }
+        pollTimer = window.setTimeout(loadData, Math.max(1000, Math.ceil(delay)));
     }
 
     dropzone.addEventListener('click', function () { if (!busy) input.click(); });
@@ -310,6 +423,7 @@ $stateJson = Json::htmlEncode($dashboard);
         var button = event.target.closest('button[data-action]');
         if (!button) return;
         var action = button.dataset.action;
+        if (action === 'view') { openScheme(button.dataset.id, button); return; }
         var form = new FormData();
         form.append('id', button.dataset.id);
         if (action === 'toggle') {
@@ -321,12 +435,22 @@ $stateJson = Json::htmlEncode($dashboard);
         if (!file || !window.confirm('清除「' + file.name + '」及其中的全部监控方案？')) return;
         request(root.dataset.clearUrl, form).then(loadData).catch(function (error) { setFeedback(error.message, 'error'); });
     });
+    document.getElementById('nm-scheme-close').addEventListener('click', closeScheme);
+    schemeDialog.addEventListener('click', function (event) {
+        if (event.target.dataset.closeScheme) closeScheme();
+    });
+    document.getElementById('nm-scheme-prev').addEventListener('click', function () { loadSchemePage(openedSchemePage - 1); });
+    document.getElementById('nm-scheme-next').addEventListener('click', function () { loadSchemePage(openedSchemePage + 1); });
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !schemeDialog.hidden) closeScheme();
+    });
 
     document.getElementById('nm-lottery-type').addEventListener('change', function (event) {
         window.location.href = window.location.pathname + '?lottery_type=' + encodeURIComponent(event.target.value);
     });
+    document.addEventListener('visibilitychange', function () { scheduleNextPoll(true); });
 
     renderBoard();
-    scheduleNextPoll();
+    scheduleNextPoll(true);
 })();
 </script>

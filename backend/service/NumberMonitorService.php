@@ -107,7 +107,7 @@ class NumberMonitorService
                 ->innerJoin(NumberMonitorScheme::tableName() . ' s', 's.id = p.scheme_id')
                 ->innerJoin(NumberMonitorFile::tableName() . ' f', 'f.id = s.file_id')
                 ->where(['f.uid' => $uid])
-                ->select('COALESCE(SUM(p.occurrence_count), 0)')->scalar();
+                ->select(['total' => new Expression('COALESCE(SUM(p.occurrence_count), 0)')])->scalar();
             if ($fileCount >= self::MAX_FILES_PER_USER
                 || $schemeCount + count($schemes) > self::MAX_SCHEMES_PER_USER
                 || $patternCount + $totalPatterns > self::MAX_PATTERNS_PER_USER) {
@@ -281,6 +281,38 @@ class NumberMonitorService
             'processed_draw_id' => (int)($cursor['last_draw_id'] ?? 0),
             'latest_draw_id' => (int)($draws[0]['id'] ?? 0),
             'updated_at' => (int)($cursor['updated_at'] ?? 0),
+            'server_now' => time(),
+        ];
+    }
+
+    public static function schemePatterns(int $uid, int $schemeId, int $page): array
+    {
+        if ($uid <= 0 || $schemeId <= 0 || $page < 1 || $page > 50) {
+            throw new \InvalidArgumentException('监控方案或页码无效');
+        }
+        $scheme = (new Query())->from(NumberMonitorScheme::tableName() . ' s')
+            ->innerJoin(NumberMonitorFile::tableName() . ' f', 'f.id = s.file_id')
+            ->select(['s.id', 's.title', 's.pattern_count'])
+            ->where(['s.id' => $schemeId, 'f.uid' => $uid])->one();
+        if (!$scheme) {
+            throw new \InvalidArgumentException('监控方案不存在');
+        }
+
+        $pageSize = 200;
+        $patterns = NumberMonitorPattern::find()->select(['pattern', 'occurrence_count'])
+            ->where(['scheme_id' => $schemeId])->orderBy(['id' => SORT_ASC])
+            ->offset(($page - 1) * $pageSize)->limit($pageSize + 1)->asArray()->all();
+        $hasMore = count($patterns) > $pageSize;
+        if ($hasMore) {
+            array_pop($patterns);
+        }
+        return [
+            'id' => (int)$scheme['id'],
+            'title' => $scheme['title'],
+            'pattern_count' => (int)$scheme['pattern_count'],
+            'page' => $page,
+            'has_more' => $hasMore,
+            'patterns' => $patterns,
         ];
     }
 
