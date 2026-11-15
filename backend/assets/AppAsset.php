@@ -17,7 +17,7 @@ class AppAsset extends AssetBundle
         'statics/assets/font-awesome/css/font-awesome.css',
         'statics/css/style.css?v=3',
         'statics/css/style-responsive.css?v=3',
-        'statics/css/admin-nav-refresh.css?v=1',
+        'statics/css/admin-nav-refresh.css?v=2',
     ];
     public $js = [
         'statics/js/jquery.dcjqaccordion.2.7.js',
@@ -26,6 +26,7 @@ class AppAsset extends AssetBundle
         'statics/js/jquery.sparkline.js',
         'statics/js/slidebars.min.js',
         'statics/js/common-scripts.js?v=11',
+        'statics/js/admin-theme.js?v=1',
         'statics/js/common.js?v=2',
     ];
     public $depends = [

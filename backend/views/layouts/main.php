@@ -183,6 +183,15 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
+    <script>
+    (function () {
+        try {
+            if (localStorage.getItem('xl-admin-theme') === 'dark') {
+                document.documentElement.setAttribute('data-xl-theme', 'dark');
+            }
+        } catch (error) {}
+    })();
+    </script>
     <?php $this->head() ?>
 </head>
 <body class="xl-admin-shell">
@@ -409,6 +418,11 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
             <ul class="nav pull-right top-menu">
                 <li>
                     <input type="text" class="form-control search" placeholder="Search">
+                </li>
+                <li class="xl-theme-control">
+                    <button type="button" id="xl-theme-toggle" class="xl-theme-toggle" aria-pressed="false" aria-label="切换到暗色主题" title="切换到暗色主题">
+                        <i class="fa fa-moon-o" aria-hidden="true"></i><span>暗色</span>
+                    </button>
                 </li>
                 <!-- user login dropdown start-->
                 <li class="dropdown">
