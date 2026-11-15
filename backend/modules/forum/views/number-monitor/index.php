@@ -24,6 +24,7 @@ $stateJson = Json::htmlEncode($dashboard);
          data-create-folder-url="<?= Html::encode(Url::to(['/forum/number-monitor/create-folder-scheme'])) ?>"
          data-toggle-url="<?= Html::encode(Url::to(['/forum/number-monitor/toggle'])) ?>"
          data-clear-url="<?= Html::encode(Url::to(['/forum/number-monitor/clear'])) ?>"
+         data-delete-scheme-url="<?= Html::encode(Url::to(['/forum/number-monitor/delete-scheme'])) ?>"
          data-csrf="<?= Html::encode($csrfToken) ?>">
     <header class="nm-heading">
         <div>
@@ -46,7 +47,7 @@ $stateJson = Json::htmlEncode($dashboard);
                 <div class="nm-import-head">
                     <div>
                         <h2>添加号码文件</h2>
-                        <span class="nm-muted">单文件空行分套，最多 15 套；文件夹中每个 TXT 为一套，每套最多 10,000 组（保留重复号码）</span>
+                        <span class="nm-muted">每个 TXT 可用空行分套，最多 15 套；每套最多 10,000 组（保留重复号码）</span>
                     </div>
                     <div class="nm-mobile-draws-action">
                         <button type="button" id="nm-mobile-draws-toggle" aria-label="查看最近开奖号" aria-controls="nm-draws-panel" aria-expanded="false">
@@ -84,6 +85,9 @@ $stateJson = Json::htmlEncode($dashboard);
             <div class="nm-board-viewport">
                 <div class="nm-board" id="nm-board" aria-live="polite"></div>
             </div>
+            <div class="nm-scheme-menu" id="nm-scheme-menu" role="menu" hidden>
+                <button type="button" id="nm-delete-scheme" role="menuitem"><i class="fa fa-trash-o" aria-hidden="true"></i> 删除这套方案</button>
+            </div>
         </main>
 
         <aside class="nm-draws" id="nm-draws-panel" aria-label="最近开奖号码">
@@ -104,6 +108,8 @@ $stateJson = Json::htmlEncode($dashboard);
                 <button type="button" id="nm-scheme-prev">上一页</button>
                 <span id="nm-scheme-page"></span>
                 <button type="button" id="nm-scheme-next">下一页</button>
+                <button type="button" id="nm-scheme-last">尾页</button>
+                <label id="nm-pattern-page-controls">每页 <select id="nm-scheme-page-size" aria-label="每页号码数量"><option value="100">100</option><option value="200">200</option><option value="400" selected>400</option><option value="1000">1000</option></select> 个</label>
             </footer>
         </section>
     </div>
@@ -266,7 +272,7 @@ $stateJson = Json::htmlEncode($dashboard);
 .nm-scheme-detail,.nm-streak-text{display:none}
 .nm-mode-detail .nm-file-column{flex:0 0 240px;width:240px}
 .nm-mode-detail .nm-scheme-list{display:grid;gap:6px;padding:6px}
-.nm-mode-detail .nm-scheme{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:8px;min-height:78px;border:1px solid var(--nm-line);border-radius:6px;padding:7px 8px}
+.nm-mode-detail .nm-scheme{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:start;gap:5px;min-height:78px;border:1px solid var(--nm-line);border-radius:6px;padding:7px 8px}
 .nm-mode-detail .nm-scheme-view{white-space:normal;overflow:visible;font-size:13px}
 .nm-mode-detail .nm-scheme-detail{display:grid;gap:2px;margin-top:4px;color:var(--nm-muted);font-size:11px;line-height:1.35}
 .nm-mode-detail .nm-scheme-detail strong{overflow:hidden;color:var(--nm-ink);font-size:11px;text-overflow:ellipsis;white-space:nowrap}
@@ -319,6 +325,23 @@ body.nm-page-focus-open{overflow:hidden}
     .nm-scheme{min-height:clamp(32px,calc((100dvh - 330px)/15),52px)}
 }
 @media(min-width:1800px) and (min-height:850px){.nm-scheme{min-height:clamp(32px,calc((100dvh - 300px)/15),52px)}}
+.nm-preview-file{padding:7px 2px 3px;color:var(--nm-ink);font-size:12px;font-weight:700}
+.nm-preview-row{padding-left:12px}
+.nm-scheme-order{display:inline-block;margin-right:4px;border-right:1px solid var(--nm-line);padding-right:4px;color:var(--nm-teal);font-weight:800}
+.nm-scheme-quantity{color:var(--nm-ink)}
+.nm-scheme-unit{display:none;color:var(--nm-muted);font-size:10px}
+.nm-mode-detail .nm-scheme-unit{display:inline}
+.nm-scheme-menu-trigger{flex:none;border:0;background:transparent;color:var(--nm-muted);padding:2px 1px;cursor:pointer}
+.nm-scheme-menu-trigger:hover,.nm-scheme-menu-trigger:focus-visible{color:var(--nm-teal)}
+.nm-scheme-menu{position:fixed;z-index:2100;min-width:150px;border:1px solid var(--nm-line);border-radius:6px;background:var(--nm-paper);box-shadow:0 10px 30px rgba(14,35,54,.18);padding:4px}
+.nm-scheme-menu[hidden]{display:none}
+.nm-scheme-menu button{width:100%;border:0;border-radius:4px;background:transparent;color:#ad3434;padding:9px;text-align:left;cursor:pointer}
+.nm-scheme-menu button:hover,.nm-scheme-menu button:focus-visible{background:var(--nm-ground)}
+.nm-scheme-dialog-foot{justify-content:center;flex-wrap:wrap;gap:7px}
+.nm-scheme-dialog-foot label{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.nm-scheme-dialog-foot select{height:34px;border:1px solid var(--nm-line);border-radius:5px;background:var(--nm-paper);color:var(--nm-ink)}
+.nm-scheme-dialog-foot [hidden]{display:none}
+@media(max-width:760px){.nm-scheme-menu-trigger{padding:1px 0}.nm-scheme-dialog-foot{padding:8px;gap:4px}.nm-scheme-dialog-foot button{min-height:32px;padding:0 7px;font-size:11px}.nm-scheme-dialog-foot label{font-size:11px}}
 </style>
 
 <script>
@@ -330,6 +353,7 @@ body.nm-page-focus-open{overflow:hidden}
     var selectedFile = null;
     var selectedFolderFiles = [];
     var selectedFolderName = '';
+    var folderPreviewEntries = [];
     var previewed = false;
     var previewSchemes = [];
     var busy = false;
@@ -355,6 +379,7 @@ body.nm-page-focus-open{overflow:hidden}
     var openedPreviewScheme = null;
     var openedPreviewEntries = [];
     var openedSchemePage = 1;
+    var schemeTotalPages = 0;
     var schemeRequest = 0;
     var dialogMode = 'patterns';
     var schemeHasMore = false;
@@ -362,6 +387,8 @@ body.nm-page-focus-open{overflow:hidden}
     var historyHasMore = false;
     var previousFocus = null;
     var previewPageSize = 400;
+    var selectedSchemeForDeletion = null;
+    var schemeMenu = document.getElementById('nm-scheme-menu');
     var drawsToggle = document.getElementById('nm-mobile-draws-toggle');
     var drawsBackdrop = document.getElementById('nm-draws-backdrop');
     var drawsPreviousFocus = null;
@@ -372,6 +399,11 @@ body.nm-page-focus-open{overflow:hidden}
         return String(value == null ? '' : value).replace(/[&<>"']/g, function (char) {
             return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char];
         });
+    }
+
+    function formatCount(value) {
+        var number = Number(value || 0);
+        return number.toLocaleString('en-US');
     }
 
     function request(url, formData) {
@@ -399,10 +431,13 @@ body.nm-page-focus-open{overflow:hidden}
         list.setAttribute('aria-busy', 'false');
         schemeDialog.querySelector('.nm-scheme-panel').classList.remove('loading');
         openedSchemePage = Number(scheme.page);
+        schemeTotalPages = Number(scheme.total_pages || 1);
         schemeHasMore = Boolean(scheme.has_more);
         document.getElementById('nm-scheme-title').textContent = scheme.title;
-        document.getElementById('nm-scheme-summary').textContent = scheme.pattern_count + ' 组号码 · 重复号码以 × 次数展示';
-        document.getElementById('nm-scheme-page').textContent = '第 ' + openedSchemePage + ' 页';
+        document.getElementById('nm-scheme-summary').textContent = scheme.pattern_count + ' 组号码（' + scheme.total_unique + ' 个不同号码）· 重复以 × 次数展示';
+        document.getElementById('nm-scheme-page').textContent = '第 ' + openedSchemePage + '/' + schemeTotalPages + ' 页 · 本页 ' + scheme.patterns.length + ' 个';
+        document.getElementById('nm-pattern-page-controls').hidden = false;
+        document.getElementById('nm-scheme-last').hidden = false;
         list.innerHTML = scheme.patterns.map(function (entry) {
             return '<span class="nm-pattern"><span>' + escapeHtml(entry.pattern) + '</span>' +
                 (Number(entry.occurrence_count) > 1 ? '<span class="nm-pattern-count">×' + Number(entry.occurrence_count) + '</span>' : '') + '</span>';
@@ -410,6 +445,7 @@ body.nm-page-focus-open{overflow:hidden}
         list.scrollTop = 0;
         document.getElementById('nm-scheme-prev').disabled = openedSchemePage <= 1;
         document.getElementById('nm-scheme-next').disabled = !schemeHasMore;
+        document.getElementById('nm-scheme-last').disabled = openedSchemePage >= schemeTotalPages;
     }
 
     function renderHistoryPage(history, page) {
@@ -424,6 +460,8 @@ body.nm-page-focus-open{overflow:hidden}
         document.getElementById('nm-scheme-title').textContent = history.title + ' · 监控历史';
         document.getElementById('nm-scheme-summary').textContent = '本次开始监控后的记录，最新在前';
         document.getElementById('nm-scheme-page').textContent = '第 ' + page + ' 页';
+        document.getElementById('nm-pattern-page-controls').hidden = true;
+        document.getElementById('nm-scheme-last').hidden = true;
         list.innerHTML = history.records.map(function (record) {
             var status = Number(record.status) === 1 ? 'hit' : Number(record.status) === 2 ? 'miss' : 'none';
             var label = status === 'hit' ? '中' : status === 'miss' ? '错' : '无结果';
@@ -466,13 +504,15 @@ body.nm-page-focus-open{overflow:hidden}
     }
 
     function loadSchemePage(page) {
-        if (page < 1 || page > 50) return;
+        if (page < 1 || page > 100 || (schemeTotalPages && page > schemeTotalPages)) return;
         if (openedPreviewScheme) {
             var start = (page - 1) * previewPageSize;
             if (start >= openedPreviewEntries.length) return;
             renderSchemePage({
                 title: openedPreviewScheme.title,
                 pattern_count: openedPreviewScheme.pattern_count,
+                total_unique: openedPreviewEntries.length,
+                total_pages: Math.max(1, Math.ceil(openedPreviewEntries.length / previewPageSize)),
                 page: page,
                 has_more: start + previewPageSize < openedPreviewEntries.length,
                 patterns: openedPreviewEntries.slice(start, start + previewPageSize)
@@ -487,7 +527,7 @@ body.nm-page-focus-open{overflow:hidden}
         document.getElementById('nm-scheme-summary').textContent = '正在读取第 ' + page + ' 页号码…';
         document.getElementById('nm-scheme-prev').disabled = true;
         document.getElementById('nm-scheme-next').disabled = true;
-        var url = root.dataset.schemeUrl + '?id=' + openedSchemeId + '&page=' + page;
+        var url = root.dataset.schemeUrl + '?id=' + openedSchemeId + '&page=' + page + '&page_size=' + previewPageSize;
         fetch(url, {credentials:'same-origin', headers:{'Accept':'application/json'}}).then(function (response) {
             return response.json().then(function (body) {
                 if (!response.ok || !body.success) throw new Error(body.message || '号码读取失败');
@@ -512,6 +552,7 @@ body.nm-page-focus-open{overflow:hidden}
         openedSchemeId = Number(id);
         dialogMode = 'patterns';
         openedSchemePage = 1;
+        schemeTotalPages = 0;
         schemeHasMore = false;
         historyCursors = [0];
         previousFocus = trigger;
@@ -531,6 +572,7 @@ body.nm-page-focus-open{overflow:hidden}
         openedSchemeId = Number(id);
         dialogMode = 'history';
         openedSchemePage = 1;
+        schemeTotalPages = 0;
         historyCursors = [0];
         historyHasMore = false;
         previousFocus = trigger;
@@ -563,6 +605,7 @@ body.nm-page-focus-open{overflow:hidden}
             }
         });
         openedSchemePage = 1;
+        schemeTotalPages = 0;
         previousFocus = trigger;
         schemeDialog.hidden = false;
         document.body.classList.add('nm-dialog-open');
@@ -599,6 +642,19 @@ body.nm-page-focus-open{overflow:hidden}
         feedback.className = 'nm-feedback' + (kind ? ' ' + kind : '');
     }
 
+    function hideSchemeMenu() {
+        schemeMenu.hidden = true;
+        selectedSchemeForDeletion = null;
+    }
+
+    function showSchemeMenu(id, x, y) {
+        selectedSchemeForDeletion = Number(id);
+        schemeMenu.hidden = false;
+        schemeMenu.style.left = Math.max(4, Math.min(x, window.innerWidth - schemeMenu.offsetWidth - 4)) + 'px';
+        schemeMenu.style.top = Math.max(4, Math.min(y, window.innerHeight - schemeMenu.offsetHeight - 4)) + 'px';
+        document.getElementById('nm-delete-scheme').focus();
+    }
+
     function formForFile(file) {
         var form = new FormData();
         form.append('file', file || selectedFile);
@@ -612,8 +668,8 @@ body.nm-page-focus-open{overflow:hidden}
             (selectedFile ? selectedFile.name : '拖入 TXT 文件或文件夹');
         document.getElementById('nm-file-meta').textContent = folderMode ? selectedFolderFiles.length + ' 个 TXT 文件，按顺序填满监控列' :
             (selectedFile ? Math.ceil(selectedFile.size / 1024) + ' KB' : '单个 TXT 最多 2 MB');
-        previewButton.disabled = !selectedFile || busy;
-        createButton.disabled = busy || (!folderMode && (!selectedFile || !previewed));
+        previewButton.disabled = (!selectedFile && !folderMode) || busy;
+        createButton.disabled = busy || !previewed;
         folderButton.disabled = busy;
     }
 
@@ -622,6 +678,7 @@ body.nm-page-focus-open{overflow:hidden}
         selectedFile = file;
         selectedFolderFiles = [];
         selectedFolderName = '';
+        folderPreviewEntries = [];
         folderInput.value = '';
         previewed = false;
         previewSchemes = [];
@@ -639,9 +696,10 @@ body.nm-page-focus-open{overflow:hidden}
         var invalid = txtFiles.find(function (file) { return file.size > 2097152; });
         if (invalid) { rejectFolder('TXT 文件「' + invalid.name + '」超过 2 MB'); return; }
         selectedFolderFiles = txtFiles.sort(function (a, b) {
-            return a.name.localeCompare(b.name, undefined, {numeric:true});
+            return (a.webkitRelativePath || a.name).localeCompare(b.webkitRelativePath || b.name, undefined, {numeric:true});
         });
         selectedFolderName = name || '文件夹导入';
+        folderPreviewEntries = [];
         selectedFile = null;
         input.value = '';
         previewed = false;
@@ -649,7 +707,7 @@ body.nm-page-focus-open{overflow:hidden}
         var preview = document.getElementById('nm-preview-list');
         preview.innerHTML = folderPreviewHtml(selectedFolderFiles);
         preview.hidden = false;
-        setFeedback('已选择 ' + selectedFolderFiles.length + ' 个 TXT 文件', 'success');
+        setFeedback('已选择 ' + selectedFolderFiles.length + ' 个 TXT 文件，请先预览方案', 'success');
         updateFileLabel();
     }
 
@@ -657,6 +715,7 @@ body.nm-page-focus-open{overflow:hidden}
         selectedFile = null;
         selectedFolderFiles = [];
         selectedFolderName = '';
+        folderPreviewEntries = [];
         previewed = false;
         previewSchemes = [];
         document.getElementById('nm-preview-list').hidden = true;
@@ -665,9 +724,14 @@ body.nm-page-focus-open{overflow:hidden}
         setFeedback(message, 'error');
     }
 
-    function folderPreviewHtml(files) {
+    function folderPreviewHtml(files, entries) {
+        entries = entries || [];
         return files.map(function (file, index) {
-            return '<button type="button" class="nm-preview-row" data-folder-preview-index="' + index + '" aria-label="查看' + escapeHtml(file.name) + '的号码"><span>' + (index + 1) + '. ' + escapeHtml(file.name) + '</span><em>' + Math.ceil(file.size / 1024) + ' KB · 查看</em></button>';
+            var schemes = entries[index] || [];
+            return '<div class="nm-preview-file">' + (index + 1) + '. ' + escapeHtml(file.name) + (entries[index] ? ' · ' + schemes.length + ' 套' : '') + '</div>' +
+                schemes.map(function (scheme, schemeIndex) {
+                    return '<button type="button" class="nm-preview-row" data-folder-preview-index="' + index + '" data-folder-scheme-index="' + schemeIndex + '" aria-label="查看' + escapeHtml(file.name) + '第' + (schemeIndex + 1) + '套号码"><span>' + escapeHtml(scheme.title) + '</span><em>' + formatCount(scheme.pattern_count) + ' 组 · 查看</em></button>';
+                }).join('');
         }).join('');
     }
 
@@ -801,7 +865,7 @@ body.nm-page-focus-open{overflow:hidden}
                     var number = Number(scheme.line_no || schemeIndex + 1);
                     var statusText = status === 'hit' ? '中' : status === 'miss' ? '错' : paused ? '暂停' : '待开';
                     var sample = String(scheme.sample || '');
-                    return '<div class="nm-scheme"><button type="button" class="nm-scheme-view" data-action="view" data-id="' + Number(scheme.id) + '" aria-label="查看第' + number + '套，' + escapeHtml(scheme.title) + '，' + Number(scheme.pattern_count || 0) + '组号码" title="' + escapeHtml(scheme.title) + ' · 查看号码"><span class="nm-scheme-primary">' + number + '.' + Number(scheme.pattern_count || 0) + '组</span><span class="nm-scheme-detail"><strong>' + escapeHtml(scheme.title) + '</strong>' + (sample ? '<span>' + escapeHtml(sample) + '</span>' : '') + '<small>最近期号 ' + escapeHtml(scheme.last_qihao || '--') + '</small></span></button><button type="button" class="nm-streak-button" data-action="history" data-id="' + Number(scheme.id) + '" aria-label="' + escapeHtml(label + '，查看逐期监控历史') + '" title="' + escapeHtml(label) + ' · 查看历史"><span class="nm-streak ' + status + '"><i class="fa ' + icon + '" aria-hidden="true"></i><span class="nm-streak-text">' + statusText + '</span>' + streak + '</span></button></div>';
+                    return '<div class="nm-scheme" data-scheme-id="' + Number(scheme.id) + '"><button type="button" class="nm-scheme-view" data-action="view" data-id="' + Number(scheme.id) + '" aria-label="查看第' + number + '套，' + escapeHtml(scheme.title) + '，' + formatCount(scheme.pattern_count || 0) + '组号码" title="' + escapeHtml(scheme.title) + ' · 查看号码；右键可删除"><span class="nm-scheme-primary"><span class="nm-scheme-order">' + number + '.</span><span class="nm-scheme-quantity">' + formatCount(scheme.pattern_count || 0) + '</span><span class="nm-scheme-unit">组</span></span><span class="nm-scheme-detail"><strong>' + escapeHtml(scheme.title) + '</strong>' + (sample ? '<span>' + escapeHtml(sample) + '</span>' : '') + '<small>最近期号 ' + escapeHtml(scheme.last_qihao || '--') + '</small></span></button><button type="button" class="nm-streak-button" data-action="history" data-id="' + Number(scheme.id) + '" aria-label="' + escapeHtml(label + '，查看逐期监控历史') + '" title="' + escapeHtml(label) + ' · 查看历史"><span class="nm-streak ' + status + '"><i class="fa ' + icon + '" aria-hidden="true"></i><span class="nm-streak-text">' + statusText + '</span>' + streak + '</span></button><button type="button" class="nm-scheme-menu-trigger" data-action="scheme-menu" data-id="' + Number(scheme.id) + '" aria-label="第' + number + '套更多操作" title="更多操作"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></button></div>';
                 }).join('');
                 return '<section class="nm-file-column ' + (Number(file.status) === 1 ? '' : 'paused') + '" data-file-id="' + Number(file.id) + '">' +
                     '<header class="nm-file-top"><div class="nm-file-title"><span class="nm-file-mark"><i class="fa fa-file-text-o" aria-hidden="true"></i></span><strong title="' + escapeHtml(file.name) + '">' + escapeHtml(file.name) + '</strong></div><div class="nm-file-meta"><small>' + schemes.length + '套</small><span class="nm-file-period" title="' + escapeHtml(period.full) + '">' + escapeHtml(period.short) + '</span></div>' +
@@ -936,9 +1000,40 @@ body.nm-page-focus-open{overflow:hidden}
     });
 
     previewButton.addEventListener('click', function () {
-        if (!selectedFile || busy) return;
+        if ((!selectedFile && !selectedFolderFiles.length) || busy) return;
         busy = true; updateFileLabel(); setFeedback('', '');
         previewed = false; previewSchemes = [];
+        if (selectedFolderFiles.length) {
+            folderPreviewEntries = [];
+            var files = selectedFolderFiles.slice();
+            var total = 0;
+            function previewNext(index) {
+                if (index >= files.length) return Promise.resolve();
+                var batch = files.slice(index, index + 6);
+                setFeedback('正在识别 ' + (index + 1) + '-' + (index + batch.length) + '/' + files.length, '');
+                return Promise.all(batch.map(function (file, batchIndex) {
+                    var form = formForFile(file);
+                    form.append('summary_only', '1');
+                    return request(root.dataset.previewUrl, form).catch(function (error) {
+                        throw new Error('「' + file.name + '」：' + error.message);
+                    }).then(function (body) {
+                        folderPreviewEntries[index + batchIndex] = body.schemes;
+                        total += body.schemes.length;
+                    });
+                })).then(function () {
+                    return previewNext(index + batch.length);
+                });
+            }
+            previewNext(0).then(function () {
+                previewed = true;
+                var preview = document.getElementById('nm-preview-list');
+                preview.innerHTML = folderPreviewHtml(files, folderPreviewEntries);
+                preview.hidden = false;
+                setFeedback('识别到 ' + files.length + ' 个文件、' + total + ' 套方案，请核对后开始监控', 'success');
+            }).catch(function (error) { setFeedback('预览失败：' + error.message, 'error'); })
+                .finally(function () { busy = false; updateFileLabel(); });
+            return;
+        }
         document.getElementById('nm-preview-list').hidden = true;
         request(root.dataset.previewUrl, formForFile()).then(function (body) {
             renderPreview(body.schemes);
@@ -952,23 +1047,25 @@ body.nm-page-focus-open{overflow:hidden}
         var folderPreview = event.target.closest('button[data-folder-preview-index]');
         if (!folderPreview || busy) return;
         var file = selectedFolderFiles[Number(folderPreview.dataset.folderPreviewIndex)];
+        var schemeIndex = Number(folderPreview.dataset.folderSchemeIndex);
         if (!file) return;
         busy = true; updateFileLabel();
         request(root.dataset.previewUrl, formForFile(file)).then(function (body) {
-            if (body.schemes.length !== 1) throw new Error('文件夹内每个 TXT 文件只能包含一套方案');
+            if (!body.schemes[schemeIndex]) throw new Error('方案不存在，请重新预览');
             previewSchemes = body.schemes;
             setFeedback('', '');
-            openPreviewScheme(0, folderPreview);
+            openPreviewScheme(schemeIndex, folderPreview);
         }).catch(function (error) { setFeedback('「' + file.name + '」预览失败：' + error.message, 'error'); })
             .finally(function () { busy = false; updateFileLabel(); });
     });
 
     createButton.addEventListener('click', function () {
         if (selectedFolderFiles.length) {
-            if (busy) return;
+            if (busy || !previewed) return;
             busy = true; updateFileLabel();
             var files = selectedFolderFiles.slice();
             var imported = 0;
+            var importedSchemes = 0;
             function nextFile() {
                 if (imported >= files.length) return Promise.resolve();
                 var file = files[imported];
@@ -977,21 +1074,26 @@ body.nm-page-focus-open{overflow:hidden}
                 form.append('file', file);
                 form.append('folder_name', selectedFolderName);
                 form.append('lottery_type', String(lotteryType));
-                return request(root.dataset.createFolderUrl, form).then(function () {
+                return request(root.dataset.createFolderUrl, form).then(function (body) {
                     imported++;
+                    importedSchemes += Number(body.file.scheme_count || 0);
                     return nextFile();
                 });
             }
             nextFile().then(function () {
                 selectedFolderFiles = [];
                 selectedFolderName = '';
+                folderPreviewEntries = [];
+                previewed = false;
                 folderInput.value = '';
                 document.getElementById('nm-preview-list').hidden = true;
                 document.getElementById('nm-preview-list').innerHTML = '';
-                setFeedback('已导入 ' + imported + ' 套方案', 'success');
+                setFeedback('已导入 ' + imported + ' 个文件、' + importedSchemes + ' 套方案', 'success');
             }).catch(function (error) {
                 selectedFolderFiles = files.slice(imported);
-                setFeedback('已导入 ' + imported + ' 套；「' + files[imported].name + '」失败：' + error.message, 'error');
+                folderPreviewEntries = [];
+                previewed = false;
+                setFeedback('已导入 ' + imported + ' 个文件、' + importedSchemes + ' 套；「' + files[imported].name + '」失败：' + error.message + '。请重新预览剩余文件', 'error');
                 var preview = document.getElementById('nm-preview-list');
                 preview.innerHTML = folderPreviewHtml(selectedFolderFiles);
             }).then(loadData).finally(function () { busy = false; updateFileLabel(); });
@@ -1013,6 +1115,12 @@ body.nm-page-focus-open{overflow:hidden}
         var button = event.target.closest('button[data-action]');
         if (!button) return;
         var action = button.dataset.action;
+        if (action === 'scheme-menu') {
+            var box = button.getBoundingClientRect();
+            showSchemeMenu(button.dataset.id, box.right, box.bottom);
+            return;
+        }
+        hideSchemeMenu();
         if (action === 'view') { openScheme(button.dataset.id, button); return; }
         if (action === 'history') { openHistory(button.dataset.id, button); return; }
         var form = new FormData();
@@ -1026,6 +1134,29 @@ body.nm-page-focus-open{overflow:hidden}
         if (!file || !window.confirm('清除「' + file.name + '」及其中的全部监控方案？')) return;
         request(root.dataset.clearUrl, form).then(loadData).catch(function (error) { setFeedback(error.message, 'error'); });
     });
+    document.getElementById('nm-board').addEventListener('contextmenu', function (event) {
+        var row = event.target.closest('.nm-scheme[data-scheme-id]');
+        if (!row) return;
+        event.preventDefault();
+        showSchemeMenu(row.dataset.schemeId, event.clientX, event.clientY);
+    });
+    document.getElementById('nm-delete-scheme').addEventListener('click', function () {
+        var id = selectedSchemeForDeletion;
+        var scheme = null;
+        (state.files || []).forEach(function (file) {
+            (file.schemes || []).forEach(function (item) { if (Number(item.id) === id) scheme = item; });
+        });
+        hideSchemeMenu();
+        if (!scheme || !window.confirm('删除「' + scheme.title + '」及其全部号码和监控历史？此操作不可恢复。')) return;
+        var form = new FormData();
+        form.append('id', String(id));
+        request(root.dataset.deleteSchemeUrl, form).then(loadData)
+            .then(function () { setFeedback('已删除这套监控方案', 'success'); })
+            .catch(function (error) { setFeedback(error.message, 'error'); });
+    });
+    document.addEventListener('click', function (event) {
+        if (!event.target.closest('#nm-scheme-menu, .nm-scheme-menu-trigger')) hideSchemeMenu();
+    });
     document.getElementById('nm-scheme-close').addEventListener('click', closeScheme);
     schemeDialog.addEventListener('click', function (event) {
         if (event.target.dataset.closeScheme) closeScheme();
@@ -1038,6 +1169,14 @@ body.nm-page-focus-open{overflow:hidden}
         if (dialogMode === 'history') loadHistoryPage(openedSchemePage + 1);
         else loadSchemePage(openedSchemePage + 1);
     });
+    document.getElementById('nm-scheme-last').addEventListener('click', function () {
+        if (dialogMode === 'patterns') loadSchemePage(schemeTotalPages);
+    });
+    document.getElementById('nm-scheme-page-size').addEventListener('change', function (event) {
+        previewPageSize = Number(event.target.value);
+        schemeTotalPages = 0;
+        if (dialogMode === 'patterns') loadSchemePage(1);
+    });
     drawsToggle.addEventListener('click', openDraws);
     document.getElementById('nm-mobile-draws-close').addEventListener('click', closeDraws);
     drawsBackdrop.addEventListener('click', closeDraws);
@@ -1047,6 +1186,7 @@ body.nm-page-focus-open{overflow:hidden}
     document.addEventListener('fullscreenchange', updateFullscreenButton);
     document.addEventListener('keydown', function (event) {
         if (event.key !== 'Escape') return;
+        if (!schemeMenu.hidden) { hideSchemeMenu(); return; }
         if (!schemeDialog.hidden) closeScheme();
         else if (root.classList.contains('nm-mobile-draws-open')) closeDraws();
         else if (root.classList.contains('nm-focus-mode')) exitFocusMode();

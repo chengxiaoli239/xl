@@ -17,7 +17,7 @@ class NumberMonitorController extends BaseController
 {
     public function allowAction()
     {
-        return ['index', 'data', 'scheme', 'history', 'preview', 'create', 'create-folder-scheme', 'toggle', 'clear'];
+        return ['index', 'data', 'scheme', 'history', 'preview', 'create', 'create-folder-scheme', 'toggle', 'clear', 'delete-scheme'];
     }
 
     public function behaviors()
@@ -34,6 +34,7 @@ class NumberMonitorController extends BaseController
                     'create-folder-scheme' => ['POST'],
                     'toggle' => ['POST'],
                     'clear' => ['POST'],
+                    'delete-scheme' => ['POST'],
                 ],
             ],
         ];
@@ -79,12 +80,12 @@ class NumberMonitorController extends BaseController
         ]);
     }
 
-    public function actionScheme($id = 0, $page = 1)
+    public function actionScheme($id = 0, $page = 1, $page_size = 400)
     {
         try {
             return $this->jsonResponse([
                 'success' => true,
-                'scheme' => NumberMonitorService::schemePatterns((int)$this->_user_id, (int)$id, (int)$page),
+                'scheme' => NumberMonitorService::schemePatterns((int)$this->_user_id, (int)$id, (int)$page, (int)$page_size),
             ]);
         } catch (\Throwable $exception) {
             return $this->errorResponse($exception);
@@ -111,12 +112,17 @@ class NumberMonitorController extends BaseController
     {
         try {
             $content = $this->getUploadedContent();
-            $schemes = array_map(function ($scheme) {
-                return [
+            $summaryOnly = (string)Yii::$app->request->post('summary_only', '') === '1';
+            $schemes = array_map(function ($scheme) use ($summaryOnly) {
+                $result = [
                     'title' => $scheme['title'],
                     'pattern_count' => $scheme['pattern_count'],
-                    'patterns' => $scheme['patterns'],
+                    'fixed_count' => $scheme['fixed_count'],
                 ];
+                if (!$summaryOnly) {
+                    $result['patterns'] = $scheme['patterns'];
+                }
+                return $result;
             }, NumberSchemeParser::parse($content));
             return $this->jsonResponse(['success' => true, 'schemes' => $schemes]);
         } catch (\Throwable $exception) {
@@ -148,12 +154,13 @@ class NumberMonitorController extends BaseController
         try {
             $content = $this->getUploadedContent();
             $schemes = NumberSchemeParser::parse($content);
-            if (count($schemes) !== 1) {
-                throw new \InvalidArgumentException('文件夹内每个 TXT 文件只能包含一套方案');
-            }
             $file = UploadedFile::getInstanceByName('file');
             $title = trim(pathinfo($file->name, PATHINFO_FILENAME));
-            $schemes[0]['title'] = StringHelper::truncate($title ?: '号码方案', 70);
+            foreach ($schemes as $index => &$scheme) {
+                $suffix = count($schemes) > 1 ? ' · ' . ($index + 1) : '';
+                $scheme['title'] = StringHelper::truncate(($title ?: '号码方案') . $suffix . ' · ' . $scheme['fixed_count'] . ' 定', 70);
+            }
+            unset($scheme);
             $result = NumberMonitorService::createFile(
                 (int)$this->_user_id,
                 (int)Yii::$app->request->post('lottery_type', 0),
@@ -183,6 +190,16 @@ class NumberMonitorController extends BaseController
     {
         try {
             NumberMonitorService::deleteFile((int)$this->_user_id, (int)Yii::$app->request->post('id', 0));
+            return $this->jsonResponse(['success' => true]);
+        } catch (\Throwable $exception) {
+            return $this->errorResponse($exception);
+        }
+    }
+
+    public function actionDeleteScheme()
+    {
+        try {
+            NumberMonitorService::deleteScheme((int)$this->_user_id, (int)Yii::$app->request->post('id', 0));
             return $this->jsonResponse(['success' => true]);
         } catch (\Throwable $exception) {
             return $this->errorResponse($exception);

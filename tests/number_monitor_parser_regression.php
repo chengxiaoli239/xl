@@ -28,6 +28,14 @@ if ($schemes[3]['fixed_count'] !== 3 || $schemes[3]['pattern_count'] !== 5
     || $schemes[3]['patterns'] !== ['234X', '890X', '234X', '892X', '235X']) {
     throw new RuntimeException('three-fixed pattern parsing or duplicate preservation failed');
 }
+$fixtureDirectory = __DIR__ . '/fixtures/number_monitor_folder/';
+$firstFolderFile = NumberSchemeParser::parse(file_get_contents($fixtureDirectory . '01-mixed.txt'));
+$secondFolderFile = NumberSchemeParser::parse(file_get_contents($fixtureDirectory . '02-mixed.txt'));
+if (count($firstFolderFile) !== 2 || count($secondFolderFile) !== 3
+    || array_column($firstFolderFile, 'fixed_count') !== [4, 2]
+    || array_column($secondFolderFile, 'fixed_count') !== [4, 2, 3]) {
+    throw new RuntimeException('multiple schemes per folder file were parsed incorrectly');
+}
 
 $allFourDigitPatterns = [];
 for ($number = 0; $number < 10000; $number++) {

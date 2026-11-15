@@ -165,11 +165,27 @@ checkMonitor(array_map(function ($file) { return (int)$file->scheme_count; }, $f
     'folder column counts or paused status changed');
 checkMonitor((string)NumberMonitorScheme::find()->select('title')
     ->where(['file_id' => $folderTargets[3]])->scalar() === 'file-4', 'folder file title was not retained');
+$multiFile = NumberMonitorService::createFile(125, 8, 'folder-name', [$folderScheme, $folderScheme], true);
+checkMonitor($multiFile['scheme_count'] === 2 && $multiFile['id'] === $folderTargets[3]
+    && (int)NumberMonitorFile::findOne($folderTargets[3])->scheme_count === 3,
+    'multiple schemes in one folder file were not imported');
+$deletedSchemeId = (int)NumberMonitorScheme::find()->select('id')
+    ->where(['file_id' => $leftColumn['id'], 'line_no' => 5])->scalar();
 try {
-    NumberMonitorService::createFile(125, 8, 'folder-name', [$folderScheme, $folderScheme], true);
-    throw new RuntimeException('folder accepted multiple schemes from one file');
+    NumberMonitorService::deleteScheme(456, $deletedSchemeId);
+    throw new RuntimeException('another account deleted a monitoring scheme');
 } catch (InvalidArgumentException $expected) {
 }
+NumberMonitorService::deleteScheme(125, $deletedSchemeId);
+checkMonitor((int)NumberMonitorFile::findOne($leftColumn['id'])->scheme_count === 14
+    && (int)NumberMonitorScheme::find()->where(['file_id' => $leftColumn['id']])->max('line_no') === 14
+    && (int)NumberMonitorPattern::find()->where(['scheme_id' => $deletedSchemeId])->count() === 0,
+    'single scheme deletion left an incorrect column count or patterns');
+$crossColumn = NumberMonitorService::createFile(125, 8, 'another-folder', array_fill(0, 3, $folderScheme), true);
+checkMonitor($crossColumn['id'] === $folderTargets[3]
+    && array_map(function ($file) { return (int)$file->scheme_count; },
+        NumberMonitorFile::find()->where(['uid' => 125])->orderBy(['id' => SORT_ASC])->all()) === [15, 15, 5],
+    'one folder file did not fill existing columns from left to right');
 foreach ($folderFiles as $file) {
     NumberMonitorService::deleteFile(125, (int)$file->id);
 }
@@ -183,6 +199,11 @@ checkMonitor(count(array_unique($folderIds)) === 2
 foreach (NumberMonitorFile::find()->where(['uid' => 126])->all() as $file) {
     NumberMonitorService::deleteFile(126, (int)$file->id);
 }
+$singleSchemeFile = NumberMonitorService::createFile(127, 8, 'one.txt', [$folderScheme]);
+$singleSchemeId = (int)NumberMonitorScheme::find()->select('id')->where(['file_id' => $singleSchemeFile['id']])->scalar();
+NumberMonitorService::deleteScheme(127, $singleSchemeId);
+checkMonitor(NumberMonitorFile::findOne($singleSchemeFile['id']) === null,
+    'deleting the last scheme left an empty monitoring column');
 
 $bulkSchemes = [];
 for ($i = 0; $i < 10; $i++) {
@@ -215,8 +236,13 @@ $largeSchemeId = (int)NumberMonitorScheme::find()->select('id')
 $firstPage = NumberMonitorService::schemePatterns(124, $largeSchemeId, 1);
 $lastPage = NumberMonitorService::schemePatterns(124, $largeSchemeId, 25);
 checkMonitor(count($firstPage['patterns']) === 400 && $firstPage['has_more']
-    && count($lastPage['patterns']) === 400 && !$lastPage['has_more'],
+    && count($lastPage['patterns']) === 400 && !$lastPage['has_more']
+    && $lastPage['total_pages'] === 25 && $lastPage['total_unique'] === 10000,
     'large scheme detail pagination is incorrect');
+$smallPage = NumberMonitorService::schemePatterns(124, $largeSchemeId, 100, 100);
+checkMonitor(count($smallPage['patterns']) === 100 && !$smallPage['has_more']
+    && $smallPage['total_pages'] === 100 && $smallPage['page_size'] === 100,
+    'page size or last page is incorrect');
 $storedLargePatterns = (new Query())->from(NumberMonitorPattern::tableName() . ' p')
     ->innerJoin(NumberMonitorScheme::tableName() . ' s', 's.id = p.scheme_id')
     ->where(['s.file_id' => $largeFile['id']])->count();

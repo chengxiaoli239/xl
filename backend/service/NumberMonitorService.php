@@ -45,9 +45,6 @@ class NumberMonitorService
         if (!$schemes || count($schemes) > NumberSchemeParser::MAX_SCHEMES_PER_FILE) {
             throw new \InvalidArgumentException('文件方案数量无效');
         }
-        if ($fillExisting && count($schemes) !== 1) {
-            throw new \InvalidArgumentException('文件夹内每个 TXT 文件只能包含一套方案');
-        }
         $name = trim(basename(str_replace('\\', '/', $name)));
         if ($name === '' || strlen($name) > 180) {
             $name = '号码方案.txt';
@@ -118,38 +115,6 @@ class NumberMonitorService
                 ->innerJoin(NumberMonitorFile::tableName() . ' f', 'f.id = s.file_id')
                 ->where(['f.lottery_type' => $lotteryType, 'f.status' => 1])->count();
             $now = time();
-            $file = $fillExisting ? NumberMonitorFile::find()
-                ->where(['uid' => $uid, 'lottery_type' => $lotteryType])
-                ->andWhere(['<', 'scheme_count', NumberSchemeParser::MAX_SCHEMES_PER_FILE])
-                ->orderBy(['id' => SORT_ASC])->one() : null;
-            if ($activeSchemeCount + (($file && !(int)$file->status) ? 0 : count($schemes))
-                > self::MAX_ACTIVE_SCHEMES_PER_LOTTERY) {
-                throw new \InvalidArgumentException('该彩种的监控方案数量已达上限');
-            }
-            if ($file) {
-                $firstLine = (int)$file->scheme_count;
-                $file->scheme_count += count($schemes);
-                $file->updated_at = $now;
-            } else {
-                if ($fileCount >= self::MAX_FILES_PER_USER) {
-                    throw new \InvalidArgumentException('账号最多支持 100 个监控文件');
-                }
-                $firstLine = 0;
-                $file = new NumberMonitorFile();
-                $file->setAttributes([
-                    'uid' => $uid,
-                    'lottery_type' => $lotteryType,
-                    'name' => $name,
-                    'status' => 1,
-                    'scheme_count' => count($schemes),
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ], false);
-            }
-            if (!$file->save(false)) {
-                throw new \RuntimeException('无法保存监控列');
-            }
-
             $patternRows = [];
             // Bound each SQL statement; repeated numbers have already been aggregated per scheme.
             $insertPatternBatch = function () use (&$patternRows) {
@@ -163,10 +128,44 @@ class NumberMonitorService
                 )->execute();
                 $patternRows = [];
             };
+            $file = null;
+            $activeAdded = 0;
             foreach ($schemes as $index => $scheme) {
+                if ($fillExisting) {
+                    $file = NumberMonitorFile::find()
+                        ->where(['uid' => $uid, 'lottery_type' => $lotteryType])
+                        ->andWhere(['<', 'scheme_count', NumberSchemeParser::MAX_SCHEMES_PER_FILE])
+                        ->orderBy(['id' => SORT_ASC])->one();
+                }
+                if (!$file) {
+                    if ($fileCount >= self::MAX_FILES_PER_USER) {
+                        throw new \InvalidArgumentException('账号最多支持 100 个监控文件');
+                    }
+                    $fileCount++;
+                    $file = new NumberMonitorFile();
+                    $file->setAttributes([
+                        'uid' => $uid,
+                        'lottery_type' => $lotteryType,
+                        'name' => $name,
+                        'status' => 1,
+                        'scheme_count' => 0,
+                        'created_at' => $now,
+                    ], false);
+                }
+                if ((int)$file->status === 1) {
+                    $activeAdded++;
+                    if ($activeAdded + $activeSchemeCount > self::MAX_ACTIVE_SCHEMES_PER_LOTTERY) {
+                        throw new \InvalidArgumentException('该彩种的监控方案数量已达上限');
+                    }
+                }
+                $file->scheme_count++;
+                $file->updated_at = $now;
+                if (!$file->save(false)) {
+                    throw new \RuntimeException('无法保存监控列');
+                }
                 $firstPattern = reset($scheme['patterns']);
                 $fixedCount = strlen(str_replace('X', '', $firstPattern));
-                $lineNo = $firstLine + $index + 1;
+                $lineNo = (int)$file->scheme_count;
                 $title = $fillExisting ? trim((string)($scheme['title'] ?? '')) : '';
                 if ($title === '') {
                     $title = '方案 ' . $lineNo . ' · ' . $fixedCount . ' 定';
@@ -258,12 +257,57 @@ class NumberMonitorService
             if (!$file) {
                 throw new \InvalidArgumentException('监控文件不存在');
             }
+            self::lockOrCreateCursor((int)$file->lottery_type, self::latestDrawId((int)$file->lottery_type));
             $schemeIds = NumberMonitorScheme::find()->select('id')->where(['file_id' => $fileId])->column();
             if ($schemeIds) {
                 NumberMonitorPattern::deleteAll(['scheme_id' => $schemeIds]);
                 NumberMonitorScheme::deleteAll(['id' => $schemeIds]);
             }
             $file->delete();
+            $transaction->commit();
+            return true;
+        } catch (\Throwable $exception) {
+            $transaction->rollBack();
+            throw $exception;
+        }
+    }
+
+    public static function deleteScheme(int $uid, int $schemeId): bool
+    {
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $scheme = NumberMonitorScheme::findOne(['id' => $schemeId, 'uid' => $uid]);
+            $file = $scheme ? NumberMonitorFile::findOne(['id' => $scheme->file_id, 'uid' => $uid]) : null;
+            if (!$file) {
+                throw new \InvalidArgumentException('监控方案不存在');
+            }
+            self::lockOrCreateCursor((int)$file->lottery_type, self::latestDrawId((int)$file->lottery_type));
+            $scheme = NumberMonitorScheme::findOne(['id' => $schemeId, 'uid' => $uid, 'file_id' => $file->id]);
+            if (!$scheme) {
+                throw new \InvalidArgumentException('监控方案不存在');
+            }
+            NumberMonitorPattern::deleteAll(['scheme_id' => $schemeId]);
+            $scheme->delete();
+            $remaining = NumberMonitorScheme::find()->where(['file_id' => $file->id])
+                ->orderBy(['line_no' => SORT_ASC, 'id' => SORT_ASC])->all();
+            if (!$remaining) {
+                $file->delete();
+            } else {
+                foreach ($remaining as $index => $item) {
+                    $lineNo = $index + 1;
+                    if ((int)$item->line_no !== $lineNo) {
+                        $defaultTitle = '方案 ' . $item->line_no . ' · ' . $item->fixed_count . ' 定';
+                        if ($item->title === $defaultTitle) {
+                            $item->title = '方案 ' . $lineNo . ' · ' . $item->fixed_count . ' 定';
+                        }
+                        $item->line_no = $lineNo;
+                        $item->save(false);
+                    }
+                }
+                $file->scheme_count = count($remaining);
+                $file->updated_at = time();
+                $file->save(false);
+            }
             $transaction->commit();
             return true;
         } catch (\Throwable $exception) {
@@ -305,9 +349,9 @@ class NumberMonitorService
         ];
     }
 
-    public static function schemePatterns(int $uid, int $schemeId, int $page): array
+    public static function schemePatterns(int $uid, int $schemeId, int $page, int $pageSize = 400): array
     {
-        if ($uid <= 0 || $schemeId <= 0 || $page < 1 || $page > 50) {
+        if ($uid <= 0 || $schemeId <= 0 || $page < 1 || !in_array($pageSize, [100, 200, 400, 1000], true)) {
             throw new \InvalidArgumentException('监控方案或页码无效');
         }
         $scheme = (new Query())->from(NumberMonitorScheme::tableName() . ' s')
@@ -318,7 +362,11 @@ class NumberMonitorService
             throw new \InvalidArgumentException('监控方案不存在');
         }
 
-        $pageSize = 400;
+        $totalUnique = (int)NumberMonitorPattern::find()->where(['scheme_id' => $schemeId])->count();
+        $totalPages = max(1, (int)ceil($totalUnique / $pageSize));
+        if ($page > $totalPages) {
+            throw new \InvalidArgumentException('页码超出范围');
+        }
         $patterns = NumberMonitorPattern::find()->select(['pattern', 'occurrence_count'])
             ->where(['scheme_id' => $schemeId])->orderBy(['id' => SORT_ASC])
             ->offset(($page - 1) * $pageSize)->limit($pageSize + 1)->asArray()->all();
@@ -331,6 +379,9 @@ class NumberMonitorService
             'title' => $scheme['title'],
             'pattern_count' => (int)$scheme['pattern_count'],
             'page' => $page,
+            'page_size' => $pageSize,
+            'total_unique' => $totalUnique,
+            'total_pages' => $totalPages,
             'has_more' => $hasMore,
             'patterns' => $patterns,
         ];
