@@ -298,7 +298,7 @@ class NumberMonitorService
             throw new \InvalidArgumentException('监控方案不存在');
         }
 
-        $pageSize = 200;
+        $pageSize = 400;
         $patterns = NumberMonitorPattern::find()->select(['pattern', 'occurrence_count'])
             ->where(['scheme_id' => $schemeId])->orderBy(['id' => SORT_ASC])
             ->offset(($page - 1) * $pageSize)->limit($pageSize + 1)->asArray()->all();

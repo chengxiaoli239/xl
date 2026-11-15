@@ -96,7 +96,7 @@ class NumberMonitorController extends BaseController
                 return [
                     'title' => $scheme['title'],
                     'pattern_count' => $scheme['pattern_count'],
-                    'patterns' => array_slice($scheme['patterns'], 0, 8),
+                    'patterns' => $scheme['patterns'],
                 ];
             }, NumberSchemeParser::parse($content));
             return $this->jsonResponse(['success' => true, 'schemes' => $schemes]);
