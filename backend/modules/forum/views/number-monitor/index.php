@@ -102,6 +102,7 @@ $stateJson = Json::htmlEncode($dashboard);
 .nm-draw-issue{overflow:hidden;font-size:13px;text-overflow:ellipsis;white-space:nowrap}
 .nm-draw-code{font-size:17px;letter-spacing:.14em!important;padding-left:.14em}
 @media(max-width:760px){.nm-draw-row{gap:5px;padding:8px}.nm-draw-issue{font-size:12px}.nm-draw-code{font-size:16px;letter-spacing:.1em!important;padding-left:.1em}}
+@media(max-width:760px){.nm-live-line{flex-wrap:wrap;gap:4px 6px}.nm-live-line>span{flex:0 0 auto;white-space:nowrap}}
 </style>
 
 <script>
