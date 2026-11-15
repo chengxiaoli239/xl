@@ -17,6 +17,46 @@ AppAsset::register($this);
 
 $menuRows = MenuHelper::getAssignedMenu(Yii::$app->user->id);
 
+$accountMenu = null;
+$otherMenuRows = [];
+foreach ($menuRows as $menuRow) {
+    if (in_array(($menuRow['label'] ?? ''), ['我的账号', '常用功能'], true)) {
+        $accountMenu = $menuRow;
+    } else {
+        $otherMenuRows[] = $menuRow;
+    }
+}
+
+$commonMenuItems = $accountMenu['items'] ?? [];
+$hasMonitorMenu = false;
+$hasDrawMenu = false;
+foreach ($commonMenuItems as &$commonMenuItem) {
+    $itemUrl = $commonMenuItem['url'] ?? '';
+    $itemUrl = is_array($itemUrl) ? ($itemUrl[0] ?? '') : $itemUrl;
+    $itemUrl = trim((string)$itemUrl, '/');
+    if ($itemUrl === 'forum/number-monitor/index') {
+        $hasMonitorMenu = true;
+    }
+    if ($itemUrl === 'forum/ssc-kj-data/index') {
+        $hasDrawMenu = true;
+        $commonMenuItem['label'] = '开奖记录';
+    }
+}
+unset($commonMenuItem);
+if (!$hasMonitorMenu) {
+    $commonMenuItems[] = ['label' => '号码监控', 'url' => ['/forum/number-monitor/index']];
+}
+if (!$hasDrawMenu) {
+    $commonMenuItems[] = ['label' => '开奖记录', 'url' => ['/forum/ssc-kj-data/index']];
+}
+$commonMenu = [
+    'label' => '常用功能',
+    'url' => '#',
+    'defaultExpanded' => true,
+    'items' => $commonMenuItems,
+];
+$menuRows = array_merge([$commonMenu], $otherMenuRows);
+
 $route = Yii::$app->controller->getRoute();
 $routeArray = explode('/', $route);
 array_pop($routeArray);
@@ -112,7 +152,8 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
         }
 
         if (isset($menuArray['items'])) {
-            echo '<li class="sub-menu">';
+            $expandedClass = !empty($menuArray['defaultExpanded']) ? ' dcjq-current-parent' : '';
+            echo '<li class="sub-menu'.$expandedClass.'">';
         } else {
             echo '<li class="'.$class.'">';
         }
@@ -144,7 +185,7 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
-<body>
+<body class="xl-admin-shell">
 <?php $this->beginBody() ?>
 
 <section id="container" >
@@ -403,12 +444,6 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
                     <a class="<?=($controllerName == 'site' ? 'active' : '')?>" href="<?=Url::home()?>">
                         <i class="fa fa-dashboard"></i>
                         <span><?=Yii::t('admin', 'dashboard')?></span>
-                    </a>
-                </li>
-                <li>
-                    <a class="<?=($controllerName == 'forum/number-monitor' ? 'active' : '')?>" href="<?=Url::toRoute('/forum/number-monitor/index')?>">
-                        <i class="fa fa-crosshairs"></i>
-                        <span>号码监控</span>
                     </a>
                 </li>
                 <?php

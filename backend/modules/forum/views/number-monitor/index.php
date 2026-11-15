@@ -44,7 +44,7 @@ $stateJson = Json::htmlEncode($dashboard);
                 <div class="nm-import-head">
                     <div>
                         <h2>添加号码文件</h2>
-                        <span class="nm-muted">TXT · 每个空行分隔一套方案</span>
+                        <span class="nm-muted">TXT · 空行分隔方案 · 最多 10 套，每套 10,000 组（重复号码保留）</span>
                     </div>
                     <div class="nm-import-actions">
                         <button type="button" id="nm-preview" class="nm-button nm-button-secondary" disabled>预览号码</button>
@@ -53,7 +53,7 @@ $stateJson = Json::htmlEncode($dashboard);
                 </div>
                 <button type="button" class="nm-dropzone" id="nm-dropzone" aria-label="选择或拖入 TXT 文件">
                     <span class="nm-drop-icon"><i class="fa fa-file-text-o" aria-hidden="true"></i></span>
-                    <span class="nm-drop-copy"><strong id="nm-file-name">拖入 TXT 文件</strong><small id="nm-file-meta">单文件最多 256 KB</small></span>
+                    <span class="nm-drop-copy"><strong id="nm-file-name">拖入 TXT 文件</strong><small id="nm-file-meta">单文件最多 1 MB</small></span>
                     <span class="nm-drop-browse">选择文件</span>
                 </button>
                 <input id="nm-file-input" type="file" accept=".txt,text/plain" hidden>
@@ -97,6 +97,11 @@ $stateJson = Json::htmlEncode($dashboard);
 .number-monitor button:focus-visible,.number-monitor select:focus-visible{outline:2px solid var(--nm-teal);outline-offset:2px}
 @media(max-width:760px){.number-monitor{border-radius:0}.nm-heading{padding:16px}.nm-file-title strong{max-width:170px}}
 @media(prefers-reduced-motion:reduce){.nm-button{transition:none}}
+#nm-file-input{display:none!important}
+.nm-draw-row{gap:6px;padding:9px 12px}
+.nm-draw-issue{overflow:hidden;font-size:13px;text-overflow:ellipsis;white-space:nowrap}
+.nm-draw-code{font-size:17px;letter-spacing:.14em!important;padding-left:.14em}
+@media(max-width:760px){.nm-draw-row{gap:5px;padding:8px}.nm-draw-issue{font-size:12px}.nm-draw-code{font-size:16px;letter-spacing:.1em!important;padding-left:.1em}}
 </style>
 
 <script>
@@ -146,7 +151,7 @@ $stateJson = Json::htmlEncode($dashboard);
 
     function updateFileLabel() {
         document.getElementById('nm-file-name').textContent = selectedFile ? selectedFile.name : '拖入 TXT 文件';
-        document.getElementById('nm-file-meta').textContent = selectedFile ? Math.ceil(selectedFile.size / 1024) + ' KB' : '单文件最多 256 KB';
+        document.getElementById('nm-file-meta').textContent = selectedFile ? Math.ceil(selectedFile.size / 1024) + ' KB' : '单文件最多 1 MB';
         previewButton.disabled = !selectedFile || busy;
         createButton.disabled = !selectedFile || !previewed || busy;
     }
@@ -181,7 +186,8 @@ $stateJson = Json::htmlEncode($dashboard);
         files.forEach(function (file) { schemeTotal += (file.schemes || []).length; });
         document.getElementById('nm-scheme-count').textContent = schemeTotal + ' 套';
         document.getElementById('nm-current-issue').textContent = state.draws && state.draws.length ? '最新 ' + state.draws[0].qihao : '等待开奖';
-        document.getElementById('nm-refresh-label').textContent = state.updated_at ? '已同步 ' + new Date(state.updated_at * 1000).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '等待开奖数据';
+        document.getElementById('nm-refresh-label').textContent = state.updated_at ? '已同步 ' + new Date(state.updated_at * 1000).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}) :
+            (state.draws && state.draws.length ? '最新开奖已同步' : '等待开奖数据');
         var hasActiveFile = files.some(function (file) { return Number(file.status) === 1 && (file.schemes || []).length > 0; });
         var isProcessed = !hasActiveFile || Number(state.processed_draw_id || 0) >= Number(state.latest_draw_id || 0);
         var syncState = document.getElementById('nm-sync-state');
@@ -221,8 +227,7 @@ $stateJson = Json::htmlEncode($dashboard);
         }
         list.innerHTML = draws.map(function (draw, index) {
             var code = String(draw.kj_code || '').replace(/\D/g, '');
-            var date = String(draw.date || '').slice(5);
-            return '<div class="nm-draw-row ' + (index === 0 ? 'latest' : '') + '"><div><span class="nm-draw-issue">' + escapeHtml(draw.qihao) + '</span><span class="nm-draw-time">' + escapeHtml(date || '—') + '</span></div><strong class="nm-draw-code">' + escapeHtml(code || '----') + '</strong></div>';
+            return '<div class="nm-draw-row ' + (index === 0 ? 'latest' : '') + '"><span class="nm-draw-issue">' + escapeHtml(draw.qihao) + '</span><strong class="nm-draw-code">' + escapeHtml(code || '----') + '</strong></div>';
         }).join('');
     }
 
@@ -233,23 +238,36 @@ $stateJson = Json::htmlEncode($dashboard);
         loadingData = true;
         var url = root.dataset.dataUrl + '?lottery_type=' + lotteryType;
         return fetch(url, {credentials:'same-origin', headers:{'Accept':'application/json'}}).then(function (response) {
+            if (response.status === 401 || response.status === 403) {
+                var accessError = new Error('监控数据访问被拒绝');
+                accessError.status = response.status;
+                throw accessError;
+            }
             return response.json().then(function (body) {
-                if (!response.ok || !body.success) throw new Error(body.message || '同步失败');
+                if (!response.ok || !body.success) {
+                    var error = new Error(body.message || '同步失败');
+                    error.status = response.status;
+                    throw error;
+                }
                 state = body.dashboard;
                 renderBoard();
+                return 5000;
             });
-        }).catch(function () {
-            document.getElementById('nm-sync-state').textContent = '同步暂不可用';
+        }).catch(function (error) {
+            var message = error.status === 401 ? '登录状态已失效，请重新登录' :
+                (error.status === 403 ? '当前账号没有号码监控数据权限' : '同步暂不可用');
+            document.getElementById('nm-sync-state').textContent = message;
             document.getElementById('nm-sync-state').classList.add('error');
-        }).finally(function () {
+            return error.status === 401 || error.status === 403 ? 30000 : 5000;
+        }).then(function (delay) {
             loadingData = false;
-            scheduleNextPoll();
+            scheduleNextPoll(delay);
         });
     }
 
-    function scheduleNextPoll() {
+    function scheduleNextPoll(delay) {
         window.clearTimeout(pollTimer);
-        pollTimer = window.setTimeout(loadData, 5000);
+        pollTimer = window.setTimeout(loadData, delay || 5000);
     }
 
     dropzone.addEventListener('click', function () { if (!busy) input.click(); });

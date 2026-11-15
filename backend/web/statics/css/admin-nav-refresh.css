@@ -1,0 +1,152 @@
+body.xl-admin-shell {
+    background: #f4f6f4;
+    color: #152421;
+}
+
+.xl-admin-shell #sidebar {
+    width: 210px !important;
+    overflow-x: hidden;
+    border-right: 1px solid #e1e8e3;
+    background: #fff;
+    box-shadow: 4px 0 20px rgba(16, 40, 32, .035);
+}
+
+.xl-admin-shell .header.white-bg {
+    border-bottom-color: #e1e8e3;
+    background: rgba(255, 255, 255, .97);
+    box-shadow: 0 2px 12px rgba(16, 40, 32, .035);
+}
+
+.xl-admin-shell a.logo {
+    color: #152421;
+    font-weight: 750;
+}
+
+.xl-admin-shell a.logo span {
+    color: #24766a;
+}
+
+.xl-admin-shell ul.sidebar-menu {
+    margin: 75px 0 0;
+    padding: 0 12px 18px;
+}
+
+.xl-admin-shell ul.sidebar-menu li {
+    margin: 3px 0;
+    padding: 0;
+}
+
+.xl-admin-shell ul.sidebar-menu > li > a {
+    display: flex;
+    min-height: 42px;
+    align-items: center;
+    gap: 9px;
+    border-radius: 8px;
+    padding: 7px 27px 7px 11px;
+    color: #75837e;
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.4;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.xl-admin-shell ul.sidebar-menu > li > a > i {
+    width: 17px;
+    flex: 0 0 17px;
+    padding: 0;
+    color: #75837e;
+    font-size: 14px;
+    text-align: center;
+}
+
+.xl-admin-shell ul.sidebar-menu > li > a:hover,
+.xl-admin-shell ul.sidebar-menu > li > a:focus {
+    background: #f1f4f1;
+    color: #152421;
+}
+
+.xl-admin-shell ul.sidebar-menu > li > a.active {
+    background: rgba(36, 118, 106, .12);
+    color: #24766a;
+}
+
+.xl-admin-shell ul.sidebar-menu > li > a.active > i,
+.xl-admin-shell ul.sidebar-menu > li > a:hover > i,
+.xl-admin-shell ul.sidebar-menu > li > a:focus > i {
+    color: #24766a;
+}
+
+.xl-admin-shell #sidebar .sub-menu > .sub li {
+    margin: 2px 0;
+    padding-left: 0;
+    background: transparent;
+}
+
+.xl-admin-shell ul.sidebar-menu li ul.sub li a {
+    display: flex;
+    min-height: 37px;
+    height: auto;
+    align-items: center;
+    border-radius: 7px;
+    padding: 8px 10px 8px 37px;
+    color: #75837e;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.xl-admin-shell ul.sidebar-menu li ul.sub li a:hover,
+.xl-admin-shell ul.sidebar-menu li ul.sub li.active a {
+    background: #f1f4f1;
+    color: #24766a;
+}
+
+.xl-admin-shell .dcjq-icon {
+    top: 50%;
+    right: 15px;
+    width: 7px;
+    height: 7px;
+    margin-top: -5px;
+    border: solid #9baaa3;
+    border-width: 0 1.5px 1.5px 0;
+    border-radius: 0;
+    background: none;
+    transform: rotate(45deg);
+}
+
+.xl-admin-shell .sub-menu > a.active .dcjq-icon {
+    margin-top: -1px;
+    border-color: #24766a;
+    background: none;
+    transform: rotate(225deg);
+}
+
+.xl-admin-shell .sidebar-toggle-box .fa-bars {
+    color: #24766a;
+}
+
+@media (max-width: 768px) {
+    .xl-admin-shell #sidebar,
+    .xl-admin-shell #container.sidebar-close #sidebar {
+        width: min(288px, calc(100vw - 32px)) !important;
+        max-width: calc(100vw - 32px);
+        background: #fff;
+        box-shadow: 8px 0 28px rgba(16, 40, 32, .14);
+    }
+
+    .xl-admin-shell ul.sidebar-menu {
+        margin-top: 74px;
+        padding: 0 12px 18px;
+    }
+
+    .xl-admin-shell ul.sidebar-menu > li > a {
+        min-height: 44px;
+    }
+
+    .xl-admin-shell #main-content {
+        margin: 0 !important;
+    }
+}

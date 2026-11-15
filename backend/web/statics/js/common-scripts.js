@@ -3,12 +3,11 @@ $(function() {
     $('#nav-accordion').dcAccordion({
         eventType: 'click',
         autoClose: true,
-        saveState: true,
+        saveState: false,
         disableLink: true,
         speed: 'slow',
         showCount: false,
         autoExpand: true,
-//        cookie: 'dcjq-accordion-1',
         classExpand: 'dcjq-current-parent'
     });
 });
@@ -39,11 +38,13 @@ var Script = function () {
             if (wSize <= 768) {
                 $('#container').addClass('sidebar-close');
                 $('#sidebar > ul').hide();
+                $('#sidebar').hide();
             }
 
             if (wSize > 768) {
                 $('#container').removeClass('sidebar-close');
                 $('#sidebar > ul').show();
+                $('#sidebar').show();
             }
         }
         $(window).on('load', responsiveView);

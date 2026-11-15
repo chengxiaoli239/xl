@@ -57,6 +57,8 @@ class NumberMonitorService
             }
             $fixedCount = null;
             $normalizedPatterns = [];
+            $patternCounts = [];
+            $samplePatterns = array_slice($scheme['patterns'], 0, 8);
             foreach ($scheme['patterns'] as $pattern) {
                 if (!is_string($pattern) || !preg_match('/^[0-9X]{4}$/', strtoupper($pattern))) {
                     throw new \InvalidArgumentException('文件中包含无效号码');
@@ -70,13 +72,21 @@ class NumberMonitorService
                     throw new \InvalidArgumentException('每套方案中的号码需要使用相同定数');
                 }
                 $fixedCount = $patternFixedCount;
-                $normalizedPatterns[$pattern] = $pattern;
+                if (!isset($patternCounts[$pattern])) {
+                    $normalizedPatterns[] = $pattern;
+                    $patternCounts[$pattern] = 0;
+                }
+                $patternCounts[$pattern]++;
             }
-            $schemes[$index]['patterns'] = array_values($normalizedPatterns);
-            $totalPatterns += count($normalizedPatterns);
+            $patternEntryCount = count($scheme['patterns']);
+            $schemes[$index]['patterns'] = $normalizedPatterns;
+            $schemes[$index]['pattern_counts'] = $patternCounts;
+            $schemes[$index]['sample_patterns'] = $samplePatterns;
+            $schemes[$index]['pattern_count'] = $patternEntryCount;
+            $totalPatterns += $patternEntryCount;
         }
         if ($totalPatterns > NumberSchemeParser::MAX_PATTERNS_PER_FILE) {
-            throw new \InvalidArgumentException('单个文件不能超过 20000 个号码');
+            throw new \InvalidArgumentException('单个文件不能超过 100,000 组号码');
         }
 
         $transaction = Yii::$app->db->beginTransaction();
@@ -96,7 +106,8 @@ class NumberMonitorService
             $patternCount = (int)(new Query())->from(NumberMonitorPattern::tableName() . ' p')
                 ->innerJoin(NumberMonitorScheme::tableName() . ' s', 's.id = p.scheme_id')
                 ->innerJoin(NumberMonitorFile::tableName() . ' f', 'f.id = s.file_id')
-                ->where(['f.uid' => $uid])->count();
+                ->where(['f.uid' => $uid])
+                ->select('COALESCE(SUM(p.occurrence_count), 0)')->scalar();
             if ($fileCount >= self::MAX_FILES_PER_USER
                 || $schemeCount + count($schemes) > self::MAX_SCHEMES_PER_USER
                 || $patternCount + $totalPatterns > self::MAX_PATTERNS_PER_USER) {
@@ -125,6 +136,18 @@ class NumberMonitorService
             }
 
             $patternRows = [];
+            // Bound each SQL statement; repeated numbers have already been aggregated per scheme.
+            $insertPatternBatch = function () use (&$patternRows) {
+                if (!$patternRows) {
+                    return;
+                }
+                Yii::$app->db->createCommand()->batchInsert(
+                    NumberMonitorPattern::tableName(),
+                    ['scheme_id', 'pattern', 'occurrence_count'],
+                    $patternRows
+                )->execute();
+                $patternRows = [];
+            };
             foreach ($schemes as $index => $scheme) {
                 $firstPattern = reset($scheme['patterns']);
                 $fixedCount = strlen(str_replace('X', '', $firstPattern));
@@ -135,9 +158,9 @@ class NumberMonitorService
                     'lottery_type' => $lotteryType,
                     'line_no' => $index + 1,
                     'title' => '方案 ' . ($index + 1) . ' · ' . $fixedCount . ' 定',
-                    'sample' => implode(' ', array_slice($scheme['patterns'], 0, 8)) . (count($scheme['patterns']) > 8 ? ' …' : ''),
+                    'sample' => implode(' ', $scheme['sample_patterns']) . ($scheme['pattern_count'] > 8 ? ' …' : ''),
                     'fixed_count' => $fixedCount,
-                    'pattern_count' => count($scheme['patterns']),
+                    'pattern_count' => $scheme['pattern_count'],
                     'started_draw_id' => $latestDrawId,
                     'last_draw_id' => $latestDrawId,
                     'current_status' => NumberMonitorScheme::STATUS_NONE,
@@ -149,16 +172,13 @@ class NumberMonitorService
                     throw new \RuntimeException('无法保存监控方案');
                 }
                 foreach ($scheme['patterns'] as $pattern) {
-                    $patternRows[] = [$model->id, strtoupper($pattern)];
+                    $patternRows[] = [$model->id, strtoupper($pattern), $scheme['pattern_counts'][$pattern]];
+                    if (count($patternRows) >= 500) {
+                        $insertPatternBatch();
+                    }
                 }
             }
-            foreach (array_chunk($patternRows, 500) as $rows) {
-                Yii::$app->db->createCommand()->batchInsert(
-                    NumberMonitorPattern::tableName(),
-                    ['scheme_id', 'pattern'],
-                    $rows
-                )->execute();
-            }
+            $insertPatternBatch();
 
             $transaction->commit();
             // A draw can arrive while the first file is being imported, before its queue hook sees it.

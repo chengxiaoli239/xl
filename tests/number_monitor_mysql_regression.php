@@ -12,12 +12,14 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 require dirname(__DIR__) . '/vendor/yiisoft/yii2/Yii.php';
 require dirname(__DIR__) . '/common/config/bootstrap.php';
 require dirname(__DIR__) . '/console/migrations/m261115_000001_create_number_monitor_tables.php';
+require dirname(__DIR__) . '/console/migrations/m261115_000002_add_occurrence_count_to_number_monitor_patterns.php';
 
 use backend\models\NumberMonitorFile;
 use backend\models\NumberMonitorPattern;
 use backend\models\NumberMonitorScheme;
 use backend\service\NumberMonitorService;
 use common\service\numberMonitor\NumberSchemeParser;
+use yii\db\Query;
 
 function checkMonitor($condition, $message)
 {
@@ -53,6 +55,8 @@ $db->createCommand()->createTable('{{%ssc_kj_data}}', [
 ])->execute();
 $migration = new m261115_000001_create_number_monitor_tables();
 $migration->safeUp();
+$migration = new m261115_000002_add_occurrence_count_to_number_monitor_patterns();
+$migration->safeUp();
 
 function addMonitorDraw($db, $qihao, $code)
 {
@@ -79,8 +83,10 @@ addMonitorDraw($db, '1001', '99999');
 $schemes = NumberSchemeParser::parse("1234 4567 8923\n\n1,3,5,6 0,3,6,1 9,1,4,5\n\n12XX 23XX 89XX\n\n234X 890X 234X 892X 235X");
 $created = NumberMonitorService::createFile(123, 8, 'sample.txt', $schemes);
 $fileId = $created['id'];
-checkMonitor($created['scheme_count'] === 4 && $created['pattern_count'] === 13, 'import counts are incorrect');
+checkMonitor($created['scheme_count'] === 4 && $created['pattern_count'] === 14, 'import counts are incorrect');
 checkMonitor((int)NumberMonitorPattern::find()->count() === 13, 'patterns were duplicated during import');
+checkMonitor((int)NumberMonitorPattern::find()->where(['pattern' => '234X'])->sum('occurrence_count') === 2,
+    'duplicate pattern occurrence was not preserved');
 checkMonitor(NumberMonitorService::dashboardData(456, 8)['files'] === [], 'files leaked across accounts');
 try {
     NumberMonitorService::setFileStatus(456, $fileId, false);
@@ -130,14 +136,14 @@ checkMonitor((int)NumberMonitorFile::find()->count() === 0
 addMonitorDraw($db, '1007', '99999');
 
 $bulkSchemes = [];
-for ($i = 0; $i < 100; $i++) {
+for ($i = 0; $i < 10; $i++) {
     $patterns = [];
     for ($number = 0; $number < 10; $number++) {
         $patterns[] = str_pad((string)$number, 4, '0', STR_PAD_LEFT);
     }
     $bulkSchemes[] = ['patterns' => $patterns];
 }
-for ($file = 0; $file < 10; $file++) {
+for ($file = 0; $file < 100; $file++) {
     NumberMonitorService::createFile(123, 8, 'bulk-' . $file . '.txt', $bulkSchemes);
 }
 checkMonitor(NumberMonitorService::dashboardData(123, 8)['processed_draw_id']
@@ -149,4 +155,16 @@ $elapsedMs = round((microtime(true) - $startedAt) * 1000);
 checkMonitor((int)NumberMonitorScheme::find()->where(['current_status' => 1, 'streak_count' => 1])->count() === 1000,
     'bulk monitor did not update all 1000 schemes');
 
-echo "number_monitor_mysql_regression: OK (1000 schemes, 10000 patterns, draw {$elapsedMs} ms)\n";
+$allFourDigitPatterns = [];
+for ($number = 0; $number < 10000; $number++) {
+    $allFourDigitPatterns[] = str_pad((string)$number, 4, '0', STR_PAD_LEFT);
+}
+$largeFileSchemes = array_fill(0, 3, ['patterns' => $allFourDigitPatterns]);
+$largeFile = NumberMonitorService::createFile(124, 8, 'large.txt', $largeFileSchemes);
+$storedLargePatterns = (new Query())->from(NumberMonitorPattern::tableName() . ' p')
+    ->innerJoin(NumberMonitorScheme::tableName() . ' s', 's.id = p.scheme_id')
+    ->where(['s.file_id' => $largeFile['id']])->count();
+checkMonitor($largeFile['pattern_count'] === 30000 && (int)$storedLargePatterns === 30000,
+    'large multi-scheme import exceeded the former file pattern limit');
+
+echo "number_monitor_mysql_regression: OK (1000 schemes, 10000 active patterns, duplicate counts and 30000 imported patterns, draw {$elapsedMs} ms)\n";

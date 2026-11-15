@@ -6,10 +6,10 @@ use InvalidArgumentException;
 
 class NumberSchemeParser
 {
-    const MAX_FILE_BYTES = 262144;
-    const MAX_SCHEMES_PER_FILE = 200;
-    const MAX_PATTERNS_PER_SCHEME = 2500;
-    const MAX_PATTERNS_PER_FILE = 20000;
+    const MAX_FILE_BYTES = 1048576;
+    const MAX_SCHEMES_PER_FILE = 10;
+    const MAX_PATTERNS_PER_SCHEME = 10000;
+    const MAX_PATTERNS_PER_FILE = 100000;
 
     public static function parse($content): array
     {
@@ -17,7 +17,7 @@ class NumberSchemeParser
             throw new InvalidArgumentException('请选择包含号码的 TXT 文件');
         }
         if (strlen($content) > self::MAX_FILE_BYTES) {
-            throw new InvalidArgumentException('TXT 文件不能超过 256 KB');
+            throw new InvalidArgumentException('TXT 文件不能超过 1 MB');
         }
 
         $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
@@ -41,7 +41,7 @@ class NumberSchemeParser
                 if (strlen($pattern) !== 4) {
                     continue;
                 }
-                $patterns[$pattern] = $pattern;
+                $patterns[] = $pattern;
             }
 
             $unmatched = preg_replace($patternRegex, ' ', $group);
@@ -63,12 +63,12 @@ class NumberSchemeParser
                 throw new InvalidArgumentException('仅支持二定、三定和四定号码');
             }
             if (count($patterns) > self::MAX_PATTERNS_PER_SCHEME) {
-                throw new InvalidArgumentException('单套方案不能超过 2500 个号码');
+                throw new InvalidArgumentException('单套方案不能超过 10,000 组号码');
             }
 
             $totalPatterns += count($patterns);
             if ($totalPatterns > self::MAX_PATTERNS_PER_FILE) {
-                throw new InvalidArgumentException('单个文件不能超过 20000 个号码');
+                throw new InvalidArgumentException('单个文件不能超过 100,000 组号码');
             }
             $fixedCount = 0;
             foreach (str_split(reset($patterns)) as $digit) {
@@ -82,7 +82,7 @@ class NumberSchemeParser
                 'patterns' => array_values($patterns),
             ];
             if (count($schemes) > self::MAX_SCHEMES_PER_FILE) {
-                throw new InvalidArgumentException('单个文件不能超过 200 套方案');
+                throw new InvalidArgumentException('单个文件最多支持 10 套方案');
             }
         }
 

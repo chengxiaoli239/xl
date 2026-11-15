@@ -24,8 +24,34 @@ if ($spacedCommaSchemes[0]['patterns'] !== ['1356', '0361']) {
 if ($schemes[2]['fixed_count'] !== 2 || $schemes[2]['patterns'] !== ['12XX', '23XX', '89XX']) {
     throw new RuntimeException('two-fixed pattern parsing failed');
 }
-if ($schemes[3]['fixed_count'] !== 3 || $schemes[3]['pattern_count'] !== 4) {
-    throw new RuntimeException('three-fixed pattern parsing or deduplication failed');
+if ($schemes[3]['fixed_count'] !== 3 || $schemes[3]['pattern_count'] !== 5
+    || $schemes[3]['patterns'] !== ['234X', '890X', '234X', '892X', '235X']) {
+    throw new RuntimeException('three-fixed pattern parsing or duplicate preservation failed');
+}
+
+$allFourDigitPatterns = [];
+for ($number = 0; $number < 10000; $number++) {
+    $allFourDigitPatterns[] = str_pad((string)$number, 4, '0', STR_PAD_LEFT);
+}
+$commaSeparatedPatterns = array_map(function ($pattern) {
+    return implode(',', str_split($pattern));
+}, $allFourDigitPatterns);
+$largeScheme = implode(' ', $commaSeparatedPatterns);
+$largeContent = implode("\n\n", array_fill(0, 10, $largeScheme));
+$largeSchemes = NumberSchemeParser::parse($largeContent);
+if (count($largeSchemes) !== 10 || $largeSchemes[0]['pattern_count'] !== 10000
+    || array_sum(array_column($largeSchemes, 'pattern_count')) !== 100000) {
+    throw new RuntimeException('large schemes and files must accept the 100000 pattern limit');
+}
+try {
+    NumberSchemeParser::parse($largeScheme . ' ' . $allFourDigitPatterns[0]);
+    throw new RuntimeException('per-scheme pattern limit must be enforced');
+} catch (InvalidArgumentException $expected) {
+}
+try {
+    NumberSchemeParser::parse(implode("\n\n", array_fill(0, 11, '1234')));
+    throw new RuntimeException('scheme count limit must be enforced');
+} catch (InvalidArgumentException $expected) {
 }
 
 foreach ([

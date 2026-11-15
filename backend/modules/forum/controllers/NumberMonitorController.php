@@ -38,6 +38,9 @@ class NumberMonitorController extends BaseController
     public function beforeAction($action)
     {
         if (Yii::$app->user->isGuest || !$this->_user_id) {
+            if ($action->id === 'data') {
+                return true;
+            }
             throw new ForbiddenHttpException('请先登录');
         }
         return parent::beforeAction($action);
@@ -59,6 +62,9 @@ class NumberMonitorController extends BaseController
 
     public function actionData($lottery_type = CommonLotteryService::LOTTERY_TYPE_LUCKY5)
     {
+        if (Yii::$app->user->isGuest || !$this->_user_id) {
+            return $this->jsonResponse(['success' => false, 'message' => '登录状态已失效，请重新登录'], 401);
+        }
         $lotteryType = (int)$lottery_type;
         if (!NumberMonitorService::supportedLotteryType($lotteryType)) {
             return $this->jsonResponse(['success' => false, 'message' => '彩种参数无效'], 400);
@@ -134,7 +140,7 @@ class NumberMonitorController extends BaseController
             throw new \InvalidArgumentException('请选择有效的 TXT 文件');
         }
         if ($file->size > NumberSchemeParser::MAX_FILE_BYTES) {
-            throw new \InvalidArgumentException('TXT 文件不能超过 256 KB');
+            throw new \InvalidArgumentException('TXT 文件不能超过 1 MB');
         }
         $content = file_get_contents($file->tempName);
         if (!is_string($content)) {
