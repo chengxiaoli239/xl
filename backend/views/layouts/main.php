@@ -55,6 +55,17 @@ $commonMenu = [
     'defaultExpanded' => true,
     'items' => $commonMenuItems,
 ];
+$otherMenuRows = array_map(static function ($menuRow) {
+    if (($menuRow['label'] ?? '') !== '游戏管理' || empty($menuRow['items'])) {
+        return $menuRow;
+    }
+    $menuRow['items'] = array_values(array_filter($menuRow['items'], static function ($item) {
+        $url = $item['url'] ?? '';
+        $route = trim((string)(is_array($url) ? ($url[0] ?? '') : $url), '/');
+        return ($item['label'] ?? '') !== '开奖记录' && $route !== 'forum/ssc-kj-data/index';
+    }));
+    return $menuRow;
+}, $otherMenuRows);
 $menuRows = array_merge([$commonMenu], $otherMenuRows);
 
 $route = Yii::$app->controller->getRoute();
@@ -133,7 +144,23 @@ function isSubMenu($menuArray, $controllerName)
 
 
 
-function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
+function xlCommonMenuIcon($label)
+{
+    $icons = [
+        '游戏记录' => '<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/>',
+        '计划任务' => '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4m10-4v4M3 10h18m-13 5 2.2 2.2L16 13"/>',
+        '个人信息' => '<circle cx="12" cy="8" r="3.5"/><path d="M5 20v-1.5a7 7 0 0 1 14 0V20H5z"/>',
+        '异常监控' => '<path d="M10.2 4.5a2.1 2.1 0 0 1 3.6 0l7.1 12.2a2.1 2.1 0 0 1-1.8 3.1H4.9a2.1 2.1 0 0 1-1.8-3.1L10.2 4.5z"/><path d="M12 9v5m0 3h.01"/>',
+        '号码监控' => '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/>',
+        '开奖记录' => '<path d="M12 2.5 14 8l5.5 2-5.5 2-2 5.5-2-5.5-5.5-2L10 8l2-5.5zM19 17v4m-2-2h4"/>',
+    ];
+    if (!isset($icons[$label])) {
+        return null;
+    }
+    return '<span class="xl-common-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'.$icons[$label].'</svg></span>';
+}
+
+function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false, $isCommonChild=false)
 {
     if (isset($menuArray) && is_array($menuArray)) {
 
@@ -151,9 +178,10 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
             $class = '';
         }
 
+        $isCommonMenu = ($menuArray['label'] ?? '') === '常用功能' && isset($menuArray['items']);
         if (isset($menuArray['items'])) {
             $expandedClass = !empty($menuArray['defaultExpanded']) ? ' dcjq-current-parent' : '';
-            echo '<li class="sub-menu'.$expandedClass.'">';
+            echo '<li class="sub-menu'.$expandedClass.($isCommonMenu ? ' xl-common-menu' : '').'">';
         } else {
             echo '<li class="'.$class.'">';
         }
@@ -187,13 +215,18 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false)
             }
             $icon = $icon ?? 'fa-file-text-o';
         }
-        echo '<a href="'.$url.'"  class="'.$class.'">'.($isShowIcon ? '<i class="fa '.$icon.'" aria-hidden="true"></i>' : '').'<span>'.$menuArray['label'].'</span></a>';
+        if ($isCommonMenu) {
+            echo '<div class="xl-common-heading" role="heading" aria-level="2">'.Html::encode($menuArray['label']).'</div>';
+        } else {
+            $menuIcon = $isCommonChild ? xlCommonMenuIcon($menuArray['label']) : null;
+            echo '<a href="'.$url.'" class="'.$class.'">'.($menuIcon ?? ($isShowIcon ? '<i class="fa '.$icon.'" aria-hidden="true"></i>' : '')).'<span>'.Html::encode($menuArray['label']).'</span></a>';
+        }
 
         if (isset($menuArray['items'])) {
             echo '<ul class="sub">';
             foreach ($menuArray['items'] as $item)
             {
-                echo initMenu($item, $controllerName, $isSubUrl, true);
+                echo initMenu($item, $controllerName, $isSubUrl, true, $isCommonMenu);
             }
             echo '</ul>';
         }

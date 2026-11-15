@@ -25,7 +25,7 @@ html[data-xl-theme="dark"] body.xl-admin-shell {
 }
 .xl-admin-shell #sidebar {
     top: 8px; left: 8px; bottom: 8px;
-    width: 204px !important; height: auto; overflow-x: hidden; overflow-y: auto;
+    box-sizing: border-box; width: 204px !important; height: auto; overflow-x: hidden; overflow-y: auto;
     border: 1px solid var(--xl-border); border-radius: 18px;
     background: linear-gradient(160deg, var(--xl-sidebar-top), var(--xl-sidebar-bottom));
     box-shadow: 4px 8px 24px var(--xl-shadow);
@@ -67,6 +67,12 @@ html[data-xl-theme="dark"] body.xl-admin-shell {
 .xl-admin-shell ul.sidebar-menu > li.sub-menu > a {
     position: relative; background: var(--xl-section); border-color: transparent;
 }
+.xl-admin-shell ul.sidebar-menu > li.xl-common-menu > .xl-common-heading {
+    display: flex; min-height: 34px; align-items: center; border-radius: 8px;
+    padding: 7px 12px; background: var(--xl-section); color: var(--xl-heading);
+    font-size: 12px; font-weight: 700; letter-spacing: .04em;
+}
+.xl-admin-shell #sidebar > ul > li.xl-common-menu > ul.sub { display: block !important; }
 .xl-admin-shell ul.sidebar-menu > li > a:hover,
 .xl-admin-shell ul.sidebar-menu > li > a:focus,
 .xl-admin-shell ul.sidebar-menu > li.sub-menu > a.active {
@@ -99,6 +105,17 @@ html[data-xl-theme="dark"] body.xl-admin-shell {
 .xl-admin-shell ul.sidebar-menu li ul.sub li a > i {
     width: 20px; flex: 0 0 20px; padding: 0;
     color: var(--xl-accent); font-size: 17px; text-align: center;
+}
+.xl-admin-shell ul.sidebar-menu .xl-common-menu li a { gap: 12px; }
+.xl-admin-shell ul.sidebar-menu .xl-common-menu li a .xl-common-icon {
+    display: inline-grid; width: 30px; height: 30px; flex: 0 0 30px;
+    place-items: center; border: 1px solid var(--xl-item-border); border-radius: 9px;
+    background: var(--xl-item); color: var(--xl-accent);
+}
+.xl-admin-shell .xl-common-icon svg { display: block; width: 19px; height: 19px; }
+.xl-admin-shell ul.sidebar-menu .xl-common-menu li a:hover .xl-common-icon,
+.xl-admin-shell ul.sidebar-menu .xl-common-menu li.active a .xl-common-icon {
+    background: var(--xl-item-active); border-color: var(--xl-border);
 }
 .xl-admin-shell ul.sidebar-menu li ul.sub li a:hover,
 .xl-admin-shell ul.sidebar-menu li ul.sub li a:focus {
@@ -319,25 +336,36 @@ html[data-xl-theme="dark"] body.xl-admin-shell .nm-feedback.error {
     .xl-admin-shell #container.xl-mobile-menu-open .xl-shell-actions { opacity: 0; pointer-events: none; }
     .xl-admin-shell #sidebar, .xl-admin-shell #container.sidebar-close #sidebar {
         top: 0; bottom: 0; left: 0; height: 100vh; height: 100dvh;
-        width: min(340px, calc(100vw - 36px)) !important;
-        max-width: calc(100vw - 36px); max-height: 100vh; max-height: 100dvh;
+        width: 40vw !important;
+        max-width: 40vw; max-height: 100vh; max-height: 100dvh;
         overflow-y: auto; border-radius: 0 20px 20px 0;
         background: linear-gradient(160deg, var(--xl-sidebar-top), var(--xl-sidebar-bottom));
         box-shadow: 12px 0 36px var(--xl-shadow);
     }
-    .xl-admin-shell .xl-nav-toggle { top: 22px; left: 18px; width: 38px; height: 38px; }
-    .xl-admin-shell .xl-sidebar-brand { min-height: 88px; padding: 22px 18px 16px 66px; }
-    .xl-admin-shell .xl-sidebar-brand a { font-size: 19px; }
-    .xl-admin-shell .xl-sidebar-brand span { font-size: 11px; }
-    .xl-admin-shell ul.sidebar-menu { margin-top: 12px; padding: 0 14px 24px; }
-    .xl-admin-shell ul.sidebar-menu > li { margin-bottom: 14px; }
+    .xl-admin-shell .xl-nav-toggle { top: 17px; left: 7px; width: 30px; height: 30px; font-size: 14px; }
+    .xl-admin-shell .xl-sidebar-brand { min-height: 74px; padding: 15px 5px 12px 43px; }
+    .xl-admin-shell .xl-sidebar-brand a { font-size: 15px; }
+    .xl-admin-shell .xl-sidebar-brand span { font-size: 9px; }
+    .xl-admin-shell ul.sidebar-menu { margin-top: 10px; padding: 0 6px 24px; }
+    .xl-admin-shell ul.sidebar-menu > li { margin-bottom: 12px; }
     .xl-admin-shell ul.sidebar-menu > li.sub-menu > a {
-        min-height: 43px; padding-left: 14px; font-size: 13px;
+        min-height: 38px; padding: 8px 26px 8px 7px; font-size: 11px;
+    }
+    .xl-admin-shell ul.sidebar-menu > li.xl-common-menu > .xl-common-heading {
+        min-height: 38px; padding: 8px 7px; font-size: 11px;
     }
     .xl-admin-shell ul.sidebar-menu li ul.sub li a {
-        min-height: 54px; padding: 12px 14px; font-size: 16px;
+        min-height: 49px; gap: 8px; padding: 8px 7px; font-size: 13px;
     }
-    .xl-admin-shell ul.sidebar-menu li ul.sub li a > i { font-size: 18px; }
+    .xl-admin-shell ul.sidebar-menu li ul.sub li a > i {
+        width: 20px; flex-basis: 20px; font-size: 16px;
+    }
+    .xl-admin-shell ul.sidebar-menu .xl-common-menu li a { gap: 8px; }
+    .xl-admin-shell ul.sidebar-menu .xl-common-menu li a .xl-common-icon {
+        width: 26px; height: 26px; flex-basis: 26px; border-radius: 8px;
+    }
+    .xl-admin-shell .xl-common-icon svg { width: 17px; height: 17px; }
+    .xl-admin-shell .dcjq-icon { right: 6px; width: 18px; height: 18px; margin-top: -9px; }
     .xl-admin-shell #sidebar > ul > li > ul.sub > li > a {
         min-height: 54px; background: transparent !important;
     }

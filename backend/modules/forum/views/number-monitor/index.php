@@ -38,11 +38,6 @@ $stateJson = Json::htmlEncode($dashboard);
                 <?php endforeach; ?>
             </select>
         </label>
-        <div class="nm-mobile-draws-action">
-            <button type="button" id="nm-mobile-draws-toggle" aria-label="查看最近开奖号" aria-controls="nm-draws-panel" aria-expanded="false">
-                <strong id="nm-floating-draw-code">----</strong><small>开奖</small>
-            </button>
-        </div>
     </header>
 
     <div class="nm-workspace">
@@ -52,6 +47,11 @@ $stateJson = Json::htmlEncode($dashboard);
                     <div>
                         <h2>添加号码文件</h2>
                         <span class="nm-muted">TXT · 空行分隔方案 · 最多 10 套，每套 10,000 组（重复号码保留）</span>
+                    </div>
+                    <div class="nm-mobile-draws-action">
+                        <button type="button" id="nm-mobile-draws-toggle" aria-label="查看最近开奖号" aria-controls="nm-draws-panel" aria-expanded="false">
+                            <strong id="nm-floating-draw-code">----</strong><small>开奖</small>
+                        </button>
                     </div>
                     <div class="nm-import-actions">
                         <button type="button" id="nm-preview" class="nm-button nm-button-secondary" disabled>预览号码</button>
@@ -141,9 +141,11 @@ $stateJson = Json::htmlEncode($dashboard);
 .nm-scheme-head strong{min-width:0;flex:1}
 .nm-scheme-sample{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;max-height:3em;line-height:1.5;overflow:hidden;white-space:normal;overflow-wrap:anywhere;text-overflow:ellipsis}
 .nm-scheme-meta>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nm-heading>.nm-mobile-draws-action,#nm-mobile-draws-close{display:none}
+.nm-import-head>.nm-mobile-draws-action,#nm-mobile-draws-close{display:none}
 @media(max-width:760px){
-    .nm-heading>.nm-mobile-draws-action{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:calc(18px + env(safe-area-inset-bottom));z-index:1000;display:block}
+    .nm-import-head{display:grid;grid-template-columns:minmax(0,1fr) 62px;align-items:start;gap:10px}
+    .nm-import-head>.nm-mobile-draws-action{display:block;grid-column:2;grid-row:1;justify-self:end}
+    .nm-import-actions{grid-column:1/-1}
     .nm-mobile-draws-action button,#nm-mobile-draws-close{display:grid;place-content:center;gap:2px;width:62px;height:62px;border:1px solid #cbd9ef;border-radius:50%;background:#fff;color:#315efb;box-shadow:0 8px 24px rgba(32,61,105,.2);cursor:pointer}
     .nm-mobile-draws-action button strong{font:700 14px ui-monospace,SFMono-Regular,Menlo,monospace;line-height:1}
     .nm-mobile-draws-action button small{font-size:9px;line-height:1}
