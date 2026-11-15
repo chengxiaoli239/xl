@@ -168,10 +168,11 @@ $stateJson = Json::htmlEncode($dashboard);
 .nm-scheme-panel{display:grid;grid-template-rows:auto minmax(0,1fr) auto;height:min(84vh,800px);max-height:calc(100vh - 32px)}
 .nm-scheme-patterns{min-height:0}
 .nm-scheme-patterns.nm-history-list{display:block}
-.nm-history-row{display:grid;grid-template-columns:max-content max-content max-content;justify-content:start;align-items:center;gap:5px;min-height:42px;border-bottom:1px solid var(--nm-line);padding:6px 2px}
-.nm-history-issue{overflow:hidden;color:var(--nm-ink);font-size:14px;font-weight:600;text-overflow:ellipsis;white-space:nowrap}
-.nm-history-code{color:var(--nm-muted);font:600 14px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em!important}
-.nm-history-status{min-width:48px;border-radius:5px;padding:4px 6px;text-align:center;font-size:13px;font-weight:700}
+.nm-scheme-panel.nm-history-mode{width:min(540px,100%);height:min(74vh,700px)}
+.nm-history-row{display:grid;grid-template-columns:minmax(0,1fr) 80px 62px;align-items:center;gap:12px;width:min(100%,440px);min-height:48px;margin-inline:auto;border-bottom:1px solid var(--nm-line);padding:8px 3px}
+.nm-history-issue{overflow:hidden;color:var(--nm-ink);font-size:15px;font-weight:600;text-overflow:ellipsis;white-space:nowrap}
+.nm-history-code{color:var(--nm-muted);font:600 16px ui-monospace,SFMono-Regular,Menlo,monospace;text-align:center;letter-spacing:.08em!important}
+.nm-history-status{min-width:54px;justify-self:end;border-radius:5px;padding:5px 7px;text-align:center;font-size:14px;font-weight:700}
 .nm-history-status.hit{background:#e5f5ee;color:#15774e}
 .nm-history-status.miss{background:#fdecec;color:#ad3434}
 .nm-history-status.none{background:#eef1f4;color:#687581}
@@ -198,7 +199,7 @@ $stateJson = Json::htmlEncode($dashboard);
     .nm-scheme-sample{margin-top:5px;font-size:9px}
     .nm-scheme-meta{margin-top:4px;font-size:9px}
 }
-@media(max-width:760px){.nm-scheme-panel{height:min(84dvh,800px);max-height:calc(100dvh - 32px)}}
+@media(max-width:760px){.nm-scheme-panel{height:min(84dvh,800px);max-height:calc(100dvh - 32px)}.nm-scheme-panel.nm-history-mode{height:min(78dvh,680px)}.nm-history-row{grid-template-columns:minmax(0,1fr) 70px 54px;gap:8px}}
 .number-monitor{padding:10px 12px 18px}
 .nm-heading{gap:8px;margin-bottom:8px;padding:8px 12px;border-radius:8px}
 .nm-heading h1{font-size:20px}
@@ -231,7 +232,7 @@ $stateJson = Json::htmlEncode($dashboard);
 .nm-file-action-label{display:none}
 .nm-file-paused{padding:3px 4px;font-size:10px}
 .nm-scheme-list{display:block;padding:2px 3px}
-.nm-scheme{display:flex;align-items:center;justify-content:space-between;gap:1px;min-width:0;min-height:25px;padding:2px 0;border:0;border-bottom:1px solid var(--nm-line);border-radius:0;box-shadow:none}
+.nm-scheme{display:flex;align-items:center;justify-content:space-between;gap:1px;min-width:0;min-height:28px;padding:3px 0;border:0;border-bottom:1px solid var(--nm-line);border-radius:0;box-shadow:none}
 .nm-scheme:last-child{border-bottom:0}
 .nm-scheme:hover{border-color:var(--nm-line);background:var(--nm-ground);box-shadow:none}
 .nm-scheme-view{flex:1;width:auto;min-width:0;overflow:hidden;margin:0;padding:2px 0;text-overflow:clip;white-space:nowrap;font-size:12px;font-weight:650;font-variant-numeric:tabular-nums;line-height:18px}
@@ -273,7 +274,7 @@ $stateJson = Json::htmlEncode($dashboard);
 @media(min-width:1800px){
     .nm-file-title strong,.nm-scheme-view{font-size:13px}
     .nm-streak-button .nm-streak{font-size:12px}
-    .nm-scheme{min-height:29px}
+    .nm-scheme{min-height:31px}
 }
 </style>
 
@@ -467,6 +468,7 @@ $stateJson = Json::htmlEncode($dashboard);
         previousFocus = trigger;
         schemeDialog.hidden = false;
         document.body.classList.add('nm-dialog-open');
+        schemeDialog.querySelector('.nm-scheme-panel').classList.remove('nm-history-mode');
         document.getElementById('nm-scheme-title').textContent = '方案号码';
         document.getElementById('nm-scheme-patterns').classList.remove('nm-history-list');
         document.getElementById('nm-scheme-patterns').innerHTML = '';
@@ -485,6 +487,7 @@ $stateJson = Json::htmlEncode($dashboard);
         previousFocus = trigger;
         schemeDialog.hidden = false;
         document.body.classList.add('nm-dialog-open');
+        schemeDialog.querySelector('.nm-scheme-panel').classList.add('nm-history-mode');
         document.getElementById('nm-scheme-title').textContent = '监控历史';
         document.getElementById('nm-scheme-summary').textContent = '正在读取历史记录…';
         document.getElementById('nm-scheme-patterns').classList.add('nm-history-list');
@@ -514,6 +517,7 @@ $stateJson = Json::htmlEncode($dashboard);
         previousFocus = trigger;
         schemeDialog.hidden = false;
         document.body.classList.add('nm-dialog-open');
+        schemeDialog.querySelector('.nm-scheme-panel').classList.remove('nm-history-mode');
         schemeDialog.querySelector('.nm-scheme-panel').focus();
         loadSchemePage(1);
     }
