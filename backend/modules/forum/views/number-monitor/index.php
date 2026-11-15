@@ -169,10 +169,10 @@ $stateJson = Json::htmlEncode($dashboard);
 .nm-scheme-panel{display:grid;grid-template-rows:auto minmax(0,1fr) auto;height:min(84vh,800px);max-height:calc(100vh - 32px)}
 .nm-scheme-patterns{min-height:0}
 .nm-scheme-patterns.nm-history-list{display:block}
-.nm-history-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:12px;min-height:42px;border-bottom:1px solid var(--nm-line);padding:7px 4px}
-.nm-history-issue{overflow:hidden;color:var(--nm-ink);font-size:12px;text-overflow:ellipsis;white-space:nowrap}
-.nm-history-code{color:var(--nm-muted);font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em!important}
-.nm-history-status{min-width:48px;border-radius:5px;padding:4px 7px;text-align:center;font-size:11px;font-weight:700}
+.nm-history-row{display:grid;grid-template-columns:max-content max-content max-content;justify-content:start;align-items:center;gap:5px;min-height:42px;border-bottom:1px solid var(--nm-line);padding:6px 2px}
+.nm-history-issue{overflow:hidden;color:var(--nm-ink);font-size:14px;font-weight:600;text-overflow:ellipsis;white-space:nowrap}
+.nm-history-code{color:var(--nm-muted);font:600 14px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em!important}
+.nm-history-status{min-width:48px;border-radius:5px;padding:4px 6px;text-align:center;font-size:13px;font-weight:700}
 .nm-history-status.hit{background:#e5f5ee;color:#15774e}
 .nm-history-status.miss{background:#fdecec;color:#ad3434}
 .nm-history-status.none{background:#eef1f4;color:#687581}
@@ -184,6 +184,21 @@ $stateJson = Json::htmlEncode($dashboard);
 .nm-scheme-view{display:block;width:100%;min-width:0;padding:0;text-align:left}
 .nm-scheme-title:focus-visible,.nm-scheme-view:focus-visible,.nm-streak-button:focus-visible{outline:2px solid var(--nm-teal);outline-offset:2px}
 .nm-history-row:last-child{border-bottom:0}
+@media(max-width:760px){
+    .nm-file-column{flex-basis:150px;width:150px;min-height:0}
+    .nm-file-top{gap:7px;padding:8px}
+    .nm-file-title{gap:6px}
+    .nm-file-title strong{max-width:100px}
+    .nm-file-actions{gap:4px}
+    .nm-file-actions button{min-width:0;height:25px;padding:0 6px;font-size:9px}
+    .nm-scheme-list{grid-template-columns:minmax(0,1fr);gap:5px;padding:6px}
+    .nm-scheme{padding:6px}
+    .nm-scheme-head{gap:3px}
+    .nm-scheme-title{font-size:10px}
+    .nm-streak-button .nm-streak{min-width:50px;font-size:10px}
+    .nm-scheme-sample{margin-top:5px;font-size:9px}
+    .nm-scheme-meta{margin-top:4px;font-size:9px}
+}
 @media(max-width:760px){.nm-scheme-panel{height:min(84dvh,800px);max-height:calc(100dvh - 32px)}}
 </style>
 

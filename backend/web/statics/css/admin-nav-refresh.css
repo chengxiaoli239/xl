@@ -30,6 +30,16 @@ html[data-xl-theme="dark"] body.xl-admin-shell {
     background: linear-gradient(160deg, var(--xl-sidebar-top), var(--xl-sidebar-bottom));
     box-shadow: 4px 8px 24px var(--xl-shadow);
 }
+@media (max-width: 768px) {
+    html.xl-mobile-menu-lock { overflow: hidden; overscroll-behavior: none; }
+    body.xl-admin-shell.xl-mobile-menu-lock {
+        position: fixed; top: var(--xl-menu-scroll-top, 0); right: 0; left: 0;
+        width: 100%; overflow: hidden; overscroll-behavior: none;
+    }
+    .xl-admin-shell #container.xl-mobile-menu-open #sidebar {
+        overscroll-behavior: contain; -webkit-overflow-scrolling: touch; touch-action: pan-y;
+    }
+}
 .xl-admin-shell .xl-nav-toggle {
     position: fixed; top: 22px; left: 20px; z-index: 1102;
     width: 34px; height: 34px; border: 0; border-radius: 9px;

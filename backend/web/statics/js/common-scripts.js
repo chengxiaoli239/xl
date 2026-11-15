@@ -1,4 +1,24 @@
 /*---LEFT BAR ACCORDION----*/
+var xlMobileMenuScrollTop = 0;
+function setXlMobileMenuScrollLock(locked) {
+    var $html = $('html');
+    var $body = $('body');
+    if (locked) {
+        xlMobileMenuScrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+        document.body.style.setProperty('--xl-menu-scroll-top', '-' + xlMobileMenuScrollTop + 'px');
+        $html.addClass('xl-mobile-menu-lock');
+        $body.addClass('xl-mobile-menu-lock');
+        return;
+    }
+    $html.removeClass('xl-mobile-menu-lock');
+    var wasLocked = $body.hasClass('xl-mobile-menu-lock');
+    $body.removeClass('xl-mobile-menu-lock');
+    document.body.style.removeProperty('--xl-menu-scroll-top');
+    if (wasLocked) {
+        window.scrollTo(0, xlMobileMenuScrollTop);
+    }
+}
+
 $(function() {
     $('#nav-accordion').dcAccordion({
         eventType: 'click',
@@ -36,6 +56,9 @@ var Script = function () {
         function responsiveView() {
             var wSize = $(window).width();
             if (wSize <= 768) {
+                if ($('#container').hasClass('xl-mobile-menu-open')) {
+                    setXlMobileMenuScrollLock(false);
+                }
                 $('#container').addClass('sidebar-close');
                 $('#container').removeClass('xl-mobile-menu-open');
                 $('#sidebar > ul').hide();
@@ -44,6 +67,7 @@ var Script = function () {
             }
 
             if (wSize > 768) {
+                setXlMobileMenuScrollLock(false);
                 $('#container').removeClass('sidebar-close');
                 $('#sidebar > ul').show();
                 $('#sidebar').show();
@@ -68,6 +92,9 @@ var Script = function () {
             $('#sidebar').css('display','none');
             $('#nav-accordion').css('display','none');
             $('#container').addClass('sidebar-closed');
+            if ($('#container').hasClass('xl-mobile-menu-open')) {
+                setXlMobileMenuScrollLock(false);
+            }
             $('#container').removeClass('xl-mobile-menu-open');
             $(this).attr({'aria-expanded': 'false', 'aria-label': '打开菜单'});
         } else {
@@ -83,6 +110,7 @@ var Script = function () {
             $('#container').removeClass('sidebar-closed');
             if ($(window).width() <= 768) {
                 $('#container').addClass('xl-mobile-menu-open');
+                setXlMobileMenuScrollLock(true);
             }
             $(this).attr({'aria-expanded': 'true', 'aria-label': '关闭菜单'});
         }
