@@ -157,6 +157,59 @@ html[data-xl-theme="dark"] .xl-admin-shell .dropdown-menu.extended li p {
 html[data-xl-theme="dark"] .xl-admin-shell .site-footer {
     background: var(--xl-header); color: var(--xl-muted);
 }
+/* The monitor has its own palette; only its colors change in dark mode. */
+html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor {
+    --nm-ink: #e3edf6; --nm-muted: #adbed0; --nm-line: #38536d;
+    --nm-paper: #1c3044; --nm-ground: #112235; --nm-teal: #91baff;
+    --nm-hit: #19875f; --nm-miss: #be4b55;
+    background: radial-gradient(ellipse at 4% 0%, #203f58 0, transparent 44%),
+        radial-gradient(ellipse at 95% 8%, #23334f 0, transparent 42%), #112235;
+}
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-heading {
+    background: linear-gradient(120deg, #1e344a, #1a2d41);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .12);
+}
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-dropzone,
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-button-secondary,
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-file-top,
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-file-paused,
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-scheme,
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-file-actions button {
+    border-color: var(--nm-line); background: #223b52; color: var(--nm-ink);
+}
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-dropzone.dragging,
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-button-secondary:hover:not(:disabled),
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-file-actions button:hover {
+    background: #2b4d68;
+}
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-drop-icon,
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-file-mark {
+    background: #294c69; color: var(--nm-teal);
+}
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-empty,
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-preview-row,
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-draw-row {
+    border-color: var(--nm-line);
+}
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-draw-row.latest {
+    background: #29465b;
+}
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-draw-code {
+    color: #ffaba5;
+}
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-empty strong,
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-draw-time,
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-scheme-meta,
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-draws-heading > i {
+    color: var(--nm-muted);
+}
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-streak.none {
+    background: #344b5f; color: var(--nm-ink);
+}
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-sync-state.error,
+html[data-xl-theme="dark"] body.xl-admin-shell .nm-feedback.error {
+    color: #ff9d9d;
+}
 @media (max-width: 768px) {
     .xl-admin-shell #sidebar, .xl-admin-shell #container.sidebar-close #sidebar {
         width: min(290px, calc(100vw - 24px)) !important;
