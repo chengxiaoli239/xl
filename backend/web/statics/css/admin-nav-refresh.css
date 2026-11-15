@@ -102,6 +102,7 @@ html[data-xl-theme="dark"] body.xl-admin-shell {
     white-space: normal; overflow-wrap: anywhere;
     transition: background .15s ease, border-color .15s ease;
 }
+.xl-admin-shell #sidebar > ul > li > ul.sub > li > a { display: flex; }
 .xl-admin-shell ul.sidebar-menu li ul.sub li a > i {
     width: 20px; flex: 0 0 20px; padding: 0;
     color: var(--xl-accent); font-size: 17px; text-align: center;
@@ -347,7 +348,8 @@ html[data-xl-theme="dark"] body.xl-admin-shell .nm-feedback.error {
     .xl-admin-shell .xl-sidebar-brand a { font-size: 15px; }
     .xl-admin-shell .xl-sidebar-brand span { font-size: 9px; }
     .xl-admin-shell ul.sidebar-menu { margin-top: 10px; padding: 0 6px 24px; }
-    .xl-admin-shell ul.sidebar-menu > li { margin-bottom: 12px; }
+    .xl-admin-shell #sidebar > ul.sidebar-menu > li { margin: 0 0 12px; }
+    .xl-admin-shell #sidebar > ul.sidebar-menu > li > a { box-sizing: border-box; width: 100%; }
     .xl-admin-shell ul.sidebar-menu > li.sub-menu > a {
         min-height: 38px; padding: 8px 26px 8px 7px; font-size: 11px;
     }
@@ -355,12 +357,12 @@ html[data-xl-theme="dark"] body.xl-admin-shell .nm-feedback.error {
         min-height: 38px; padding: 8px 7px; font-size: 11px;
     }
     .xl-admin-shell ul.sidebar-menu li ul.sub li a {
-        min-height: 49px; gap: 8px; padding: 8px 7px; font-size: 13px;
+        min-height: 49px; gap: 10px; padding: 8px 7px; font-size: 13px;
     }
     .xl-admin-shell ul.sidebar-menu li ul.sub li a > i {
         width: 20px; flex-basis: 20px; font-size: 16px;
     }
-    .xl-admin-shell ul.sidebar-menu .xl-common-menu li a { gap: 8px; }
+    .xl-admin-shell ul.sidebar-menu .xl-common-menu li a { gap: 12px; }
     .xl-admin-shell ul.sidebar-menu .xl-common-menu li a .xl-common-icon {
         width: 26px; height: 26px; flex-basis: 26px; border-radius: 8px;
     }
