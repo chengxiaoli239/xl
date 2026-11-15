@@ -26,7 +26,6 @@ $stateJson = Json::htmlEncode($dashboard);
          data-csrf="<?= Html::encode($csrfToken) ?>">
     <header class="nm-heading">
         <div>
-            <p class="nm-eyebrow">开奖追踪</p>
             <h1>号码监控</h1>
             <div class="nm-live-line"><span class="nm-live-dot"></span><span id="nm-refresh-label">同步最新开奖</span><span class="nm-separator">·</span><span id="nm-current-issue">等待开奖</span></div>
         </div>
@@ -46,7 +45,7 @@ $stateJson = Json::htmlEncode($dashboard);
                 <div class="nm-import-head">
                     <div>
                         <h2>添加号码文件</h2>
-                        <span class="nm-muted">TXT · 空行分隔方案 · 最多 10 套，每套 10,000 组（重复号码保留）</span>
+                        <span class="nm-muted">TXT · 空行分隔 · 最多 15 套，每套 10,000 组（保留重复号码）</span>
                     </div>
                     <div class="nm-mobile-draws-action">
                         <button type="button" id="nm-mobile-draws-toggle" aria-label="查看最近开奖号" aria-controls="nm-draws-panel" aria-expanded="false">
@@ -60,7 +59,7 @@ $stateJson = Json::htmlEncode($dashboard);
                 </div>
                 <button type="button" class="nm-dropzone" id="nm-dropzone" aria-label="选择或拖入 TXT 文件">
                     <span class="nm-drop-icon"><i class="fa fa-file-text-o" aria-hidden="true"></i></span>
-                    <span class="nm-drop-copy"><strong id="nm-file-name">拖入 TXT 文件</strong><small id="nm-file-meta">单文件最多 1 MB</small></span>
+                    <span class="nm-drop-copy"><strong id="nm-file-name">拖入 TXT 文件</strong><small id="nm-file-meta">单文件最多 2 MB</small></span>
                     <span class="nm-drop-browse">选择文件</span>
                 </button>
                 <input id="nm-file-input" type="file" accept=".txt,text/plain" hidden>
@@ -69,7 +68,7 @@ $stateJson = Json::htmlEncode($dashboard);
             </section>
 
             <div class="nm-board-heading">
-                <div><h2>监控方案</h2><span id="nm-scheme-count" class="nm-count">0 套</span></div>
+                <div><h2>监控方案</h2><span id="nm-scheme-count" class="nm-count">0 套</span><span id="nm-monitor-period" class="nm-monitor-period">最新期号 --</span></div>
                 <span id="nm-sync-state" class="nm-sync-state">实时同步中</span>
             </div>
             <div class="nm-board-viewport">
@@ -200,6 +199,82 @@ $stateJson = Json::htmlEncode($dashboard);
     .nm-scheme-meta{margin-top:4px;font-size:9px}
 }
 @media(max-width:760px){.nm-scheme-panel{height:min(84dvh,800px);max-height:calc(100dvh - 32px)}}
+.number-monitor{padding:10px 12px 18px}
+.nm-heading{gap:8px;margin-bottom:8px;padding:8px 12px;border-radius:8px}
+.nm-heading h1{font-size:20px}
+.nm-live-line{gap:5px;margin-top:2px;font-size:11px}
+.nm-lottery-select select{min-width:110px;height:30px}
+.nm-workspace{gap:10px}
+.nm-import-panel{padding:8px 10px;border-radius:8px}
+.nm-import-head{gap:8px;margin-bottom:5px}
+.nm-import-head .nm-muted{margin-top:2px;font-size:10px}
+.nm-import-actions{gap:6px}
+.nm-button{height:30px;padding:0 9px}
+.nm-dropzone{min-height:38px;gap:8px;padding:4px 8px}
+.nm-drop-icon{flex-basis:25px;width:25px;height:25px;font-size:12px}
+.nm-drop-copy small{margin-top:1px;font-size:10px}
+.nm-drop-browse{font-size:11px}
+.nm-preview{max-height:160px;margin-top:6px;padding-top:4px}
+.nm-preview-row{padding:5px 2px;font-size:12px}
+.nm-board-heading{margin:9px 1px 5px}
+.nm-board-viewport{padding-bottom:4px}
+.nm-board{width:100%;gap:5px;min-height:0}
+.nm-file-column{flex:0 0 max(98px,calc(10% - 4.5px));width:max(98px,calc(10% - 4.5px));min-height:0;border-radius:6px}
+.nm-file-top{display:grid;grid-template-columns:minmax(0,1fr);gap:2px;padding:4px}
+.nm-file-title{min-width:0;gap:0}
+.nm-file-mark{display:none}
+.nm-file-title>div{display:flex;align-items:center;gap:3px;min-width:0;width:100%}
+.nm-file-title strong{flex:1;min-width:0;max-width:none;font-size:12px}
+.nm-file-title small{flex:none;margin:0;font-size:9px;white-space:nowrap}
+.nm-file-actions{justify-content:flex-end;gap:3px}
+.nm-file-actions button{display:grid;place-items:center;min-width:24px;width:24px;height:22px;padding:0;border-radius:4px;font-size:11px}
+.nm-file-action-label{display:none}
+.nm-file-paused{padding:3px 4px;font-size:10px}
+.nm-scheme-list{display:block;padding:2px 3px}
+.nm-scheme{display:flex;align-items:center;justify-content:space-between;gap:1px;min-width:0;min-height:25px;padding:2px 0;border:0;border-bottom:1px solid var(--nm-line);border-radius:0;box-shadow:none}
+.nm-scheme:last-child{border-bottom:0}
+.nm-scheme:hover{border-color:var(--nm-line);background:var(--nm-ground);box-shadow:none}
+.nm-scheme-view{flex:1;width:auto;min-width:0;overflow:hidden;margin:0;padding:2px 0;text-overflow:clip;white-space:nowrap;font-size:12px;font-weight:650;font-variant-numeric:tabular-nums;line-height:18px}
+.nm-streak-button{flex:none;padding:0}
+.nm-streak-button .nm-streak{display:inline-flex;align-items:center;justify-content:center;gap:1px;min-width:25px;padding:2px 1px;border-radius:4px;font-size:11px;line-height:1.1;white-space:nowrap}
+.nm-streak .fa{font-size:10px}
+.nm-file-column.paused .nm-scheme{opacity:.72}
+.nm-monitor-period{color:var(--nm-muted);font-size:10px;white-space:nowrap}
+@media(max-width:1600px){
+    .nm-workspace{display:block}
+    .nm-import-head>.nm-mobile-draws-action{display:block;margin-left:auto}
+    .nm-mobile-draws-action button{display:grid;place-content:center;gap:1px;width:42px;height:42px;border:1px solid #cbd9ef;border-radius:50%;background:#fff;color:#315efb;box-shadow:0 4px 12px rgba(32,61,105,.14);cursor:pointer}
+    .nm-mobile-draws-action button strong{font:700 12px ui-monospace,SFMono-Regular,Menlo,monospace;line-height:1}
+    .nm-mobile-draws-action button small{font-size:9px;line-height:1}
+    .nm-draws{display:none}
+    .number-monitor.nm-mobile-draws-open .nm-draws{position:fixed;top:50%;left:50%;z-index:2001;display:block;width:min(420px,calc(100vw - 28px));max-height:85dvh;transform:translate(-50%,-50%);box-shadow:0 22px 64px rgba(12,28,45,.22)}
+    .nm-draws-heading>i{display:none}
+    #nm-mobile-draws-close{display:grid;place-items:center;width:30px;height:30px;border:1px solid var(--nm-line);border-radius:5px;background:#fff;color:var(--nm-ink);cursor:pointer}
+    .nm-draws-backdrop:not([hidden]){position:fixed;inset:0;z-index:2000;background:rgba(12,28,45,.62)}
+    .nm-draw-list{display:block;max-height:70dvh;overflow-y:auto}
+}
+@media(max-width:760px){
+    .number-monitor{padding:8px 8px 16px;border-radius:0}
+    .nm-heading{flex-direction:row;align-items:center;padding:8px}
+    .nm-heading h1{font-size:18px}
+    .nm-live-line{flex-wrap:wrap;font-size:10px}
+    .nm-lottery-select{flex-direction:row;align-items:center}
+    .nm-lottery-select span{display:none}
+    .nm-lottery-select select{min-width:92px;max-width:100px;height:30px;font-size:11px}
+    .nm-import-panel{padding:7px}
+    .nm-import-head{display:grid;grid-template-columns:minmax(0,1fr) 46px;gap:5px;align-items:start}
+    .nm-import-head>.nm-mobile-draws-action{grid-column:2;grid-row:1}
+    .nm-import-actions{grid-column:1/-1;width:100%}
+    .nm-board-heading,.nm-board-heading>div{flex-wrap:wrap;gap:5px}
+    .nm-file-column{flex:0 0 106px;width:106px}
+    .nm-file-title strong{font-size:11px}
+    .nm-scheme-view{font-size:11px}
+}
+@media(min-width:1800px){
+    .nm-file-title strong,.nm-scheme-view{font-size:13px}
+    .nm-streak-button .nm-streak{font-size:12px}
+    .nm-scheme{min-height:29px}
+}
 </style>
 
 <script>
@@ -455,7 +530,7 @@ $stateJson = Json::htmlEncode($dashboard);
     }
 
     function openDraws() {
-        if (window.innerWidth > 760) return;
+        if (window.innerWidth > 1600) return;
         drawsPreviousFocus = document.activeElement;
         root.classList.add('nm-mobile-draws-open');
         drawsBackdrop.hidden = false;
@@ -480,7 +555,7 @@ $stateJson = Json::htmlEncode($dashboard);
 
     function updateFileLabel() {
         document.getElementById('nm-file-name').textContent = selectedFile ? selectedFile.name : '拖入 TXT 文件';
-        document.getElementById('nm-file-meta').textContent = selectedFile ? Math.ceil(selectedFile.size / 1024) + ' KB' : '单文件最多 1 MB';
+        document.getElementById('nm-file-meta').textContent = selectedFile ? Math.ceil(selectedFile.size / 1024) + ' KB' : '单文件最多 2 MB';
         previewButton.disabled = !selectedFile || busy;
         createButton.disabled = !selectedFile || !previewed || busy;
     }
@@ -500,9 +575,7 @@ $stateJson = Json::htmlEncode($dashboard);
         var preview = document.getElementById('nm-preview-list');
         previewSchemes = schemes;
         preview.innerHTML = schemes.map(function (scheme, index) {
-            var sample = scheme.patterns.slice(0, 8).join(' ');
-            if (Number(scheme.pattern_count) > 8) sample += ' …';
-            return '<button type="button" class="nm-preview-row" data-preview-index="' + index + '" aria-label="查看' + escapeHtml(scheme.title) + '的全部号码"><span><strong>' + escapeHtml(scheme.title) + '</strong><br>' + escapeHtml(sample) + '</span><em>' + escapeHtml(scheme.pattern_count) + ' 组 · 查看</em></button>';
+            return '<button type="button" class="nm-preview-row" data-preview-index="' + index + '" aria-label="查看' + escapeHtml(scheme.title) + '的全部号码"><span><strong>' + escapeHtml(scheme.title) + '</strong></span><em>' + escapeHtml(scheme.pattern_count) + ' 组 · 查看</em></button>';
         }).join('');
         preview.hidden = false;
         previewed = true;
@@ -516,7 +589,9 @@ $stateJson = Json::htmlEncode($dashboard);
         var schemeTotal = 0;
         files.forEach(function (file) { schemeTotal += (file.schemes || []).length; });
         document.getElementById('nm-scheme-count').textContent = schemeTotal + ' 套';
-        document.getElementById('nm-current-issue').textContent = state.draws && state.draws.length ? '最新 ' + state.draws[0].qihao : '等待开奖';
+        var latestIssue = state.draws && state.draws.length ? String(state.draws[0].qihao || '') : '';
+        document.getElementById('nm-current-issue').textContent = latestIssue ? '最新 ' + latestIssue : '等待开奖';
+        document.getElementById('nm-monitor-period').textContent = latestIssue ? '最新期号 ' + latestIssue : '最新期号 --';
         document.getElementById('nm-refresh-label').textContent = state.updated_at ? '已同步 ' + new Date(state.updated_at * 1000).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}) :
             (state.draws && state.draws.length ? '最新开奖已同步' : '等待开奖数据');
         var hasActiveFile = files.some(function (file) { return Number(file.status) === 1 && (file.schemes || []).length > 0; });
@@ -531,17 +606,18 @@ $stateJson = Json::htmlEncode($dashboard);
         } else {
             board.innerHTML = files.map(function (file) {
                 var schemes = file.schemes || [];
-                var cards = schemes.map(function (scheme) {
+                var cards = schemes.map(function (scheme, schemeIndex) {
                     var paused = Number(file.status) !== 1;
                     var status = paused ? 'none' : Number(scheme.current_status) === 1 ? 'hit' : Number(scheme.current_status) === 2 ? 'miss' : 'none';
-                    var label = paused ? '已暂停' : status === 'hit' ? '中 +' + scheme.streak_count : status === 'miss' ? '错 +' + scheme.streak_count : '待开奖';
-                    var meta = scheme.last_qihao ? '最近更新 ' + scheme.last_qihao : scheme.pattern_count + ' 组号码';
-                    var sample = String(scheme.sample || '').replace(/ ?…$/, '');
-                    return '<article class="nm-scheme"><div class="nm-scheme-head"><button type="button" class="nm-scheme-title" data-action="view" data-id="' + Number(scheme.id) + '" aria-label="查看' + escapeHtml(scheme.title) + '号码">' + escapeHtml(scheme.title) + '</button><button type="button" class="nm-streak-button" data-action="history" data-id="' + Number(scheme.id) + '" aria-label="查看' + escapeHtml(scheme.title) + '每期监控历史"><span class="nm-streak ' + status + '">' + escapeHtml(label) + '</span></button></div><button type="button" class="nm-scheme-view" data-action="view" data-id="' + Number(scheme.id) + '" aria-label="查看' + escapeHtml(scheme.title) + '号码"><div class="nm-scheme-sample">' + escapeHtml(sample) + '</div><div class="nm-scheme-meta"><span>' + escapeHtml(meta) + '</span><span class="nm-scheme-open-hint">号码 <i class="fa fa-angle-right" aria-hidden="true"></i></span></div></button></article>';
+                    var icon = status === 'hit' ? 'fa-check' : status === 'miss' ? 'fa-times' : paused ? 'fa-pause' : 'fa-minus';
+                    var label = paused ? '已暂停' : status === 'hit' ? '连中 ' + scheme.streak_count + ' 期' : status === 'miss' ? '连错 ' + scheme.streak_count + ' 期' : '等待本期开奖';
+                    var streak = status === 'hit' || status === 'miss' ? '+' + Number(scheme.streak_count || 0) : '';
+                    var number = Number(scheme.line_no || schemeIndex + 1);
+                    return '<div class="nm-scheme"><button type="button" class="nm-scheme-view" data-action="view" data-id="' + Number(scheme.id) + '" aria-label="查看第' + number + '套，' + escapeHtml(scheme.title) + '，' + Number(scheme.pattern_count || 0) + '组号码" title="' + escapeHtml(scheme.title) + ' · 查看号码">' + number + '.' + Number(scheme.pattern_count || 0) + '组</button><button type="button" class="nm-streak-button" data-action="history" data-id="' + Number(scheme.id) + '" aria-label="' + escapeHtml(label + '，查看逐期监控历史') + '" title="' + escapeHtml(label) + ' · 查看历史"><span class="nm-streak ' + status + '"><i class="fa ' + icon + '" aria-hidden="true"></i>' + streak + '</span></button></div>';
                 }).join('');
                 return '<section class="nm-file-column ' + (Number(file.status) === 1 ? '' : 'paused') + '" data-file-id="' + Number(file.id) + '">' +
                     '<header class="nm-file-top"><div class="nm-file-title"><span class="nm-file-mark"><i class="fa fa-file-text-o" aria-hidden="true"></i></span><div><strong title="' + escapeHtml(file.name) + '">' + escapeHtml(file.name) + '</strong><small>' + schemes.length + ' 套方案</small></div></div>' +
-                    '<div class="nm-file-actions"><button type="button" data-action="toggle" data-id="' + Number(file.id) + '" data-active="' + (Number(file.status) === 1 ? '0' : '1') + '">' + (Number(file.status) === 1 ? '暂停' : '继续') + '</button><button type="button" data-action="clear" data-id="' + Number(file.id) + '">清除</button></div></header>' +
+                    '<div class="nm-file-actions"><button type="button" data-action="toggle" data-id="' + Number(file.id) + '" data-active="' + (Number(file.status) === 1 ? '0' : '1') + '" aria-label="' + (Number(file.status) === 1 ? '暂停' : '继续') + '监控文件 ' + escapeHtml(file.name) + '" title="' + (Number(file.status) === 1 ? '暂停' : '继续') + '"><i class="fa ' + (Number(file.status) === 1 ? 'fa-pause' : 'fa-play') + '" aria-hidden="true"></i><span class="nm-file-action-label">' + (Number(file.status) === 1 ? '暂停' : '继续') + '</span></button><button type="button" data-action="clear" data-id="' + Number(file.id) + '" aria-label="清除监控文件 ' + escapeHtml(file.name) + '" title="清除"><i class="fa fa-trash-o" aria-hidden="true"></i><span class="nm-file-action-label">清除</span></button></div></header>' +
                     (Number(file.status) === 1 ? '' : '<div class="nm-file-paused">已暂停监控</div>') +
                     '<div class="nm-scheme-list">' + cards + '</div></section>';
             }).join('');
@@ -715,7 +791,7 @@ $stateJson = Json::htmlEncode($dashboard);
         else if (event.key === 'Escape') closeDraws();
     });
     window.addEventListener('resize', function () {
-        if (window.innerWidth > 760) closeDraws();
+        if (window.innerWidth > 1600) closeDraws();
     });
 
     document.getElementById('nm-lottery-type').addEventListener('change', function (event) {

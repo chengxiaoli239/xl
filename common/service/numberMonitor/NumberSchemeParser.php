@@ -6,10 +6,10 @@ use InvalidArgumentException;
 
 class NumberSchemeParser
 {
-    const MAX_FILE_BYTES = 1048576;
-    const MAX_SCHEMES_PER_FILE = 10;
+    const MAX_FILE_BYTES = 2097152;
+    const MAX_SCHEMES_PER_FILE = 15;
     const MAX_PATTERNS_PER_SCHEME = 10000;
-    const MAX_PATTERNS_PER_FILE = 100000;
+    const MAX_PATTERNS_PER_FILE = 150000;
 
     public static function parse($content): array
     {
@@ -17,7 +17,7 @@ class NumberSchemeParser
             throw new InvalidArgumentException('请选择包含号码的 TXT 文件');
         }
         if (strlen($content) > self::MAX_FILE_BYTES) {
-            throw new InvalidArgumentException('TXT 文件不能超过 1 MB');
+            throw new InvalidArgumentException('TXT 文件不能超过 2 MB');
         }
 
         $content = preg_replace('/^\xEF\xBB\xBF/', '', $content);
@@ -68,7 +68,7 @@ class NumberSchemeParser
 
             $totalPatterns += count($patterns);
             if ($totalPatterns > self::MAX_PATTERNS_PER_FILE) {
-                throw new InvalidArgumentException('单个文件不能超过 100,000 组号码');
+                throw new InvalidArgumentException('单个文件不能超过 150,000 组号码');
             }
             $fixedCount = 0;
             foreach (str_split(reset($patterns)) as $digit) {
@@ -82,7 +82,7 @@ class NumberSchemeParser
                 'patterns' => array_values($patterns),
             ];
             if (count($schemes) > self::MAX_SCHEMES_PER_FILE) {
-                throw new InvalidArgumentException('单个文件最多支持 10 套方案');
+                throw new InvalidArgumentException('单个文件最多支持 15 套方案');
             }
         }
 

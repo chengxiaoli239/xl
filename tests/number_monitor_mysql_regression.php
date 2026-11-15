@@ -185,4 +185,11 @@ $storedLargePatterns = (new Query())->from(NumberMonitorPattern::tableName() . '
 checkMonitor($largeFile['pattern_count'] === 30000 && (int)$storedLargePatterns === 30000,
     'large multi-scheme import exceeded the former file pattern limit');
 
-echo "number_monitor_mysql_regression: OK (1000 schemes, 10000 active patterns, duplicate counts and 30000 imported patterns, draw {$elapsedMs} ms)\n";
+$repeatedScheme = ['patterns' => array_fill(0, 10000, '1234')];
+$additionalFile = NumberMonitorService::createFile(124, 8, 'additional.txt', array_fill(0, 15, $repeatedScheme));
+checkMonitor($additionalFile['scheme_count'] === 15 && $additionalFile['pattern_count'] === 150000,
+    'account import exceeded the former 100000 pattern limit');
+checkMonitor((int)NumberMonitorScheme::find()->where(['uid' => 124])->sum('pattern_count') === 180000,
+    'account pattern total did not preserve duplicate occurrences');
+
+echo "number_monitor_mysql_regression: OK (1000 schemes, 10000 active patterns, duplicate counts and 180000 imported patterns, draw {$elapsedMs} ms)\n";

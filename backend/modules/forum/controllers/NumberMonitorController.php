@@ -170,7 +170,7 @@ class NumberMonitorController extends BaseController
             throw new \InvalidArgumentException('请选择有效的 TXT 文件');
         }
         if ($file->size > NumberSchemeParser::MAX_FILE_BYTES) {
-            throw new \InvalidArgumentException('TXT 文件不能超过 1 MB');
+            throw new \InvalidArgumentException('TXT 文件不能超过 2 MB');
         }
         $content = file_get_contents($file->tempName);
         if (!is_string($content)) {

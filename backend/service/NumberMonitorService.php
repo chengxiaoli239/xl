@@ -17,7 +17,7 @@ class NumberMonitorService
 {
     const MAX_FILES_PER_USER = 100;
     const MAX_SCHEMES_PER_USER = 2000;
-    const MAX_PATTERNS_PER_USER = 100000;
+    const MAX_PATTERNS_PER_USER = 2000000;
     const MAX_ACTIVE_SCHEMES_PER_LOTTERY = 10000;
     const PROCESS_BATCH_SIZE = 1;
     const UPDATE_BATCH_SIZE = 400;
@@ -86,7 +86,7 @@ class NumberMonitorService
             $totalPatterns += $patternEntryCount;
         }
         if ($totalPatterns > NumberSchemeParser::MAX_PATTERNS_PER_FILE) {
-            throw new \InvalidArgumentException('单个文件不能超过 100,000 组号码');
+            throw new \InvalidArgumentException('单个文件不能超过 150,000 组号码');
         }
 
         $transaction = Yii::$app->db->beginTransaction();
@@ -103,15 +103,15 @@ class NumberMonitorService
             $schemeCount = (int)(new Query())->from(NumberMonitorScheme::tableName() . ' s')
                 ->innerJoin(NumberMonitorFile::tableName() . ' f', 'f.id = s.file_id')
                 ->where(['f.uid' => $uid])->count();
-            $patternCount = (int)(new Query())->from(NumberMonitorPattern::tableName() . ' p')
-                ->innerJoin(NumberMonitorScheme::tableName() . ' s', 's.id = p.scheme_id')
-                ->innerJoin(NumberMonitorFile::tableName() . ' f', 'f.id = s.file_id')
-                ->where(['f.uid' => $uid])
-                ->select(['total' => new Expression('COALESCE(SUM(p.occurrence_count), 0)')])->scalar();
-            if ($fileCount >= self::MAX_FILES_PER_USER
-                || $schemeCount + count($schemes) > self::MAX_SCHEMES_PER_USER
-                || $patternCount + $totalPatterns > self::MAX_PATTERNS_PER_USER) {
-                throw new \InvalidArgumentException('已达到账号监控容量上限');
+            $patternCount = (int)NumberMonitorScheme::find()->where(['uid' => $uid])->sum('pattern_count');
+            if ($fileCount >= self::MAX_FILES_PER_USER) {
+                throw new \InvalidArgumentException('账号最多支持 100 个监控文件');
+            }
+            if ($schemeCount + count($schemes) > self::MAX_SCHEMES_PER_USER) {
+                throw new \InvalidArgumentException('账号最多支持 2,000 套监控方案');
+            }
+            if ($patternCount + $totalPatterns > self::MAX_PATTERNS_PER_USER) {
+                throw new \InvalidArgumentException('账号监控号码累计不能超过 2,000,000 组');
             }
             $activeSchemeCount = (int)(new Query())->from(NumberMonitorScheme::tableName() . ' s')
                 ->innerJoin(NumberMonitorFile::tableName() . ' f', 'f.id = s.file_id')
@@ -259,7 +259,7 @@ class NumberMonitorService
             ->orderBy(['id' => SORT_ASC])->asArray()->all();
         $fileIds = array_column($files, 'id');
         $schemes = $fileIds ? NumberMonitorScheme::find()
-            ->select(['id', 'file_id', 'line_no', 'title', 'sample', 'pattern_count',
+            ->select(['id', 'file_id', 'line_no', 'title', 'fixed_count', 'pattern_count',
                 'last_qihao', 'current_status', 'streak_count'])
             ->where(['file_id' => $fileIds])
             ->orderBy(['file_id' => SORT_ASC, 'line_no' => SORT_ASC])->asArray()->all() : [];

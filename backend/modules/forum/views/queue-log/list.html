@@ -6,68 +6,75 @@
 <script type="text/javascript" src="/statics/js/jquery-2.0.3.js"></script>
 <script type="text/javascript" src="/js/layui/global.js?v={{STATIC_VERSION}}"></script>
 <script type="text/javascript" src="/js/common.js?v={{STATIC_VERSION}}"></script>
-<div style="float: left; width: 100%;"><div>
-<div id="new-content" style="margin-top: 65px;margin-left: -8px">
-    <div class="title" style="margin-bottom: 5px">
-        <h3>消息队列列表&nbsp;&nbsp;</h3>
-    </div>
-    <div class="search-cond clearfix">
-        <form class="layui-form  layuiadmin-card-header-auto" action="" data-auto-get id="search-form">
-            <div class="row">
-                <div class="col-md-1">
-                    <input type="text" name="id" id="id" autocomplete="off" class="layui-input" placeholder="id">
-                </div>
-                <div class="col-md-2">
-                    <input type="text" name="job_class" autocomplete="off" class="layui-input" placeholder="完整类名">
-                </div>
-                <div class="col-md-1">
-                    <select class="layui-input" name="is_delay" lay-search>
-                        <option value="">--是否延迟--</option>
-                        <option value="2">否</option>
-                        <option value="1">是</option>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <!--<input type="text" name="name" autocomplete="off" class="layui-input" placeholder="名称">-->
-                    <select class="layui-input" name="name" lay-search>
-                        <option value="">--选择名称--</option>
-                        {%for item in options['name']%}
-                            <option value="{{item.name}}">{{item.name}}[{{item.job_class}}]</option>
-                        {%endfor%}
-                    </select>
-                </div>
-                <div class="col-md-1">
-                    <select class="layui-input" name="status" lay-search>
-                        <option value="">--选择状态--</option>
-                        <option value="1">待处理</option>
-                        <option value="2">处理中</option>
-                        <option value="3">成功</option>
-                        <option value="4">异常</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <input type="text" name="create_time" placeholder="时间" id="create_time" autocomplete="off" class="layui-input">
-                </div>
-                <div class="col-md-3">
-                    <input type="text" name="params" autocomplete="off" class="layui-input" placeholder="参数内容">
-                </div>
-                <div class="col-md-3">
-                    <input type="text" name="business_id" autocomplete="off" class="layui-input" placeholder="business_id">
-                </div>
-                <div class="col-md-3">
+<style>
+    .queue-log-page{box-sizing:border-box;width:100%;padding:16px;}
+    .queue-log-heading{margin:0 0 14px;padding:0 2px;}
+    .queue-log-heading h3{margin:0;color:#243247;font-size:20px;font-weight:600;line-height:1.4;}
+    .queue-log-filter-panel{margin-bottom:14px;padding:14px;background:#fff;border:1px solid #e6ebf1;border-radius:8px;}
+    .queue-log-filter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;align-items:center;}
+    .queue-log-filter-grid .layui-input{box-sizing:border-box;width:100%;height:38px;}
+    .queue-log-filter-actions{display:flex;gap:8px;align-items:center;}
+    .queue-log-table-wrap{width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;background:#fff;border:1px solid #e6ebf1;border-radius:8px;}
+    .queue-log-table-wrap .layui-table-view{max-width:100%;margin:0;border:0;}
+    .queue-log-table-wrap .layui-table-header{background:#f6f8fb;}
+    .queue-log-table-wrap .layui-table-cell{height:auto;min-height:38px;line-height:1.45;}
+    .queue-log-hidden{display:none;}
+    .queue-log-param-content{box-sizing:border-box;width:100%;height:100%;margin:0;padding:16px;overflow:auto;background:#f6f8fb;color:#243247;font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word;}
+    @media(max-width:767px){
+        .queue-log-page{padding:10px;}
+        .queue-log-heading{margin-bottom:10px;}
+        .queue-log-heading h3{font-size:18px;}
+        .queue-log-filter-panel{margin-bottom:10px;padding:10px;}
+        .queue-log-filter-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+        .queue-log-filter-grid .queue-log-filter-wide{grid-column:1/-1;}
+        .queue-log-filter-actions{grid-column:1/-1;}
+    }
+</style>
+<div class="queue-log-page">
+    <header class="queue-log-heading">
+        <h3>消息队列列表</h3>
+    </header>
+    <section class="queue-log-filter-panel">
+        <form class="layui-form" action="" data-auto-get id="search-form">
+            <div class="queue-log-filter-grid">
+                <input type="text" name="id" id="id" autocomplete="off" class="layui-input" placeholder="队列记录 ID">
+                <input type="text" name="job_class" autocomplete="off" class="layui-input" placeholder="完整类名">
+                <select class="layui-input" name="is_delay" lay-search>
+                    <option value="">是否延迟</option>
+                    <option value="2">否</option>
+                    <option value="1">是</option>
+                </select>
+                <select class="layui-input queue-log-filter-wide" name="name" lay-search>
+                    <option value="">选择队列名称</option>
+                    {%for item in options['name']%}
+                        <option value="{{item.name}}">{{item.name}}[{{item.job_class}}]</option>
+                    {%endfor%}
+                </select>
+                <select class="layui-input" name="status" lay-search>
+                    <option value="">选择状态</option>
+                    <option value="1">待处理</option>
+                    <option value="2">处理中</option>
+                    <option value="3">成功</option>
+                    <option value="4">异常</option>
+                </select>
+                <input type="text" name="create_time" placeholder="入列时间范围" id="create_time" autocomplete="off" class="layui-input">
+                <input type="text" name="params" autocomplete="off" class="layui-input" placeholder="参数内容">
+                <input type="text" name="business_id" autocomplete="off" class="layui-input" placeholder="业务 ID">
+                <div class="queue-log-filter-actions">
                     <button type="submit" class="layui-btn layui-btn-sm" lay-submit="" lay-filter="LAY-user-front-search" id="search-submit">
                         <i class="layui-icon layui-icon-search"></i>
                         搜索
                     </button>
-                    <button type="reset" class="layui-btn layui-btn-warm layui-btn-sm" lay-submit="" lay-filter="LAY-user-front-search">
+                    <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm" lay-submit="" lay-filter="LAY-user-front-search">
                         重置
                     </button>
                 </div>
             </div>
         </form>
+    </section>
+    <div class="queue-log-table-wrap">
+        <table class="layui-hide" lay-filter="main" id="main-table"></table>
     </div>
-    <div class="clearfix"></div>
-    <table class="layui-hide" lay-filter="main" id="main-table"></table>
     <script type="text/html" id="toolbar">
         <div class="layui-btn-container">
             <button class="layui-btn layui-btn-sm" lay-event="repush">批量重新入列</button>
@@ -79,10 +86,17 @@
     </script>
     <script type="text/javascript">
 
-        function show()
+        function show(button)
         {
-            let text = $(event.target).next('span').html();
-            layui.layer.alert('<pre>' + text + '</pre>', {area: ['900px', '600px']});
+            var text = $(button).next('.queue-log-hidden').text();
+            var content = $('<pre class="queue-log-param-content"></pre>').text(text).prop('outerHTML');
+            layui.layer.open({
+                type: 1,
+                title: '队列参数',
+                area: [Math.min(920, window.innerWidth - 24) + 'px', Math.min(620, window.innerHeight - 24) + 'px'],
+                content: content,
+                shadeClose: true
+            });
         }
 
         layui.use(['form', 'layer', 'table', 'laydate', 'element'], function () {
@@ -109,10 +123,10 @@
                     [
                         {checkbox: true},
                         {type:"numbers", title: '序号', width:60},
-                        {field:"id", title: 'ID', width:180},
-                        {field:"name", title: '名称', width:150},
-                        {field:"type", title: '队列类型', width:80},
-                        {field:"job_class", title: '类名', width:300},
+                        {field:"id", title: '记录 ID', width:100},
+                        {field:"name", title: '名称', width:145},
+                        {field:"type", title: '队列类型', width:90},
+                        {field:"job_class", title: '类名', width:260},
                         {field:'status_text', title: '状态', width:80, templet: function (d) {
                                 let result = d.status_text;
                                 if (d.status == 2) {
@@ -126,7 +140,7 @@
                                 return result;
                             }},
                         {field:'count', title: '运行次数', width:80},
-                        {field:'delay', title: '延迟秒数', width:60},
+                        {field:'delay', title: '延迟秒数', width:80},
                         {field:'time', title: '运行时长(秒)', width:100},
                         {field:'params', title: '参数', width:250, templet: function (d) {
                                 let params;
@@ -136,10 +150,11 @@
                                 } catch(exception) {
                                     params = d.params;
                                 }
-                                return '<button class="layui-btn layui-btn-xs" onclick="show()">查看</button>' + '<span>' + params + '</span>';
+                                var safeParams = $('<div>').text(params).html();
+                                return '<button class="layui-btn layui-btn-primary layui-btn-xs" onclick="show(this)">查看参数</button>' + '<span class="queue-log-hidden">' + safeParams + '</span>';
 
                             }},
-                        {field:'remark', title: '运行结果', width:150},
+                        {field:'remark', title: '运行结果', width:180},
                         {field:'create_time', title: '入列与完成时间', width:180, templet: function (d) {
                                 let result = '入列:' + d.last_push_time;
                                 result += '</br>' + '完成:' + d.complete_time;
@@ -150,8 +165,8 @@
                                 result += '</br>' + '更新:' + d.update_time;
                                 return result;
                             }},
-                        {field:'business_id', title: '业务id', width:100},
-                        {title:'操作', toolbar: '#bar', width: 150}
+                        {field:'business_id', title: '业务 ID', width:110},
+                        {title:'操作', toolbar: '#bar', width: 140}
                     ],
 
                 ],
@@ -169,7 +184,6 @@
 
             table.on('tool(main)', function(obj){
                 var data = obj.data;
-                console.log(data);
                 if(obj.event === 'detail'){
                     requestApi('/forum/queue-log/status', {system_queue_id:data.system_queue_id}, function(data) {
                         layer.alert(data.message);
@@ -191,8 +205,6 @@
                         for(let i in checkStatus.data) {
                             queues.push([checkStatus.data[i].id, checkStatus.data[i].job_class]);
                         }
-                        console.log(queues);
-
                         url = '/forum/queue-log/re-push';
                         requestApi(url, {'queues':queues}, function(){
                             $('#search-submit').click();
@@ -208,8 +220,6 @@
                         for(let i in checkStatus.data) {
                             queuesIds.push(checkStatus.data[i].id);
                         }
-                        console.log(queuesIds);
-
                         url = '/forum/queue-log/mark-complete';
                         requestApi(url, {'queue_ids':queuesIds}, function(){
                             $('#search-submit').click();

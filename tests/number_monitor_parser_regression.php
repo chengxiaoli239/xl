@@ -37,11 +37,11 @@ $commaSeparatedPatterns = array_map(function ($pattern) {
     return implode(',', str_split($pattern));
 }, $allFourDigitPatterns);
 $largeScheme = implode(' ', $commaSeparatedPatterns);
-$largeContent = implode("\n\n", array_fill(0, 10, $largeScheme));
+$largeContent = implode("\n\n", array_fill(0, 15, $largeScheme));
 $largeSchemes = NumberSchemeParser::parse($largeContent);
-if (count($largeSchemes) !== 10 || $largeSchemes[0]['pattern_count'] !== 10000
-    || array_sum(array_column($largeSchemes, 'pattern_count')) !== 100000) {
-    throw new RuntimeException('large schemes and files must accept the 100000 pattern limit');
+if (count($largeSchemes) !== 15 || $largeSchemes[0]['pattern_count'] !== 10000
+    || array_sum(array_column($largeSchemes, 'pattern_count')) !== 150000) {
+    throw new RuntimeException('large schemes and files must accept the 150000 pattern limit');
 }
 try {
     NumberSchemeParser::parse($largeScheme . ' ' . $allFourDigitPatterns[0]);
@@ -49,7 +49,7 @@ try {
 } catch (InvalidArgumentException $expected) {
 }
 try {
-    NumberSchemeParser::parse(implode("\n\n", array_fill(0, 11, '1234')));
+    NumberSchemeParser::parse(implode("\n\n", array_fill(0, 16, '1234')));
     throw new RuntimeException('scheme count limit must be enforced');
 } catch (InvalidArgumentException $expected) {
 }
