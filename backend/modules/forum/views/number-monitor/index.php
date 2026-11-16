@@ -74,6 +74,10 @@ $stateJson = Json::htmlEncode($dashboard);
             <div class="nm-board-heading">
                 <div><h2>监控方案</h2><span id="nm-scheme-count" class="nm-count">0 套</span><span id="nm-monitor-period" class="nm-monitor-period">最新期号 --</span></div>
                 <div class="nm-board-controls">
+                    <div class="nm-color-switch" role="group" aria-label="中错颜色">
+                        <button type="button" id="nm-color-red-black" aria-pressed="false" title="中红，错黑">红/黑</button>
+                        <button type="button" id="nm-color-green-red" aria-pressed="true" title="中绿，错红">绿/红</button>
+                    </div>
                     <div class="nm-view-switch" role="group" aria-label="监控方案显示模式">
                         <button type="button" id="nm-mode-compact" aria-pressed="true">紧凑</button>
                         <button type="button" id="nm-mode-detail" aria-pressed="false">详细</button>
@@ -86,7 +90,7 @@ $stateJson = Json::htmlEncode($dashboard);
                 <div class="nm-board" id="nm-board" aria-live="polite"></div>
             </div>
             <div class="nm-scheme-menu" id="nm-scheme-menu" role="menu" hidden>
-                <button type="button" id="nm-delete-scheme" role="menuitem"><i class="fa fa-trash-o" aria-hidden="true"></i> 删除这套方案</button>
+                <button type="button" id="nm-delete-scheme" role="menuitem">删除</button>
             </div>
         </main>
 
@@ -123,6 +127,7 @@ $stateJson = Json::htmlEncode($dashboard);
 .nm-workspace{display:grid;grid-template-columns:minmax(0,1fr) 270px;align-items:start;gap:16px}.nm-main{min-width:0}.nm-import-panel,.nm-draws{border:1px solid var(--nm-line);border-radius:8px;background:var(--nm-paper)}.nm-import-panel{padding:16px}.nm-import-head{justify-content:space-between;gap:16px;margin-bottom:12px}.nm-import-head h2,.nm-board-heading h2,.nm-draws-heading h2{margin:0;font-size:15px;font-weight:700;color:var(--nm-ink)}.nm-muted,.nm-draws-heading span{color:var(--nm-muted);font-size:11px}.nm-import-head .nm-muted{display:block;margin-top:4px}.nm-import-actions{gap:8px}.nm-button{height:34px;border:1px solid transparent;border-radius:5px;padding:0 13px;font-size:12px;font-weight:650;cursor:pointer;transition:background .15s,border-color .15s}.nm-button:disabled{cursor:not-allowed;opacity:.45}.nm-button-primary{background:var(--nm-teal);color:#fff}.nm-button-primary:hover:not(:disabled){background:#11736e}.nm-button-secondary{border-color:var(--nm-line);background:#fff;color:var(--nm-ink)}.nm-button-secondary:hover:not(:disabled){background:#f5f8f8}
 .nm-dropzone{width:100%;min-height:62px;gap:12px;border:1px dashed #b9cbca;border-radius:6px;background:#f8fbfa;padding:9px 12px;text-align:left;cursor:pointer}.nm-dropzone.dragging{border-color:var(--nm-teal);background:#edf8f6}.nm-drop-icon{display:grid;flex:0 0 38px;width:38px;height:38px;place-items:center;border-radius:6px;background:#e7f3f1;color:var(--nm-teal);font-size:16px}.nm-drop-copy{display:block;min-width:0;flex:1}.nm-drop-copy strong,.nm-drop-copy small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nm-drop-copy strong{font-size:12px;color:var(--nm-ink)}.nm-drop-copy small{margin-top:4px;color:var(--nm-muted);font-size:11px}.nm-drop-browse{border-left:1px solid var(--nm-line);padding:5px 3px 5px 12px;color:var(--nm-teal);font-size:12px;font-weight:650;white-space:nowrap}.nm-preview{max-height:180px;overflow:auto;margin-top:10px;border-top:1px solid var(--nm-line);padding-top:8px}.nm-preview-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:7px 2px;border-bottom:1px solid #edf1f2;font-size:11px}.nm-preview-row strong{font-weight:650}.nm-preview-row span{overflow:hidden;color:var(--nm-muted);text-overflow:ellipsis;white-space:nowrap}.nm-preview-row em{color:var(--nm-teal);font-style:normal;white-space:nowrap}.nm-feedback{min-height:0;color:var(--nm-muted);font-size:11px}.nm-feedback:not(:empty){padding-top:8px}.nm-feedback.error{color:#b43636}.nm-feedback.success{color:#167a61}
 .nm-board-heading{justify-content:space-between;margin:20px 2px 10px}.nm-board-heading>div{gap:9px}.nm-count{color:var(--nm-muted);font-size:11px}.nm-sync-state{color:var(--nm-muted);font-size:11px}.nm-sync-state.error{color:#b43636}.nm-board-viewport{overflow-x:auto;padding-bottom:10px;scrollbar-color:#bdcbcd transparent;scrollbar-width:thin}.nm-board{display:flex;align-items:stretch;gap:12px;min-height:300px}.nm-empty{display:grid;width:100%;min-height:240px;place-items:center;border:1px dashed #cbd6d7;border-radius:8px;color:var(--nm-muted);font-size:12px}.nm-empty strong{display:block;margin-bottom:6px;color:#50616a;font-size:13px}.nm-file-column{flex:0 0 252px;width:252px;min-height:292px;overflow:hidden;border:1px solid var(--nm-line);border-radius:8px;background:var(--nm-paper)}.nm-file-top{display:flex;align-items:flex-start;justify-content:space-between;gap:9px;padding:12px;border-bottom:1px solid var(--nm-line);background:#fafcfc}.nm-file-title{min-width:0;gap:8px}.nm-file-mark{display:grid;flex:0 0 28px;width:28px;height:28px;place-items:center;border-radius:5px;background:#e8f3f1;color:var(--nm-teal);font-size:12px}.nm-file-title strong{display:block;max-width:138px;overflow:hidden;color:var(--nm-ink);font-size:12px;text-overflow:ellipsis;white-space:nowrap}.nm-file-title small{display:block;margin-top:3px;color:var(--nm-muted);font-size:10px}.nm-file-actions{gap:5px}.nm-file-actions button{height:27px;border:1px solid var(--nm-line);border-radius:4px;background:white;color:#45555d;padding:0 7px;font-size:10px;cursor:pointer}.nm-file-actions button:hover{border-color:#9eaeaf;background:#f5f8f8}.nm-file-actions button[data-action="clear"]{color:#a43434}.nm-file-paused{padding:5px 12px;border-bottom:1px solid var(--nm-line);background:#f5f6f6;color:var(--nm-muted);font-size:10px}.nm-scheme-list{display:grid;align-content:start;gap:8px;padding:9px}.nm-scheme{border:1px solid #e6ebec;border-radius:6px;background:#fff;padding:9px}.nm-scheme-head{justify-content:space-between;gap:7px}.nm-scheme-head strong{overflow:hidden;color:var(--nm-ink);font-size:11px;font-weight:650;text-overflow:ellipsis;white-space:nowrap}.nm-streak{flex:0 0 auto;min-width:66px;padding:5px 7px;border-radius:4px;color:#fff;text-align:center;font-size:11px;font-weight:700;line-height:1.1}.nm-streak.hit{background:var(--nm-hit)}.nm-streak.miss{background:var(--nm-miss)}.nm-streak.none{background:#e9eff0;color:#617179}.nm-scheme-sample{overflow:hidden;margin-top:7px;color:var(--nm-muted);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;text-overflow:ellipsis;white-space:nowrap}.nm-scheme-meta{margin-top:5px;color:#89969a;font-size:10px}.nm-file-column.paused .nm-scheme{opacity:.66}
+.nm-color-switch{display:inline-flex;overflow:hidden;border:1px solid var(--nm-line);border-radius:6px;background:var(--nm-paper)}.nm-color-switch button{height:28px;border:0;background:transparent;color:var(--nm-muted);padding:0 7px;font-size:10px;cursor:pointer;white-space:nowrap}.nm-color-switch button[aria-pressed="true"]{background:#e8f0ff;color:#2455c9;font-weight:700}.number-monitor.nm-color-red-black{--nm-hit:#c62828;--nm-miss:#171717}
 .nm-draws{position:sticky;top:10px;overflow:hidden}.nm-draws-heading{justify-content:space-between;padding:14px;border-bottom:1px solid var(--nm-line)}.nm-draws-heading span{display:block;margin-top:4px}.nm-draws-heading>i{color:#829297;font-size:15px}.nm-draw-list{max-height:calc(100vh - 240px);overflow-y:auto}.nm-draw-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 14px;border-bottom:1px solid #edf1f2}.nm-draw-row:last-child{border-bottom:0}.nm-draw-row.latest{background:#f0f7f6}.nm-draw-issue{display:block;color:var(--nm-ink);font-size:11px;font-weight:650}.nm-draw-time{display:block;margin-top:3px;color:#91a0a3;font-size:10px}.nm-draw-code{color:#8f3434;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;font-weight:750;letter-spacing:1px!important}.nm-draw-empty{padding:28px 12px;color:var(--nm-muted);font-size:11px;text-align:center}
 @media(max-width:1050px){.nm-workspace{grid-template-columns:minmax(0,1fr) 230px;gap:12px}.nm-file-column{flex-basis:230px;width:230px}}
 @media(max-width:760px){.number-monitor{padding:16px 12px 28px}.nm-heading{align-items:flex-start}.nm-heading h1{font-size:21px}.nm-lottery-select{align-items:flex-start;flex-direction:column;gap:4px}.nm-lottery-select select{min-width:116px}.nm-workspace{grid-template-columns:minmax(0,1fr)}.nm-import-panel{padding:12px}.nm-import-head{align-items:flex-start;flex-direction:column}.nm-import-actions{width:100%}.nm-import-actions .nm-button{flex:1}.nm-draws{position:static}.nm-draw-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));max-height:270px}.nm-draw-row{padding:8px 10px}.nm-file-column{flex-basis:232px;width:232px}.nm-board{min-height:250px}}
@@ -218,6 +223,7 @@ $stateJson = Json::htmlEncode($dashboard);
 @media(max-width:760px){.nm-scheme-panel{height:min(84dvh,800px);max-height:calc(100dvh - 32px)}.nm-scheme-panel.nm-history-mode{height:min(78dvh,680px)}.nm-history-row{grid-template-columns:minmax(0,1fr) 70px 54px;gap:8px}}
 .number-monitor{padding:10px 12px 18px}
 .nm-heading{gap:8px;margin-bottom:8px;padding:8px 12px;border-radius:8px}
+.nm-heading{position:sticky;top:56px;z-index:30;background:linear-gradient(120deg,rgba(255,255,255,.98),rgba(244,248,252,.98));box-shadow:0 6px 16px rgba(54,91,128,.08);backdrop-filter:blur(8px)}
 .nm-heading h1{font-size:20px}
 .nm-live-line{gap:5px;margin-top:2px;font-size:11px}
 .nm-lottery-select select{min-width:110px;height:30px}
@@ -301,6 +307,7 @@ body.nm-page-focus-open{overflow:hidden}
 @media(max-width:760px){
     .number-monitor{padding:8px 8px 16px;border-radius:0}
     .nm-heading{flex-direction:row;align-items:center;padding:8px}
+    .nm-heading{top:64px}
     .nm-heading h1{font-size:18px}
     .nm-live-line{flex-wrap:wrap;font-size:10px}
     .nm-lottery-select{flex-direction:row;align-items:center}
@@ -337,16 +344,24 @@ body.nm-page-focus-open{overflow:hidden}
 .nm-scheme-menu[hidden]{display:none}
 .nm-scheme-menu button{width:100%;border:0;border-radius:4px;background:transparent;color:#ad3434;padding:9px;text-align:left;cursor:pointer}
 .nm-scheme-menu button:hover,.nm-scheme-menu button:focus-visible{background:var(--nm-ground)}
+.nm-scheme-menu button{padding:8px 10px;font-size:11px}
 .nm-scheme-dialog-foot{justify-content:center;flex-wrap:wrap;gap:7px}
 .nm-scheme-dialog-foot label{display:flex;align-items:center;gap:4px;white-space:nowrap}
 .nm-scheme-dialog-foot select{height:34px;border:1px solid var(--nm-line);border-radius:5px;background:var(--nm-paper);color:var(--nm-ink)}
 .nm-scheme-dialog-foot [hidden]{display:none}
 @media(max-width:760px){.nm-scheme-menu-trigger{padding:1px 0}.nm-scheme-dialog-foot{padding:8px;gap:4px}.nm-scheme-dialog-foot button{min-height:32px;padding:0 7px;font-size:11px}.nm-scheme-dialog-foot label{font-size:11px}}
+html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-black{--nm-hit:#d94b55;--nm-miss:#18212a}
+.number-monitor.nm-color-red-black .nm-history-status.hit,
+html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-black .nm-history-status.hit{background:var(--nm-hit);color:#fff}
+.number-monitor.nm-color-red-black .nm-history-status.miss,
+html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-black .nm-history-status.miss{background:var(--nm-miss);color:#fff}
 </style>
 
 <script>
 (function () {
     var root = document.getElementById('number-monitor');
+    document.documentElement.classList.add('nm-page-shell');
+    document.body.classList.add('nm-page-shell');
     var lotteryType = Number(root.dataset.lotteryType);
     var csrf = root.dataset.csrf;
     var state = <?= $stateJson ?>;
@@ -394,6 +409,8 @@ body.nm-page-focus-open{overflow:hidden}
     var drawsPreviousFocus = null;
     var displayMode = 'compact';
     try { displayMode = localStorage.getItem('number-monitor-display-mode') === 'detail' ? 'detail' : 'compact'; } catch (error) {}
+    var colorMode = 'green-red';
+    try { colorMode = localStorage.getItem('number-monitor-color-mode') === 'red-black' ? 'red-black' : 'green-red'; } catch (error) {}
 
     function escapeHtml(value) {
         return String(value == null ? '' : value).replace(/[&<>"']/g, function (char) {
@@ -789,6 +806,14 @@ body.nm-page-focus-open{overflow:hidden}
         try { localStorage.setItem('number-monitor-display-mode', displayMode); } catch (error) {}
     }
 
+    function setColorMode(mode) {
+        colorMode = mode === 'red-black' ? 'red-black' : 'green-red';
+        root.classList.toggle('nm-color-red-black', colorMode === 'red-black');
+        document.getElementById('nm-color-red-black').setAttribute('aria-pressed', colorMode === 'red-black' ? 'true' : 'false');
+        document.getElementById('nm-color-green-red').setAttribute('aria-pressed', colorMode === 'green-red' ? 'true' : 'false');
+        try { localStorage.setItem('number-monitor-color-mode', colorMode); } catch (error) {}
+    }
+
     function updateFullscreenButton() {
         var active = document.fullscreenElement === root || root.classList.contains('nm-focus-mode');
         var button = document.getElementById('nm-fullscreen');
@@ -1182,6 +1207,8 @@ body.nm-page-focus-open{overflow:hidden}
     drawsBackdrop.addEventListener('click', closeDraws);
     document.getElementById('nm-mode-compact').addEventListener('click', function () { setDisplayMode('compact'); });
     document.getElementById('nm-mode-detail').addEventListener('click', function () { setDisplayMode('detail'); });
+    document.getElementById('nm-color-red-black').addEventListener('click', function () { setColorMode('red-black'); });
+    document.getElementById('nm-color-green-red').addEventListener('click', function () { setColorMode('green-red'); });
     document.getElementById('nm-fullscreen').addEventListener('click', toggleFullscreen);
     document.addEventListener('fullscreenchange', updateFullscreenButton);
     document.addEventListener('keydown', function (event) {
@@ -1201,6 +1228,7 @@ body.nm-page-focus-open{overflow:hidden}
     document.addEventListener('visibilitychange', function () { scheduleNextPoll(true); });
 
     setDisplayMode(displayMode);
+    setColorMode(colorMode);
     updateFullscreenButton();
     renderBoard();
     scheduleNextPoll(true);

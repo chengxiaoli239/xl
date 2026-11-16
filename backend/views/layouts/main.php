@@ -239,7 +239,7 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false, $is
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
-<html lang="<?= Yii::$app->language ?>">
+<html lang="<?= Yii::$app->language ?>" class="<?= $route === 'forum/number-monitor/index' ? 'nm-page-shell' : '' ?>">
 <head>
     <meta charset="<?= Yii::$app->charset ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -256,7 +256,7 @@ function initMenu($menuArray, $controllerName, $isSubUrl, $isShowIcon=false, $is
     </script>
     <?php $this->head() ?>
 </head>
-<body class="xl-admin-shell">
+<body class="xl-admin-shell<?= $route === 'forum/number-monitor/index' ? ' nm-page-shell' : '' ?>">
 <?php $this->beginBody() ?>
 
 <section id="container" >

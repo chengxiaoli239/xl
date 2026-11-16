@@ -404,3 +404,40 @@ html[data-xl-theme="dark"] body.xl-admin-shell .nm-feedback.error {
 @media (prefers-reduced-motion: reduce) {
     .xl-admin-shell ul.sidebar-menu li ul.sub li a { transition: none; }
 }
+
+/* Keep the monitor page on one vertical scroll chain. The sidebar remains an
+   independent scroller, while the monitor heading can stick to the viewport. */
+html.nm-page-shell,
+html.nm-page-shell body.xl-admin-shell {
+    height: 100%;
+    overflow: hidden !important;
+}
+body.xl-admin-shell.nm-page-shell #container {
+    height: 100dvh;
+    min-height: 100%;
+    overflow: hidden;
+}
+body.xl-admin-shell.nm-page-shell #main-content {
+    box-sizing: border-box;
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+body.xl-admin-shell.nm-page-shell #main-content > .wrapper {
+    min-height: 100%;
+}
+html.touch-scroll body.xl-admin-shell.nm-page-shell #main-content {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+body.xl-admin-shell.nm-page-shell #container.xl-mobile-menu-open #main-content,
+body.xl-admin-shell.nm-page-shell.nm-dialog-open #main-content,
+body.xl-admin-shell.nm-page-shell.nm-page-focus-open #main-content,
+html.touch-scroll body.xl-admin-shell.nm-page-shell #container.xl-mobile-menu-open #main-content,
+html.touch-scroll body.xl-admin-shell.nm-page-shell.nm-dialog-open #main-content,
+html.touch-scroll body.xl-admin-shell.nm-page-shell.nm-page-focus-open #main-content {
+    overflow-y: hidden !important;
+}
