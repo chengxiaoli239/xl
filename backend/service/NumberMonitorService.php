@@ -7,6 +7,7 @@ use backend\models\NumberMonitorFile;
 use backend\models\NumberMonitorPattern;
 use backend\models\NumberMonitorScheme;
 use backend\models\SscKjData;
+use common\models\AdminModel;
 use common\service\lottery\CommonLotteryService;
 use common\service\numberMonitor\NumberSchemeParser;
 use Yii;
@@ -347,6 +348,29 @@ class NumberMonitorService
             'updated_at' => (int)($cursor['updated_at'] ?? 0),
             'server_now' => time(),
         ];
+    }
+
+    public static function monitorOwners(int $lotteryType): array
+    {
+        return (new Query())->from(['f' => NumberMonitorFile::tableName()])
+            ->leftJoin(['a' => AdminModel::tableName()], 'a.id = f.uid')
+            ->select([
+                'uid' => 'f.uid',
+                'username' => 'a.username',
+                'file_count' => new Expression('COUNT(*)'),
+                'scheme_count' => new Expression('SUM(f.scheme_count)'),
+                'active_file_count' => new Expression('SUM(CASE WHEN f.status = 1 THEN 1 ELSE 0 END)'),
+            ])
+            ->where(['f.lottery_type' => $lotteryType])
+            ->groupBy(['f.uid', 'a.username'])
+            ->orderBy(['f.uid' => SORT_ASC])->all();
+    }
+
+    public static function schemeOwnerUid(int $schemeId): int
+    {
+        return (int)(new Query())->from(['s' => NumberMonitorScheme::tableName()])
+            ->innerJoin(['f' => NumberMonitorFile::tableName()], 'f.id = s.file_id')
+            ->select('f.uid')->where(['s.id' => $schemeId])->scalar();
     }
 
     public static function schemePatterns(int $uid, int $schemeId, int $page, int $pageSize = 400): array

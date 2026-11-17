@@ -8,6 +8,9 @@ use yii\helpers\Url;
 /* @var $lotteryType int */
 /* @var $lotteryTypes array */
 /* @var $dashboard array */
+/* @var $isSuperAdmin bool */
+/* @var $ownerUid int */
+/* @var $ownUid int */
 /* @var $csrfToken string */
 
 $this->title = '号码监控';
@@ -16,6 +19,9 @@ $stateJson = Json::htmlEncode($dashboard);
 <section class="number-monitor wrapper site-min-height"
          id="number-monitor"
          data-lottery-type="<?= (int)$lotteryType ?>"
+         data-owner-uid="<?= (int)$ownerUid ?>"
+         data-own-uid="<?= (int)$ownUid ?>"
+         data-admin-view="<?= $isSuperAdmin ? '1' : '0' ?>"
          data-data-url="<?= Html::encode(Url::to(['/forum/number-monitor/data'])) ?>"
          data-scheme-url="<?= Html::encode(Url::to(['/forum/number-monitor/scheme'])) ?>"
          data-history-url="<?= Html::encode(Url::to(['/forum/number-monitor/history'])) ?>"
@@ -31,6 +37,22 @@ $stateJson = Json::htmlEncode($dashboard);
             <h1>号码监控</h1>
             <div class="nm-live-line"><span class="nm-live-dot"></span><span id="nm-refresh-label">同步最新开奖</span><span class="nm-separator">·</span><span id="nm-current-issue">等待开奖</span></div>
         </div>
+        <?php if ($isSuperAdmin): ?>
+            <label class="nm-owner-select">
+                <span>监控账号</span>
+                <select id="nm-owner" aria-label="查看监控账号">
+                    <option value="0" <?= $ownerUid === 0 ? 'selected' : '' ?>>全部用户</option>
+                    <option value="<?= (int)$ownUid ?>" <?= $ownerUid === $ownUid ? 'selected' : '' ?>>我的监控</option>
+                    <?php foreach ($dashboard['owners'] as $owner): ?>
+                        <?php if ((int)$owner['uid'] === $ownUid) continue; ?>
+                        <option value="<?= (int)$owner['uid'] ?>" <?= $ownerUid === (int)$owner['uid'] ? 'selected' : '' ?>><?= Html::encode(($owner['username'] ?: 'UID ' . $owner['uid']) . ' · ' . $owner['scheme_count'] . ' 套') ?></option>
+                    <?php endforeach; ?>
+                    <?php if ($ownerUid > 0 && $ownerUid !== $ownUid && !in_array($ownerUid, array_map('intval', array_column($dashboard['owners'], 'uid')), true)): ?>
+                        <option value="<?= (int)$ownerUid ?>" selected>UID <?= (int)$ownerUid ?></option>
+                    <?php endif; ?>
+                </select>
+            </label>
+        <?php endif; ?>
         <label class="nm-lottery-select">
             <span>彩种</span>
             <select id="nm-lottery-type" aria-label="选择彩种">
@@ -43,7 +65,7 @@ $stateJson = Json::htmlEncode($dashboard);
 
     <div class="nm-workspace">
         <main class="nm-main">
-            <section class="nm-import-panel" aria-label="导入号码方案">
+            <section class="nm-import-panel" aria-label="导入号码方案" <?= $ownerUid !== $ownUid ? 'hidden' : '' ?>>
                 <div class="nm-import-head">
                     <div>
                         <h2>添加号码文件</h2>
@@ -72,7 +94,7 @@ $stateJson = Json::htmlEncode($dashboard);
             </section>
 
             <div class="nm-board-heading">
-                <div><h2>监控方案</h2><span id="nm-scheme-count" class="nm-count">0 套</span><span id="nm-monitor-period" class="nm-monitor-period">最新期号 --</span></div>
+                <div><h2 id="nm-board-title">监控方案</h2><span id="nm-scheme-count" class="nm-count">0 套</span><span id="nm-monitor-period" class="nm-monitor-period">最新期号 --</span></div>
                 <div class="nm-board-controls">
                     <div class="nm-color-switch" role="group" aria-label="中错颜色">
                         <button type="button" id="nm-color-red-black" aria-pressed="false" title="中红，错黑">红/黑</button>
@@ -355,6 +377,17 @@ html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-blac
 html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-black .nm-history-status.hit{background:var(--nm-hit);color:#fff}
 .number-monitor.nm-color-red-black .nm-history-status.miss,
 html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-black .nm-history-status.miss{background:var(--nm-miss);color:#fff}
+.nm-owner-select{display:flex;align-items:center;gap:8px;margin-left:auto;color:var(--nm-muted);font-size:12px}
+.nm-owner-select select{width:min(230px,26vw);height:30px;border:1px solid var(--nm-line);border-radius:6px;background:var(--nm-paper);color:var(--nm-ink);padding:0 8px;font-size:12px}
+.nm-import-panel[hidden]{display:none}
+.nm-board.nm-owner-overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));align-content:start;gap:8px}
+.nm-owner-card{display:grid;gap:7px;min-height:76px;border:1px solid var(--nm-line);border-radius:6px;background:var(--nm-paper);color:var(--nm-ink);padding:12px;text-align:left;cursor:pointer}
+.nm-owner-card:hover{border-color:var(--nm-teal);background:var(--nm-ground)}
+.nm-owner-card strong{overflow:hidden;font-size:14px;text-overflow:ellipsis;white-space:nowrap}
+.nm-owner-card span{color:var(--nm-muted);font-size:11px}
+.nm-owner-card b{color:var(--nm-teal);font-weight:600}
+@media(max-width:760px){.nm-heading{flex-wrap:wrap}.nm-owner-select{order:3;flex:0 0 100%;margin-left:0}.nm-owner-select select{width:100%}.nm-board.nm-owner-overview{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.nm-readonly .nm-scheme-menu-trigger{display:none}
 </style>
 
 <script>
@@ -363,6 +396,11 @@ html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-blac
     document.documentElement.classList.add('nm-page-shell');
     document.body.classList.add('nm-page-shell');
     var lotteryType = Number(root.dataset.lotteryType);
+    var ownerUid = Number(root.dataset.ownerUid);
+    var ownUid = Number(root.dataset.ownUid);
+    var isSuperAdmin = root.dataset.adminView === '1';
+    var canEdit = ownerUid === ownUid;
+    root.classList.toggle('nm-readonly', !canEdit);
     var csrf = root.dataset.csrf;
     var state = <?= $stateJson ?>;
     var selectedFile = null;
@@ -859,22 +897,35 @@ html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-blac
         var board = document.getElementById('nm-board');
         var scrollLeft = board.parentNode.scrollLeft;
         var files = state.files || [];
+        var owners = state.owners || [];
+        board.classList.toggle('nm-owner-overview', isSuperAdmin && ownerUid === 0);
+        document.getElementById('nm-board-title').textContent = isSuperAdmin && ownerUid === 0 ? '监控账号' : '监控方案';
         var schemeTotal = 0;
         files.forEach(function (file) { schemeTotal += (file.schemes || []).length; });
-        document.getElementById('nm-scheme-count').textContent = schemeTotal + ' 套';
+        document.getElementById('nm-scheme-count').textContent = isSuperAdmin && ownerUid === 0 ? owners.length + ' 个账号' : schemeTotal + ' 套';
         var latestIssue = state.draws && state.draws.length ? String(state.draws[0].qihao || '') : '';
         document.getElementById('nm-current-issue').textContent = latestIssue ? '最新 ' + latestIssue : '等待开奖';
         document.getElementById('nm-monitor-period').textContent = latestIssue ? '最新期号 ' + latestIssue : '最新期号 --';
         document.getElementById('nm-refresh-label').textContent = state.updated_at ? '已同步 ' + new Date(state.updated_at * 1000).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'}) :
             (state.draws && state.draws.length ? '最新开奖已同步' : '等待开奖数据');
-        var hasActiveFile = files.some(function (file) { return Number(file.status) === 1 && (file.schemes || []).length > 0; });
+        var hasActiveFile = files.some(function (file) { return Number(file.status) === 1 && (file.schemes || []).length > 0; }) ||
+            (isSuperAdmin && ownerUid === 0 && owners.some(function (owner) { return Number(owner.active_file_count) > 0; }));
         var isProcessed = !hasActiveFile || Number(state.processed_draw_id || 0) >= Number(state.latest_draw_id || 0);
         var syncState = document.getElementById('nm-sync-state');
         syncState.textContent = isProcessed ? (hasActiveFile ? '已处理至最新期' : '实时同步中') : '正在处理开奖';
         syncState.classList.toggle('error', false);
         syncState.classList.toggle('pending', !isProcessed);
 
-        if (!files.length) {
+        if (isSuperAdmin && ownerUid === 0) {
+            board.innerHTML = owners.length ? owners.map(function (owner) {
+                var uid = Number(owner.uid);
+                var name = owner.username || 'UID ' + uid;
+                return '<button type="button" class="nm-owner-card" data-owner-uid="' + uid + '" aria-label="查看 ' + escapeHtml(name) + ' 的监控记录">' +
+                    '<strong>' + escapeHtml(name) + '</strong><span>' + Number(owner.file_count) + ' 个文件 · ' +
+                    Number(owner.scheme_count) + ' 套方案</span><span><b>' + Number(owner.active_file_count) +
+                    ' 个文件运行中</b></span></button>';
+            }).join('') : '<div class="nm-empty"><div><strong>暂无监控记录</strong></div></div>';
+        } else if (!files.length) {
             board.innerHTML = '<div class="nm-empty"><div><strong>还没有监控文件</strong>导入 TXT 后，方案会显示在这里</div></div>';
         } else {
             board.innerHTML = files.map(function (file) {
@@ -893,10 +944,15 @@ html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-blac
                 }).join('');
                 return '<section class="nm-file-column ' + (Number(file.status) === 1 ? '' : 'paused') + '" data-file-id="' + Number(file.id) + '">' +
                     '<header class="nm-file-top"><div class="nm-file-title"><span class="nm-file-mark"><i class="fa fa-file-text-o" aria-hidden="true"></i></span><strong title="' + escapeHtml(file.name) + '">' + escapeHtml(file.name) + '</strong></div><div class="nm-file-meta"><small>' + schemes.length + '套</small><span class="nm-file-period" title="' + escapeHtml(period.full) + '">' + escapeHtml(period.short) + '</span></div>' +
-                    '<div class="nm-file-actions"><button type="button" data-action="toggle" data-id="' + Number(file.id) + '" data-active="' + (Number(file.status) === 1 ? '0' : '1') + '" aria-label="' + (Number(file.status) === 1 ? '暂停' : '继续') + '监控文件 ' + escapeHtml(file.name) + '" title="' + (Number(file.status) === 1 ? '暂停' : '继续') + '"><i class="fa ' + (Number(file.status) === 1 ? 'fa-pause' : 'fa-play') + '" aria-hidden="true"></i><span class="nm-file-action-label">' + (Number(file.status) === 1 ? '暂停' : '继续') + '</span></button><button type="button" data-action="clear" data-id="' + Number(file.id) + '" aria-label="清除监控文件 ' + escapeHtml(file.name) + '" title="清除"><i class="fa fa-trash-o" aria-hidden="true"></i><span class="nm-file-action-label">清除</span></button></div></header>' +
+                    (canEdit ? '<div class="nm-file-actions"><button type="button" data-action="toggle" data-id="' + Number(file.id) + '" data-active="' + (Number(file.status) === 1 ? '0' : '1') + '" aria-label="' + (Number(file.status) === 1 ? '暂停' : '继续') + '监控文件 ' + escapeHtml(file.name) + '" title="' + (Number(file.status) === 1 ? '暂停' : '继续') + '"><i class="fa ' + (Number(file.status) === 1 ? 'fa-pause' : 'fa-play') + '" aria-hidden="true"></i><span class="nm-file-action-label">' + (Number(file.status) === 1 ? '暂停' : '继续') + '</span></button><button type="button" data-action="clear" data-id="' + Number(file.id) + '" aria-label="清除监控文件 ' + escapeHtml(file.name) + '" title="清除"><i class="fa fa-trash-o" aria-hidden="true"></i><span class="nm-file-action-label">清除</span></button></div>' : '') + '</header>' +
                     (Number(file.status) === 1 ? '' : '<div class="nm-file-paused">已暂停监控</div>') +
                     '<div class="nm-scheme-list">' + cards + '</div></section>';
             }).join('');
+        }
+        if (!canEdit) {
+            board.querySelectorAll('.nm-scheme-view').forEach(function (button) {
+                button.title = button.title.replace('；右键可删除', '');
+            });
         }
         board.parentNode.scrollLeft = scrollLeft;
         renderDraws();
@@ -935,7 +991,7 @@ html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-blac
         pollTimer = null;
         loadingData = true;
         syncPollCycle();
-        var url = root.dataset.dataUrl + '?lottery_type=' + lotteryType;
+        var url = root.dataset.dataUrl + '?lottery_type=' + lotteryType + (isSuperAdmin ? '&owner_uid=' + ownerUid : '');
         return fetch(url, {credentials:'same-origin', headers:{'Accept':'application/json'}}).then(function (response) {
             if (response.status === 401 || response.status === 403) {
                 var accessError = new Error('监控数据访问被拒绝');
@@ -952,7 +1008,8 @@ html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-blac
                 if (Number(state.server_now)) clockOffsetMs = Number(state.server_now) * 1000 - Date.now();
                 renderBoard();
                 var files = state.files || [];
-                var hasActiveFile = files.some(function (file) { return Number(file.status) === 1; });
+                var hasActiveFile = files.some(function (file) { return Number(file.status) === 1; }) ||
+                    (isSuperAdmin && ownerUid === 0 && (state.owners || []).some(function (owner) { return Number(owner.active_file_count) > 0; }));
                 var latestDraw = state.draws && state.draws[0];
                 if (latestDraw && Number(latestDraw.created_at || 0) * 1000 >= activeCycle * pollCycleMs &&
                     (!hasActiveFile || Number(state.processed_draw_id || 0) >= Number(state.latest_draw_id || 0))) {
@@ -1138,10 +1195,16 @@ html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-blac
     });
 
     document.getElementById('nm-board').addEventListener('click', function (event) {
+        var ownerButton = event.target.closest('button[data-owner-uid]');
+        if (ownerButton && isSuperAdmin) {
+            window.location.href = window.location.pathname + '?lottery_type=' + lotteryType + '&owner_uid=' + Number(ownerButton.dataset.ownerUid);
+            return;
+        }
         var button = event.target.closest('button[data-action]');
         if (!button) return;
         var action = button.dataset.action;
         if (action === 'scheme-menu') {
+            if (!canEdit) return;
             var box = button.getBoundingClientRect();
             showSchemeMenu(button.dataset.id, box.right, box.bottom);
             return;
@@ -1149,6 +1212,7 @@ html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-blac
         hideSchemeMenu();
         if (action === 'view') { openScheme(button.dataset.id, button); return; }
         if (action === 'history') { openHistory(button.dataset.id, button); return; }
+        if (!canEdit) return;
         var form = new FormData();
         form.append('id', button.dataset.id);
         if (action === 'toggle') {
@@ -1161,12 +1225,14 @@ html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-blac
         request(root.dataset.clearUrl, form).then(loadData).catch(function (error) { setFeedback(error.message, 'error'); });
     });
     document.getElementById('nm-board').addEventListener('contextmenu', function (event) {
+        if (!canEdit) return;
         var row = event.target.closest('.nm-scheme[data-scheme-id]');
         if (!row) return;
         event.preventDefault();
         showSchemeMenu(row.dataset.schemeId, event.clientX, event.clientY);
     });
     document.getElementById('nm-delete-scheme').addEventListener('click', function () {
+        if (!canEdit) return;
         var id = selectedSchemeForDeletion;
         var scheme = null;
         (state.files || []).forEach(function (file) {
@@ -1224,8 +1290,15 @@ html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-blac
     });
 
     document.getElementById('nm-lottery-type').addEventListener('change', function (event) {
-        window.location.href = window.location.pathname + '?lottery_type=' + encodeURIComponent(event.target.value);
+        window.location.href = window.location.pathname + '?lottery_type=' + encodeURIComponent(event.target.value) +
+            (isSuperAdmin ? '&owner_uid=' + ownerUid : '');
     });
+    if (isSuperAdmin) {
+        document.getElementById('nm-owner').addEventListener('change', function (event) {
+            window.location.href = window.location.pathname + '?lottery_type=' + lotteryType +
+                '&owner_uid=' + encodeURIComponent(event.target.value);
+        });
+    }
     document.addEventListener('visibilitychange', function () { scheduleNextPoll(true); });
 
     setDisplayMode(displayMode);

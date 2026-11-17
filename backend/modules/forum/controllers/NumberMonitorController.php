@@ -4,6 +4,7 @@ namespace backend\modules\forum\controllers;
 
 use backend\controllers\BaseController;
 use backend\service\NumberMonitorService;
+use common\models\AdminModel;
 use common\service\lottery\CommonLotteryService;
 use common\service\numberMonitor\NumberSchemeParser;
 use Yii;
@@ -51,21 +52,30 @@ class NumberMonitorController extends BaseController
         return parent::beforeAction($action);
     }
 
-    public function actionIndex($lottery_type = CommonLotteryService::LOTTERY_TYPE_LUCKY5)
+    public function actionIndex($lottery_type = CommonLotteryService::LOTTERY_TYPE_LUCKY5, $owner_uid = 0)
     {
         $lotteryType = (int)$lottery_type;
         if (!NumberMonitorService::supportedLotteryType($lotteryType)) {
             $lotteryType = CommonLotteryService::LOTTERY_TYPE_LUCKY5;
         }
+        $isSuperAdmin = $this->isSuperAdmin();
+        $ownerUid = $this->visibleOwnerUid($owner_uid);
+        $dashboard = NumberMonitorService::dashboardData($ownerUid, $lotteryType);
+        if ($isSuperAdmin) {
+            $dashboard['owners'] = NumberMonitorService::monitorOwners($lotteryType);
+        }
         return $this->render('index', [
             'lotteryType' => $lotteryType,
             'lotteryTypes' => NumberMonitorService::lotteryTypeOptions(),
-            'dashboard' => NumberMonitorService::dashboardData((int)$this->_user_id, $lotteryType),
+            'dashboard' => $dashboard,
+            'isSuperAdmin' => $isSuperAdmin,
+            'ownerUid' => $ownerUid,
+            'ownUid' => (int)$this->_user_id,
             'csrfToken' => Yii::$app->request->csrfToken,
         ]);
     }
 
-    public function actionData($lottery_type = CommonLotteryService::LOTTERY_TYPE_LUCKY5)
+    public function actionData($lottery_type = CommonLotteryService::LOTTERY_TYPE_LUCKY5, $owner_uid = 0)
     {
         if (Yii::$app->user->isGuest || !$this->_user_id) {
             return $this->jsonResponse(['success' => false, 'message' => '登录状态已失效，请重新登录'], 401);
@@ -74,18 +84,25 @@ class NumberMonitorController extends BaseController
         if (!NumberMonitorService::supportedLotteryType($lotteryType)) {
             return $this->jsonResponse(['success' => false, 'message' => '彩种参数无效'], 400);
         }
+        $isSuperAdmin = $this->isSuperAdmin();
+        $ownerUid = $this->visibleOwnerUid($owner_uid);
+        $dashboard = NumberMonitorService::dashboardData($ownerUid, $lotteryType);
+        if ($isSuperAdmin) {
+            $dashboard['owners'] = NumberMonitorService::monitorOwners($lotteryType);
+        }
         return $this->jsonResponse([
             'success' => true,
-            'dashboard' => NumberMonitorService::dashboardData((int)$this->_user_id, $lotteryType),
+            'dashboard' => $dashboard,
         ]);
     }
 
     public function actionScheme($id = 0, $page = 1, $page_size = 400)
     {
         try {
+            $ownerUid = $this->readOwnerUid((int)$id);
             return $this->jsonResponse([
                 'success' => true,
-                'scheme' => NumberMonitorService::schemePatterns((int)$this->_user_id, (int)$id, (int)$page, (int)$page_size),
+                'scheme' => NumberMonitorService::schemePatterns($ownerUid, (int)$id, (int)$page, (int)$page_size),
             ]);
         } catch (\Throwable $exception) {
             return $this->errorResponse($exception);
@@ -95,10 +112,11 @@ class NumberMonitorController extends BaseController
     public function actionHistory($id = 0, $before_id = 0)
     {
         try {
+            $ownerUid = $this->readOwnerUid((int)$id);
             return $this->jsonResponse([
                 'success' => true,
                 'history' => NumberMonitorService::schemeHistory(
-                    (int)$this->_user_id,
+                    $ownerUid,
                     (int)$id,
                     (int)$before_id
                 ),
@@ -220,6 +238,27 @@ class NumberMonitorController extends BaseController
             throw new \InvalidArgumentException('无法读取 TXT 文件');
         }
         return $content;
+    }
+
+    private function isSuperAdmin(): bool
+    {
+        $identity = Yii::$app->user->identity;
+        return (int)$this->_user_id === 1 && $identity
+            && (int)$identity->user_type === AdminModel::USER_TYPE_SUPER_ADMIN
+            && (int)$identity->status === AdminModel::STATUS_ACTIVE;
+    }
+
+    private function visibleOwnerUid($requestedUid): int
+    {
+        return $this->isSuperAdmin() ? max(0, (int)$requestedUid) : (int)$this->_user_id;
+    }
+
+    private function readOwnerUid(int $schemeId): int
+    {
+        if (!$this->isSuperAdmin() || $schemeId <= 0) {
+            return (int)$this->_user_id;
+        }
+        return NumberMonitorService::schemeOwnerUid($schemeId) ?: (int)$this->_user_id;
     }
 
     private function jsonResponse(array $data, int $status = 200): array
