@@ -380,7 +380,6 @@ html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-blac
     var pollEndMs = 90 * 1000;
     var clockOffsetMs = Number(state.server_now) ? Number(state.server_now) * 1000 - Date.now() : 0;
     var activeCycle = Math.floor((Date.now() + clockOffsetMs) / pollCycleMs);
-    var cycleStartDrawId = Number(state.latest_draw_id || 0);
     var settledCycle = -1;
     var input = document.getElementById('nm-file-input');
     var folderInput = document.getElementById('nm-folder-input');
@@ -926,7 +925,6 @@ html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-blac
         var cycle = Math.floor(serverNowMs() / pollCycleMs);
         if (cycle !== activeCycle) {
             activeCycle = cycle;
-            cycleStartDrawId = Number(state.latest_draw_id || 0);
             settledCycle = -1;
         }
     }
@@ -955,7 +953,8 @@ html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-blac
                 renderBoard();
                 var files = state.files || [];
                 var hasActiveFile = files.some(function (file) { return Number(file.status) === 1; });
-                if (Number(state.latest_draw_id || 0) > cycleStartDrawId &&
+                var latestDraw = state.draws && state.draws[0];
+                if (latestDraw && Number(latestDraw.created_at || 0) * 1000 >= activeCycle * pollCycleMs &&
                     (!hasActiveFile || Number(state.processed_draw_id || 0) >= Number(state.latest_draw_id || 0))) {
                     settledCycle = activeCycle;
                 }
@@ -983,6 +982,8 @@ html[data-xl-theme="dark"] body.xl-admin-shell .number-monitor.nm-color-red-blac
             delay = pollStartMs - phase;
         } else if (phase < pollEndMs - 1000 && settledCycle !== activeCycle) {
             delay = immediate ? 0 : Math.min(5000, pollEndMs - phase - 1000);
+        } else if (settledCycle !== activeCycle) {
+            delay = Math.min(30000, pollCycleMs - phase + pollStartMs);
         } else {
             delay = pollCycleMs - phase + pollStartMs;
         }

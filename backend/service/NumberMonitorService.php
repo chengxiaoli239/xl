@@ -336,7 +336,7 @@ class NumberMonitorService
         }
         unset($file);
 
-        $draws = SscKjData::find()->select(['id', 'index_id', 'qihao', 'kj_code', 'code_4n_str', 'date'])
+        $draws = SscKjData::find()->select(['id', 'index_id', 'qihao', 'kj_code', 'code_4n_str', 'date', 'created_at'])
             ->where(['lottery_type' => $lotteryType])->orderBy(['id' => SORT_DESC])->limit(30)->asArray()->all();
         $cursor = NumberMonitorCursor::find()->where(['lottery_type' => $lotteryType])->asArray()->one();
         return [
